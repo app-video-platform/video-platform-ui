@@ -1,5 +1,11 @@
 @mixin shrinkLabel {
-    top: -14px;
-    font-size: 12px;
-    color: black;
+  top: -14px;
+  font-size: 12px;
+  color: black;
+}
+
+@mixin flex($justify: center, $align: center) {
+  display: flex;
+  justify-content: $justify;
+  align-items: $align;
 }
