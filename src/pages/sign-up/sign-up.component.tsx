@@ -6,6 +6,7 @@ import './sign-up.styles.scss';
 import { AppDispatch } from '../../store/store';
 import { useDispatch } from 'react-redux';
 import { signupUser } from '../../store/auth.slice';
+import { useNavigate } from 'react-router-dom';
 
 export interface SignupFormData {
   firstName: string;
@@ -18,6 +19,7 @@ export interface SignupFormData {
 
 const SignUp: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<SignupFormData>({
     firstName: '',
     lastName: '',
@@ -81,13 +83,18 @@ const SignUp: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('User Data:', formData);
+      dispatch(signupUser(formData))
+        .unwrap() // unwrap() turns the thunk result into a "normal" promise
+        .then(() => {
+          navigate('/email-sent');  // example redirect (requires useNavigate)
+        })
+        .catch((error) => {
+          // ❌ Failed signup, show error message
+          console.error('Error signing up', error);
+        });
     }
-
-    console.log('This THE FORM', formData, 'and ITS GON BE SENT');
-
-    dispatch(signupUser(formData));
   };
+
 
 
   return (

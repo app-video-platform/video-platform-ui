@@ -39,3 +39,5 @@ export const registerUser = async (userData: SignupFormData) => {
     throw error;
   }
 };
+
+export const verifyEmailApi = (token: string) => httpClient.get('/verify?token=' + token);
