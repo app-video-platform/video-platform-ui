@@ -7,6 +7,6 @@ interface ButtonProps {
   onClick: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({ text, onClick }) => <button onClick={onClick} className="btn">{text}</button>;
+const Button: React.FC<ButtonProps> = ({ text, onClick }) => <button onClick={onClick} className="button">{text}</button>;
 
 export default Button;
