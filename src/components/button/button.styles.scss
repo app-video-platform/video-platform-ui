@@ -1,19 +1,31 @@
 @import './../../styles/variables';
 
-.button {
-  background-color: $primary-color;
+.vp-button {
+  // background-color: $primary-color;
   color: white;
   padding: 10px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s;
+  font-weight: bold;
 
-  &:hover {
-    background-color: darken($primary-color, 10%);
+  &--primary {
+    background-color: $primary-color;
+    transition: background 0.3s;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
   }
 
   &--secondary {
-    background-color: $secondary-color;
+    border: 1px solid $primary-color;
+    color: $primary-color;
+    transition: border-color 0.3s;
+
+    &:hover {
+      border-color: darken($primary-color, 10%);
+      color: darken($primary-color, 10%);
+    }
   }
 }

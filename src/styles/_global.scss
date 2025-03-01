@@ -13,6 +13,12 @@ body {
   line-height: 1.6;
 }
 
+button {
+  background: unset;
+  border: unset;
+  cursor: pointer;
+}
+
 .error-text-red {
   color: red;
   font-size: 11px;
