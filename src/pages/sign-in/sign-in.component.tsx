@@ -55,7 +55,7 @@ const SignIn: React.FC = () => {
         .then((value) => {
           console.log(value);
 
-          localStorage.setItem('userToken', value.token);
+          // localStorage.setItem('userToken', value.token);
 
           navigate('/');  // example redirect (requires useNavigate)
         })

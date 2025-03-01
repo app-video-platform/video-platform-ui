@@ -43,7 +43,7 @@ export const registerUser = async (userData: UserRegisterData) => {
 
 export const signInUser = async (userData: SignInFormData) => {
   try {
-    const response = await httpClient.post<UserLoginResponse>('api/auth/login', userData);
+    const response = await httpClient.post<UserLoginResponse>('api/auth/login', userData, { mock: true });
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);

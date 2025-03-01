@@ -66,6 +66,13 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    // This action can be used to rehydrate the token on app load
+    setToken: (state, action: PayloadAction<string>) => {
+      state.token = action.payload;
+    },
+    setUserProfile: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+    },
     logout: (state) => {
       state.user = null;
       state.token = null;
@@ -113,6 +120,8 @@ const authSlice = createSlice({
       })
       .addCase(signinUser.fulfilled, (state, action: PayloadAction<UserLoginResponse>) => {
         state.loading = false;
+        console.log('in case', action.payload);
+
         state.user = {
           // id: action.payload.id,
           firstName: action.payload.firstName,
@@ -129,5 +138,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, resetMessage } = authSlice.actions;
+export const { logout, resetMessage, setToken, setUserProfile } = authSlice.actions;
 export default authSlice.reducer;
