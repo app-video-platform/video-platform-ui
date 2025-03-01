@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User } from '../models/user';
+import { User, UserRegisterData } from '../models/user';
 import { registerUser, verifyEmailApi } from '../api/user-api';
-import { SignupFormData } from '../pages/sign-up/sign-up.component';
 
 interface AuthState {
   user: null | User;
@@ -14,7 +13,7 @@ const initialState: AuthState = { user: null, token: null, loading: false, error
 
 export const signupUser = createAsyncThunk<
   { user: User; token: string }, // Return type
-  SignupFormData, // Argument type (user data)
+  UserRegisterData, // Argument type (user data)
   { rejectValue: string } // Error type
 >('auth/signupUser', async (userData, { rejectWithValue }) => {
   try {

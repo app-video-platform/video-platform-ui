@@ -7,6 +7,7 @@ import { AppDispatch } from '../../store/store';
 import { useDispatch } from 'react-redux';
 import { signupUser } from '../../store/auth.slice';
 import { useNavigate } from 'react-router-dom';
+import { UserRegisterData } from '../../models/user';
 
 export interface SignupFormData {
   firstName: string;
@@ -83,7 +84,13 @@ const SignUp: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      dispatch(signupUser(formData))
+      const registerData: UserRegisterData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password
+      };
+      dispatch(signupUser(registerData))
         .unwrap() // unwrap() turns the thunk result into a "normal" promise
         .then(() => {
           navigate('/email-sent');  // example redirect (requires useNavigate)

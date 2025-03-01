@@ -1,4 +1,4 @@
-import { User } from '../models/user';
+import { User, UserRegisterData } from '../models/user';
 import { SignupFormData } from '../pages/sign-up/sign-up.component';
 import httpClient from './http-client';
 
@@ -30,9 +30,9 @@ export const getNewAPI = async () => {
 };
 
 
-export const registerUser = async (userData: SignupFormData) => {
+export const registerUser = async (userData: UserRegisterData) => {
   try {
-    const response = await httpClient.post<User>('/register', userData);
+    const response = await httpClient.post<User>('api/auth/register', userData);
     return response.data;
   } catch (error) {
     console.error('Error registering new user:', error);
@@ -40,4 +40,4 @@ export const registerUser = async (userData: SignupFormData) => {
   }
 };
 
-export const verifyEmailApi = (token: string) => httpClient.get('/verify?token=' + token);
+export const verifyEmailApi = (token: string) => httpClient.get('api/auth/verify?token=' + token);
