@@ -1,7 +1,9 @@
 export interface User {
-  id: string,
-  name: string,
-  email: string
+  // id: string,
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'admin' | 'user'
 }
 
 
@@ -10,4 +12,13 @@ export interface UserRegisterData {
   lastName: string;
   email: string;
   password: string;
+}
+
+export interface UserLoginResponse {
+  // id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  token: string;
+  role: 'admin' | 'user'
 }

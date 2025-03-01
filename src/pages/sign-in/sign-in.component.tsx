@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
-import { SignupFormData } from '../sign-up/sign-up.component';
 import { Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/form-input/form-input.component';
 import { signinUser } from '../../store/auth.slice';
@@ -21,7 +20,6 @@ const SignIn: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +57,7 @@ const SignIn: React.FC = () => {
 
           localStorage.setItem('userToken', value.token);
 
-          navigate('/home');  // example redirect (requires useNavigate)
+          navigate('/');  // example redirect (requires useNavigate)
         })
         .catch((error) => {
           // ❌ Failed signup, show error message
@@ -91,8 +89,6 @@ const SignIn: React.FC = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              onFocus={() => setIsPasswordFocused(true)}
-              onBlur={() => setIsPasswordFocused(false)}
               required
             />
             <button
