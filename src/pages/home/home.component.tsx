@@ -11,10 +11,10 @@ const Home: React.FC = () => {
   const fetchUsers = async () => {
     setError(null);
     try {
-      const usersData = await getNewAPI();
+      // const usersData = await getNewAPI();
       console.log('User state:', user);
       console.log('Token:', token);
-      setApiResponse(usersData);
+      setApiResponse('usersData');
     } catch (err) {
       setError('Failed to fetch data - ' + err);
     }

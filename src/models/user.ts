@@ -3,7 +3,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'admin' | 'user'
+  role: string[]
 }
 
 
@@ -20,5 +20,5 @@ export interface UserLoginResponse {
   lastName: string;
   email: string;
   token: string;
-  role: 'admin' | 'user'
+  role: string[]
 }
