@@ -21,7 +21,6 @@ const SignIn: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,8 +90,6 @@ const SignIn: React.FC = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              onFocus={() => setIsPasswordFocused(true)}
-              onBlur={() => setIsPasswordFocused(false)}
               required
             />
             <button
@@ -104,11 +101,11 @@ const SignIn: React.FC = () => {
             </button>
           </div>
           {errors.password && <p className="error-text-red">{errors.password}</p>}
+          <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition" type="submit">
+            Sign In
+          </button>
         </form>
 
-        <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition" type="submit">
-          Sign In
-        </button>
       </div>
     </div>
   );
