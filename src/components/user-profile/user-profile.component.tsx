@@ -1,0 +1,80 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { logout } from '../../store/auth.slice';
+import { User } from '../../models/user';
+
+import './user-profile.styles.scss';
+
+interface UserProfileDropdownProps {
+  onLogout: () => void;
+}
+
+const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ onLogout }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  let user = useSelector((state: RootState) => state.auth.user);
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const otherUser: User = {
+    firstName: localStorage.getItem('firstName') || '',
+    lastName: localStorage.getItem('lastName') || '',
+    email: localStorage.getItem('email') || '',
+    role: localStorage.getItem('roles')?.split(',').map(role => role.trim()) || [],
+  };
+
+  if (!user && otherUser) {
+    user = otherUser;
+  }
+
+  // Toggle dropdown open/close
+  const handleToggle = () => {
+    setOpen(prev => !prev);
+  };
+
+  // Log the user out
+  const handleLogout = () => {
+    dispatch(logout());
+    onLogout();
+    setOpen(false);
+  };
+
+  // Close the dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  if (!user) { return null; }
+
+  return (
+    <div className="user-profile-dropdown" ref={dropdownRef}>
+      <button onClick={handleToggle} className="user-profile-button">
+        {user.firstName} {user.lastName}
+      </button>
+      {open && (
+        <div className="dropdown-menu">
+          <div className="dropdown-item">
+            <span>{user.email}</span>
+          </div>
+          <div className="dropdown-item">
+            <span>Role: {Array.isArray(user.role) ? user.role.join(', ') : user.role}</span>
+          </div>
+          <hr />
+          <div className="dropdown-item logout-btn" onClick={handleLogout}>
+            Logout
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default UserProfileDropdown;
