@@ -9,20 +9,24 @@ import SignUp from './pages/sign-up/sign-up.component';
 import VerifyEmail from './pages/verify-email/verify-email.component';
 import EmailSent from './pages/email-sent/email-sent.component';
 import SignIn from './pages/sign-in/sign-in.component';
+import AppInitializer from './utils/app-initializer.util';
 
 const App: React.FC = () => (
   <div>
-    <Routes>
-      <Route path="/" element={<Navigation />}>
-        <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-      </Route>
-      <Route path="signup" element={<SignUp />} />
-      <Route path="signin" element={<SignIn />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/email-sent" element={<EmailSent />} />
-    </Routes>
+    <AppInitializer>
+      <Routes>
+        <Route path="/" element={<Navigation />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+        </Route>
+        <Route path="signup" element={<SignUp />} />
+        <Route path="signin" element={<SignIn />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/email-sent" element={<EmailSent />} />
+      </Routes>
+
+    </AppInitializer>
   </div>
 );
 
