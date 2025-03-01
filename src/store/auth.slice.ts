@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User, UserRegisterData } from '../models/user';
-import { registerUser, verifyEmailApi } from '../api/user-api';
+import { registerUser, signInUser, verifyEmailApi } from '../api/user-api';
+import { SignInFormData } from '../pages/sign-in/sign-in.component';
 
 interface AuthState {
   user: null | User;
@@ -35,6 +36,19 @@ export const verifyEmail = createAsyncThunk(
     }
   }
 );
+
+export const signinUser = createAsyncThunk<
+  { token: string }, // Return type
+  SignInFormData, // Argument type (user data)
+  { rejectValue: string } // Error type
+>('auth/signinUser', async (userData, { rejectWithValue }) => {
+  try {
+    const response = await signInUser(userData);
+    return { token: response }; // Assume API returns a token
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || 'Signin failed');
+  }
+});
 
 
 // ** Auth Slice **

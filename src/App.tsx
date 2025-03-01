@@ -8,6 +8,7 @@ import Contact from './pages/contact/contact.component';
 import SignUp from './pages/sign-up/sign-up.component';
 import VerifyEmail from './pages/verify-email/verify-email.component';
 import EmailSent from './pages/email-sent/email-sent.component';
+import SignIn from './pages/sign-in/sign-in.component';
 
 const App: React.FC = () => (
   <div>
@@ -18,6 +19,7 @@ const App: React.FC = () => (
         <Route path="contact" element={<Contact />} />
       </Route>
       <Route path="signup" element={<SignUp />} />
+      <Route path="signin" element={<SignIn />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/email-sent" element={<EmailSent />} />
     </Routes>

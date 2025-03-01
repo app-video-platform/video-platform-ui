@@ -7,8 +7,8 @@ import './nav.styles.scss';
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleRedirect = () => {
-    navigate('/signup');
+  const handleRedirect = (url: '/signup' | '/signin') => {
+    navigate(url);
   };
 
   return (
@@ -24,8 +24,8 @@ const Navigation: React.FC = () => {
         </div>
         <div className="user-buttons">
           <ul className="nav-link-list">
-            <li><button onClick={handleRedirect}>Sign Up</button></li>
-            <li>Sign In</li>
+            <li><button onClick={() => handleRedirect('/signup')}>Sign Up</button></li>
+            <li><button onClick={() => handleRedirect('/signin')}>Sign In</button></li>
           </ul>
         </div>
       </nav>
