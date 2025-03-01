@@ -104,11 +104,11 @@ const SignIn: React.FC = () => {
             </button>
           </div>
           {errors.password && <p className="error-text-red">{errors.password}</p>}
+          <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition" type="submit">
+            Sign In
+          </button>
         </form>
 
-        <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition" type="submit">
-          Sign In
-        </button>
       </div>
     </div>
   );
