@@ -12,9 +12,9 @@ interface FormInputProps {
 
 const FormInput: React.FC<FormInputProps> = ({ label, required, value, ...otherProps }) => (
   <div className="group">
-    <input className="form-input" {...otherProps} required={required} />
+    <input className="form-input" {...otherProps} required={required} id={otherProps.name} data-testid={`input-${otherProps.name}`} />
     {label && (
-      <label className={`${value ? 'shrink' : ''} form-input-label`} >
+      <label className={`${value ? 'shrink' : ''} form-input-label`} htmlFor={otherProps.name}>
         {label} {required && <span className="text-red">*</span>}
       </label>
     )}
