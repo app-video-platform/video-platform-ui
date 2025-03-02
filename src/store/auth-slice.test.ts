@@ -2,7 +2,6 @@
 import authReducer, {
   logout,
   resetMessage,
-  setToken,
   setUserProfile,
   signupUser,
   verifyEmail,
@@ -13,17 +12,13 @@ import { User, UserLoginResponse } from '../models/user';
 // Define an initial state matching your AuthState interface
 const initialState = {
   user: null,
-  token: null,
   loading: false,
   error: null,
   message: null,
+  isUserLoggedIn: null
 };
 
 describe('auth slice reducers', () => {
-  it('should handle setToken', () => {
-    const state = authReducer(initialState, setToken('abc123'));
-    expect(state.token).toBe('abc123');
-  });
 
   it('should handle setUserProfile', () => {
     const user = {
@@ -45,7 +40,6 @@ describe('auth slice reducers', () => {
     };
     const state = authReducer(modifiedState, logout());
     expect(state.user).toBeNull();
-    expect(state.token).toBeNull();
     expect(state.message).toBeNull();
   });
 
@@ -104,26 +98,14 @@ describe('auth slice async thunks', () => {
 
   // Simulate the fulfilled state for signinUser
   it('should handle signinUser.fulfilled', () => {
-    const fakeResponse: UserLoginResponse = {
-      token: 'abc123',
-      firstName: 'Alice',
-      lastName: 'Smith',
-      email: 'alice@example.com',
-      role: ['user'],
-    };
+    const fakeResponse = 'Login successful';
     const action = {
       type: signinUser.fulfilled.type,
       payload: fakeResponse,
     };
     const state = authReducer({ ...initialState, loading: true }, action);
     expect(state.loading).toBe(false);
-    expect(state.token).toBe(fakeResponse.token);
-    expect(state.user).toEqual({
-      firstName: fakeResponse.firstName,
-      lastName: fakeResponse.lastName,
-      email: fakeResponse.email,
-      role: fakeResponse.role,
-    });
+    expect(state.isUserLoggedIn).toEqual(true);
   });
 
   // Simulate the rejected state for signinUser

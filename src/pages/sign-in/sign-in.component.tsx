@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
 import { Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/form-input/form-input.component';
-import { signinUser } from '../../store/auth.slice';
+import { getUserProfile, signinUser } from '../../store/auth.slice';
 
 export interface SignInFormData {
   email: string;
@@ -55,7 +55,7 @@ const SignIn: React.FC = () => {
         .then((value) => {
           console.log(value);
 
-          // localStorage.setItem('userToken', value.token);
+          dispatch(getUserProfile());
 
           navigate('/');  // example redirect (requires useNavigate)
         })
