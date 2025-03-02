@@ -107,7 +107,7 @@ const SignUp: React.FC = () => {
   return (
     <div>
       <div className='sign-up-container'>
-        <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
+        <h1 className="text-2xl font-bold mb-4" data-testid='sign-up-header'>Sign Up</h1>
         <form onSubmit={handleSubmit}>
 
           <FormInput label="First Name"
@@ -153,6 +153,7 @@ const SignUp: React.FC = () => {
               type="button"
               className="toggle-password-btn"
               onClick={() => togglePasswordVisibility('password')}
+              data-testid='toggle-password-password'
             >
               {showPassword.password ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
