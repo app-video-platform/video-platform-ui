@@ -19,6 +19,6 @@ export interface UserLoginResponse {
   firstName: string;
   lastName: string;
   email: string;
-  token: string;
+  // token: string;
   role: string[]
 }

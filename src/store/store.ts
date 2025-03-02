@@ -9,15 +9,10 @@ export const store = configureStore({
 
 store.subscribe(() => {
   const state = store.getState();
-  const token = state.auth.token;
   console.log('state', state.auth);
 
   const user = state.auth.user;
-  if (token) {
-    localStorage.setItem('userToken', token);
-  } else {
-    localStorage.removeItem('userToken');
-  }
+
   if (user) {
     localStorage.setItem('firstName', user.firstName);
     localStorage.setItem('lastName', user.lastName);

@@ -1,6 +1,6 @@
 // user-api.test.ts
 
-import { getNewAPI, registerUser, signInUser, verifyEmailApi } from './user-api';
+import { registerUser, signInUser, verifyEmailApi } from './auth-api';
 import httpClient from './http-client';
 
 jest.mock('./http-client');
@@ -18,7 +18,7 @@ describe('User API functions', () => {
 
       const result = await registerUser(userData);
       expect(result).toEqual(fakeResponse);
-      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/register', userData);
+      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/register', userData, { withCredentials: false });
     });
 
     it('should throw error when httpClient.post rejects', async () => {
@@ -40,7 +40,7 @@ describe('User API functions', () => {
 
       const result = await signInUser(signInData);
       expect(result).toEqual(fakeResponse);
-      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/login', signInData);
+      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/login', signInData, { withCredentials: false });
     });
 
     it('should throw error when httpClient.post rejects', async () => {
@@ -57,7 +57,7 @@ describe('User API functions', () => {
     it('should call httpClient.get with the correct URL', () => {
       const token = 'token123';
       verifyEmailApi(token);
-      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/auth/verify?token=' + token);
+      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/auth/verify?token=' + token, { withCredentials: false });
     });
   });
 });
