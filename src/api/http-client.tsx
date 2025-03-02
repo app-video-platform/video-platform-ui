@@ -55,7 +55,12 @@ const excludedEndpoints = ['/api/auth/register', '/api/auth/login', '/api/auth/v
 httpClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Check if the URL should be excluded from CSRF token attachment
+
+    console.log('INTERCEPT', config.url);
+
     if (config.url && excludedEndpoints.some((endpoint) => config.url?.includes(endpoint))) {
+      console.log('SKIP INTERCEPT FOR', config.url);
+
       return config;
     }
 
@@ -63,6 +68,8 @@ httpClient.interceptors.request.use(
     const methodsRequiringCsrf = ['post', 'put', 'delete', 'patch'];
     if (config.method && methodsRequiringCsrf.includes(config.method.toLowerCase())) {
       const csrfToken = getCookie('CSRF-TOKEN'); // Ensure this matches your cookie name
+      console.log('COOKIE', csrfToken);
+
       if (csrfToken) {
         // Ensure headers exists
         config.headers = config.headers || {};
