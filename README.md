@@ -1,70 +1,148 @@
-# Getting Started with Create React App
+# Video Platform UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React + TypeScript project with a custom Webpack, Babel, Jest, and ESLint configuration. This project serves as a base for building a video platform UI with state management, routing, and testing.
 
-## Available Scripts
+## Table of Contents
+
+- [Video Platform UI](#video-platform-ui)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Available Scripts](#available-scripts)
+      - [Start Development Server](#start-development-server)
+      - [Build for Production](#build-for-production)
+      - [Run Tests](#run-tests)
+      - [Lint the Code](#lint-the-code)
+      - [Automatically fix lint issues:](#automatically-fix-lint-issues)
+      - [TypeScript Check](#typescript-check)
+    - [Project Structure](#project-structure)
+    - [Dependencies](#dependencies)
+      - [Runtime Dependencies](#runtime-dependencies)
+      - [Development Dependencies](#development-dependencies)
+    - [Contributing](#contributing)
+
+## Features
+
+- **React & TypeScript:** Modern UI development with type safety.
+- **Custom Build Setup:** Configured with Webpack and Babel for flexible bundling and transpilation.
+- **Routing:** Powered by React Router.
+- **State Management:** Ready for Redux integration via @reduxjs/toolkit.
+- **Testing:** Configured with Jest, ts-jest, and React Testing Library.
+- **Linting & Code Quality:** ESLint (with Airbnb and TypeScript rules) for consistent code quality.
+- **Sass & CSS Modules:** Support for styling with Sass and CSS modules.
+- **Performance Monitoring:** Includes Web Vitals for performance tracking.
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/en/) (version 14.x or above recommended)
+- [npm](https://www.npmjs.com/) (or yarn)
+
+### Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone <repository-url>
+cd video-platform-ui
+npm install
+```
+
+If you prefer yarn, run `yarn install`.
+
+### Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+#### Start Development Server
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Starts the app in development mode using Webpack Dev Server:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+````bash
+npm start
+````
+Open [http://localhost:8080](https://example.com) to view it in your browser.
 
-### `npm test`
+#### Build for Production
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Builds the app for production into the dist folder:
 
-### `npm run build`
+````bash
+npm run build
+````
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Run Tests
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Launches the test runner using Jest:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+````bash
+npm test
+````
 
-### `npm run eject`
+#### Lint the Code
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Checks your source code for linting issues:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+````bash
+npm run lint
+````
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+#### Automatically fix lint issues:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+````bash
+npm run lint:fix
+````
 
-## Learn More
+#### TypeScript Check
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Performs a type check without emitting files:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+````bash
+npm run tsc
+````
 
-### Code Splitting
+### Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+````php
+video-platform-ui/
+├── node_modules/               # Installed packages
+├── public/                     # Static assets and HTML template
+│   ├── favicon.ico             # Favicon file
+│   └── index.html              # HTML template for the app
+├── src/                        # Application source code
+│   ├── pages/                  # React page components (e.g., Home.tsx)
+│   ├── App.test.tsx            # Test file for the App component
+│   ├── App.tsx                 # Main App component (routes and layout)
+│   ├── index.tsx               # Entry point for the React application
+│   └── setupTests.ts           # Global test setup file (imports jest-dom)
+├── .eslintrc.js                # ESLint configuration
+├── babel.config.js             # Babel configuration
+├── jest.config.js              # Jest configuration
+├── tsconfig.json               # TypeScript configuration
+├── webpack.config.js           # Webpack configuration
+└── package.json                # Project metadata and scripts
+````
 
-### Analyzing the Bundle Size
+### Dependencies
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+#### Runtime Dependencies
 
-### Making a Progressive Web App
+- React & React-DOM: Core UI libraries.
+- React Router: Client-side routing.
+- Axios: Promise-based HTTP client.
+- Web Vitals: Performance metrics reporting.
+- Others: Additional libraries (such as @reduxjs/toolkit, lucide-react, etc.) can be added as needed.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+#### Development Dependencies
 
-### Advanced Configuration
+- Babel & Presets: For transpiling modern JavaScript/TypeScript.
+- Webpack & Plugins: For bundling and serving the application.
+- Jest & Testing Library: For unit and integration testing.
+- ESLint & Plugins: For code quality and style enforcement.
+- TypeScript & ts-jest: For type checking and testing with TypeScript.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Contributing
+This project is personal is contributing is forbidden. Thank you for your understanding!

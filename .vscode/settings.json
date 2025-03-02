@@ -3,7 +3,6 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": true,
   "editor.formatOnSave": true,
-  "files.eol": "\n",
   "eslint.codeActionsOnSave.mode": "all",
   "eslint.validate": [
     "javascript",

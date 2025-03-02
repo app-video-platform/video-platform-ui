@@ -30,7 +30,6 @@ export const getNewAPI = async () => {
   }
 };
 
-
 export const registerUser = async (userData: UserRegisterData) => {
   try {
     const response = await httpClient.post<string>('api/auth/register', userData);
@@ -43,7 +42,7 @@ export const registerUser = async (userData: UserRegisterData) => {
 
 export const signInUser = async (userData: SignInFormData) => {
   try {
-    // const response = await httpClient.post<UserLoginResponse>('api/auth/login', userData, { mock: true });
+    // const response = await httpClient.post<UserLoginResponse>('api/auth/login', userData, { mock: true }); // COMM FOR INTERCEPT
     const response = await httpClient.post<UserLoginResponse>('api/auth/login', userData);
     return response.data;
   } catch (error) {

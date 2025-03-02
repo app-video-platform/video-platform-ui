@@ -1,3 +1,7 @@
-@import 'variables';
-@import 'mixins';
-@import 'global';
+// @import 'variables';
+// @import 'mixins';
+// @import 'global';
+
+@forward 'variables';
+@forward 'mixins';
+@forward 'global';
