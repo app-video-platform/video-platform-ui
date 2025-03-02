@@ -1,4 +1,4 @@
-import { User, UserLoginResponse, UserRegisterData } from '../models/user';
+import { UserRegisterData } from '../models/user';
 import { SignInFormData } from '../pages/sign-in/sign-in.component';
 import httpClient from './http-client';
 

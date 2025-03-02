@@ -1,63 +1,34 @@
-// user-api.test.ts
-
-import { registerUser, signInUser, verifyEmailApi } from './auth-api';
+import { User } from '../models/user';
 import httpClient from './http-client';
+import { getUserProfileAPI } from './user-api';
 
 jest.mock('./http-client');
 
 const mockedHttpClient = httpClient as jest.Mocked<typeof httpClient>;
 
 describe('User API functions', () => {
-  describe('registerUser', () => {
-    it('should return data when httpClient.post resolves', async () => {
-      const fakeResponse = 'registered';
-      const userData = { email: 'test@example.com', password: 'secret', firstName: 'Test', lastName: 'Example' };
+  describe('getUserProfile', () => {
+    it('should return data when httpClient.get resolves', async () => {
+      const fakeResponse: User = {
+        firstName: 'Mock',
+        lastName: 'User',
+        email: 'mock@user.test',
+        role: ['User']
+      };
 
-      // Assuming UserRegisterData matches this shape
-      mockedHttpClient.post.mockResolvedValueOnce({ data: fakeResponse });
+      mockedHttpClient.get.mockResolvedValueOnce({ data: fakeResponse });
 
-      const result = await registerUser(userData);
+      const result = await getUserProfileAPI();
       expect(result).toEqual(fakeResponse);
-      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/register', userData, { withCredentials: false });
+      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/user/userInfo');
     });
 
-    it('should throw error when httpClient.post rejects', async () => {
-      const error = new Error('Registration error');
-      const userData = { email: 'test@example.com', password: 'secret', firstName: 'Test', lastName: 'Example' };
+    it('should throw error when httpClient.get rejects', async () => {
+      const error = new Error('Retrieving user info error');
 
-      mockedHttpClient.post.mockRejectedValueOnce(error);
+      mockedHttpClient.get.mockRejectedValueOnce(error);
 
-      await expect(registerUser(userData)).rejects.toThrow('Registration error');
-    });
-  });
-
-  describe('signInUser', () => {
-    it('should return data when httpClient.post resolves', async () => {
-      const fakeResponse = { token: 'abc123' };
-      const signInData = { email: 'test@example.com', password: 'secret' };
-
-      mockedHttpClient.post.mockResolvedValueOnce({ data: fakeResponse });
-
-      const result = await signInUser(signInData);
-      expect(result).toEqual(fakeResponse);
-      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/login', signInData, { withCredentials: false });
-    });
-
-    it('should throw error when httpClient.post rejects', async () => {
-      const error = new Error('Login error');
-      const signInData = { email: 'test@example.com', password: 'secret' };
-
-      mockedHttpClient.post.mockRejectedValueOnce(error);
-
-      await expect(signInUser(signInData)).rejects.toThrow('Login error');
-    });
-  });
-
-  describe('verifyEmailApi', () => {
-    it('should call httpClient.get with the correct URL', () => {
-      const token = 'token123';
-      verifyEmailApi(token);
-      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/auth/verify?token=' + token, { withCredentials: false });
+      await expect(getUserProfileAPI()).rejects.toThrow('Retrieving user info error');
     });
   });
 });
