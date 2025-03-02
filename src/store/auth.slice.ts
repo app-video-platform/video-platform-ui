@@ -40,8 +40,8 @@ export const signupUser = createAsyncThunk<
 
 // Verify email thunk: calls the verify endpoint with the token.
 export const verifyEmail = createAsyncThunk<
-  string,  // Return type: success message
-  string,  // Argument type: token
+  string,
+  string,
   { rejectValue: string } // Error type
 >('auth/verifyEmail', async (token: string, { rejectWithValue }) => {
   try {

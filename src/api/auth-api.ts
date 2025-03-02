@@ -14,7 +14,7 @@ export const getNewAPI = async () => {
 
 export const registerUser = async (userData: UserRegisterData) => {
   try {
-    const response = await httpClient.post<string>('api/auth/register', userData, { withCredentials: false });
+    const response = await httpClient.post<string>('api/auth/register', userData, { withCredentials: false, mock: true });
     return response.data;
   } catch (error) {
     console.error('Error registering new user:', error);
