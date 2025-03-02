@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -36,17 +36,43 @@ const httpClient = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  withCredentials: true,
   // adapter: mockAdapter, // COMMM FOR INTERCEPT
 });
 
-// // Optional: Add interceptors for auth tokens
-// httpClient.interceptors.request.use((config) => {
-//   const token = localStorage.getItem('token');
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()?.split(';').shift() || null;
+  }
+  return null;
+}
+
+const excludedEndpoints = ['/api/auth/register', '/api/auth/login', '/api/auth/verify'];
+
+// Request interceptor to attach the CSRF token to state-changing requests
+httpClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Check if the URL should be excluded from CSRF token attachment
+    if (config.url && excludedEndpoints.some((endpoint) => config.url?.includes(endpoint))) {
+      return config;
+    }
+
+    // Only attach CSRF token for methods that change state
+    const methodsRequiringCsrf = ['post', 'put', 'delete', 'patch'];
+    if (config.method && methodsRequiringCsrf.includes(config.method.toLowerCase())) {
+      const csrfToken = getCookie('CSRF-TOKEN'); // Ensure this matches your cookie name
+      if (csrfToken) {
+        // Ensure headers exists
+        config.headers = config.headers || {};
+        config.headers['X-CSRF-Token'] = csrfToken;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 
 

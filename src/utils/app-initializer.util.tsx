@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setToken, setUserProfile } from './../store/auth.slice';
+import { setUserProfile } from './../store/auth.slice';
 import { AppDispatch } from './../store/store';
 import { User } from '../models/user';
 
@@ -12,16 +12,16 @@ const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    const token = localStorage.getItem('userToken');
+    // const token = localStorage.getItem('userToken');
     const firstName = localStorage.getItem('firstName');
     const lastName = localStorage.getItem('lastName');
     const email = localStorage.getItem('email');
     const role = localStorage.getItem('roles');
 
 
-    if (token) {
-      dispatch(setToken(token));
-    }
+    // if (token) {
+    //   dispatch(setToken(token));
+    // }
 
     if (firstName && lastName && email && role) {
       const roleList = role.split(',').map(role => role.trim());

@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
-import { logout } from '../../store/auth.slice';
+import { logout, logoutUser } from '../../store/auth.slice';
 import { User } from '../../models/user';
 
 import './user-profile.styles.scss';
+import { useNavigate } from 'react-router-dom';
 
 interface UserProfileDropdownProps {
   onLogout: () => void;
@@ -12,6 +13,7 @@ interface UserProfileDropdownProps {
 
 const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ onLogout }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   let user = useSelector((state: RootState) => state.auth.user);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -37,6 +39,16 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ onLogout }) =
     dispatch(logout());
     onLogout();
     setOpen(false);
+
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => {
+        // Redirect to login or homepage
+        navigate('/');
+      })
+      .catch((error) => {
+        console.error('Logout error:', error);
+      });
   };
 
   // Close the dropdown when clicking outside
