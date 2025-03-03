@@ -8,47 +8,47 @@ declare module 'axios' {
 
 const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 
-const mockAdapter = async (config: AxiosRequestConfig): Promise<AxiosResponse> => { // COMM FOR INTERCEPT
-  if (config.mock) {
-    if (config.url?.includes('api/auth/login')) {
-      return Promise.resolve({
-        data: {
-          firstName: 'Mock',
-          lastName: 'User',
-          email: 'mock@user.com',
-          token: 'mocked-jwt-token',
-          role: ['user'],
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: config.headers,
-        config,
-      } as AxiosResponse);
-    }
+// const mockAdapter = async (config: AxiosRequestConfig): Promise<AxiosResponse> => { // COMM FOR INTERCEPT
+//   if (config.mock) {
+//     if (config.url?.includes('api/auth/login')) {
+//       return Promise.resolve({
+//         data: {
+//           firstName: 'Mock',
+//           lastName: 'User',
+//           email: 'mock@user.com',
+//           token: 'mocked-jwt-token',
+//           role: ['user'],
+//         },
+//         status: 200,
+//         statusText: 'OK',
+//         headers: config.headers,
+//         config,
+//       } as AxiosResponse);
+//     }
 
-    if (config.url?.includes('api/auth/register')) {
-      return Promise.resolve({
-        data: 'Register mock success',
-        status: 200,
-        statusText: 'OK',
-        headers: config.headers,
-        config,
-      } as AxiosResponse);
-    }
+//     if (config.url?.includes('api/auth/register')) {
+//       return Promise.resolve({
+//         data: 'Register mock success',
+//         status: 200,
+//         statusText: 'OK',
+//         headers: config.headers,
+//         config,
+//       } as AxiosResponse);
+//     }
 
-    if (config.url?.includes('api/auth/verify?token=abc')) {
-      return Promise.resolve({
-        data: 'Verification success',
-        status: 200,
-        statusText: 'OK',
-        headers: config.headers,
-        config,
-      } as AxiosResponse);
-    }
-  }
-  const defaultAdapter = axios.defaults.adapter as (config: AxiosRequestConfig) => Promise<AxiosResponse>;
-  return defaultAdapter(config);
-};
+//     if (config.url?.includes('api/auth/verify?token=abc')) {
+//       return Promise.resolve({
+//         data: 'Verification success',
+//         status: 200,
+//         statusText: 'OK',
+//         headers: config.headers,
+//         config,
+//       } as AxiosResponse);
+//     }
+//   }
+//   const defaultAdapter = axios.defaults.adapter as (config: AxiosRequestConfig) => Promise<AxiosResponse>;
+//   return defaultAdapter(config);
+// };
 
 const httpClient = axios.create({
   baseURL: API_BASE_URL,
@@ -57,7 +57,7 @@ const httpClient = axios.create({
     'Accept': 'application/json',
   },
   withCredentials: true,
-  adapter: mockAdapter, // COMMM FOR INTERCEPT
+  // adapter: mockAdapter, // COMMM FOR INTERCEPT
 });
 
 function getCookie(name: string): string | null {
