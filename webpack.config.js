@@ -47,7 +47,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: 'public/manifest.json', to: 'manifest.json' },
-        { from: 'public/_redirects', to: '_redirects' },
+        { from: 'public/_redirects', to: '_redirects', toType: 'file' },
       ],
     }),
     new webpack.DefinePlugin({
