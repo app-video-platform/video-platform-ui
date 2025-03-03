@@ -86,7 +86,7 @@ httpClient.interceptors.request.use(
 
     // Only attach CSRF token for methods that change state
     const methodsRequiringCsrf = ['post', 'put', 'delete', 'patch'];
-    if (config.method && methodsRequiringCsrf.includes(config.method.toLowerCase())) {
+    if ((config.method && methodsRequiringCsrf.includes(config.method.toLowerCase())) || config.headers?.['X-CSRF-Force']) {
       const csrfToken = getCookie('CSRF-TOKEN'); // Ensure this matches your cookie name
       console.log('COOKIE', csrfToken);
 
