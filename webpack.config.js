@@ -12,46 +12,49 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/'
+    publicPath: '/',
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx']
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   devServer: {
     historyApiFallback: true,
-    static: './dist'
+    static: './dist',
   },
   module: {
     rules: [
       {
         test: /\.[jt]sx?$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        use: 'babel-loader',
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
-      }
-    ]
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html',
       favicon: './public/favicon.ico',
-      manifest: './public/manifest.json'
+      manifest: './public/manifest.json',
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'public/manifest.json', to: 'manifest.json' }
-      ]
+        { from: 'public/manifest.json', to: 'manifest.json' },
+        { from: 'public/_redirects', to: '_redirects' },
+      ],
     }),
     new webpack.DefinePlugin({
-      'process.env.REACT_APP_BASE_PATH': JSON.stringify(process.env.REACT_APP_BASE_PATH),
-      'process.env.PUBLIC_URL': JSON.stringify('')
-    })
-  ]
+      'process.env.REACT_APP_BASE_PATH': JSON.stringify(
+        process.env.REACT_APP_BASE_PATH
+      ),
+      'process.env.PUBLIC_URL': JSON.stringify(''),
+    }),
+  ],
 };
