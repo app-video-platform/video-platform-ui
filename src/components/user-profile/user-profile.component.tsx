@@ -7,11 +7,8 @@ import { User } from '../../models/user';
 import './user-profile.styles.scss';
 import { useNavigate } from 'react-router-dom';
 
-interface UserProfileDropdownProps {
-  onLogout: () => void;
-}
 
-const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ onLogout }) => {
+const UserProfileDropdown: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   let user = useSelector((state: RootState) => state.auth.user);
@@ -37,7 +34,7 @@ const UserProfileDropdown: React.FC<UserProfileDropdownProps> = ({ onLogout }) =
   // Log the user out
   const handleLogout = () => {
     dispatch(logout());
-    onLogout();
+    // onLogout();
     setOpen(false);
 
     dispatch(logoutUser())

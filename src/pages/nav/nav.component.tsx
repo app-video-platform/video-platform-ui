@@ -6,30 +6,30 @@ import UserProfileDropdown from '../../components/user-profile/user-profile.comp
 import Button from '../../components/button/button.component';
 
 import './nav.styles.scss';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
-  const [token, setToken] = useState<string | null>(localStorage.getItem('userToken'));
-
-  const refreshToken = () => {
-    setToken(localStorage.getItem('userToken'));
-  };
+  // const [token, setToken] = useState<string | null>(localStorage.getItem('userToken'));
+  const user = useSelector((state: RootState) => state.auth.user);
+  // const refreshToken = () => {
+  //   setToken(localStorage.getItem('userToken'));
+  // };
 
   // If you want to update token state when localStorage changes in other tabs:
   useEffect(() => {
-    const handleStorageChange = () => {
-      refreshToken();
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    console.log('USER in NAV', user);
 
-  const handleLogout = () => {
-    // The logout logic (removing token from localStorage) is handled inside UserProfileDropdown.
-    // Here, we simply refresh the state.
-    refreshToken();
-    // navigate('/signin'); // Redirect after logout if needed
-  };
+
+    // const handleStorageChange = () => {
+    //   refreshToken();
+    // };
+    // window.addEventListener('storage', handleStorageChange);
+    // return () => window.removeEventListener('storage', handleStorageChange);
+  }, [user]);
+
+
 
   const handleRedirect = (url: '/signup' | '/signin') => {
     navigate(url);
@@ -48,8 +48,8 @@ const Navigation: React.FC = () => {
         </div>
         <div className="user-buttons">
           <ul className="nav-link-list">
-            {token ? (
-              <UserProfileDropdown onLogout={handleLogout} />
+            {user ? (
+              <UserProfileDropdown />
             ) : (
               <ul className="nav-link-list">
                 <li>
