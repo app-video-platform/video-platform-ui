@@ -76,7 +76,7 @@ httpClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Check if the URL should be excluded from CSRF token attachment
 
-    console.log('INTERCEPT', config.url);
+    console.log('INTERCEPT', config.url, config, logCookies());
 
     if (config.url && excludedEndpoints.some((endpoint) => config.url?.includes(endpoint))) {
       console.log('SKIP INTERCEPT FOR', config.url);
@@ -100,6 +100,14 @@ httpClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+
+function logCookies() {
+  console.log('Current cookies:', document.cookie);
+  // You can also check for a specific cookie:
+  // const jwtCookie = document.cookie.split('; ').find(row => row.startsWith('JWT_TOKEN='));
+  // console.log('JWT_TOKEN exists:', !!jwtCookie);
+}
 
 
 
