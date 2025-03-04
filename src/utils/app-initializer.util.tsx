@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUserProfile } from './../store/auth.slice';
+import { getUserProfile, setUserProfile } from './../store/auth.slice';
 import { AppDispatch } from './../store/store';
 import { User } from '../models/user';
 
@@ -32,6 +32,8 @@ const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
         role: roleList
       };
       dispatch(setUserProfile(user));
+    } else {
+      dispatch(getUserProfile()).then((data) => console.log('User Profile in Init', data));
     }
   }, [dispatch]);
 
