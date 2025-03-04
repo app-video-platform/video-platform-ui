@@ -28,7 +28,7 @@ export const verifyEmailApi = (token: string) => httpClient.get('api/auth/verify
 export const signInUser = async (userData: SignInFormData) => {
   try {
     // const response = await httpClient.post<UserLoginResponse>('api/auth/login', userData, { mock: true }); // COMM FOR INTERCEPT
-    const response = await httpClient.post<string>('api/auth/login', userData, { withCredentials: false });
+    const response = await httpClient.post<string>('api/auth/login', userData);
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);
