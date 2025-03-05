@@ -109,6 +109,91 @@ function logCookies() {
   // console.log('JWT_TOKEN exists:', !!jwtCookie);
 }
 
+// -----------------------------
+// Refresh Token Flow
+// -----------------------------
+
+// Variables to manage the refresh flow
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: any) => void;
+}> = [];
+
+// Process queued requests after a refresh attempt
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else if (token) {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Add a response interceptor to handle 401 errors
+httpClient.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error) => {
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+    // If error is 401 (unauthorized) and the request wasn't already retried
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Prevent infinite loop by not retrying the refresh endpoint itself
+      if (originalRequest.url?.includes('/api/auth/refresh')) {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token: string | unknown) => {
+            if (originalRequest.headers) {
+              originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            }
+            return axios(originalRequest);
+          })
+          .catch(err => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      return new Promise((resolve, reject) => {
+        // Make sure to call the refresh endpoint; adjust URL or payload as needed
+        axios
+          .post(`${API_BASE_URL}/api/auth/refresh`, {}, { withCredentials: true })
+          .then(({ data }) => {
+            // Assume the new access token is returned as data.accessToken
+            const newAccessToken = data.accessToken;
+
+            // Optionally, store the new token in local storage or update context
+            // localStorage.setItem('accessToken', newAccessToken);
+
+            // Update default authorization header for future requests
+            httpClient.defaults.headers.common['Authorization'] = 'Bearer ' + newAccessToken;
+            if (originalRequest.headers) {
+              originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
+            }
+            processQueue(null, newAccessToken);
+            resolve(axios(originalRequest));
+          })
+          .catch((err) => {
+            processQueue(err, null);
+            // Optionally, handle logout or redirect to login if refresh fails
+            reject(err);
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      });
+    }
+    return Promise.reject(error);
+  }
+);
+
 
 
 
