@@ -138,9 +138,7 @@ httpClient.interceptors.response.use(
   (error) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-    // If error is 401 (unauthorized) and the request wasn't already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Prevent infinite loop by not retrying the refresh endpoint itself
       if (originalRequest.url?.includes('/api/auth/refresh')) {
         return Promise.reject(error);
       }
@@ -149,12 +147,7 @@ httpClient.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token: string | unknown) => {
-            if (originalRequest.headers) {
-              originalRequest.headers['Authorization'] = 'Bearer ' + token;
-            }
-            return axios(originalRequest);
-          })
+          .then(() => axios(originalRequest))
           .catch(err => Promise.reject(err));
       }
 
@@ -162,27 +155,15 @@ httpClient.interceptors.response.use(
       isRefreshing = true;
 
       return new Promise((resolve, reject) => {
-        // Make sure to call the refresh endpoint; adjust URL or payload as needed
         axios
           .post(`${API_BASE_URL}/api/auth/refresh`, {}, { withCredentials: true })
-          .then(({ data }) => {
-            // Assume the new access token is returned as data.accessToken
-            const newAccessToken = data.accessToken;
-
-            // Optionally, store the new token in local storage or update context
-            // localStorage.setItem('accessToken', newAccessToken);
-
-            // Update default authorization header for future requests
-            httpClient.defaults.headers.common['Authorization'] = 'Bearer ' + newAccessToken;
-            if (originalRequest.headers) {
-              originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
-            }
-            processQueue(null, newAccessToken);
+          .then(() => {
+            // The backend should update the cookies (JWT, CSRF) automatically
+            processQueue(null);
             resolve(axios(originalRequest));
           })
           .catch((err) => {
             processQueue(err, null);
-            // Optionally, handle logout or redirect to login if refresh fails
             reject(err);
           })
           .finally(() => {
@@ -193,6 +174,7 @@ httpClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
 
 
 
