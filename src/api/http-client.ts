@@ -156,7 +156,7 @@ httpClient.interceptors.response.use(
 
       return new Promise((resolve, reject) => {
         axios
-          .post(`${API_BASE_URL}/api/auth/refresh`, {}, { withCredentials: true })
+          .post(`${API_BASE_URL}api/auth/refresh`, {}, { withCredentials: true })
           .then(() => {
             // The backend should update the cookies (JWT, CSRF) automatically
             processQueue(null);
