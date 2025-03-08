@@ -14,7 +14,7 @@ const Dashboard: React.FC = () => {
     <div>
       <div className='dashboard-top'>
         <h2>Galactica dashboard</h2>
-        <button onClick={() => navigate('')}>Go to website</button>
+        <button onClick={() => navigate('/')}>Go to website</button>
         <UserProfileDropdown />
       </div>
       <div className='dashboard-outlet'>
