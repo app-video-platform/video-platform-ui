@@ -33,6 +33,9 @@ exports[`App Component matches snapshot after navigation 1`] = `
           class="nav-link-list"
         >
           <li>
+            <div />
+          </li>
+          <li>
             <button
               class="vp-button vp-button--secondary"
             >
