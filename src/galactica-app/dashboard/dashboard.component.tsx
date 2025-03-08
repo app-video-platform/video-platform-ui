@@ -6,6 +6,7 @@ import { RootState } from '../../store/store';
 import UserProfileDropdown from '../../components/user-profile/user-profile.component';
 
 import './dashboard.styles.scss';
+import UserDashboard from '../user-dashboard/user-dashboard.component';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Dashboard: React.FC = () => {
         <UserProfileDropdown />
       </div>
       <div className='dashboard-outlet'>
+        <UserDashboard />
         <Outlet />
       </div>
     </div>
