@@ -15,31 +15,34 @@ const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
 
   useEffect(() => {
     // const token = localStorage.getItem('userToken');
-    const firstName = localStorage.getItem('firstName');
-    const lastName = localStorage.getItem('lastName');
-    const email = localStorage.getItem('email');
-    const role = localStorage.getItem('roles');
+    // const firstName = localStorage.getItem('firstName');
+    // const lastName = localStorage.getItem('lastName');
+    // const email = localStorage.getItem('email');
+    // const role = localStorage.getItem('roles');
 
 
     // if (token) {
     //   dispatch(setToken(token));
     // }
-
-    if (firstName && lastName && email && role) {
-      const roleList = role.split(',').map(role => role.trim());
-      const user: User = {
-        firstName,
-        lastName,
-        email,
-        role: roleList
-      };
-      dispatch(setUserProfile(user));
-    } else {
-      dispatch(getUserProfile()).then((data) => {
-        console.log('User Profile in Init', data);
-        navigate('dashboard');
-      });
-    }
+    dispatch(getUserProfile()).then((data) => {
+      console.log('User Profile in Init', data);
+      navigate('dashboard');
+    });
+    // if (firstName && lastName && email && role) {
+    //   const roleList = role.split(',').map(role => role.trim());
+    //   const user: User = {
+    //     firstName,
+    //     lastName,
+    //     email,
+    //     role: roleList
+    //   };
+    //   dispatch(setUserProfile(user));
+    // } else {
+    //   dispatch(getUserProfile()).then((data) => {
+    //     console.log('User Profile in Init', data);
+    //     navigate('dashboard');
+    //   });
+    // }
   }, [dispatch]);
 
   return <>{children}</>;

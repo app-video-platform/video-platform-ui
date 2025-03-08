@@ -40,7 +40,7 @@ describe('Auth API functions', () => {
 
       const result = await signInUser(signInData);
       expect(result).toEqual(fakeResponse);
-      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/login', signInData, { withCredentials: false });
+      expect(mockedHttpClient.post).toHaveBeenCalledWith('api/auth/login', signInData);
     });
 
     it('should throw error when httpClient.post rejects', async () => {

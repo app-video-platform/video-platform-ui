@@ -11,7 +11,8 @@ const UserDashboard: React.FC = () => {
 
   return (
     <div className='user-dashboard-container'>
-      <FaUser className="user-avatar" />
+      {/* <FaUser className="user-avatar" /> */}
+      {React.createElement(FaUser as React.FC<{ className: string }>, { className: 'user-avatar' })}
       <div className="user-profile">
         <h2>{user?.firstName} {user?.lastName}</h2>
         <span>{user?.email}</span>
