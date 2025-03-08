@@ -45,3 +45,13 @@ export const logoutAPI = async () => {
     throw error;
   }
 };
+
+export const googleAPI = async (idToken: string) => {
+  try {
+    const response = await httpClient.post<null>('api/auth/googleSignIn', idToken);
+    return response.data;
+  } catch (error) {
+    console.error('Error logging out:', error);
+    throw error;
+  }
+};

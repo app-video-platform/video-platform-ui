@@ -53,15 +53,20 @@ const SignIn: React.FC = () => {
       dispatch(signinUser(formData))
         .unwrap() // unwrap() turns the thunk result into a "normal" promise
         .then((value) => {
-          console.log(value);
+          // console.log(value);
 
-          dispatch(getUserProfile());
+          dispatch(getUserProfile()).then(data => {
+            if (data) {
+              console.log('GO TO DASHBOARD FROM SIGN IN');
 
-          navigate('dashboard');  // example redirect (requires useNavigate)
+              navigate('dashboard');
+            }
+          });
+
         })
         .catch((error) => {
           // ❌ Failed signup, show error message
-          console.error('Error signing up', error);
+          console.error('Error signing ip', error);
         });
     }
   };

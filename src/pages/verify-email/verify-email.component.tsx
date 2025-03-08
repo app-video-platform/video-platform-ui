@@ -28,7 +28,6 @@ const VerifyEmail: React.FC = () => {
           setStatus('error');
         }
       });
-    console.log('token', token);
   }, [searchParams]);
 
   const messages = {

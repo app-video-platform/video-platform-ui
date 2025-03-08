@@ -8,26 +8,11 @@ import Button from '../../components/button/button.component';
 import './nav.styles.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import GoogleSignInButton from '../../components/google-sign-in-button/google-sign-in-button.component';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
-  // const [token, setToken] = useState<string | null>(localStorage.getItem('userToken'));
   const user = useSelector((state: RootState) => state.auth.user);
-  // const refreshToken = () => {
-  //   setToken(localStorage.getItem('userToken'));
-  // };
-
-  // If you want to update token state when localStorage changes in other tabs:
-  useEffect(() => {
-    console.log('USER in NAV', user);
-
-
-    // const handleStorageChange = () => {
-    //   refreshToken();
-    // };
-    // window.addEventListener('storage', handleStorageChange);
-    // return () => window.removeEventListener('storage', handleStorageChange);
-  }, [user]);
 
 
 
@@ -52,6 +37,9 @@ const Navigation: React.FC = () => {
               <UserProfileDropdown />
             ) : (
               <ul className="nav-link-list">
+                <li>
+                  <GoogleSignInButton />
+                </li>
                 <li>
                   <Button onClick={() => handleRedirect('/signup')} type='secondary' text='Sign Up' />
                 </li>
