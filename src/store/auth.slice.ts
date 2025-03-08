@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User, UserRegisterData } from '../models/user';
-import { logoutAPI, registerUser, signInUser, verifyEmailApi } from '../api/auth-api';
+import { googleAPI, logoutAPI, registerUser, signInUser, verifyEmailApi } from '../api/auth-api';
 import { getUserProfileAPI } from '../api/user-api';
 
 import { SignInFormData } from '../pages/sign-in/sign-in.component';
@@ -60,6 +60,23 @@ export const signinUser = createAsyncThunk<
 >('auth/signinUser', async (userData, { rejectWithValue }) => {
   try {
     const response = await signInUser(userData);
+    return response; // API returns user info with token
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || 'Signin failed');
+  }
+});
+
+export const googleSignInUser = createAsyncThunk<
+  string,  // Return type: google login response
+  string,     // Argument type (token)
+  { rejectValue: string } // Error type
+>('auth/googleSignInUser', async (idToken, { rejectWithValue }) => {
+  try {
+    const response = await googleAPI(idToken);
+    if (!response) {
+      // If response is null or falsy, reject with an error message.
+      return rejectWithValue('Signin failed');
+    }
     return response; // API returns user info with token
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || 'Signin failed');
@@ -150,7 +167,7 @@ const authSlice = createSlice({
       })
       .addCase(signinUser.fulfilled, (state, action: PayloadAction<string>) => {
         state.loading = false;
-        console.log('in case', action.payload);
+        // console.log('in case', action.payload);
 
         if (action.payload === 'Login successful') {
           state.isUserLoggedIn = true;
@@ -160,6 +177,25 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload || 'Signin failed';
       })
+      // Google Sign In
+      .addCase(googleSignInUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleSignInUser.fulfilled, (state, action: PayloadAction<string>) => {
+        state.loading = false;
+        // console.log('in case', action.payload);
+
+        state.isUserLoggedIn = true;
+        // if (action.payload === 'Login successful') {
+        //   state.isUserLoggedIn = true;
+        // }
+      })
+      .addCase(googleSignInUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Google Signin failed';
+      })
+      // Get User Profile
       .addCase(getUserProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
