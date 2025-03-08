@@ -9,6 +9,9 @@ import VerifyEmail from './pages/verify-email/verify-email.component';
 import AppInitializer from './utils/app-initializer.util';
 import Navigation from './pages/nav/nav.component';
 import Contact from './pages/contact/contact.component';
+import Dashboard from './galactica-app/dashboard/dashboard.component';
+import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
+import ProtectedRoute from './utils/protected-route.util';
 
 const App = () => (
   <AppInitializer>
@@ -22,6 +25,17 @@ const App = () => (
       <Route path="signin" element={<SignIn />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/email-sent" element={<EmailSent />} />
+
+      <Route
+        path="dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<UserDashboard />} />
+      </Route>
     </Routes>
 
   </AppInitializer>

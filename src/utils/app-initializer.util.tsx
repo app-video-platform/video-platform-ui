@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { getUserProfile, setUserProfile } from './../store/auth.slice';
 import { AppDispatch } from './../store/store';
 import { User } from '../models/user';
+import { useNavigate } from 'react-router-dom';
 
 interface AppInitializerProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface AppInitializerProps {
 
 const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // const token = localStorage.getItem('userToken');
@@ -33,7 +35,10 @@ const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
       };
       dispatch(setUserProfile(user));
     } else {
-      dispatch(getUserProfile()).then((data) => console.log('User Profile in Init', data));
+      dispatch(getUserProfile()).then((data) => {
+        console.log('User Profile in Init', data);
+        navigate('dashboard');
+      });
     }
   }, [dispatch]);
 
