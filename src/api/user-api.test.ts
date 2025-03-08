@@ -20,7 +20,7 @@ describe('User API functions', () => {
 
       const result = await getUserProfileAPI();
       expect(result).toEqual(fakeResponse);
-      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/user/userInfo');
+      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/user/userInfo', { 'headers': { 'X-CSRF-Force': true } });
     });
 
     it('should throw error when httpClient.get rejects', async () => {

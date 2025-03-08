@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`App Component matches snapshot 1`] = `
+exports[`App Component matches snapshot after navigation 1`] = `
 <div>
   <nav>
     <div

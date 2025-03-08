@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { User } from '../models/user';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -11,39 +12,30 @@ const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 // const mockAdapter = async (config: AxiosRequestConfig): Promise<AxiosResponse> => { // COMM FOR INTERCEPT
 //   if (config.mock) {
 //     if (config.url?.includes('api/auth/login')) {
-//       return Promise.resolve({
+//       const mockResponse: AxiosResponse<string> = {
+//         data: 'Login successful!',
+//         status: 200,
+//         statusText: 'OK',
+//         headers: {},
+//         config: config as InternalAxiosRequestConfig
+//       };
+//       return Promise.resolve(mockResponse);
+//     }
+
+//     if (config.url?.includes('api/user/userInfo')) {
+//       const mockResponse: AxiosResponse<User> = {
 //         data: {
-//           firstName: 'Mock',
-//           lastName: 'User',
-//           email: 'mock@user.com',
-//           token: 'mocked-jwt-token',
-//           role: ['user'],
+//           firstName: 'Alex',
+//           lastName: 'Bej',
+//           email: 'alexbej@a;ex.ved',
+//           role: []
 //         },
 //         status: 200,
 //         statusText: 'OK',
-//         headers: config.headers,
-//         config,
-//       } as AxiosResponse);
-//     }
-
-//     if (config.url?.includes('api/auth/register')) {
-//       return Promise.resolve({
-//         data: 'Register mock success',
-//         status: 200,
-//         statusText: 'OK',
-//         headers: config.headers,
-//         config,
-//       } as AxiosResponse);
-//     }
-
-//     if (config.url?.includes('api/auth/verify?token=abc')) {
-//       return Promise.resolve({
-//         data: 'Verification success',
-//         status: 200,
-//         statusText: 'OK',
-//         headers: config.headers,
-//         config,
-//       } as AxiosResponse);
+//         headers: {},
+//         config: config as InternalAxiosRequestConfig
+//       };
+//       return Promise.resolve(mockResponse);
 //     }
 //   }
 //   const defaultAdapter = axios.defaults.adapter as (config: AxiosRequestConfig) => Promise<AxiosResponse>;

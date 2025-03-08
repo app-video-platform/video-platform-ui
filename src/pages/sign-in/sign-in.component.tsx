@@ -57,7 +57,7 @@ const SignIn: React.FC = () => {
 
           dispatch(getUserProfile());
 
-          navigate('/');  // example redirect (requires useNavigate)
+          navigate('dashboard');  // example redirect (requires useNavigate)
         })
         .catch((error) => {
           // ❌ Failed signup, show error message

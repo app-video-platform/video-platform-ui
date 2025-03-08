@@ -11,20 +11,20 @@ import { useNavigate } from 'react-router-dom';
 const UserProfileDropdown: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  let user = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector((state: RootState) => state.auth.user);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const otherUser: User = {
-    firstName: localStorage.getItem('firstName') || '',
-    lastName: localStorage.getItem('lastName') || '',
-    email: localStorage.getItem('email') || '',
-    role: localStorage.getItem('roles')?.split(',').map(role => role.trim()) || [],
-  };
+  // const otherUser: User = {
+  //   firstName: localStorage.getItem('firstName') || '',
+  //   lastName: localStorage.getItem('lastName') || '',
+  //   email: localStorage.getItem('email') || '',
+  //   role: localStorage.getItem('roles')?.split(',').map(role => role.trim()) || [],
+  // };
 
-  if (!user && otherUser) {
-    user = otherUser;
-  }
+  // if (!user && otherUser) {
+  //   user = otherUser;
+  // }
 
   // Toggle dropdown open/close
   const handleToggle = () => {
