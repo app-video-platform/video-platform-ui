@@ -1,4 +1,4 @@
-import { User } from '../models/user';
+import { User } from '../models/user/user';
 import httpClient from './http-client';
 import { getUserProfileAPI } from './user-api';
 

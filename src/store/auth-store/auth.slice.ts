@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User, UserRegisterData } from '../models/user';
-import { googleAPI, logoutAPI, registerUser, signInUser, verifyEmailApi } from '../api/auth-api';
-import { getUserProfileAPI } from '../api/user-api';
+import { User, UserRegisterData } from '../../models/user/user';
+import { googleAPI, logoutAPI, registerUser, signInUser, verifyEmailApi } from '../../api/auth-api';
+import { getUserProfileAPI } from '../../api/user-api';
 
-import { SignInFormData } from '../pages/sign-in/sign-in.component';
+import { SignInFormData } from '../../pages/sign-in/sign-in.component';
 
 interface AuthState {
   user: null | User;

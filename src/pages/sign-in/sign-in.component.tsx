@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../store/store';
 import { Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/form-input/form-input.component';
-import { getUserProfile, signinUser } from '../../store/auth.slice';
+import { getUserProfile, signinUser } from '../../store/auth-store/auth.slice';
 
 export interface SignInFormData {
   email: string;

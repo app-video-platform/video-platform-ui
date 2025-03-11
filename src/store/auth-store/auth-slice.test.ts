@@ -7,7 +7,7 @@ import authReducer, {
   verifyEmail,
   signinUser,
 } from './auth.slice';
-import { User, UserLoginResponse } from '../models/user';
+import { User, UserLoginResponse } from '../../models/user/user';
 
 // Define an initial state matching your AuthState interface
 const initialState = {

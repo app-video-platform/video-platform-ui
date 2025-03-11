@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
-import { getUserProfile, googleSignInUser } from '../../store/auth.slice';
+import { getUserProfile, googleSignInUser } from '../../store/auth-store/auth.slice';
 import { useNavigate } from 'react-router-dom';
 
 const GoogleSignInButton: React.FC = () => {

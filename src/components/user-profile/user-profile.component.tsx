@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store/store';
-import { logout, logoutUser } from '../../store/auth.slice';
-import { User } from '../../models/user';
+import { AppDispatch } from '../../store/store';
+import { logout, logoutUser } from '../../store/auth-store/auth.slice';
 
 import './user-profile.styles.scss';
 import { useNavigate } from 'react-router-dom';
+import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
 
 const UserProfileDropdown: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector(selectAuthUser);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

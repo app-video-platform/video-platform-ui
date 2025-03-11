@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
-import { verifyEmail } from '../../store/auth.slice';
+import { verifyEmail } from '../../store/auth-store/auth.slice';
 
 import './verify-email.styles.scss';
 

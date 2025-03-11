@@ -20,7 +20,7 @@ const middlewares = [dummyThunk] as any;
 const mockStore = configureStore(middlewares);
 
 // Mock getUserProfile and setUserProfile from your auth slice so that the async thunk resolves immediately.
-jest.mock('./store/auth.slice', () => ({
+jest.mock('./store/auth-store/auth.slice', () => ({
   getUserProfile: jest.fn(() => () =>
     Promise.resolve({
       payload: {

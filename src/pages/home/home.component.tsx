@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
 const Home: React.FC = () => {
   const [apiResponse, setApiResponse] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const { user } = useSelector((state: RootState) => state.auth);
+  const user = useSelector(selectAuthUser);
 
   const fetchUsers = async () => {
     setError(null);
