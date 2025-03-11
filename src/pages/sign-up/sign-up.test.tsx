@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SignUp from './sign-up.component';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../../store/auth.slice';
+import authReducer from '../../store/auth-store/auth.slice';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 

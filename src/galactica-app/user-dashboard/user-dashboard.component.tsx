@@ -4,10 +4,11 @@ import { RootState } from '../../store/store';
 import { FaUser } from 'react-icons/fa';
 
 import './user-dashboard.styles.scss';
+import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
 
 const UserDashboard: React.FC = () => {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector(selectAuthUser);
 
   return (
     <div className='user-dashboard-container'>

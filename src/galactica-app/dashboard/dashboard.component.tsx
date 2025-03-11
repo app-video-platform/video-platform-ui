@@ -19,7 +19,7 @@ const Dashboard: React.FC = () => {
         <UserProfileDropdown />
       </div>
       <div className='dashboard-outlet'>
-        <UserDashboard />
+        {/* <UserDashboard /> */}
         <Outlet />
       </div>
     </div>

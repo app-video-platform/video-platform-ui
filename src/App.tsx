@@ -14,6 +14,7 @@ import UnauthorizedPage from './pages/errors/unauthorized/unauthorized.component
 import Dashboard from './galactica-app/dashboard/dashboard.component';
 import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
 import ProtectedRoute from './utils/protected-route.util';
+import ProductsPage from './galactica-app/products/products.component';
 
 const App = () => (
   <AppInitializer>
@@ -38,7 +39,7 @@ const App = () => (
           // </ProtectedRoute>
         }
       />
-      {/* <Route path='' element={<UserDashboard />} /> */}
+      <Route index element={<ProductsPage />} />
     </Routes>
 
   </AppInitializer>

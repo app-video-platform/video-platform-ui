@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { getUserProfile, setUserProfile } from './../store/auth.slice';
+import { getUserProfile, setUserProfile } from '../store/auth-store/auth.slice';
 import { AppDispatch } from './../store/store';
-import { User } from '../models/user';
+import { User } from '../models/user/user';
 import { useNavigate } from 'react-router-dom';
 
 interface AppInitializerProps {

@@ -9,10 +9,11 @@ import './nav.styles.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import GoogleSignInButton from '../../components/google-sign-in-button/google-sign-in-button.component';
+import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const user = useSelector(selectAuthUser);
 
 
 

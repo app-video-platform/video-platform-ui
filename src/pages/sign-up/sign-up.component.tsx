@@ -5,9 +5,9 @@ import FormInput from '../../components/form-input/form-input.component';
 import './sign-up.styles.scss';
 import { AppDispatch } from '../../store/store';
 import { useDispatch } from 'react-redux';
-import { signupUser } from '../../store/auth.slice';
+import { signupUser } from '../../store/auth-store/auth.slice';
 import { useNavigate } from 'react-router-dom';
-import { UserRegisterData } from '../../models/user';
+import { UserRegisterData } from '../../models/user/user';
 
 export interface SignupFormData {
   firstName: string;

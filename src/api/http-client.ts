@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { User } from '../models/user';
+import { User } from '../models/user/user';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
