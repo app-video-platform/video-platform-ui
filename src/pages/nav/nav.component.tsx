@@ -23,7 +23,7 @@ const Navigation: React.FC = () => {
 
   return (
     <Fragment>
-      <nav>
+      <nav className='website-navbar'>
         <div className="logo-container"></div>
         <div className="nav-links">
           <ul className="nav-link-list">

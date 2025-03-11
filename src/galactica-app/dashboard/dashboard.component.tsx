@@ -7,6 +7,7 @@ import UserProfileDropdown from '../../components/user-profile/user-profile.comp
 
 import './dashboard.styles.scss';
 import UserDashboard from '../user-dashboard/user-dashboard.component';
+import Breadcrumbs from '../../components/breadcrumb/breadcrumb.component';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Dashboard: React.FC = () => {
         <button onClick={() => navigate('/')}>Go to website</button>
         <UserProfileDropdown />
       </div>
+      <Breadcrumbs />
       <div className='dashboard-outlet'>
         {/* <UserDashboard /> */}
         <Outlet />
