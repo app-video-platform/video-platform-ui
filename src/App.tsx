@@ -12,9 +12,9 @@ import Contact from './pages/contact/contact.component';
 import NotFoundPage from './pages/errors/not-found/not-found.component';
 import UnauthorizedPage from './pages/errors/unauthorized/unauthorized.component';
 import Dashboard from './galactica-app/dashboard/dashboard.component';
-import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
-import ProtectedRoute from './utils/protected-route.util';
-import ProductsPage from './galactica-app/products/products.component';
+import CreateProduct from './galactica-app/products/create-product/create-product.component';
+import ProductsList from './galactica-app/products/products-list/products-list.component';
+import ProductsLayout from './galactica-app/products/products-layout.component';
 
 const App = () => (
   <AppInitializer>
@@ -32,7 +32,10 @@ const App = () => (
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       <Route path="dashboard" element={<Dashboard />}>
-        <Route path="products" element={<ProductsPage />} />
+        <Route path="products" element={<ProductsLayout />} >
+          <Route index element={<ProductsList />} />
+          <Route path='create' element={<CreateProduct />} />
+        </Route>
       </Route>
     </Routes>
 

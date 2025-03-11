@@ -1,0 +1,28 @@
+@use 'sass:color';
+
+.products-table {
+  width: 100%;
+  text-align: left;
+  margin-top: 50px;
+
+  tr {
+    height: 50px;
+  }
+}
+
+.add-product-btn {
+  padding: 15px 30px;
+  border-radius: 5px;
+  color: white;
+  background-color: black;
+
+  &:hover {
+    background-color: color.scale(black, $lightness: 20%);
+  }
+}
+
+.products-header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
