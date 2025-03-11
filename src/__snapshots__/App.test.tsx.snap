@@ -2,7 +2,9 @@
 
 exports[`App Component matches snapshot after navigation 1`] = `
 <div>
-  <nav>
+  <nav
+    class="website-navbar"
+  >
     <div
       class="logo-container"
     />
