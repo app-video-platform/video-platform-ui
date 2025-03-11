@@ -4,9 +4,14 @@ import httpClient from './http-client';
 
 export const getAllProductsByUserIdAPI = async (userId: string) => {
   try {
-    const response = await httpClient.get<BaseProduct>('api/product/getAll?user=' + userId, {
-      headers: { 'X-CSRF-Force': true }
+    console.log('BEFORE CALL');
+
+    const response = await httpClient.get<BaseProduct[]>('api/product/getAll?user=' + userId, {
+      headers: { 'X-CSRF-Force': true },
+      mock: true
     });
+    console.log('AFTER CALL');
+
     return response.data;
   } catch (error) {
     console.error('Error getting all products:', error);
