@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { User } from '../models/user/user';
+import { BaseProduct } from '../models/product/product';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -9,38 +10,92 @@ declare module 'axios' {
 
 const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 
-// const mockAdapter = async (config: AxiosRequestConfig): Promise<AxiosResponse> => { // COMM FOR INTERCEPT
-//   if (config.mock) {
-//     if (config.url?.includes('api/auth/login')) {
-//       const mockResponse: AxiosResponse<string> = {
-//         data: 'Login successful!',
-//         status: 200,
-//         statusText: 'OK',
-//         headers: {},
-//         config: config as InternalAxiosRequestConfig
-//       };
-//       return Promise.resolve(mockResponse);
-//     }
+const mockAdapter = async (config: AxiosRequestConfig): Promise<AxiosResponse> => { // COMM FOR INTERCEPT
+  if (config.mock) {
+    if (config.url?.includes('api/auth/login')) {
+      const mockResponse: AxiosResponse<string> = {
+        data: 'Login successful!',
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: config as InternalAxiosRequestConfig
+      };
+      return Promise.resolve(mockResponse);
+    }
 
-//     if (config.url?.includes('api/user/userInfo')) {
-//       const mockResponse: AxiosResponse<User> = {
-//         data: {
-//           firstName: 'Alex',
-//           lastName: 'Bej',
-//           email: 'alexbej@a;ex.ved',
-//           role: []
-//         },
-//         status: 200,
-//         statusText: 'OK',
-//         headers: {},
-//         config: config as InternalAxiosRequestConfig
-//       };
-//       return Promise.resolve(mockResponse);
-//     }
-//   }
-//   const defaultAdapter = axios.defaults.adapter as (config: AxiosRequestConfig) => Promise<AxiosResponse>;
-//   return defaultAdapter(config);
-// };
+    if (config.url?.includes('api/user/userInfo')) {
+      const mockResponse: AxiosResponse<User> = {
+        data: {
+          id: 'user-id-alex-bej',
+          firstName: 'Alex',
+          lastName: 'Bej',
+          email: 'alexbej@a;ex.ved',
+          role: []
+        },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: config as InternalAxiosRequestConfig
+      };
+      return Promise.resolve(mockResponse);
+    }
+
+    if (config.url?.includes('api/product/getAll')) {
+      const now = new Date(Date.now());
+
+      const mockResponse: AxiosResponse<BaseProduct[]> = {
+        data: [
+          {
+            id: '1',
+            name: 'Course 1',
+            description: 'Lorem ipsum dolor sit amet', // Limit 420 characters
+            image: '',      // URL to image (jpeg, png, etc.)
+            type: 'Course',
+            status: 'draft',
+            userId: 'user-id-alex-bej',
+            price: 'free',
+            customers: 12,
+            createdAt: now,
+            updatedAt: now,
+          },
+          {
+            id: '2',
+            name: 'Download package 1',
+            description: 'Lorem ipsum dolor sit amet', // Limit 420 characters
+            image: '',      // URL to image (jpeg, png, etc.)
+            type: 'Download',
+            status: 'draft',
+            userId: 'user-id-alex-bej',
+            price: 10.99,
+            customers: 44,
+            createdAt: now,
+            updatedAt: now,
+          },
+          {
+            id: '3',
+            name: 'Coaching session 1',
+            description: 'Lorem ipsum dolor sit amet', // Limit 420 characters
+            image: '',      // URL to image (jpeg, png, etc.)
+            type: 'Consultation',
+            status: 'published',
+            userId: 'user-id-alex-bej',
+            price: 24.99,
+            customers: 44,
+            createdAt: now,
+            updatedAt: now,
+          }
+        ],
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: config as InternalAxiosRequestConfig
+      };
+      return Promise.resolve(mockResponse);
+    }
+  }
+  const defaultAdapter = axios.defaults.adapter as (config: AxiosRequestConfig) => Promise<AxiosResponse>;
+  return defaultAdapter(config);
+};
 
 const httpClient = axios.create({
   baseURL: API_BASE_URL,
@@ -49,7 +104,7 @@ const httpClient = axios.create({
     'Accept': 'application/json',
   },
   withCredentials: true,
-  // adapter: mockAdapter, // COMMM FOR INTERCEPT
+  adapter: mockAdapter, // COMMM FOR INTERCEPT
 });
 
 function getCookie(name: string): string | null {

@@ -31,15 +31,9 @@ const App = () => (
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-      <Route
-        path="dashboard"
-        element={
-          // <ProtectedRoute>
-          <Dashboard />
-          // </ProtectedRoute>
-        }
-      />
-      <Route index element={<ProductsPage />} />
+      <Route path="dashboard" element={<Dashboard />}>
+        <Route path="products" element={<ProductsPage />} />
+      </Route>
     </Routes>
 
   </AppInitializer>

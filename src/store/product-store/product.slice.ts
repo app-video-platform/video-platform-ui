@@ -1,8 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Product } from '../../models/product/product.types';
+import { getAllProductsByUserIdAPI } from '../../api/products-api';
+import { BaseProduct } from '../../models/product/product';
 
 interface ProductState {
-  products: null | Product[];
+  products: null | BaseProduct[];
   loading: boolean;
   error: string | null;
   // Optional: you might want to store a message (for creating/editing/removing status)
@@ -15,6 +17,20 @@ const initialState: ProductState = {
   error: null,
   message: null,
 };
+
+
+export const getAllProductsByUserId = createAsyncThunk<
+  BaseProduct[],  // Return type: Product[]
+  string,     // Argument type (userId)
+  { rejectValue: string } // Error type
+>('products/getAllProductsByUserId', async (idToken, { rejectWithValue }) => {
+  try {
+    const response = await getAllProductsByUserIdAPI(idToken);
+    return response; // API returns user info with token
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || 'Signin failed');
+  }
+});
 
 
 const productsSlice = createSlice({
@@ -50,6 +66,22 @@ const productsSlice = createSlice({
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
+  },
+
+  extraReducers: (builder) => {
+    builder
+      .addCase(getAllProductsByUserId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllProductsByUserId.fulfilled, (state, action: PayloadAction<BaseProduct[]>) => {
+        state.loading = false;
+        state.products = action.payload;
+      })
+      .addCase(getAllProductsByUserId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error retrieving products';
+      });
   },
 });
 
