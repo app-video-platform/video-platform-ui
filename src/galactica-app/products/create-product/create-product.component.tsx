@@ -3,6 +3,7 @@ import { ProductType } from '../../../models/product/product.types';
 import FormInput from '../../../components/form-input/form-input.component';
 
 import './create-product.styles.scss';
+import UppyFileUploader from '../../../components/uppy-file-uploader/uppy-file-uploader.component';
 
 export interface ProductFormData {
   name: string;
@@ -21,12 +22,21 @@ const CreateProduct: React.FC = () => {
     price: 'free',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const productTypes: ProductType[] = ['Course', 'Download', 'Consultation'];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFilesChange = (files: File[]) => {
+    // Callback to update the form's state with files from UppyFileUploader
+    setUploadedFiles(files);
+
+    console.log('files', files);
+
   };
 
   const validateForm = () => {
@@ -52,6 +62,8 @@ const CreateProduct: React.FC = () => {
       };
 
       console.log('Product data', productData);
+      console.log('files', uploadedFiles);
+
     }
   };
 
@@ -87,9 +99,12 @@ const CreateProduct: React.FC = () => {
           {errors.type && <p className="error-text-red">{errors.type}</p>}
         </div>
 
+        <div className='file-uploader'>
+          <UppyFileUploader onFilesChange={handleFilesChange} />
+        </div>
 
         {errors.type && <p className="error-text-red">{errors.type}</p>}
-        <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition" type="submit">
+        <button className="save-product-btn" type="submit">
           Save
         </button>
       </form>
