@@ -1,3 +1,4 @@
+import { DownloadSection } from './download-section';
 import { ProductType, ProductStatus } from './product.types';
 
 export interface BaseProduct {
@@ -12,4 +13,16 @@ export interface BaseProduct {
   customers: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+
+export interface ICreateProduct {
+  name: string;
+  description: string; // Limit 420 characters
+  type: ProductType;
+  status: ProductStatus;
+  userId: string;
+  price: 'free' | number;
+  sections: DownloadSection[];
+
 }

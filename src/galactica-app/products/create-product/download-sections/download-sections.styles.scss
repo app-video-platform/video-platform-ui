@@ -1,0 +1,17 @@
+.download-sections {
+  width: 80%;
+  margin: 100px auto;
+
+  .download-section {
+    margin-bottom: 1rem;
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+
+    .section-header-line {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}

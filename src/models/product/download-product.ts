@@ -1,8 +1,8 @@
-import { Section } from './download-section';
+import { DownloadSection } from './download-section';
 import { BaseProduct } from './product';
 
 export interface DownloadProduct extends BaseProduct {
-  sections: Section[];
+  sections: DownloadSection[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Product } from '../../models/product/product.types';
-import { getAllProductsByUserIdAPI } from '../../api/products-api';
-import { BaseProduct } from '../../models/product/product';
+import { Product, ProductStatus, ProductType } from '../../models/product/product.types';
+import { CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI } from '../../api/products-api';
+import { BaseProduct, ICreateProduct } from '../../models/product/product';
 
 interface ProductState {
   products: null | BaseProduct[];
@@ -29,6 +29,19 @@ export const getAllProductsByUserId = createAsyncThunk<
     return response; // API returns user info with token
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || 'Signin failed');
+  }
+});
+
+export const createNewProduct = createAsyncThunk<
+  CeSaZic,  // Return type: Product[]
+  ICreateProduct,     // Argument type (userId)
+  { rejectValue: string } // Error type
+>('products/createNewProduct', async (product, { rejectWithValue }) => {
+  try {
+    const response = await createNewProductAPI(product);
+    return response; // API returns user info with token
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || 'Creating Product Failed');
   }
 });
 
@@ -81,6 +94,32 @@ const productsSlice = createSlice({
       .addCase(getAllProductsByUserId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error retrieving products';
+      })
+      .addCase(createNewProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createNewProduct.fulfilled, (state, action: PayloadAction<CeSaZic>) => {
+        state.loading = false;
+        state.products ??= [];
+        const now = new Date(Date.now());
+        state.products?.push({
+          createdAt: now,
+          customers: 0,
+          description: action.payload.description,
+          id: action.payload.id,
+          image: '',
+          name: action.payload.name,
+          price: action.payload.price,
+          status: action.payload.status as ProductStatus,
+          type: action.payload.type as ProductType,
+          updatedAt: now,
+          userId: action.payload.userId
+        });
+      })
+      .addCase(createNewProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error creating new product';
       });
   },
 });
