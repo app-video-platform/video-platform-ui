@@ -131,6 +131,7 @@ httpClient.interceptors.request.use(
     const methodsRequiringCsrf = ['post', 'put', 'delete', 'patch'];
     if ((config.method && methodsRequiringCsrf.includes(config.method.toLowerCase())) || config.headers?.['X-CSRF-Force']) {
       const csrfToken = getCookie('XSRF-TOKEN'); // Ensure this matches your cookie name
+      console.log('CALLING' + config.url, 'token is', csrfToken);
 
       if (csrfToken) {
         // Ensure headers exists
