@@ -135,7 +135,9 @@ httpClient.interceptors.request.use(
       if (csrfToken) {
         // Ensure headers exists
         config.headers = config.headers || {};
-        config.headers['X-CSRF-Token'] = csrfToken;
+        config.headers['X-XSRF-Token'] = csrfToken;
+        console.log('CONFIG HEADERS', config.headers);
+
       }
     }
     return config;
