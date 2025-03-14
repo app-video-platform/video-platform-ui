@@ -4,7 +4,7 @@ import './form-input.styles.scss';
 
 interface FormInputProps {
   label?: string;
-  value: string;
+  value: string | number;
   required?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;

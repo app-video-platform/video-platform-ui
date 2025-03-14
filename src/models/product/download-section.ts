@@ -1,7 +1,7 @@
-export interface Section {
-  id: string;
+export interface DownloadSection {
+  id?: string;
   title: string;
   description: string;
-  files: File[];
+  files?: File[];
   position?: number;
 }
