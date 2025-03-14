@@ -108,6 +108,8 @@ const httpClient = axios.create({
 });
 
 function getCookie(name: string): string | null {
+  console.log('document cookie', document.cookie);
+
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) {
