@@ -38,7 +38,7 @@ export const getAllProductsByUserIdAPI = async (userId: string) => {
 
 export const createNewProductAPI = async (product: ICreateProduct) => {
   try {
-    const response = await httpClient.post<CeSaZic>('api/products', product, { withCredentials: true });
+    const response = await httpClient.post<CeSaZic>('api/product', product, { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error('Error creating new product:', error);
