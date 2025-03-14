@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .type-selectors-container {
   display: flex;
   width: 60%;
@@ -27,5 +29,21 @@
     &:hover {
       background-color: rgb(216, 216, 216);
     }
+  }
+}
+
+.save-product-btn {
+  height: 80px;
+  width: 150px;
+  background-color: black;
+  color: white;
+  margin: 20px auto;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    background-color: color.scale(black, $lightness: 10%);
   }
 }
