@@ -26,6 +26,7 @@ module.exports = {
   // Allows importing CSS/SCSS files into Jest tests
   moduleNameMapper: {
     '\\.(css|scss)$': 'identity-obj-proxy',
+    '\\.(png|jpe?g|gif|svg)$': '<rootDir>/src/utils/file.mock.js',
   },
 
   // Treat `.ts` and `.tsx` explicitly as ES Modules
