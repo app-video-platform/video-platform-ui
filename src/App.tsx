@@ -16,6 +16,7 @@ import CreateProduct from './galactica-app/products/create-product/create-produc
 import ProductsList from './galactica-app/products/products-list/products-list.component';
 import ProductsLayout from './galactica-app/products/products-layout.component';
 import UserPagePreview from './galactica-app/user-page-preview/user-page-preview.component';
+import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
 
 const App = () => (
   <AppInitializer>
@@ -33,6 +34,7 @@ const App = () => (
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       <Route path="dashboard" element={<Dashboard />}>
+        <Route index element={<UserDashboard />} />
         <Route path="products" element={<ProductsLayout />} >
           <Route index element={<ProductsList />} />
           <Route path='create' element={<CreateProduct />} />

@@ -1,13 +1,13 @@
 .user-dashboard-container {
-  display: flex;
-  height: 150px;
-  gap: 20px;
+  // display: flex;
+  // height: 150px;
+  // gap: 20px;
 
   .user-avatar {
     font-size: 150px;
   }
 
-  .user-profile {
+  .user-info-box {
     display: flex;
     flex-direction: column;
     height: 100%;
