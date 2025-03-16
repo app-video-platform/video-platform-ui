@@ -1,28 +1,25 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { AppDispatch, RootState } from './../../../store/store';
+import { AppDispatch } from './../../../store/store';
 import { selectAuthUser } from './../../../store/auth-store/auth.selectors';
 import { getAllProductsByUserId } from './../../../store/product-store/product.slice';
 
 import './products-list.styles.scss';
 import { useNavigate } from 'react-router-dom';
+import { selectAllProducts } from '../../../store/product-store/product.selectors';
 
 const ProductsList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { products, loading, error } = useSelector((state: RootState) => state.products);
+  const products = useSelector(selectAllProducts);
   const user = useSelector(selectAuthUser);
 
   useEffect(() => {
-    console.log('Get in here');
-
     if (user && user.id) {
       dispatch(getAllProductsByUserId(user.id));
     } else {
-      console.log('Now mock');
-
-      dispatch(getAllProductsByUserId('user-id-alex-bej'));
+      dispatch(getAllProductsByUserId('user-id-alex-bej')).unwrap().then(data => console.log('data from call in useeffect', data));
     }
   }, [dispatch, user]);
 
@@ -57,7 +54,7 @@ const ProductsList: React.FC = () => {
                   <td>{product.price}</td>
                   <td>{product.status}</td>
                   <td>{product.customers}</td>
-                  <td><button onClick={() => alert('Maaaaai, Tomi, ce credeai ca o sa se intample?')}>Edit</button></td>
+                  <td><button onClick={() => navigate(`edit/${product.id}`)}>Edit</button></td>
                 </tr>
               ))}
 

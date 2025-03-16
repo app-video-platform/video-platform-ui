@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Product, ProductStatus, ProductType } from '../../models/product/product.types';
-import { CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI } from '../../api/products-api';
-import { BaseProduct, ICreateProduct } from '../../models/product/product';
+import { CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI, updateProductAPI } from '../../api/products-api';
+import { BaseProduct, ICreateProduct, IUpdateProduct } from '../../models/product/product';
 
 interface ProductState {
   products: null | BaseProduct[];
@@ -45,6 +45,19 @@ export const createNewProduct = createAsyncThunk<
   }
 });
 
+export const updateProductDetails = createAsyncThunk<
+  CeSaZic,  // Return type: Product[]
+  IUpdateProduct,     // Argument type (userId)
+  { rejectValue: string } // Error type
+>('products/updateProductDetails', async (updatedProduct, { rejectWithValue }) => {
+  try {
+    const response = await updateProductAPI(updatedProduct);
+    return response; // API returns user info with token
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || 'Updating Product Failed');
+  }
+});
+
 
 const productsSlice = createSlice({
   name: 'products',
@@ -83,6 +96,7 @@ const productsSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+      // getAllProductsByUserId
       .addCase(getAllProductsByUserId.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -95,6 +109,8 @@ const productsSlice = createSlice({
         state.loading = false;
         state.error = action.payload || 'Error retrieving products';
       })
+
+      // createNewProduct
       .addCase(createNewProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -120,6 +136,39 @@ const productsSlice = createSlice({
       .addCase(createNewProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error creating new product';
+      })
+
+      // updateProductDetails
+      .addCase(updateProductDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProductDetails.fulfilled, (state, action: PayloadAction<CeSaZic>) => {
+        state.loading = false;
+        if (state.products) {
+          const now = new Date(Date.now());
+          const updatedProduct = {
+            createdAt: now,
+            customers: 0,
+            description: action.payload.description,
+            id: action.payload.id,
+            image: '',
+            name: action.payload.name,
+            price: action.payload.price,
+            status: action.payload.status as ProductStatus,
+            type: action.payload.type as ProductType,
+            updatedAt: now,
+            userId: action.payload.userId
+          };
+          const index = state.products?.findIndex(product => product.id === updatedProduct.id);
+          if (index !== -1) {
+            state.products[index] = updatedProduct;
+          }
+        }
+      })
+      .addCase(updateProductDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error updating product';
       });
   },
 });

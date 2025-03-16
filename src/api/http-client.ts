@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { User } from '../models/user/user';
 import { BaseProduct } from '../models/product/product';
+import { DownloadProduct } from '../models/product/download-product';
+import { CeSaZic } from './products-api';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -40,8 +42,71 @@ const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 //       return Promise.resolve(mockResponse);
 //     }
 
+//     if (config.url?.includes('api/products/update')) {
+//       const mockResponse: AxiosResponse<CeSaZic> = {
+//         data: {
+//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm omnis satanica potestats, imnis inscriptios de mai jos!',
+//           id: '1',
+//           name: 'How to stop nose leaks',
+//           price: 10.99,
+//           sections: [{
+//             id: '1',
+//             position: 1,
+//             title: 'Section One',
+//             description: 'Section One Description'
+//           },
+//           {
+//             id: '2',
+//             position: 2,
+//             title: 'Section Two',
+//             description: 'Section Two Description'
+//           }
+//           ],
+//           status: 'draft',
+//           type: 'DOWNLOAD',
+//           userId: 'user-id-alex-bej'
+//         },
+//         status: 200,
+//         statusText: 'OK',
+//         headers: {},
+//         config: config as InternalAxiosRequestConfig
+//       };
+//       return Promise.resolve(mockResponse);
+//     }
+
+//     if (config.url?.includes('api/product/get?')) {
+//       const now = new Date();
+//       const mockResponse: AxiosResponse<DownloadProduct> = {
+//         data: {
+//           createdAt: now,
+//           customers: 100,
+//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm omnis satanica potestats, imnis inscriptios de mai jos!',
+//           id: '1',
+//           image: '',
+//           name: 'How to stop nose leaks',
+//           price: 10.99,
+//           sections: [{
+//             position: 1,
+//             title: 'Section One',
+//             description: 'Section One Description'
+//           }],
+//           status: 'draft',
+//           type: 'DOWNLOAD',
+//           updatedAt: now,
+//           userId: 'user-id-alex-bej'
+//         },
+//         status: 200,
+//         statusText: 'OK',
+//         headers: {},
+//         config: config as InternalAxiosRequestConfig
+//       };
+//       return Promise.resolve(mockResponse);
+//     }
+
 //     if (config.url?.includes('api/product/getAll')) {
-//       const now = new Date(Date.now());
+//       const now = new Date();
+//       console.log('THIS CALLEd?');
+
 
 //       const mockResponse: AxiosResponse<BaseProduct[]> = {
 //         data: [
@@ -108,8 +173,6 @@ const httpClient = axios.create({
 });
 
 function getCookie(name: string): string | null {
-  console.log('document cookie', document.cookie);
-
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) {
@@ -133,14 +196,10 @@ httpClient.interceptors.request.use(
     const methodsRequiringCsrf = ['post', 'put', 'delete', 'patch'];
     if ((config.method && methodsRequiringCsrf.includes(config.method.toLowerCase())) || config.headers?.['X-CSRF-Force']) {
       const csrfToken = getCookie('XSRF-TOKEN'); // Ensure this matches your cookie name
-      console.log('CALLING' + config.url, 'token is', csrfToken);
-
       if (csrfToken) {
         // Ensure headers exists
         config.headers = config.headers || {};
         config.headers['X-XSRF-TOKEN'] = csrfToken;
-        console.log('CONFIG HEADERS', config.headers);
-
       }
     }
     return config;
