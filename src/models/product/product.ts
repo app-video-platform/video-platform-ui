@@ -26,3 +26,14 @@ export interface ICreateProduct {
   sections: DownloadSection[];
 
 }
+
+export interface IUpdateProduct {
+  id: string;
+  name: string;
+  description: string; // Limit 420 characters
+  type: ProductType;
+  status: ProductStatus;
+  userId: string;
+  price: 'free' | number;
+  sections: DownloadSection[];
+}

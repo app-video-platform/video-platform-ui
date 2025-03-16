@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ProductType } from '../../../models/product/product.types';
 import FormInput from '../../../components/form-input/form-input.component';
@@ -9,11 +9,14 @@ import DownloadSections from './download-sections/download-sections.component';
 import { DownloadSection } from '../../../models/product/download-section';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
-import { ICreateProduct } from '../../../models/product/product';
+import { ICreateProduct, IUpdateProduct } from '../../../models/product/product';
 import PriceSelector from '../../../components/price-selector/price-selector.component';
 import { AppDispatch } from '../../../store/store';
-import { createNewProduct } from '../../../store/product-store/product.slice';
+import { createNewProduct, updateProductDetails } from '../../../store/product-store/product.slice';
 import Button from '../../../components/button/button.component';
+import { getProductByProductIdAPI } from '../../../api/products-api';
+import { DownloadProduct } from '../../../models/product/download-product';
+import { useParams } from 'react-router-dom';
 
 export interface ProductFormData {
   name: string;
@@ -23,10 +26,16 @@ export interface ProductFormData {
   sections: DownloadSection[];
 }
 
-const CreateProduct: React.FC = () => {
+interface ProductFormProps {
+  mode: 'create' | 'edit';
+}
+
+const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { id } = useParams<{ id: string }>();
+
   const user = useSelector(selectAuthUser);
   const uniqueId = uuidv4();
-  const dispatch = useDispatch<AppDispatch>();
 
 
   const [formData, setFormData] = useState<ProductFormData>({
@@ -36,10 +45,34 @@ const CreateProduct: React.FC = () => {
     price: 'free',
     sections: [{ id: uniqueId, title: '', description: '', position: 1 }]
   });
+
+
+  const [product, setProduct] = useState<DownloadProduct | null>(null);
+
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const productTypes: ProductType[] = ['COURSE', 'DOWNLOAD', 'CONSULTATION'];
+
+  useEffect(() => {
+    if (!product && id) {
+      getProductByProductIdAPI(id).then(data => {
+        console.log('product', data);
+
+        const initialData: ProductFormData = {
+          description: data.description,
+          name: data.name,
+          price: data.price,
+          sections: data.sections,
+          type: data.type
+        };
+        setProduct(data);
+        setFormData(initialData);
+        console.log(formData);
+      });
+
+    }
+  }, [product, id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -79,34 +112,49 @@ const CreateProduct: React.FC = () => {
 
       const sectionsWithoutIds = formData.sections.map(({ id, ...rest }) => rest);
 
+      if (mode === 'create') {
+        const productData: ICreateProduct = {
+          name: formData.name,
+          description: formData.description,
+          type: formData.type as ProductType,
+          price: formData.price,
+          sections: sectionsWithoutIds,
+          status: 'draft',
+          userId: user?.id ?? ''
+        };
 
-      const productData: ICreateProduct = {
-        name: formData.name,
-        description: formData.description,
-        type: formData.type as ProductType,
-        price: formData.price,
-        sections: sectionsWithoutIds,
-        status: 'draft',
-        userId: user?.id ?? ''
-      };
+        dispatch(createNewProduct(productData)).unwrap().then(data => {
+          console.log('response', data);
+        });
+      } else if (mode === 'edit') {
+        const updateData: IUpdateProduct = {
+          id: id as string,
+          name: formData.name,
+          description: formData.description,
+          type: formData.type as ProductType,
+          price: formData.price,
+          sections: sectionsWithoutIds,
+          status: product?.status || 'draft',
+          userId: product?.userId || '',
+        };
 
-      console.log('form', formData);
-
-
-      console.log('Product data', productData);
-      console.log('files', uploadedFiles);
-
-      dispatch(createNewProduct(productData)).unwrap().then(data => {
-        console.log('response', data);
-
-      });
-
+        dispatch(updateProductDetails(updateData))
+          .unwrap()
+          .then((data) => {
+            console.log('Update response', data);
+          });
+      }
     }
   };
+
 
   const onTypeButtonClick = (selectedType: ProductType) => {
     setFormData((prev) => ({ ...prev, type: selectedType }));
   };
+
+  if (!product) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
@@ -114,6 +162,10 @@ const CreateProduct: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
 
+        <div className="form-input">
+          <label htmlFor={'title'}>{'Title'}</label>
+          <input id={'title'} name={'name'} type={'text'} value={formData.name} onChange={handleChange} />
+        </div>
         <FormInput label="Title"
           type="text"
           name="name"
@@ -152,11 +204,12 @@ const CreateProduct: React.FC = () => {
           />
         </div>
 
-        <Button type="primary" text='Save' htmlType='submit' />
+
+        <Button type="primary" text={mode === 'create' ? 'Save' : 'Update'} htmlType='submit' />
       </form>
 
     </div>
   );
 };
 
-export default CreateProduct;
+export default ProductForm;

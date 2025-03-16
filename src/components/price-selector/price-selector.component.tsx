@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FormInput from '../form-input/form-input.component';
 
 interface PriceSelectorProps {
@@ -9,8 +9,15 @@ interface PriceSelectorProps {
 
 
 const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
-  const [selectedPriceMode, setSelectedPriceMode] = useState<string>('free');
+  const [selectedPriceMode, setSelectedPriceMode] = useState<'free' | 'paid'>('free');
 
+  useEffect(() => {
+    if (price === 'free') {
+      setSelectedPriceMode('free');
+    } else {
+      setSelectedPriceMode('paid');
+    }
+  }, [price]);
 
   const handlePriceModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;

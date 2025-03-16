@@ -12,7 +12,7 @@ import Contact from './pages/contact/contact.component';
 import NotFoundPage from './pages/errors/not-found/not-found.component';
 import UnauthorizedPage from './pages/errors/unauthorized/unauthorized.component';
 import Dashboard from './galactica-app/dashboard/dashboard.component';
-import CreateProduct from './galactica-app/products/create-product/create-product.component';
+import ProductForm from './galactica-app/products/create-product/create-product.component';
 import ProductsList from './galactica-app/products/products-list/products-list.component';
 import ProductsLayout from './galactica-app/products/products-layout.component';
 import UserPagePreview from './galactica-app/user-page-preview/user-page-preview.component';
@@ -39,7 +39,8 @@ const App = () => (
         <Route index element={<UserDashboard />} />
         <Route path="products" element={<ProductsLayout />} >
           <Route index element={<ProductsList />} />
-          <Route path='create' element={<CreateProduct />} />
+          <Route path='create' element={<ProductForm mode='create' />} />
+          <Route path='edit/:id' element={<ProductForm mode='edit' />} />
         </Route>
         <Route path='my-page-preview' element={<UserPagePreview />} />
       </Route>
