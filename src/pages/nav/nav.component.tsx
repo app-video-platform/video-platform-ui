@@ -7,7 +7,6 @@ import Button from '../../components/button/button.component';
 
 import './nav.styles.scss';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
 import GoogleSignInButton from '../../components/google-sign-in-button/google-sign-in-button.component';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
@@ -28,8 +27,8 @@ const Navigation: React.FC = () => {
         <div className="nav-links">
           <ul className="nav-link-list">
             <li>Home</li>
-            <li>Chi sonno</li>
-            <li>Contattami</li>
+            <li>About</li>
+            <li>Contact</li>
           </ul>
         </div>
         <div className="user-buttons">
@@ -39,7 +38,7 @@ const Navigation: React.FC = () => {
             ) : (
               <ul className="nav-link-list">
                 <li>
-                  <GoogleSignInButton />
+                  <GoogleSignInButton data-test-id='google-sign-in-button' />
                 </li>
                 <li>
                   <Button onClick={() => handleRedirect('/signup')} type='secondary' text='Sign Up' />

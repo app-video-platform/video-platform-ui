@@ -19,13 +19,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div>Hoe wors
-      <button
-        onClick={fetchUsers}
-        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-      >
-        Fetch Data
-      </button>
+    <div>Some content is finna be here soon!
       {
         apiResponse && <div>{apiResponse}</div>
       }

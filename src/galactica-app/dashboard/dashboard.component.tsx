@@ -18,8 +18,7 @@ const Dashboard: React.FC = () => {
         <h2>Galactica dashboard</h2>
         <div className='app-nav-links'>
           <Link to={''}>Dashboard</Link>
-          <button onClick={() => navigate('products')}><strong>Products</strong></button>
-          <button onClick={() => navigate('my-page-preview')}><strong>Preview my page</strong></button>
+          <Link to={'products'}>Products</Link>
           <Link to={''}>Sales & Analytics</Link>
           <Link to={''}>Marketing and Communication</Link>
         </div>

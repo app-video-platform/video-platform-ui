@@ -10,20 +10,18 @@ interface PriceSelectorProps {
 
 const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
   const [selectedPriceMode, setSelectedPriceMode] = useState<string>('free');
-  // const [isNumberInputVisible, setIsNumberInputVisible] = useState<boolean>(false);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('change', event.target.value);
-    if (event.target.value === 'free') {
-      setSelectedPriceMode(event.target.value);
+
+  const handlePriceModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setSelectedPriceMode(value as 'free' | 'paid');
+    if (value === 'free') {
       setPrice('free');
-    } else if (event.target.value === 'paid') {
-      setSelectedPriceMode(event.target.value);
-      // setPrice()
-    } else {
-      setPrice(Number(event.target.value));
     }
-    // setPrice(event.target.value);
+  };
+
+  const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPrice(Number(event.target.value));
   };
 
   return (
@@ -34,7 +32,7 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
           name="price"           // ensure both radio buttons share the same name
           value="free"
           checked={selectedPriceMode === 'free'}
-          onChange={handleChange}
+          onChange={handlePriceModeChange}
         />
         Free
       </label>
@@ -45,7 +43,7 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
           name="price"
           value="paid"
           checked={selectedPriceMode === 'paid'}
-          onChange={handleChange}
+          onChange={handlePriceModeChange}
         />
         Paid
       </label>
@@ -56,7 +54,7 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
           type="text"
           name="price"
           value={price}
-          onChange={handleChange} />
+          onChange={handlePriceChange} />
       }
     </div>
   );

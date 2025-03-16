@@ -10,6 +10,26 @@ const Breadcrumbs: React.FC = () => {
   // e.g. "/dashboard/products/new" -> ["dashboard", "products", "new"]
   const pathnames = location.pathname.split('/').filter((x) => x);
 
+  const toCamelCase = (segment: string): string => {
+    if (segment && !segment.includes('-')) { return segment; }
+    const words = segment.split('-');
+    return words
+      .map((word, index) => {
+        if (index === 0) {
+          return word.toLowerCase();
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join('');
+  };
+
+  const labelMap: Record<string, string> = {
+    dashboard: 'Dashboard',
+    products: 'Products',
+    new: 'New',
+    myPagePreview: 'My Page Preview'
+  };
+
   return (
     <nav aria-label="breadcrumb">
       <ul className="breadcrumb-list">
@@ -19,16 +39,7 @@ const Breadcrumbs: React.FC = () => {
 
           // Check if this is the last segment (no link)
           const isLast = index === pathnames.length - 1;
-
-          // You might want to map segments to human-friendly labels
-          // e.g. "products" -> "Products"
-          const labelMap: Record<string, string> = {
-            dashboard: 'Dashboard',
-            products: 'Products',
-            new: 'New',
-            // etc.
-          };
-          const label = labelMap[segment] || segment;
+          const label = labelMap[toCamelCase(segment)] || segment;
 
           return (
             <li key={segment}>

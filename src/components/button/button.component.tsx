@@ -4,10 +4,11 @@ import './button.styles.scss';
 
 interface ButtonProps {
   text: string;
-  type: string;
-  onClick: () => void;
+  type: 'neutral' | 'primary' | 'secondary';
+  onClick?: () => void;
+  htmlType?: 'button' | 'submit' | 'reset';
 }
 
-const Button: React.FC<ButtonProps> = ({ text, type = 'primary', onClick }) => <button onClick={onClick} className={`vp-button vp-button--${type}`}>{text}</button>;
+const Button: React.FC<ButtonProps> = ({ text, type = 'neutral', onClick, htmlType }) => <button onClick={onClick} type={htmlType} className={`vp-button vp-button--${type}`}>{text}</button>;
 
 export default Button;

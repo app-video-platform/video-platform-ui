@@ -6,6 +6,7 @@ import FormInput from '../../../../components/form-input/form-input.component';
 
 import './download-sections.styles.scss';
 import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
+import Button from '../../../../components/button/button.component';
 
 interface DynamicSectionsProps {
   sections: DownloadSection[];
@@ -64,7 +65,7 @@ const DownloadSections: React.FC<DynamicSectionsProps> = ({ sections, onChangeSe
         <div key={section.id} className='download-section'>
           <div className='section-header-line'>
             <h3>Section {section.position}</h3>
-            <button onClick={() => removeSection(section.id)}>Remove</button>
+            <Button onClick={() => removeSection(section.id)} text='Remove' type='secondary' />
           </div>
 
           <FormInput label="Section Title"
@@ -89,8 +90,7 @@ const DownloadSections: React.FC<DynamicSectionsProps> = ({ sections, onChangeSe
         </div>
       ))}
 
-      <button type='button' onClick={addSection}>Add Section</button>
-
+      <Button type='primary' htmlType='button' onClick={addSection} text='Add Section' />
     </div>
   );
 };

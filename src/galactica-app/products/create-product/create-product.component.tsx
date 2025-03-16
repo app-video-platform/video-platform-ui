@@ -13,6 +13,7 @@ import { ICreateProduct } from '../../../models/product/product';
 import PriceSelector from '../../../components/price-selector/price-selector.component';
 import { AppDispatch } from '../../../store/store';
 import { createNewProduct } from '../../../store/product-store/product.slice';
+import Button from '../../../components/button/button.component';
 
 export interface ProductFormData {
   name: string;
@@ -151,9 +152,7 @@ const CreateProduct: React.FC = () => {
           />
         </div>
 
-        <button className="save-product-btn" type="submit">
-          Save
-        </button>
+        <Button type="primary" text='Save' htmlType='submit' />
       </form>
 
     </div>
