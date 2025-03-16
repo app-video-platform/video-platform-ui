@@ -1,0 +1,71 @@
+@use 'sass:color';
+
+.multi-step-container {
+  width: 800px;
+  height: 90%;
+  background-color: #080025;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  .step-container {
+    margin-top: 50px;
+    flex: 1;
+
+    .step-header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+  }
+
+  .step-action-buttons {
+    margin-top: auto;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+
+    button {
+      color: white;
+    }
+
+    .primary-step-btn {
+      background-color: black;
+      padding: 20px 30px;
+      border-radius: 10px;
+
+      &:hover {
+        background-color: color.scale(black, $lightness: 10%);
+      }
+    }
+  }
+}
+
+// .step {
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+
+//   .step-action-buttons {
+//     margin-top: auto;
+//     display: flex;
+//     gap: 15px;
+//     justify-content: flex-end;
+
+//     button {
+//       color: white;
+//     }
+
+//     .primary-step-btn {
+//       background-color: black;
+//       padding: 20px 30px;
+//       border-radius: 10px;
+
+//       &:hover {
+//         background-color: color.scale(black, $lightness: 10%);
+//       }
+//     }
+//   }
+// }

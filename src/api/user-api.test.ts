@@ -13,7 +13,8 @@ describe('User API functions', () => {
         firstName: 'Mock',
         lastName: 'User',
         email: 'mock@user.test',
-        role: ['User']
+        role: ['User'],
+        onboardingCompleted: true,
       };
 
       mockedHttpClient.get.mockResolvedValueOnce({ data: fakeResponse });
