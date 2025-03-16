@@ -3,6 +3,11 @@
   width: 100%;
   justify-content: space-between;
   padding: 20px;
+
+  .app-nav-links {
+    display: flex;
+    gap: 40px;
+  }
 }
 
 .dashboard-outlet {

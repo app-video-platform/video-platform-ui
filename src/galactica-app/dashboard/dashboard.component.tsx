@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 
@@ -16,8 +16,13 @@ const Dashboard: React.FC = () => {
     <div>
       <div className='dashboard-top'>
         <h2>Galactica dashboard</h2>
-        <button onClick={() => navigate('products')}><strong>Products</strong></button>
-        <button onClick={() => navigate('my-page-preview')}><strong>Preview my page</strong></button>
+        <div className='app-nav-links'>
+          <Link to={''}>Dashboard</Link>
+          <button onClick={() => navigate('products')}><strong>Products</strong></button>
+          <button onClick={() => navigate('my-page-preview')}><strong>Preview my page</strong></button>
+          <Link to={''}>Sales & Analytics</Link>
+          <Link to={''}>Marketing and Communication</Link>
+        </div>
         <button onClick={() => navigate('/')}>Go to website</button>
         <UserProfileDropdown />
       </div>

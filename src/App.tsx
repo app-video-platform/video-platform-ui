@@ -17,6 +17,7 @@ import ProductsList from './galactica-app/products/products-list/products-list.c
 import ProductsLayout from './galactica-app/products/products-layout.component';
 import UserPagePreview from './galactica-app/user-page-preview/user-page-preview.component';
 import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
+import Onboarding from './galactica-app/onboarding/onboarding.component';
 
 const App = () => (
   <AppInitializer>
@@ -33,6 +34,7 @@ const App = () => (
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+      <Route path='onboarding' element={<Onboarding />} />
       <Route path="dashboard" element={<Dashboard />}>
         <Route index element={<UserDashboard />} />
         <Route path="products" element={<ProductsLayout />} >

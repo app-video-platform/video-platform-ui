@@ -55,11 +55,16 @@ const SignIn: React.FC = () => {
         .then((value) => {
           // console.log(value);
 
-          dispatch(getUserProfile()).then(data => {
+          dispatch(getUserProfile()).unwrap().then(data => {
             if (data) {
-              console.log('GO TO DASHBOARD FROM SIGN IN');
+              if (data.onboardingCompleted) {
+                console.log('GO TO DASHBOARD FROM SIGN IN', data);
+                navigate('dashboard');
+              } else {
+                console.log('GO TO ONBOARDING FROM SIGN IN', data);
+                navigate('onboarding');
+              }
 
-              navigate('dashboard');
             }
           });
 

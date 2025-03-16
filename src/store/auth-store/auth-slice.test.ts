@@ -26,6 +26,7 @@ describe('auth slice reducers', () => {
       lastName: 'Smith',
       email: 'alice@example.com',
       role: ['user'],
+      onboardingCompleted: true,
     } as User;
     const state = authReducer(initialState, setUserProfile(user));
     expect(state.user).toEqual(user);
