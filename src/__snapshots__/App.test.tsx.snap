@@ -18,10 +18,10 @@ exports[`App Component matches snapshot after navigation 1`] = `
           Home
         </li>
         <li>
-          Chi sonno
+          About
         </li>
         <li>
-          Contattami
+          Contact
         </li>
       </ul>
     </div>
@@ -56,12 +56,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
     </div>
   </nav>
   <div>
-    Hoe wors
-    <button
-      class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-    >
-      Fetch Data
-    </button>
+    Some content is finna be here soon!
   </div>
 </div>
 `;

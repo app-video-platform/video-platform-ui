@@ -8,6 +8,27 @@ import { useNavigate } from 'react-router-dom';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
 
+// Custom hook to handle clicks outside of a given ref.
+function useOnClickOutside<T extends HTMLElement>(
+  ref: React.RefObject<T | null>,
+  handler: (event: MouseEvent) => void
+) {
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      // If ref.current is null or contains the event target, do nothing
+      if (!ref.current || ref.current.contains(event.target as Node)) {
+        return;
+      }
+      handler(event);
+    };
+
+    document.addEventListener('mousedown', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+    };
+  }, [ref, handler]);
+}
+
 const UserProfileDropdown: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -15,16 +36,7 @@ const UserProfileDropdown: React.FC = () => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // const otherUser: User = {
-  //   firstName: localStorage.getItem('firstName') || '',
-  //   lastName: localStorage.getItem('lastName') || '',
-  //   email: localStorage.getItem('email') || '',
-  //   role: localStorage.getItem('roles')?.split(',').map(role => role.trim()) || [],
-  // };
-
-  // if (!user && otherUser) {
-  //   user = otherUser;
-  // }
+  useOnClickOutside(dropdownRef, () => setOpen(false));
 
   // Toggle dropdown open/close
   const handleToggle = () => {
@@ -34,7 +46,6 @@ const UserProfileDropdown: React.FC = () => {
   // Log the user out
   const handleLogout = () => {
     dispatch(logout());
-    // onLogout();
     setOpen(false);
 
     dispatch(logoutUser())
@@ -47,19 +58,6 @@ const UserProfileDropdown: React.FC = () => {
         console.error('Logout error:', error);
       });
   };
-
-  // Close the dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   if (!user) { return null; }
 

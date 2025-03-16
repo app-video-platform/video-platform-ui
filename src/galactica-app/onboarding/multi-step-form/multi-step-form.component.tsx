@@ -10,6 +10,7 @@ import StepThree from './step-three/step-three.component';
 import StepFour from './step-four/step-four.component';
 import StepFive from './step-five/step-five.component';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../../components/button/button.component';
 
 export interface MultiStepFormData {
   profileImage: string;
@@ -85,16 +86,16 @@ const MultiStepForm: React.FC = () => {
       {renderStep()}
     </div>
     <div className='step-action-buttons'>
-      <button onClick={() => handleSkip()}>Skip</button>
+      <Button onClick={() => handleSkip()} text='Skip' type='neutral' />
       {
-        step !== 1 && <button onClick={prevStep} className='primary-step-btn'>Back</button>
+        step !== 1 && <Button onClick={prevStep} text='Back' type='primary' />
       }
       {
-        step !== 5 && <button onClick={() => handleNextStep('next')} className='primary-step-btn'>Next</button>
+        step !== 5 && <Button onClick={() => handleNextStep('next')} type='primary' text='Next' />
       }
 
       {
-        step === 5 && <button onClick={() => handleNextStep('continue')} className='primary-step-btn'>Continue</button>
+        step === 5 && <Button onClick={() => handleNextStep('continue')} text='Continue' type='primary' />
       }
     </div>
   </div>;

@@ -5,6 +5,7 @@ import { AppDispatch } from '../../store/store';
 import { Eye, EyeOff } from 'lucide-react';
 import FormInput from '../../components/form-input/form-input.component';
 import { getUserProfile, signinUser } from '../../store/auth-store/auth.slice';
+import Button from '../../components/button/button.component';
 
 export interface SignInFormData {
   email: string;
@@ -38,6 +39,7 @@ const SignIn: React.FC = () => {
     if (!formData.password) {
       newErrors.password = 'Password is required';
     }
+    console.log('new errors', newErrors);
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -48,6 +50,8 @@ const SignIn: React.FC = () => {
   };
 
   const handleSubmit = (e: React.FormEvent) => {
+    console.log('get here');
+
     e.preventDefault();
     if (validateForm()) {
       dispatch(signinUser(formData))
@@ -80,7 +84,7 @@ const SignIn: React.FC = () => {
   return (
     <div>
       <div className='sign-up-container'>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <FormInput
             label="Email"
             type="email"
@@ -110,9 +114,8 @@ const SignIn: React.FC = () => {
             </button>
           </div>
           {errors.password && <p className="error-text-red">{errors.password}</p>}
-          <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition" type="submit">
-            Sign In
-          </button>
+          <button type='submit'>Sign</button>
+          <Button type="primary" htmlType='submit' text='Sign In' />
         </form>
 
       </div>

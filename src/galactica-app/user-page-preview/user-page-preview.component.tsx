@@ -314,7 +314,7 @@ const UserPagePreview: React.FC = () => {
     </div>
 
     <div>
-      <h2>Downloads</h2>
+      <h2 className='user-page-category-header'>Downloads</h2>
       <div className='products-list'>
         {downloads.map((item) => (
           <div key={item.id}>
@@ -324,7 +324,7 @@ const UserPagePreview: React.FC = () => {
 
       </div>
 
-      <h2>Courses</h2>
+      <h2 className='user-page-category-header'>Courses</h2>
       <div className='products-list'>
         {courses.map((item) => (
           <div key={item.id}>
@@ -333,7 +333,7 @@ const UserPagePreview: React.FC = () => {
         ))}
       </div>
 
-      <h2>Consultations</h2>
+      <h2 className='user-page-category-header'>Consultations</h2>
       <div className='products-list'>
         {consultations.map((item) => (
           <div key={item.id}>

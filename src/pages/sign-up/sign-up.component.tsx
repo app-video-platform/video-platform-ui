@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { signupUser } from '../../store/auth-store/auth.slice';
 import { useNavigate } from 'react-router-dom';
 import { UserRegisterData } from '../../models/user/user';
+import Button from '../../components/button/button.component';
 
 export interface SignupFormData {
   firstName: string;
@@ -190,9 +191,7 @@ const SignUp: React.FC = () => {
           </div>
           {errors.confirmPassword && <p className="error-text-red">{errors.confirmPassword}</p>}
 
-          <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition" type="submit">
-            Sign Up
-          </button>
+          <Button text='Sign Up' htmlType='submit' type="primary" />
         </form>
       </div>
     </div>

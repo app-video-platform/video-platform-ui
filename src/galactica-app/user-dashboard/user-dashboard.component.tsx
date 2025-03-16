@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { selectAllProducts } from '../../store/product-store/product.selectors';
 import { BaseProduct } from '../../models/product/product';
 import ProductCard from '../../components/product-box/product-box.component';
+import Button from '../../components/button/button.component';
 
 
 const UserDashboard: React.FC = () => {
@@ -35,7 +36,7 @@ const UserDashboard: React.FC = () => {
           <span>Member since: <strong>12 March 2025</strong></span>
         </div>
         <div className='action-buttons-container'>
-          <button className='see-preview-btn' onClick={() => navigate('my-page-preview')}>Preview</button>
+          <Button onClick={() => navigate('my-page-preview')} text='Preview' type='secondary' />
         </div>
       </div>
 
@@ -49,7 +50,7 @@ const UserDashboard: React.FC = () => {
           ) : (
             <div>
               <p>You don&apos;t have any products yet. Go ahead and create one right now!</p>
-              <button onClick={() => navigate('products/create')}>Create product</button>
+              <Button onClick={() => navigate('products/create')} text='Create Product' type='primary' />
             </div>
           )
         }

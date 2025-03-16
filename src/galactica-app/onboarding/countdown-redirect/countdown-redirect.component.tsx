@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../../components/button/button.component';
 
 const CountdownRedirect: React.FC = () => {
   const [seconds, setSeconds] = useState<number>(10);
@@ -22,7 +23,7 @@ const CountdownRedirect: React.FC = () => {
   return <div>
     <p>You have already completed your onboarding process. If you want to go through it again, or need help with the app, go to your settings page and look for Onboarding and Help</p>
     <p>You will be redirected to your dashboard in {seconds} seconds</p>;
-    <p>Or you can <button onClick={() => navigate('/dashboard')}>go now</button></p>
+    <p>Or you can <Button type='primary' text='go now' onClick={() => navigate('/dashboard')} /></p>
   </div>;
 };
 
