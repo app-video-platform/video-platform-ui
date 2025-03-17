@@ -125,7 +125,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 
         dispatch(createNewProduct(productData)).unwrap().then(data => {
           console.log('response', data);
-        });
+        }
+        );
       } else if (mode === 'edit') {
         const updateData: IUpdateProduct = {
           id: id as string,
@@ -152,7 +153,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     setFormData((prev) => ({ ...prev, type: selectedType }));
   };
 
-  if (!product) {
+  if (id && !product) {
     return <div>Loading...</div>;
   }
 
@@ -161,11 +162,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
       <h2>Create new product</h2>
 
       <form onSubmit={handleSubmit}>
-
-        <div className="form-input">
-          <label htmlFor={'title'}>{'Title'}</label>
-          <input id={'title'} name={'name'} type={'text'} value={formData.name} onChange={handleChange} />
-        </div>
         <FormInput label="Title"
           type="text"
           name="name"
