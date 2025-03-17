@@ -46,14 +46,16 @@ const GoogleSignInButton: React.FC = () => {
     const idToken = response.credential;
 
     dispatch(googleSignInUser(idToken))
-      .then(() => {
-        dispatch(getUserProfile()).then(data => {
-          if (data) {
-            console.log('GO TO DASHBOARD FROM GOOGLE SIGN IN');
+      .then((data) => {
+        if (data) {
+          dispatch(getUserProfile()).then(data => {
+            if (data) {
+              console.log('GO TO DASHBOARD FROM GOOGLE SIGN IN');
 
-            navigate('dashboard');
-          }
-        });
+              navigate('dashboard');
+            }
+          });
+        }
       })
       .catch((error) => {
         console.error('Error logging in:', error);
