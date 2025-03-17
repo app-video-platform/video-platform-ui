@@ -4,7 +4,7 @@ import { CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI, updateProductA
 import { BaseProduct, ICreateProduct, IUpdateProduct } from '../../models/product/product';
 
 interface ProductState {
-  products: null | BaseProduct[];
+  products: null | CeSaZic[];
   loading: boolean;
   error: string | null;
   // Optional: you might want to store a message (for creating/editing/removing status)
@@ -20,7 +20,7 @@ const initialState: ProductState = {
 
 
 export const getAllProductsByUserId = createAsyncThunk<
-  BaseProduct[],  // Return type: Product[]
+  CeSaZic[],  // Return type: Product[]
   string,     // Argument type (userId)
   { rejectValue: string } // Error type
 >('products/getAllProductsByUserId', async (idToken, { rejectWithValue }) => {
@@ -64,15 +64,15 @@ const productsSlice = createSlice({
   initialState,
   reducers: {
     // Set a list of products
-    setProducts(state, action: PayloadAction<Product[]>) {
+    setProducts(state, action: PayloadAction<CeSaZic[]>) {
       state.products = action.payload;
     },
     // Add a single product
-    addProduct(state, action: PayloadAction<Product>) {
+    addProduct(state, action: PayloadAction<CeSaZic>) {
       state.products?.push(action.payload);
     },
     // Update an existing product by id
-    updateProduct(state, action: PayloadAction<Product>) {
+    updateProduct(state, action: PayloadAction<CeSaZic>) {
       const index = state.products?.findIndex(p => p.id === action.payload.id);
       if (state.products && index && index !== -1) {
         state.products[index] = action.payload;
@@ -101,7 +101,7 @@ const productsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(getAllProductsByUserId.fulfilled, (state, action: PayloadAction<BaseProduct[]>) => {
+      .addCase(getAllProductsByUserId.fulfilled, (state, action: PayloadAction<CeSaZic[]>) => {
         state.loading = false;
         state.products = action.payload;
       })
@@ -118,20 +118,7 @@ const productsSlice = createSlice({
       .addCase(createNewProduct.fulfilled, (state, action: PayloadAction<CeSaZic>) => {
         state.loading = false;
         state.products ??= [];
-        const now = new Date(Date.now());
-        state.products?.push({
-          createdAt: now,
-          customers: 0,
-          description: action.payload.description,
-          id: action.payload.id,
-          image: '',
-          name: action.payload.name,
-          price: action.payload.price,
-          status: action.payload.status as ProductStatus,
-          type: action.payload.type as ProductType,
-          updatedAt: now,
-          userId: action.payload.userId
-        });
+        state.products.push(action.payload);
       })
       .addCase(createNewProduct.rejected, (state, action) => {
         state.loading = false;
@@ -146,20 +133,7 @@ const productsSlice = createSlice({
       .addCase(updateProductDetails.fulfilled, (state, action: PayloadAction<CeSaZic>) => {
         state.loading = false;
         if (state.products) {
-          const now = new Date(Date.now());
-          const updatedProduct = {
-            createdAt: now,
-            customers: 0,
-            description: action.payload.description,
-            id: action.payload.id,
-            image: '',
-            name: action.payload.name,
-            price: action.payload.price,
-            status: action.payload.status as ProductStatus,
-            type: action.payload.type as ProductType,
-            updatedAt: now,
-            userId: action.payload.userId
-          };
+          const updatedProduct = action.payload;
           const index = state.products?.findIndex(product => product.id === updatedProduct.id);
           if (index !== -1) {
             state.products[index] = updatedProduct;
