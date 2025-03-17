@@ -16,7 +16,7 @@ import { createNewProduct, updateProductDetails } from '../../../store/product-s
 import Button from '../../../components/button/button.component';
 import { getProductByProductIdAPI } from '../../../api/products-api';
 import { DownloadProduct } from '../../../models/product/download-product';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export interface ProductFormData {
   name: string;
@@ -32,6 +32,7 @@ interface ProductFormProps {
 
 const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
   const user = useSelector(selectAuthUser);
@@ -125,6 +126,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 
         dispatch(createNewProduct(productData)).unwrap().then(data => {
           console.log('response', data);
+          navigate('/');
         }
         );
       } else if (mode === 'edit') {
@@ -142,6 +144,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
         dispatch(updateProductDetails(updateData))
           .unwrap()
           .then((data) => {
+            navigate('/');
             console.log('Update response', data);
           });
       }
