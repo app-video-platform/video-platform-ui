@@ -56,7 +56,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
   const productTypes: ProductType[] = ['COURSE', 'DOWNLOAD', 'CONSULTATION'];
 
   useEffect(() => {
-    if (!product && id && type) {
+    if (!product && id && type && user) {
       getProductByProductIdAPI(id, type).then(data => {
         console.log('product', data);
 
