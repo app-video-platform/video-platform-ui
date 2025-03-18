@@ -43,7 +43,7 @@ export const createNewProductAPI = async (product: ICreateProduct) => {
 
 export const getProductByProductIdAPI = async (productId: string) => {
   try {
-    const response = await httpClient.get<DownloadProduct>('api/product/get?productId=' + productId);
+    const response = await httpClient.get<DownloadProduct>('api/getProduct?productId=' + productId);
     return response.data;
   } catch (error) {
     console.error(`Error retrieving product with id ${productId}:`, error);
@@ -53,7 +53,7 @@ export const getProductByProductIdAPI = async (productId: string) => {
 
 export const updateProductAPI = async (updatedProduct: IUpdateProduct) => {
   try {
-    const response = await httpClient.post<CeSaZic>('api/products/update', updatedProduct);
+    const response = await httpClient.put<CeSaZic>('api/products', updatedProduct);
     return response.data;
   } catch (error) {
     console.error(`Error updating product with id ${updatedProduct.id}:`, error);
