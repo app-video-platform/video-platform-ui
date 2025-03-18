@@ -53,8 +53,8 @@ const ProductsList: React.FC = () => {
                   <td>{product.type}</td>
                   <td>{product.price}</td>
                   <td>{product.status}</td>
-                  <td>{product.customers}</td>
-                  <td><button onClick={() => navigate(`edit/${product.id}`)}>Edit</button></td>
+                  {/* <td>{product.customers}</td> */}
+                  <td><button onClick={() => navigate(`edit/${product.type}/${product.id}`)}>Edit</button></td>
                 </tr>
               ))}
 

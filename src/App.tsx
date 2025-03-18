@@ -40,7 +40,7 @@ const App = () => (
         <Route path="products" element={<ProductsLayout />} >
           <Route index element={<ProductsList />} />
           <Route path='create' element={<ProductForm mode='create' />} />
-          <Route path='edit/:id' element={<ProductForm mode='edit' />} />
+          <Route path="edit/:type/:id" element={<ProductForm mode='edit' />} />
         </Route>
         <Route path='my-page-preview' element={<UserPagePreview />} />
       </Route>

@@ -1,5 +1,6 @@
 import { DownloadProduct } from '../models/product/download-product';
 import { BaseProduct, ICreateProduct, IUpdateProduct } from '../models/product/product';
+import { ProductType } from '../models/product/product.types';
 import httpClient from './http-client';
 
 
@@ -41,9 +42,9 @@ export const createNewProductAPI = async (product: ICreateProduct) => {
   }
 };
 
-export const getProductByProductIdAPI = async (productId: string) => {
+export const getProductByProductIdAPI = async (productId: string, productType: ProductType) => {
   try {
-    const response = await httpClient.get<DownloadProduct>('api/products/getProduct?productId=' + productId);
+    const response = await httpClient.get<DownloadProduct>(`api/products/getProduct?productId=${productId}?type=${productType}`);
     return response.data;
   } catch (error) {
     console.error(`Error retrieving product with id ${productId}:`, error);

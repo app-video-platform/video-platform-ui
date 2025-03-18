@@ -33,7 +33,7 @@ interface ProductFormProps {
 const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id, type } = useParams<{ id: string, type: ProductType }>();
 
   const user = useSelector(selectAuthUser);
   const uniqueId = uuidv4();
@@ -56,8 +56,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
   const productTypes: ProductType[] = ['COURSE', 'DOWNLOAD', 'CONSULTATION'];
 
   useEffect(() => {
-    if (!product && id) {
-      getProductByProductIdAPI(id).then(data => {
+    if (!product && id && type) {
+      getProductByProductIdAPI(id, type).then(data => {
         console.log('product', data);
 
         const initialData: ProductFormData = {
