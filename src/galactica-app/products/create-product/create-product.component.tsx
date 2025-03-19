@@ -132,9 +132,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
       } else if (mode === 'edit') {
         console.log('edit form data', formData);
 
-        const filteredSectionsWithoutIds = formData.sections
-          .filter(({ id }) => id && id.startsWith('tmp'))
-          .map(({ id, ...rest }) => rest);
+        const updatedSections = formData.sections.map(section => {
+          if (section.id && section.id.startsWith('tmp')) {
+            const { id, ...rest } = section;
+            return rest;
+          }
+          return section;
+        });
 
         const updateData: IUpdateProduct = {
           id: id as string,
@@ -142,7 +146,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
           description: formData.description,
           type: formData.type as ProductType,
           price: formData.price,
-          sections: filteredSectionsWithoutIds,
+          sections: updatedSections,
           status: product?.status || 'draft',
           userId: product?.userId || '',
         };
