@@ -44,7 +44,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     description: '',
     type: '',
     price: 'free',
-    sections: [{ id: uniqueId, title: '', description: '', position: 1 }]
+    sections: [{ id: `tmp-${uniqueId}`, title: '', description: '', position: 1 }]
   });
 
 
@@ -111,9 +111,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     e.preventDefault();
     if (validateForm()) {
 
-      const sectionsWithoutIds = formData.sections.map(({ id, ...rest }) => rest);
 
       if (mode === 'create') {
+        const sectionsWithoutIds = formData.sections.map(({ id, ...rest }) => rest);
         const productData: ICreateProduct = {
           name: formData.name,
           description: formData.description,
@@ -132,13 +132,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
       } else if (mode === 'edit') {
         console.log('edit form data', formData);
 
+        const filteredSectionsWithoutIds = formData.sections
+          .filter(({ id }) => id && id.startsWith('tmp'))
+          .map(({ id, ...rest }) => rest);
+
         const updateData: IUpdateProduct = {
           id: id as string,
           name: formData.name,
           description: formData.description,
           type: formData.type as ProductType,
           price: formData.price,
-          sections: formData.sections,
+          sections: filteredSectionsWithoutIds,
           status: product?.status || 'draft',
           userId: product?.userId || '',
         };
