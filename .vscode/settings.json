@@ -15,5 +15,8 @@
   "prettier.printWidth": 80,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always"
-  }
+  },
+  "editor.rulers": [
+    150
+  ]
 }

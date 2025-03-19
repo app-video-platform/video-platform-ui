@@ -1,4 +1,8 @@
-import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { User } from '../models/user/user';
 import { BaseProduct } from '../models/product/product';
 import { DownloadProduct } from '../models/product/download-product';
@@ -45,7 +49,8 @@ const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 //     if (config.url?.includes('api/products/update')) {
 //       const mockResponse: AxiosResponse<CeSaZic> = {
 //         data: {
-//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm omnis satanica potestats, imnis inscriptios de mai jos!',
+//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm omnis 
+// satanica potestats, imnis inscriptios de mai jos!',
 //           id: '1',
 //           name: 'How to stop nose leaks',
 //           price: 10.99,
@@ -80,7 +85,8 @@ const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 //         data: {
 //           createdAt: now,
 //           customers: 100,
-//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm omnis satanica potestats, imnis inscriptios de mai jos!',
+//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm 
+// omnis satanica potestats, imnis inscriptios de mai jos!',
 //           id: '1',
 //           image: '',
 //           name: 'How to stop nose leaks',
@@ -106,7 +112,6 @@ const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 //     if (config.url?.includes('api/product/getAll')) {
 //       const now = new Date();
 //       console.log('THIS CALLEd?');
-
 
 //       const mockResponse: AxiosResponse<BaseProduct[]> = {
 //         data: [
@@ -166,7 +171,7 @@ const httpClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
   withCredentials: true,
   // adapter: mockAdapter, // COMMM FOR INTERCEPT
@@ -181,20 +186,31 @@ function getCookie(name: string): string | null {
   return null;
 }
 
-const excludedEndpoints = ['/api/auth/register', '/api/auth/login', '/api/auth/verify'];
+const excludedEndpoints = [
+  '/api/auth/register',
+  '/api/auth/login',
+  '/api/auth/verify',
+];
 
 // Request interceptor to attach the CSRF token to state-changing requests
 httpClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Check if the URL should be excluded from CSRF token attachment
 
-    if (config.url && excludedEndpoints.some((endpoint) => config.url?.includes(endpoint))) {
+    if (
+      config.url &&
+      excludedEndpoints.some((endpoint) => config.url?.includes(endpoint))
+    ) {
       return config;
     }
 
     // Only attach CSRF token for methods that change state
     const methodsRequiringCsrf = ['post', 'put', 'delete', 'patch'];
-    if ((config.method && methodsRequiringCsrf.includes(config.method.toLowerCase())) || config.headers?.['X-CSRF-Force']) {
+    if (
+      (config.method &&
+        methodsRequiringCsrf.includes(config.method.toLowerCase())) ||
+      config.headers?.['X-CSRF-Force']
+    ) {
       const csrfToken = getCookie('XSRF-TOKEN'); // Ensure this matches your cookie name
       if (csrfToken) {
         // Ensure headers exists
@@ -206,7 +222,6 @@ httpClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 
 // -----------------------------
 // Refresh Token Flow
@@ -221,7 +236,7 @@ let failedQueue: Array<{
 
 // Process queued requests after a refresh attempt
 const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else if (token) {
@@ -235,7 +250,9 @@ const processQueue = (error: any, token: string | null = null) => {
 httpClient.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (originalRequest.url?.includes('/api/auth/refresh')) {
@@ -247,7 +264,7 @@ httpClient.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then(() => axios(originalRequest))
-          .catch(err => Promise.reject(err));
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -255,7 +272,11 @@ httpClient.interceptors.response.use(
 
       return new Promise((resolve, reject) => {
         axios
-          .post(`${API_BASE_URL}api/auth/refresh`, {}, { withCredentials: true })
+          .post(
+            `${API_BASE_URL}api/auth/refresh`,
+            {},
+            { withCredentials: true }
+          )
           .then(() => {
             // The backend should update the cookies (JWT, CSRF) automatically
             processQueue(null);
@@ -273,9 +294,5 @@ httpClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
-
-
 
 export default httpClient;

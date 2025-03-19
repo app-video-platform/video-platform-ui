@@ -18,6 +18,7 @@ import ProductsLayout from './galactica-app/products/products-layout.component';
 import UserPagePreview from './galactica-app/user-page-preview/user-page-preview.component';
 import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
 import Onboarding from './galactica-app/onboarding/onboarding.component';
+import ForgotPassword from './pages/forgot-password/forgot-password.component';
 
 const App = () => (
   <AppInitializer>
@@ -33,6 +34,7 @@ const App = () => (
       <Route path="/email-sent" element={<EmailSent />} />
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route path='onboarding' element={<Onboarding />} />
       <Route path="dashboard" element={<Dashboard />}>

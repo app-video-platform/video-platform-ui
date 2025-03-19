@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch } from '../../store/store';
 import { Eye, EyeOff } from 'lucide-react';
+
+import { AppDispatch } from '../../store/store';
 import FormInput from '../../components/form-input/form-input.component';
 import { getUserProfile, signinUser } from '../../store/auth-store/auth.slice';
 import Button from '../../components/button/button.component';
+
+import './sign-in.styles.scss';
 
 export interface SignInFormData {
   email: string;
@@ -114,10 +117,13 @@ const SignIn: React.FC = () => {
             </button>
           </div>
           {errors.password && <p className="error-text-red">{errors.password}</p>}
-          <button type='submit'>Sign</button>
           <Button type="primary" htmlType='submit' text='Sign In' />
         </form>
 
+        <div className='forgot-password-button-container'>
+          <button className='forgot-password-btn' onClick={() => navigate('/forgot-password')}>I forgot my password</button>
+
+        </div>
       </div>
     </div>
   );

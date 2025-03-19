@@ -23,6 +23,7 @@ module.exports = {
     indent: ['error', 2],
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
+    'max-len': ['error', { code: 150 }],
 
     // Prevent Bugs
     'no-unused-vars': ['warn'],
