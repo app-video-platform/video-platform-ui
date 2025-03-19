@@ -105,7 +105,7 @@ describe('GoogleSignInButton component', () => {
 
     // Set up the dispatch mock to simulate successful actions.
     // First call resolves (googleSignInUser), second resolves with a truthy value (getUserProfile).
-    mockDispatch.mockResolvedValueOnce(undefined);
+    mockDispatch.mockResolvedValueOnce(true);
     mockDispatch.mockResolvedValueOnce(true);
 
     // Render the component.

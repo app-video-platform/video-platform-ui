@@ -16,13 +16,13 @@ const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
   const products = useSelector(selectAllProducts);
-  let topThreeProducts: BaseProduct[] = [];
+  const topThreeProducts: BaseProduct[] = [];
 
-  if (products) {
-    topThreeProducts = products
-      .sort((a, b) => b.customers - a.customers)
-      .slice(0, 3);
-  }
+  // if (products) {
+  //   topThreeProducts = products
+  //     .sort((a, b) => b.customers - a.customers)
+  //     .slice(0, 3);
+  // }
 
   return (
     <div className='user-dashboard-container'>

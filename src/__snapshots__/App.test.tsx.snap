@@ -39,14 +39,14 @@ exports[`App Component matches snapshot after navigation 1`] = `
           </li>
           <li>
             <button
-              class="vp-button vp-button--secondary"
+              class="vp-button vp-button--secondary undefined"
             >
               Sign Up
             </button>
           </li>
           <li>
             <button
-              class="vp-button vp-button--primary"
+              class="vp-button vp-button--primary undefined"
             >
               Sign In
             </button>

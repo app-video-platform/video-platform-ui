@@ -55,3 +55,14 @@ export const googleAPI = async (idToken: string) => {
     throw error;
   }
 };
+
+
+export const forgotPasswordAPI = async (email: string) => {
+  try {
+    const response = await httpClient.post<string>('api/auth/forgot', email);
+    return response.data;
+  } catch (error) {
+    console.error('Error sending your email for password reset:', error);
+    throw error;
+  }
+};
