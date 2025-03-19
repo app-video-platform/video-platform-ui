@@ -73,7 +73,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
       });
 
     }
-  }, [product, id]);
+  }, [product, id, type, user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
