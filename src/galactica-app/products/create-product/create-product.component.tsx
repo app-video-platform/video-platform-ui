@@ -130,13 +130,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
         }
         );
       } else if (mode === 'edit') {
+        console.log('edit form data', formData);
+
         const updateData: IUpdateProduct = {
           id: id as string,
           name: formData.name,
           description: formData.description,
           type: formData.type as ProductType,
           price: formData.price,
-          sections: sectionsWithoutIds,
+          sections: formData.sections,
           status: product?.status || 'draft',
           userId: product?.userId || '',
         };
