@@ -50,8 +50,6 @@ const GoogleSignInButton: React.FC = () => {
         if (data) {
           dispatch(getUserProfile()).then(data => {
             if (data) {
-              console.log('GO TO DASHBOARD FROM GOOGLE SIGN IN');
-
               navigate('dashboard');
             }
           });

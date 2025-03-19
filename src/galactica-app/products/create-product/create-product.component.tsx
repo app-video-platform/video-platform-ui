@@ -121,12 +121,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
           price: formData.price,
           sections: sectionsWithoutIds,
           status: 'draft',
-          userId: user?.id ?? ''
+          userId: ''
         };
 
         dispatch(createNewProduct(productData)).unwrap().then(data => {
           console.log('response', data);
-          navigate('/');
+
+          navigate('products');
         }
         );
       } else if (mode === 'edit') {
