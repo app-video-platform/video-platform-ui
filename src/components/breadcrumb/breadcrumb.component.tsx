@@ -27,18 +27,22 @@ const Breadcrumbs: React.FC = () => {
     dashboard: 'Dashboard',
     products: 'Products',
     new: 'New',
-    myPagePreview: 'My Page Preview'
+    myPagePreview: 'My Page Preview',
+    edit: 'Edit Product',
   };
+
+  const editIndex = pathnames.findIndex(segment => toCamelCase(segment) === 'edit');
+  const filteredPathnames = editIndex >= 0 ? pathnames.slice(0, editIndex + 1) : pathnames;
 
   return (
     <nav aria-label="breadcrumb">
       <ul className="breadcrumb-list">
-        {pathnames.map((segment, index) => {
+        {filteredPathnames.map((segment, index) => {
           // Build the path up to this segment
-          const to = '/' + pathnames.slice(0, index + 1).join('/');
+          const to = '/' + filteredPathnames.slice(0, index + 1).join('/');
 
           // Check if this is the last segment (no link)
-          const isLast = index === pathnames.length - 1;
+          const isLast = index === filteredPathnames.length - 1;
           const label = labelMap[toCamelCase(segment)] || segment;
 
           return (
