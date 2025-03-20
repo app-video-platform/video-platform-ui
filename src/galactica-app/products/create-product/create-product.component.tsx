@@ -49,6 +49,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 
 
   const [product, setProduct] = useState<DownloadProduct | null>(null);
+  const [productImage, setProductImage] = useState<File | null>(null);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -92,6 +93,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 
   };
 
+  const handleImageChange = (image: File[]) => {
+    // Callback to update the form's state with files from UppyFileUploader
+    setProductImage(image[0]);
+
+    console.log('product image', image[0]);
+
+  };
+
   const handleSectionsChange = (updatedSections: DownloadSection[]) => {
     setFormData((prev) => ({ ...prev, sections: updatedSections }));
   };
@@ -121,7 +130,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
           price: formData.price,
           sections: sectionsWithoutIds,
           status: 'draft',
-          userId: ''
+          userId: user?.id ?? ''
         };
 
         dispatch(createNewProduct(productData)).unwrap().then(data => {
@@ -204,7 +213,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
           {errors.type && <p className="error-text-red">{errors.type}</p>}
         </div>
 
-        <PriceSelector price={formData.price} setPrice={handleSetPrice} />
+        <div className='price-selector-wrapper'>
+          <h3>Choose Your Price Option</h3>
+          <PriceSelector price={formData.price} setPrice={handleSetPrice} />
+        </div>
+
+        <div className='image-uploader'>
+          <h3>Upload an image</h3>
+          <UppyFileUploader onFilesChange={handleImageChange} allowedFileTypes={['image/*']} />
+        </div>
 
         <div className='file-uploader'>
           <DownloadSections
