@@ -15,7 +15,8 @@ const initialState = {
   loading: false,
   error: null,
   message: null,
-  isUserLoggedIn: null
+  isUserLoggedIn: null,
+  notifications: []
 };
 
 describe('auth slice reducers', () => {

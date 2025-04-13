@@ -1,0 +1,17 @@
+.notifications-button {
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+}
+
+.notifications-dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  width: 150px;
+  background: antiquewhite;
+  padding: 10px;
+}
