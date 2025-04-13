@@ -12,9 +12,9 @@ import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 import { ICreateProduct, IUpdateProduct } from '../../../models/product/product';
 import PriceSelector from '../../../components/price-selector/price-selector.component';
 import { AppDispatch } from '../../../store/store';
-import { createNewProduct, updateProductDetails } from '../../../store/product-store/product.slice';
+import { addImageToProduct, createNewProduct, updateProductDetails } from '../../../store/product-store/product.slice';
 import Button from '../../../components/button/button.component';
-import { getProductByProductIdAPI } from '../../../api/products-api';
+import { addFileToSectionAPI, getProductByProductIdAPI } from '../../../api/products-api';
 import { DownloadProduct } from '../../../models/product/download-product';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -24,6 +24,11 @@ export interface ProductFormData {
   type: ProductType | '';
   price: 'free' | number;
   sections: DownloadSection[];
+}
+
+export interface IFilesWithSection {
+  sectionId: string,
+  files: File[]
 }
 
 interface ProductFormProps {
@@ -52,7 +57,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
   const [productImage, setProductImage] = useState<File | null>(null);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadedFilesWithSection, setUploadedFilesWithSection] = useState<IFilesWithSection[]>([]);
 
   const productTypes: ProductType[] = ['COURSE', 'DOWNLOAD', 'CONSULTATION'];
 
@@ -85,12 +90,26 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     setFormData((prev) => ({ ...prev, price: price }));
   };
 
-  const handleFilesChange = (files: File[]) => {
-    // Callback to update the form's state with files from UppyFileUploader
-    setUploadedFiles(files);
+  const handleFilesChange = (filesWithSections: IFilesWithSection) => {
+    setUploadedFilesWithSection((prevFiles = []) => {
+      // Find if a file section with the same sectionId already exists
+      const index = prevFiles.findIndex(
+        (fileSection) => fileSection.sectionId === filesWithSections.sectionId
+      );
 
-    console.log('files', files);
+      // If found, update its files; otherwise, add the new entry to the array
+      if (index !== -1) {
+        // Create a new array with an updated entry
+        return prevFiles.map((fileSection, i) =>
+          i === index ? { ...fileSection, files: filesWithSections.files } : fileSection
+        );
+      } else {
+        return [...prevFiles, filesWithSections];
+      }
+    });
 
+    console.log('files', filesWithSections);
+    console.log('all files', uploadedFilesWithSection);
   };
 
   const handleImageChange = (image: File[]) => {
@@ -133,12 +152,37 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
           userId: user?.id ?? ''
         };
 
+        console.log('SAVE PRODUCT', productData);
+        console.log('SAVE IMAGE', productImage);
+        console.log('SAVE FILES', uploadedFilesWithSection);
+
+
         dispatch(createNewProduct(productData)).unwrap().then(data => {
           console.log('response', data);
 
+          if (data) {
+            if (productImage) {
+              dispatch(addImageToProduct({ productId: data.id, image: productImage })).unwrap().then(imageData => {
+                console.log('image upload data', imageData);
+
+              });
+            }
+            if (uploadedFilesWithSection) {
+              uploadedFilesWithSection.forEach(filesWithSection => {
+                const foundSection = data.sections.find(section => section.position.toString() === filesWithSection.sectionId);
+                if (foundSection) {
+                  filesWithSection.files.forEach(file => {
+                    console.log(`add file for section ${foundSection.id}`, file);
+
+                    addFileToSectionAPI(file, data.id, foundSection.id);
+                  });
+                }
+              });
+            }
+          }
+
           navigate('products');
-        }
-        );
+        });
       } else if (mode === 'edit') {
         console.log('edit form data', formData);
 

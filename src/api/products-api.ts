@@ -61,3 +61,23 @@ export const updateProductAPI = async (updatedProduct: IUpdateProduct) => {
     throw error;
   }
 };
+
+export const addImageToProductAPI = async (image: File, productId: string) => {
+  try {
+    const response = await httpClient.post<string>(`api/products/image?productId=${productId}`, image);
+    return response.data;
+  } catch (error) {
+    console.error(`Error adding image to product with id ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const addFileToSectionAPI = async (file: File, productId: string, sectionId: string) => {
+  try {
+    const response = await httpClient.post<string>(`api/products/file?productId=${productId}&sectionId=${sectionId}`, file);
+    return response.data;
+  } catch (error) {
+    console.error(`Error adding image to product with id ${productId}:`, error);
+    throw error;
+  }
+};
