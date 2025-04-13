@@ -168,31 +168,35 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     console.log('SAVE FILES', uploadedFilesWithSection);
 
     // Create the new product and wait for the response
-    const data = await dispatch(createNewProduct(productData)).unwrap();
-    console.log('response', data);
+    dispatch(createNewProduct(productData)).unwrap().then(async data => {
+      console.log('response', data);
+      if (data) {
 
-    // Handle image upload if available
-    if (data && productImage) {
-      const imageData = await dispatch(
-        addImageToProduct({ productId: data.id, image: productImage })
-      ).unwrap();
-      console.log('image upload data', imageData);
-    }
+        // Handle image upload if available
+        if (data && productImage) {
+          const imageData = await dispatch(
+            addImageToProduct({ productId: data.id, image: productImage })
+          ).unwrap();
+          console.log('image upload data', imageData);
+        }
 
-    // Handle file uploads for each section if provided
-    if (data && uploadedFilesWithSection) {
-      uploadFilesInBackground(uploadedFilesWithSection, data, dispatch)
-        .then(results => {
-          console.log('file upload results:', results);
-        })
-        .catch(error => {
-          console.error('Error during file uploads:', error);
-          // Optionally, dispatch another error notification here.
-        });
-    }
+        // Handle file uploads for each section if provided
+        if (data && uploadedFilesWithSection) {
+          uploadFilesInBackground(uploadedFilesWithSection, data, dispatch)
+            .then(results => {
+              console.log('file upload results:', results);
+            })
+            .catch(error => {
+              console.error('Error during file uploads:', error);
+              // Optionally, dispatch another error notification here.
+            });
+        }
 
-    // Navigate away from the page after creation
-    navigate('products');
+        // Navigate away from the page after creation
+        navigate('products');
+      }
+    });
+
   };
 
   const handleEditProduct = async () => {
