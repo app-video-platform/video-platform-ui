@@ -8,6 +8,7 @@ import UserProfileDropdown from '../../components/user-profile/user-profile.comp
 import './dashboard.styles.scss';
 import UserDashboard from '../user-dashboard/user-dashboard.component';
 import Breadcrumbs from '../../components/breadcrumb/breadcrumb.component';
+import NotificationsDropdown from '../../components/notifications-dropdown/notifications-dropdown.component';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const Dashboard: React.FC = () => {
           <Link to={''}>Marketing and Communication</Link>
         </div>
         <button onClick={() => navigate('/')}>Go to website</button>
+        <NotificationsDropdown />
         <UserProfileDropdown />
       </div>
       <Breadcrumbs />

@@ -2,6 +2,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Product, ProductStatus, ProductType } from '../../models/product/product.types';
 import { addImageToProductAPI, CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI, updateProductAPI } from '../../api/products-api';
 import { BaseProduct, ICreateProduct, IUpdateProduct } from '../../models/product/product';
+import { AppDispatch } from '../store';
+import { addNotification } from '../auth-store/auth.slice';
+import { useSelector } from 'react-redux';
+import { selectNotifications } from '../auth-store/auth.selectors';
 
 interface ProductState {
   products: null | CeSaZic[];
@@ -35,12 +39,28 @@ export const getAllProductsByUserId = createAsyncThunk<
 export const createNewProduct = createAsyncThunk<
   CeSaZic,  // Return type: Product[]
   ICreateProduct,     // Argument type (userId)
-  { rejectValue: string } // Error type
->('products/createNewProduct', async (product, { rejectWithValue }) => {
+  { rejectValue: string, dispatch: AppDispatch } // Error type
+>('products/createNewProduct', async (product, { rejectWithValue, dispatch }) => {
+  const notifications = useSelector(selectNotifications);
+
   try {
     const response = await createNewProductAPI(product);
+    dispatch(addNotification({
+      id: notifications.length + 1,
+      isRead: false,
+      type: 'SUCCESS',
+      title: 'Product Created',
+      message: `Your product ${product.name} was created successfully. You can go to your products dashboard and check it out.`
+    }));
     return response; // API returns user info with token
   } catch (error: any) {
+    dispatch(addNotification({
+      id: notifications.length + 1,
+      isRead: false,
+      type: 'ERROR',
+      title: 'Product Creation Faile',
+      message: `Your product ${product.name} could not be created. Sorry :(`
+    }));
     return rejectWithValue(error.response?.data?.message || 'Creating Product Failed');
   }
 });

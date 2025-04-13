@@ -4,24 +4,24 @@ import { googleAPI, logoutAPI, registerUser, signInUser, verifyEmailApi } from '
 import { getUserProfileAPI } from '../../api/user-api';
 
 import { SignInFormData } from '../../pages/sign-in/sign-in.component';
+import { Notification } from '../../models/user/notification';
 
 interface AuthState {
   user: null | User;
-  // token: string | null;
   loading: boolean;
   error: string | null;
-  // Optional: you might want to store a message (for registration/verification status)
   message: string | null;
   isUserLoggedIn: boolean | null;
+  notifications: Notification[];
 }
 
 const initialState: AuthState = {
   user: null,
-  // token: null,
   loading: false,
   error: null,
   message: null,
   isUserLoggedIn: null,
+  notifications: []
 };
 
 // Registration thunk: returns a success message from the backend.
@@ -129,6 +129,16 @@ const authSlice = createSlice({
     resetMessage: (state) => {
       state.message = null;
     },
+
+    addNotification: (state, action: PayloadAction<Notification>) => {
+      state.notifications.push(action.payload);
+    },
+    markNotificationAsRead: (state, action: PayloadAction<Notification>) => {
+      const foundNotification = state.notifications.find(notif => notif.id === action.payload.id);
+      if (foundNotification) {
+        foundNotification.isRead = true;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -221,5 +231,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, resetMessage, setUserProfile } = authSlice.actions;
+export const { logout, resetMessage, setUserProfile, addNotification, markNotificationAsRead } = authSlice.actions;
 export default authSlice.reducer;

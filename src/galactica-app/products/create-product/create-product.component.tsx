@@ -17,6 +17,7 @@ import Button from '../../../components/button/button.component';
 import { addFileToSectionAPI, getProductByProductIdAPI } from '../../../api/products-api';
 import { DownloadProduct } from '../../../models/product/download-product';
 import { useNavigate, useParams } from 'react-router-dom';
+import { uploadFilesInBackground } from '../../../utils/background-file-uploader';
 
 export interface ProductFormData {
   name: string;
@@ -135,84 +136,93 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     // return Object.keys(newErrors).length === 0; 
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-
-
-      if (mode === 'create') {
-        const sectionsWithoutIds = formData.sections.map(({ id, ...rest }) => rest);
-        const productData: ICreateProduct = {
-          name: formData.name,
-          description: formData.description,
-          type: formData.type as ProductType,
-          price: formData.price,
-          sections: sectionsWithoutIds,
-          status: 'draft',
-          userId: user?.id ?? ''
-        };
-
-        console.log('SAVE PRODUCT', productData);
-        console.log('SAVE IMAGE', productImage);
-        console.log('SAVE FILES', uploadedFilesWithSection);
-
-
-        dispatch(createNewProduct(productData)).unwrap().then(data => {
-          console.log('response', data);
-
-          if (data) {
-            if (productImage) {
-              dispatch(addImageToProduct({ productId: data.id, image: productImage })).unwrap().then(imageData => {
-                console.log('image upload data', imageData);
-
-              });
-            }
-            if (uploadedFilesWithSection) {
-              uploadedFilesWithSection.forEach(filesWithSection => {
-                const foundSection = data.sections.find(section => section.position.toString() === filesWithSection.sectionId);
-                if (foundSection) {
-                  filesWithSection.files.forEach(file => {
-                    console.log(`add file for section ${foundSection.id}`, file);
-
-                    addFileToSectionAPI(file, data.id, foundSection.id);
-                  });
-                }
-              });
-            }
-          }
-
-          navigate('products');
-        });
-      } else if (mode === 'edit') {
-        console.log('edit form data', formData);
-
-        const updatedSections = formData.sections.map(section => {
-          if (section.id && section.id.startsWith('tmp')) {
-            const { id, ...rest } = section;
-            return rest;
-          }
-          return section;
-        });
-
-        const updateData: IUpdateProduct = {
-          id: id as string,
-          name: formData.name,
-          description: formData.description,
-          type: formData.type as ProductType,
-          price: formData.price,
-          sections: updatedSections,
-          status: product?.status || 'draft',
-          userId: product?.userId || '',
-        };
-
-        dispatch(updateProductDetails(updateData))
-          .unwrap()
-          .then((data) => {
-            navigate('/');
-            console.log('Update response', data);
-          });
-      }
+    if (!validateForm()) {
+      return;
     }
+
+    if (mode === 'create') {
+      await handleCreateProduct();
+    } else if (mode === 'edit') {
+      await handleEditProduct();
+    }
+  };
+
+  const handleCreateProduct = async () => {
+    // Remove id fields from sections before sending
+    const sectionsWithoutIds = formData.sections.map(({ id, ...rest }) => rest);
+
+    const productData: ICreateProduct = {
+      name: formData.name,
+      description: formData.description,
+      type: formData.type as ProductType,
+      price: formData.price,
+      sections: sectionsWithoutIds,
+      status: 'draft',
+      userId: user?.id ?? ''
+    };
+
+    console.log('SAVE PRODUCT', productData);
+    console.log('SAVE IMAGE', productImage);
+    console.log('SAVE FILES', uploadedFilesWithSection);
+
+    // Create the new product and wait for the response
+    const data = await dispatch(createNewProduct(productData)).unwrap();
+    console.log('response', data);
+
+    // Handle image upload if available
+    if (data && productImage) {
+      const imageData = await dispatch(
+        addImageToProduct({ productId: data.id, image: productImage })
+      ).unwrap();
+      console.log('image upload data', imageData);
+    }
+
+    // Handle file uploads for each section if provided
+    if (data && uploadedFilesWithSection) {
+      uploadFilesInBackground(uploadedFilesWithSection, data, dispatch)
+        .then(results => {
+          console.log('file upload results:', results);
+        })
+        .catch(error => {
+          console.error('Error during file uploads:', error);
+          // Optionally, dispatch another error notification here.
+        });
+    }
+
+    // Navigate away from the page after creation
+    navigate('products');
+  };
+
+  const handleEditProduct = async () => {
+    console.log('edit form data', formData);
+
+    // Remove temporary IDs from new sections (those starting with 'tmp')
+    const updatedSections = formData.sections.map(section => {
+      if (section.id && section.id.startsWith('tmp')) {
+        const { id, ...rest } = section;
+        return rest;
+      }
+      return section;
+    });
+
+    const updateData: IUpdateProduct = {
+      id: id as string,
+      name: formData.name,
+      description: formData.description,
+      type: formData.type as ProductType,
+      price: formData.price,
+      sections: updatedSections,
+      status: product?.status || 'draft',
+      userId: product?.userId || '',
+    };
+
+    const updateResponse = await dispatch(updateProductDetails(updateData)).unwrap();
+    console.log('Update response', updateResponse);
+
+    // Navigate after editing
+    navigate('/');
   };
 
 
