@@ -74,7 +74,7 @@ export const addImageToProductAPI = async (image: File, productId: string) => {
 
 export const addFileToSectionAPI = async (file: File, sectionId: string) => {
   try {
-    const response = await httpClient.post<string>('api/files/upload', { file, sectionId });
+    const response = await httpClient.post<string>('api/files/upload-section-file', { file, sectionId });
     return response.data;
   } catch (error) {
     console.error(`Error adding file to section with id ${sectionId}:`, error);
