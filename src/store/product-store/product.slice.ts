@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Product, ProductStatus, ProductType } from '../../models/product/product.types';
-import { CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI, updateProductAPI } from '../../api/products-api';
+import { addImageToProductAPI, CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI, updateProductAPI } from '../../api/products-api';
 import { BaseProduct, ICreateProduct, IUpdateProduct } from '../../models/product/product';
 
 interface ProductState {
@@ -55,6 +55,19 @@ export const updateProductDetails = createAsyncThunk<
     return response; // API returns user info with token
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || 'Updating Product Failed');
+  }
+});
+
+export const addImageToProduct = createAsyncThunk<
+  string,  // Return type: Product[]
+  { productId: string; image: File },     // Argument type (productId)
+  { rejectValue: string } // Error type
+>('products/addImageToProduct', async ({ productId, image }, { rejectWithValue }) => {
+  try {
+    const response = await addImageToProductAPI(image, productId);
+    return response; // API returns user info with token
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || 'Creating Product Failed');
   }
 });
 
@@ -143,6 +156,18 @@ const productsSlice = createSlice({
       .addCase(updateProductDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error updating product';
+      })
+      .addCase(addImageToProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addImageToProduct.fulfilled, (state, action: PayloadAction<string>) => {
+        state.loading = false;
+        state.message = action.payload;
+      })
+      .addCase(addImageToProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error uploading image';
       });
   },
 });

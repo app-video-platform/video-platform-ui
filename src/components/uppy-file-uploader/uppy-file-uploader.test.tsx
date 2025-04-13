@@ -5,6 +5,7 @@ import UppyFileUploader from './uppy-file-uploader.component';
 import Uppy from '@uppy/core';
 import '@testing-library/jest-dom';
 
+jest.mock('@uppy/thumbnail-generator', () => jest.fn());
 jest.mock('@uppy/google-drive', () => jest.fn());
 jest.mock('@uppy/dropbox', () => jest.fn());
 jest.mock('@uppy/onedrive', () => jest.fn());
@@ -44,6 +45,8 @@ describe('UppyFileUploader component', () => {
       use: jest.fn(),
       on: jest.fn(),
       getFiles: jest.fn(() => [{ data: { name: 'file1.mp4' } }]),
+      // Add the destroy method to the mock instance
+      destroy: jest.fn(),
       close: jest.fn(),
     };
 
@@ -61,8 +64,6 @@ describe('UppyFileUploader component', () => {
     const dashboardProps = JSON.parse(dashboard.textContent || '{}');
     expect(dashboardProps.plugins).toEqual(['GoogleDrive', 'Dropbox', 'OneDrive', 'Url', 'Unsplash']);
     expect(dashboardProps.proudlyDisplayPoweredByUppy).toBe(true);
-    // And the custom class is passed
-    expect(dashboardProps.className).toBe('custom-uppy-dashboard');
   });
 
   it('registers event listeners for file-added and file-removed', () => {

@@ -7,13 +7,14 @@ import FormInput from '../../../../components/form-input/form-input.component';
 import './download-sections.styles.scss';
 import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
 import Button from '../../../../components/button/button.component';
+import { IFilesWithSection } from '../create-product.component';
 
 interface DynamicSectionsProps {
   sections: DownloadSection[];
   // eslint-disable-next-line no-unused-vars
   onChangeSections: (updated: DownloadSection[]) => void;
   // eslint-disable-next-line no-unused-vars
-  handleFilesChange: (files: File[]) => void;
+  handleFilesChange: (filesWithSection: IFilesWithSection) => void;
 }
 
 const DownloadSections: React.FC<DynamicSectionsProps> = ({ sections, onChangeSections, handleFilesChange }) => {
@@ -86,7 +87,9 @@ const DownloadSections: React.FC<DynamicSectionsProps> = ({ sections, onChangeSe
               handleSectionChange(section.id, 'description', e.target.value)
             } />
 
-          <UppyFileUploader onFilesChange={handleFilesChange} />
+          <UppyFileUploader onFilesChange={(files: File[]) =>
+            handleFilesChange({ sectionId: section.position?.toString() || '', files })
+          } />
         </div>
       ))}
 
