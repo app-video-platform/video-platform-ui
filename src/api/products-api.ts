@@ -81,3 +81,72 @@ export const addFileToSectionAPI = async (file: File, sectionId: string) => {
     throw error;
   }
 };
+
+export const getPresignedUrlAPI = async (sectionId: string, fileName: string) => {
+  try {
+    const response = await httpClient.get('/api/files/presigned-url', {
+      params: {
+        sectionId,
+        folderType: 'DOWNLOAD_SECTION_FILES',
+        filename: fileName
+      }
+    });
+    return response.data; // { fileId, presignedUrl, key, fileUrl }
+  } catch (error) {
+    console.error(`Error getting presigned URL for section ${sectionId}:`, error);
+    throw error;
+  }
+};
+
+// STEP 2: Upload file to presigned URL
+export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => {
+  try {
+    const response = await fetch(presignedUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type
+      },
+      body: file
+    });
+
+    if (!response.ok) {
+      throw new Error('File upload to presigned URL failed');
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Error uploading to presigned URL:', error);
+    throw error;
+  }
+};
+
+// STEP 3: Confirm file upload
+export const confirmFileUploadAPI = async (payload: {
+  sectionId: string;
+  fileId: string;
+  key: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+}) => {
+  try {
+    const response = await httpClient.post('/api/files/confirm-upload', payload, {
+      withCredentials: true,
+      headers: {
+        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? ''
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error confirming file upload:', error);
+    throw error;
+  }
+};
+
+// Utility function to read CSRF cookie
+const getCookie = (name: string): string | null => {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? match[2] : null;
+};

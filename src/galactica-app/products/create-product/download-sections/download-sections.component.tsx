@@ -19,18 +19,16 @@ interface DynamicSectionsProps {
 
 const DownloadSections: React.FC<DynamicSectionsProps> = ({ sections, onChangeSections, handleFilesChange }) => {
 
-  const uniqueId = uuidv4();
-
   const handleSectionChange = (
-    id: string | undefined,
+    localId: string | undefined,
     field: keyof DownloadSection,
     value: string
   ) => {
-    if (!id) { return; }
+    if (!localId) { return; }
     // Create a new array so we don't mutate the original
     const updated = sections.map(section => {
       // If this is the matching section, update the specified field
-      if (section.id === id) {
+      if (section.localId === localId) {
         return { ...section, [field]: value };
       }
       // Otherwise, leave it as-is
@@ -44,7 +42,7 @@ const DownloadSections: React.FC<DynamicSectionsProps> = ({ sections, onChangeSe
   const addSection = () => {
     onChangeSections([
       ...sections,
-      { id: uniqueId, title: '', description: '', position: sections.length + 1 }
+      { localId: uuidv4(), title: '', description: '', position: sections.length + 1 }
     ]);
   };
 
@@ -88,7 +86,7 @@ const DownloadSections: React.FC<DynamicSectionsProps> = ({ sections, onChangeSe
             } />
 
           <UppyFileUploader onFilesChange={(files: File[]) =>
-            handleFilesChange({ sectionId: section.position?.toString() || '', files })
+            handleFilesChange({ sectionLocalId: section.localId || '', files })
           } />
         </div>
       ))}

@@ -17,7 +17,7 @@ import Button from '../../../components/button/button.component';
 import { addFileToSectionAPI, getProductByProductIdAPI } from '../../../api/products-api';
 import { DownloadProduct } from '../../../models/product/download-product';
 import { useNavigate, useParams } from 'react-router-dom';
-import { uploadFilesInBackground } from '../../../utils/background-file-uploader';
+import { uploadFilesInBackground } from '../../../utils/files/background-uploader';
 
 export interface ProductFormData {
   name: string;
@@ -28,7 +28,7 @@ export interface ProductFormData {
 }
 
 export interface IFilesWithSection {
-  sectionId: string,
+  sectionLocalId: string,
   files: File[]
 }
 
@@ -42,15 +42,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
   const { id, type } = useParams<{ id: string, type: ProductType }>();
 
   const user = useSelector(selectAuthUser);
-  const uniqueId = uuidv4();
-
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
     type: '',
     price: 'free',
-    sections: [{ id: `tmp-${uniqueId}`, title: '', description: '', position: 1 }]
+    sections: [{ localId: uuidv4(), title: '', description: '', position: 1 }]
   });
 
 
@@ -95,7 +93,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     setUploadedFilesWithSection((prevFiles = []) => {
       // Find if a file section with the same sectionId already exists
       const index = prevFiles.findIndex(
-        (fileSection) => fileSection.sectionId === filesWithSections.sectionId
+        (fileSection) => fileSection.sectionLocalId === filesWithSections.sectionLocalId
       );
 
       // If found, update its files; otherwise, add the new entry to the array
@@ -132,8 +130,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
     if (!formData.type) { newErrors.type = 'Fara asta nu poti mere mai departe!'; }
 
     setErrors(newErrors);
-    return true;
-    // return Object.keys(newErrors).length === 0; 
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -151,7 +148,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 
   const handleCreateProduct = async () => {
     // Remove id fields from sections before sending
-    const sectionsWithoutIds = formData.sections.map(({ id, ...rest }) => rest);
+    const sectionsWithoutIds = formData.sections.map(({ localId, id, ...rest }) => rest);
 
     const productData: ICreateProduct = {
       name: formData.name,
@@ -180,16 +177,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
           console.log('image upload data', imageData);
         }
 
-        // Handle file uploads for each section if provided
-        if (data && uploadedFilesWithSection) {
-          uploadFilesInBackground(uploadedFilesWithSection, data, dispatch)
-            .then(results => {
-              console.log('file upload results:', results);
-            })
-            .catch(error => {
-              console.error('Error during file uploads:', error);
-              // Optionally, dispatch another error notification here.
-            });
+
+        if (data && uploadedFilesWithSection.length > 0) {
+          uploadFilesInBackground(uploadedFilesWithSection, formData.sections, data.sections);
         }
 
         // Navigate away from the page after creation
