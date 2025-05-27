@@ -1,11 +1,18 @@
 .website-navbar {
-  display: flex;
   width: 100%;
-  height: 100px;
-  background: aliceblue;
-  padding: 10px 20px;
-  justify-content: space-between;
-  align-items: center;
+  // max-width: 1140px;
+  height: 80px;
+  // background: aliceblue;
+  padding: 0 20px;
+
+  .navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1480px;
+    margin: auto;
+    height: 100%;
+  }
 }
 
 .logo-container {
@@ -15,7 +22,8 @@
 }
 
 .nav-link-list {
+  display: flex;
   list-style: none;
-  display: inline-flex;
-  gap: 10px;
+  gap: 30px;
+  font-weight: 600;
 }

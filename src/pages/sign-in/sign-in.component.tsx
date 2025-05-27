@@ -9,6 +9,7 @@ import { getUserProfile, signinUser } from '../../store/auth-store/auth.slice';
 import Button from '../../components/button/button.component';
 
 import './sign-in.styles.scss';
+import GoogleSignInButton from '../../components/google-sign-in-button/google-sign-in-button.component';
 
 export interface SignInFormData {
   email: string;
@@ -119,6 +120,8 @@ const SignIn: React.FC = () => {
           {errors.password && <p className="error-text-red">{errors.password}</p>}
           <Button type="primary" htmlType='submit' text='Sign In' />
         </form>
+
+        <GoogleSignInButton data-test-id='google-sign-in-button' />
 
         <div className='forgot-password-button-container'>
           <button className='forgot-password-btn' onClick={() => navigate('/forgot-password')}>I forgot my password</button>

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Fragment } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 import UserProfileDropdown from '../../components/user-profile/user-profile.component';
 import Button from '../../components/button/button.component';
 
 import './nav.styles.scss';
 import { useSelector } from 'react-redux';
-import GoogleSignInButton from '../../components/google-sign-in-button/google-sign-in-button.component';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
+import Footer from '../../components/footer/footer.component';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
@@ -23,35 +23,46 @@ const Navigation: React.FC = () => {
   return (
     <Fragment>
       <nav className='website-navbar'>
-        <div className="logo-container"></div>
-        <div className="nav-links">
+        <div className='navbar-content'>
+          <div className="logo-container"></div>
+          {/* <div className="nav-links"> */}
           <ul className="nav-link-list">
-            <li>Home</li>
+            <li><Link to={'/'}>Home</Link></li>
+            <li><Link to={'/about'}>About</Link></li>
+            <li><Link to={'/pricing'}>Pricing</Link></li>
+            <li>Galactica App</li>
+
+            <li><Link to={'/contact'}>Contact Us</Link></li>
+
+            {/* <li>Home</li>
             <li>About</li>
-            <li>Contact</li>
+            <li>Pricing</li> */}
+            {/* <li>Contact Us</li> */}
           </ul>
-        </div>
-        <div className="user-buttons">
-          <ul className="nav-link-list">
-            {user ? (
-              <UserProfileDropdown />
-            ) : (
-              <ul className="nav-link-list">
-                <li>
+          {/* </div> */}
+          <div className="user-buttons">
+            <ul className="nav-link-list">
+              {user ? (
+                <UserProfileDropdown />
+              ) : (
+                <ul className="nav-link-list">
+                  {/* <li>
                   <GoogleSignInButton data-test-id='google-sign-in-button' />
-                </li>
-                <li>
-                  <Button onClick={() => handleRedirect('/signup')} type='secondary' text='Sign Up' />
-                </li>
-                <li>
-                  <Button onClick={() => handleRedirect('/signin')} type='primary' text='Sign In' />
-                </li>
-              </ul>
-            )}
-          </ul>
+                </li> */}
+                  <li>
+                    <Button onClick={() => handleRedirect('/signin')} type='secondary' text='Sign In' />
+                  </li>
+                  <li>
+                    <Button onClick={() => handleRedirect('/signup')} type='primary' text='Register' />
+                  </li>
+                </ul>
+              )}
+            </ul>
+          </div>
         </div>
       </nav>
       <Outlet />
+      <Footer />
     </Fragment>
   );
 };
