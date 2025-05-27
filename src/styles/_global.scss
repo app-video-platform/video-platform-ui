@@ -1,5 +1,5 @@
 // @import 'variables';
-@use './variables' as *;
+@use "./variables" as *;
 
 * {
   margin: 0;
@@ -23,4 +23,20 @@ button {
 .error-text-red {
   color: red;
   font-size: 11px;
+}
+
+.gal-huge-header {
+  font-size: $font-size-xxl;
+}
+
+.gal-big-header {
+  font-size: $font-size-xl;
+}
+
+.gal-medium-header {
+  font-size: $font-size-l;
+}
+
+.gal-subtext {
+  font-size: $font-size-medium;
 }

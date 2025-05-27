@@ -5,75 +5,72 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import '@testing-library/jest-dom';
 
-// Mock react-redux and react-router-dom hooks.
+// Mock react-redux and react-router-dom hooks
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(),
 }));
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
 
-// Mock child components.
+// Mock child components
 jest.mock('../../components/user-profile/user-profile.component', () => {
-  const MockUserProfileDropdown = () => (
-    <div data-testid="user-profile-dropdown">UserProfileDropdown</div>
-  );
-  MockUserProfileDropdown.displayName = 'UserProfileDropdown';
-  return MockUserProfileDropdown;
+  const MockUserProfile = () => <div data-testid="user-profile-dropdown">UserProfileDropdown</div>;
+  MockUserProfile.displayName = 'UserProfileDropdown';
+  return MockUserProfile;
 });
-jest.mock('../../components/google-sign-in-button/google-sign-in-button.component', () => {
-  const MockGoogleSignInButton = () => (
-    <div>GoogleSignInButton</div>
-  );
-  MockGoogleSignInButton.displayName = 'GoogleSignInButton';
-  return MockGoogleSignInButton;
+
+jest.mock('../../components/footer/footer.component', () => {
+  const MockFooter = () => <footer data-testid="footer">Footer</footer>;
+  MockFooter.displayName = 'Footer';
+  return MockFooter;
 });
 
 describe('Navigation component', () => {
   let mockNavigate: jest.Mock;
+
   beforeEach(() => {
     mockNavigate = jest.fn();
     (useNavigate as unknown as jest.Mock).mockReturnValue(mockNavigate);
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders navigation links and sign in/up buttons when no user is present', () => {
+  it('renders navigation links and Register/Sign In buttons when no user is present', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
     render(<Navigation />);
 
-    // Check static nav links.
+    // Check updated nav links
     expect(screen.getByText(/Home/i)).toBeInTheDocument();
     expect(screen.getByText(/About/i)).toBeInTheDocument();
-    expect(screen.getByText(/Contact/i)).toBeInTheDocument();
+    expect(screen.getByText(/Pricing/i)).toBeInTheDocument();
+    expect(screen.getByText(/Galactica App/i)).toBeInTheDocument();
+    expect(screen.getByText(/Contact Us/i)).toBeInTheDocument();
 
-    // Check that the GoogleSignInButton is rendered.
-    expect(screen.getByText(/GoogleSignInButton/i)).toBeInTheDocument();
-    // Check that Sign Up and Sign In buttons are rendered with proper text.
-    expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument();
+    // Check buttons
+    expect(screen.getByRole('button', { name: /Register/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
   });
 
   it('renders user profile dropdown when a user is present', () => {
-    const dummyUser = { firstName: 'Jane', lastName: 'Doe' };
-    (useSelector as unknown as jest.Mock).mockReturnValue(dummyUser);
+    (useSelector as unknown as jest.Mock).mockReturnValue({ firstName: 'Jane' });
     render(<Navigation />);
 
     expect(screen.getByTestId('user-profile-dropdown')).toBeInTheDocument();
-    // It should not render the GoogleSignInButton or the Sign Up/Sign In buttons.
-    expect(screen.queryByTestId('google-sign-in-button')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Sign Up/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Register/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Sign In/i })).not.toBeInTheDocument();
   });
 
-  it('calls navigate with "/signup" when Sign Up button is clicked', () => {
+  it('calls navigate with "/signup" when Register button is clicked', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
     render(<Navigation />);
 
-    const signUpButton = screen.getByRole('button', { name: /Sign Up/i });
-    fireEvent.click(signUpButton);
+    const registerButton = screen.getByRole('button', { name: /Register/i });
+    fireEvent.click(registerButton);
     expect(mockNavigate).toHaveBeenCalledWith('/signup');
   });
 
@@ -86,10 +83,10 @@ describe('Navigation component', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/signin');
   });
 
-  it('renders the Outlet component', () => {
+  it('renders the Outlet and Footer component', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
-    const { container } = render(<Navigation />);
-    // We don't have direct text for Outlet, but we can at least verify that the Navigation renders without error.
-    expect(container).toBeInTheDocument();
+    render(<Navigation />);
+
+    expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
 });

@@ -6,57 +6,440 @@ exports[`App Component matches snapshot after navigation 1`] = `
     class="website-navbar"
   >
     <div
-      class="logo-container"
-    />
-    <div
-      class="nav-links"
+      class="navbar-content"
     >
+      <div
+        class="logo-container"
+      />
       <ul
         class="nav-link-list"
       >
         <li>
-          Home
+          <a
+            href="/"
+          >
+            Home
+          </a>
         </li>
         <li>
-          About
+          <a
+            href="/about"
+          >
+            About
+          </a>
         </li>
         <li>
-          Contact
+          <a
+            href="/pricing"
+          >
+            Pricing
+          </a>
+        </li>
+        <li>
+          Galactica App
+        </li>
+        <li>
+          <a
+            href="/contact"
+          >
+            Contact Us
+          </a>
         </li>
       </ul>
-    </div>
-    <div
-      class="user-buttons"
-    >
-      <ul
-        class="nav-link-list"
+      <div
+        class="user-buttons"
       >
         <ul
           class="nav-link-list"
         >
-          <li>
-            <div />
-          </li>
-          <li>
-            <button
-              class="vp-button vp-button--secondary undefined"
-            >
-              Sign Up
-            </button>
-          </li>
-          <li>
-            <button
-              class="vp-button vp-button--primary undefined"
-            >
-              Sign In
-            </button>
-          </li>
+          <ul
+            class="nav-link-list"
+          >
+            <li>
+              <button
+                class="vp-button vp-button--secondary undefined"
+              >
+                Sign In
+              </button>
+            </li>
+            <li>
+              <button
+                class="vp-button vp-button--primary undefined"
+              >
+                Register
+              </button>
+            </li>
+          </ul>
         </ul>
-      </ul>
+      </div>
     </div>
   </nav>
-  <div>
-    Some content is finna be here soon!
+  <main
+    class="landing-page"
+  >
+    <section
+      class="hero-section"
+    >
+      <div
+        class="hero-content"
+      >
+        <h1
+          class="gal-huge-header hero-header"
+        >
+          Create Courses That Inspire
+        </h1>
+        <p
+          class="gal-subtext hero-subtext"
+        >
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
+        </p>
+        <button
+          class="vp-button vp-button--primary hero-cta"
+        >
+          Launch Now
+        </button>
+      </div>
+      <div
+        class="hero-image"
+      />
+    </section>
+    <section
+      class="video-section"
+    >
+      <h1
+        class="gal-big-header"
+      >
+        How It Works
+      </h1>
+      <p
+        class="gal-subtext"
+      >
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus.
+      </p>
+      <div
+        class="video-container"
+      />
+    </section>
+    <section
+      class="services-section"
+    >
+      <h1
+        class="gal-big-header services-header"
+      >
+        Our Services
+      </h1>
+      <div
+        class="services"
+      >
+        <div
+          class="service-container"
+        >
+          <div
+            class="service-icon"
+          />
+          <h2
+            class="gal-medium-header service-header"
+          >
+            Download Package
+          </h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
+          </p>
+        </div>
+        <div
+          class="service-container"
+        >
+          <div
+            class="service-icon"
+          />
+          <h2
+            class="gal-medium-header service-header"
+          >
+            Course
+          </h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
+          </p>
+        </div>
+        <div
+          class="service-container"
+        >
+          <div
+            class="service-icon"
+          />
+          <h2
+            class="gal-medium-header service-header"
+          >
+            Consultation
+          </h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
+          </p>
+        </div>
+      </div>
+    </section>
+    <section
+      class="features-section"
+    >
+      <div
+        class="features-wrapper"
+      >
+        <h1
+          class="gal-big-header features-header"
+        >
+          Some of Our Features
+        </h1>
+        <div
+          class="features-container"
+        >
+          <div
+            class="feature-container feature-container__email"
+          >
+            <div
+              class="feature-icon feature-icon__email"
+            />
+            <h2
+              class="gal-medium-header feature-header"
+            >
+              Email Marketing
+            </h2>
+            <p>
+              Engage your students with automated email campaigns, personalized updates, and exclusive offers.
+            </p>
+          </div>
+          <div
+            class="feature-container feature-container__branding"
+          >
+            <h2
+              class="gal-medium-header feature-header"
+            >
+              Branding Tools
+            </h2>
+            <p>
+              Build your own branded storefront to showcase and sell your courses, making your platform uniquely yours.
+            </p>
+            <div
+              class="feature-icon feature-icon__branding"
+            />
+          </div>
+          <div
+            class="feature-container feature-container__analitics"
+          >
+            <div
+              class="analitics-text"
+            >
+              <h2
+                class="gal-medium-header feature-header"
+              >
+                Real-Time Analitics
+              </h2>
+              <p>
+                Track sales, user behavior, and generate custom reports to refine your strategy.
+              </p>
+            </div>
+            <div
+              class="branding-image feature-icon"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+    <section
+      class="cta-section"
+    >
+      <h1
+        class="gal-big-header"
+      >
+        Transform Your Passion Into Profit
+      </h1>
+      <p
+        class="gal-subtext cta-subtext"
+      >
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
+      </p>
+      <div
+        class="btns-container"
+      >
+        <button
+          class="vp-button vp-button--primary undefined"
+        >
+          Launch Now
+        </button>
+        <button
+          class="vp-button vp-button--secondary undefined"
+        >
+          Learn More
+        </button>
+      </div>
+    </section>
+  </main>
+  <div
+    class="gal-footer"
+  >
+    <div
+      class="footer-content"
+    >
+      <div
+        class="logo-container"
+      />
+      <div
+        class="main-container"
+      >
+        <div
+          class="pages-container"
+        >
+          <h3
+            class="list-title"
+          >
+            Pages
+          </h3>
+          <ul
+            class="link-list"
+          >
+            <li>
+              <a
+                href="/"
+              >
+                Home
+              </a>
+            </li>
+            <li>
+              <a
+                href="/pricing"
+              >
+                Pricing
+              </a>
+            </li>
+            <li>
+              <a
+                href="/products"
+              >
+                Products
+              </a>
+            </li>
+            <li>
+              <a
+                href="/features"
+              >
+                Features
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          class="help-container"
+        >
+          <h3
+            class="list-title"
+          >
+            Get Help
+          </h3>
+          <ul
+            class="link-list"
+          >
+            <li>
+              <a
+                href="/help"
+              >
+                Help Center
+              </a>
+            </li>
+            <li>
+              <a
+                href="/faq"
+              >
+                FAQ
+              </a>
+            </li>
+            <li>
+              <a
+                href="/help/tutorials"
+              >
+                Tutorials
+              </a>
+            </li>
+            <li>
+              <a
+                href="/contact"
+              >
+                Contact Us
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div
+          class="company-container"
+        >
+          <h3
+            class="list-title"
+          >
+            Company
+          </h3>
+          <ul
+            class="link-list"
+          >
+            <li>
+              <a
+                href="/about"
+              >
+                About Us
+              </a>
+            </li>
+            <li>
+              <a
+                href="/terms-of-use"
+              >
+                Terms of Service
+              </a>
+            </li>
+            <li>
+              <a
+                href="/privacy-policy"
+              >
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a
+                href="/cookie-policy"
+              >
+                Cookie Policy
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div
+        class="socials-container"
+      >
+        <h3>
+          Follow Us On
+        </h3>
+        <div
+          class="socials-list"
+        >
+          <div
+            class="social-icon"
+          />
+          <div
+            class="social-icon"
+          />
+          <div
+            class="social-icon"
+          />
+          <div
+            class="social-icon"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      class="footer-rights-container"
+    >
+      <p>
+        © Galactica 2025. All rights reserved
+      </p>
+    </div>
   </div>
 </div>
 `;

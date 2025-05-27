@@ -1,5 +1,5 @@
 // @import './../../styles/variables';
-@use './../../styles/index.scss' as *;
+@use "./../../styles/index.scss" as *;
 @use "sass:color";
 
 .vp-button {
@@ -10,6 +10,8 @@
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+  height: 48px;
+  min-width: 200px;
 
   &--primary {
     background-color: $primary-color;
