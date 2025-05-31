@@ -20,6 +20,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { uploadFilesInBackground } from '../../../utils/files/background-uploader';
 
 export interface ProductFormData {
+  id?: string;
   name: string;
   description: string; // Limit 420 characters
   type: ProductType | '';

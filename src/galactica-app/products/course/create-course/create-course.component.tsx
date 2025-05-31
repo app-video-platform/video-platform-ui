@@ -8,6 +8,7 @@ import PriceSelector from '../../../../components/price-selector/price-selector.
 import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
 import { DownloadSection } from '../../../../models/product/download-section';
 import {
+  ICreateCourseProduct,
   ICreateProduct,
   INewProductPayload,
 } from '../../../../models/product/product';
@@ -18,7 +19,10 @@ import { ProductFormData } from '../../create-product/create-product.component';
 import FormInput from '../../../../components/form-input/form-input.component';
 
 import './create-course.styles.scss';
-import { createCourseProduct } from '../../../../store/product-store/product.slice';
+import {
+  createCourseProduct,
+  updateCourseProductDetails,
+} from '../../../../store/product-store/product.slice';
 import { set } from 'react-hook-form';
 
 const CreateCourse: React.FC = () => {
@@ -29,6 +33,7 @@ const CreateCourse: React.FC = () => {
   const user = useSelector(selectAuthUser);
 
   const [formData, setFormData] = useState<ProductFormData>({
+    id: '',
     name: '',
     description: '',
     type: '',
@@ -89,27 +94,58 @@ const CreateCourse: React.FC = () => {
     if (!validateForm()) {
       return;
     }
-    await handleCreateProduct();
+    await handleUpdateProduct();
   };
 
-  const handleCreateProduct = async () => {
+  const handleUpdateProduct = async () => {
     // Remove id fields from sections before sending
-    const sectionsWithoutIds = formData.sections.map(
-      ({ localId, id, ...rest }) => rest
-    );
 
-    const productData: ICreateProduct = {
+    const productData: ICreateCourseProduct = {
       name: formData.name,
       description: formData.description,
-      type: formData.type as ProductType,
+      type: 'COURSE' as ProductType,
       price: formData.price,
-      sections: sectionsWithoutIds,
       status: 'draft',
       userId: user?.id ?? '',
     };
 
     console.log('SAVE PRODUCT', productData);
-    console.log('SAVE IMAGE', productImage);
+    console.log('PRODUCT ID', formData.id);
+
+    if (!formData.id) {
+      console.error('Product ID is not set. Cannot update product details.');
+      setErrors({
+        api: 'Product ID is not set. Cannot update product details.',
+      });
+      return;
+    }
+
+    dispatch(
+      updateCourseProductDetails({
+        productId: formData.id,
+        details: productData,
+      })
+    )
+      .unwrap()
+      .then((data) => {
+        console.log('response', data);
+        if (data) {
+          window.alert('Course product created successfully!');
+        }
+      })
+      .catch((error) => {
+        console.error('Error creating course product:', error);
+        setErrors({
+          api: 'Failed to create course product. Please try again.',
+        });
+      })
+      .finally(() => {
+        // 4) In either case (success or failure), turn OFF loading here:
+        setShowLoadingRestOfForm(false);
+
+        // TEMPORARY
+        setRestOfForm(true);
+      });
   };
 
   const onTypeButtonClick = (selectedType: ProductType) => {
@@ -133,6 +169,8 @@ const CreateCourse: React.FC = () => {
       name,
       description,
       type: type as ProductType,
+      userId: user?.id ?? '',
+      status: 'draft',
     };
 
     setTimeout(() => {
@@ -141,6 +179,8 @@ const CreateCourse: React.FC = () => {
         .then((data) => {
           console.log('response', data);
           if (data) {
+            formData.id = data; // Set the product ID in formData
+            setFormData((prev) => ({ ...prev, id: data }));
             setRestOfForm(true);
           }
         })

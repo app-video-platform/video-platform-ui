@@ -1,21 +1,23 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   addImageToProductAPI,
-  CeSaZic,
+  IProductResponse,
   createCourseProductAPI,
   createNewProductAPI,
   getAllProductsByUserIdAPI,
+  updateCourseDetailsAPI,
   updateProductAPI,
 } from '../../api/products-api';
 import {
   ICreateProduct,
   INewProductPayload,
+  IUpdateCourseDetailsPayload,
   IUpdateProduct,
 } from '../../models/product/product';
 
 interface ProductState {
-  products: null | CeSaZic[];
-  currentProduct: CeSaZic | null; // the product we’re currently creating/editing
+  products: null | IProductResponse[];
+  currentProduct: IProductResponse | null; // the product we’re currently creating/editing
   loading: boolean;
   error: string | null;
   // Optional: you might want to store a message (for creating/editing/removing status)
@@ -31,7 +33,7 @@ const initialState: ProductState = {
 };
 
 export const createCourseProduct = createAsyncThunk<
-  string, // what this thunk returns on success
+  IProductResponse, // what this thunk returns on success
   INewProductPayload, // the argument you pass in
   { rejectValue: string }
 >('products/createCourseProduct', async (payload, thunkAPI) => {
@@ -45,8 +47,26 @@ export const createCourseProduct = createAsyncThunk<
   }
 });
 
+export const updateCourseProductDetails = createAsyncThunk<
+  string, // what this thunk returns on success
+  IUpdateCourseDetailsPayload, // the argument you pass in
+  { rejectValue: string }
+>('products/updateCourseProductDetails', async (payload, thunkAPI) => {
+  try {
+    const response = await updateCourseDetailsAPI(
+      payload.productId,
+      payload.details
+    );
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || err.message || 'Failed to update product'
+    );
+  }
+});
+
 export const getAllProductsByUserId = createAsyncThunk<
-  CeSaZic[], // Return type: Product[]
+  IProductResponse[], // Return type: Product[]
   string, // Argument type (userId)
   { rejectValue: string } // Error type
 >('products/getAllProductsByUserId', async (idToken, { rejectWithValue }) => {
@@ -59,7 +79,7 @@ export const getAllProductsByUserId = createAsyncThunk<
 });
 
 export const createNewProduct = createAsyncThunk<
-  CeSaZic, // Return type: Product[]
+  IProductResponse, // Return type: Product[]
   ICreateProduct, // Argument type (userId)
   { rejectValue: string } // Error type
 >('products/createNewProduct', async (product, { rejectWithValue }) => {
@@ -74,7 +94,7 @@ export const createNewProduct = createAsyncThunk<
 });
 
 export const updateProductDetails = createAsyncThunk<
-  CeSaZic, // Return type: Product[]
+  IProductResponse, // Return type: Product[]
   IUpdateProduct, // Argument type (userId)
   { rejectValue: string } // Error type
 >(
@@ -114,11 +134,11 @@ const productsSlice = createSlice({
   initialState,
   reducers: {
     // Set a list of products
-    setProducts(state, action: PayloadAction<CeSaZic[]>) {
+    setProducts(state, action: PayloadAction<IProductResponse[]>) {
       state.products = action.payload;
     },
     // Add a single product
-    addProduct(state, action: PayloadAction<CeSaZic>) {
+    addProduct(state, action: PayloadAction<IProductResponse>) {
       state.products?.push(action.payload);
     },
     clearCurrentProduct(state) {
@@ -127,7 +147,7 @@ const productsSlice = createSlice({
       state.error = null;
     },
     // Update an existing product by id
-    updateProduct(state, action: PayloadAction<CeSaZic>) {
+    updateProduct(state, action: PayloadAction<IProductResponse>) {
       const index = state.products?.findIndex(
         (p) => p.id === action.payload.id
       );
@@ -160,7 +180,7 @@ const productsSlice = createSlice({
       })
       .addCase(
         getAllProductsByUserId.fulfilled,
-        (state, action: PayloadAction<CeSaZic[]>) => {
+        (state, action: PayloadAction<IProductResponse[]>) => {
           state.loading = false;
           state.products = action.payload;
         }
@@ -177,7 +197,7 @@ const productsSlice = createSlice({
       })
       .addCase(
         createNewProduct.fulfilled,
-        (state, action: PayloadAction<CeSaZic>) => {
+        (state, action: PayloadAction<IProductResponse>) => {
           state.loading = false;
           state.products ??= [];
           state.products.push(action.payload);
@@ -195,7 +215,7 @@ const productsSlice = createSlice({
       })
       .addCase(
         updateProductDetails.fulfilled,
-        (state, action: PayloadAction<CeSaZic>) => {
+        (state, action: PayloadAction<IProductResponse>) => {
           state.loading = false;
           if (state.products) {
             const updatedProduct = action.payload;
@@ -235,13 +255,11 @@ const productsSlice = createSlice({
       })
       .addCase(
         createCourseProduct.fulfilled,
-        (state, action: PayloadAction<string>) => {
+        (state, action: PayloadAction<IProductResponse>) => {
           state.loading = false;
           state.error = null;
 
-          state.currentProduct = {
-            id: action.payload,
-          };
+          state.currentProduct = action.payload;
 
           state.message = 'Product created successfully';
         }

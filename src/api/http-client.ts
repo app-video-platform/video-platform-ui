@@ -6,7 +6,7 @@ import axios, {
 import { User } from '../models/user/user';
 import { BaseProduct } from '../models/product/product';
 import { DownloadProduct } from '../models/product/download-product';
-import { CeSaZic } from './products-api';
+import { IProductResponse } from './products-api';
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -47,9 +47,9 @@ const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 //     }
 
 //     if (config.url?.includes('api/products/update')) {
-//       const mockResponse: AxiosResponse<CeSaZic> = {
+//       const mockResponse: AxiosResponse<IProductResponse> = {
 //         data: {
-//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm omnis 
+//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm omnis
 // satanica potestats, imnis inscriptios de mai jos!',
 //           id: '1',
 //           name: 'How to stop nose leaks',
@@ -85,7 +85,7 @@ const API_BASE_URL = process.env.REACT_APP_BASE_PATH;
 //         data: {
 //           createdAt: now,
 //           customers: 100,
-//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm 
+//           description: 'Lorem ipsum dolor sit amet. Gaudeamus igitur, iuvenem dum sumus. Exosricsamus te, omnis immundus spiritusm
 // omnis satanica potestats, imnis inscriptios de mai jos!',
 //           id: '1',
 //           image: '',

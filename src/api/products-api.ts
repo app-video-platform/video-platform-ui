@@ -1,6 +1,7 @@
 import { DownloadProduct } from '../models/product/download-product';
 import {
   BaseProduct,
+  ICreateCourseProduct,
   ICreateProduct,
   INewProductPayload,
   IUpdateProduct,
@@ -8,7 +9,7 @@ import {
 import { ProductType } from '../models/product/product.types';
 import httpClient from './http-client';
 
-export interface CeSaZic {
+export interface IProductResponse {
   type?: string;
   id: string;
   name?: string;
@@ -21,17 +22,40 @@ export interface CeSaZic {
 
 export interface Sectiunile {
   id: string;
-  title: string;
-  description: string;
-  position: number;
+  title?: string;
+  description?: string;
+  position?: number;
   content?: any; // Can be text, video, etc.
 }
 
 export const createCourseProductAPI = async (payload: INewProductPayload) => {
   try {
-    const response = await httpClient.post<string>('api/products', payload, {
-      withCredentials: true,
-    });
+    const response = await httpClient.post<IProductResponse>(
+      'api/products',
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+};
+
+export const updateCourseDetailsAPI = async (
+  productId: string,
+  payload: ICreateCourseProduct
+) => {
+  try {
+    const response = await httpClient.put<string>(
+      `api/products?productId=${productId}`,
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error('Error creating product:', error);
@@ -41,7 +65,7 @@ export const createCourseProductAPI = async (payload: INewProductPayload) => {
 
 export const getAllProductsByUserIdAPI = async (userId: string) => {
   try {
-    const response = await httpClient.get<CeSaZic[]>(
+    const response = await httpClient.get<IProductResponse[]>(
       'api/products?userId=' + userId
     );
     return response.data;
@@ -53,9 +77,13 @@ export const getAllProductsByUserIdAPI = async (userId: string) => {
 
 export const createNewProductAPI = async (product: ICreateProduct) => {
   try {
-    const response = await httpClient.post<CeSaZic>('api/products', product, {
-      withCredentials: true,
-    });
+    const response = await httpClient.post<IProductResponse>(
+      'api/products',
+      product,
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error('Error creating new product:', error);
@@ -80,7 +108,7 @@ export const getProductByProductIdAPI = async (
 
 export const updateProductAPI = async (updatedProduct: IUpdateProduct) => {
   try {
-    const response = await httpClient.put<CeSaZic>(
+    const response = await httpClient.put<IProductResponse>(
       'api/products',
       updatedProduct
     );
