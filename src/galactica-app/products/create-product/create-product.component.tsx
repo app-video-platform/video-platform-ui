@@ -183,7 +183,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
         }
 
         // Navigate away from the page after creation
-        navigate('products');
+        navigate('..');
       }
     });
 
