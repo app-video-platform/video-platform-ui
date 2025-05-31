@@ -179,8 +179,8 @@ const CreateCourse: React.FC = () => {
         .then((data) => {
           console.log('response', data);
           if (data) {
-            formData.id = data; // Set the product ID in formData
-            setFormData((prev) => ({ ...prev, id: data }));
+            formData.id = data.id; // Set the product ID in formData
+            setFormData((prev) => ({ ...prev, id: data.id }));
             setRestOfForm(true);
           }
         })
