@@ -4,6 +4,7 @@ import {
   ICreateCourseProduct,
   ICreateProduct,
   INewProductPayload,
+  IUpdateCourseProduct,
   IUpdateProduct,
 } from '../models/product/product';
 import { ProductType } from '../models/product/product.types';
@@ -44,13 +45,10 @@ export const createCourseProductAPI = async (payload: INewProductPayload) => {
   }
 };
 
-export const updateCourseDetailsAPI = async (
-  productId: string,
-  payload: ICreateCourseProduct
-) => {
+export const updateCourseDetailsAPI = async (payload: IUpdateCourseProduct) => {
   try {
     const response = await httpClient.put<IProductResponse>(
-      `api/products?productId=${productId}`,
+      'api/product',
       payload,
       {
         withCredentials: true,

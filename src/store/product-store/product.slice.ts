@@ -12,6 +12,7 @@ import {
   ICreateProduct,
   INewProductPayload,
   IUpdateCourseDetailsPayload,
+  IUpdateCourseProduct,
   IUpdateProduct,
 } from '../../models/product/product';
 
@@ -49,14 +50,11 @@ export const createCourseProduct = createAsyncThunk<
 
 export const updateCourseProductDetails = createAsyncThunk<
   IProductResponse, // what this thunk returns on success
-  IUpdateCourseDetailsPayload, // the argument you pass in
+  IUpdateCourseProduct, // the argument you pass in
   { rejectValue: string }
 >('products/updateCourseProductDetails', async (payload, thunkAPI) => {
   try {
-    const response = await updateCourseDetailsAPI(
-      payload.productId,
-      payload.details
-    );
+    const response = await updateCourseDetailsAPI(payload);
     return response;
   } catch (err: any) {
     return thunkAPI.rejectWithValue(

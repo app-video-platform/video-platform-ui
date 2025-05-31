@@ -42,6 +42,16 @@ export interface ICreateCourseProduct {
   price?: 'free' | number;
 }
 
+export interface IUpdateCourseProduct {
+  name?: string;
+  description?: string; // Limit 420 characters
+  type?: ProductType;
+  status?: ProductStatus;
+  userId: string;
+  price?: 'free' | number;
+  productId: string;
+}
+
 export interface IUpdateCourseDetailsPayload {
   productId: string;
   details: ICreateCourseProduct;

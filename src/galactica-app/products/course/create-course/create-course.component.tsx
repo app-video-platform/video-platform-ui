@@ -11,6 +11,7 @@ import {
   ICreateCourseProduct,
   ICreateProduct,
   INewProductPayload,
+  IUpdateCourseProduct,
 } from '../../../../models/product/product';
 import { ProductType } from '../../../../models/product/product.types';
 import { selectAuthUser } from '../../../../store/auth-store/auth.selectors';
@@ -100,18 +101,6 @@ const CreateCourse: React.FC = () => {
   const handleUpdateProduct = async () => {
     // Remove id fields from sections before sending
 
-    const productData: ICreateCourseProduct = {
-      name: formData.name,
-      description: formData.description,
-      type: 'COURSE' as ProductType,
-      price: formData.price,
-      status: 'draft',
-      userId: user?.id ?? '',
-    };
-
-    console.log('SAVE PRODUCT', productData);
-    console.log('PRODUCT ID', formData.id);
-
     if (!formData.id) {
       console.error('Product ID is not set. Cannot update product details.');
       setErrors({
@@ -120,11 +109,23 @@ const CreateCourse: React.FC = () => {
       return;
     }
 
+    const productData: IUpdateCourseProduct = {
+      name: formData.name,
+      description: formData.description,
+      type: 'COURSE' as ProductType,
+      price: formData.price,
+      status: 'draft',
+      userId: user?.id ?? '',
+      productId: formData.id,
+    };
+
+    console.log('SAVE PRODUCT', productData);
+    console.log('PRODUCT ID', formData.id);
+
+    
+
     dispatch(
-      updateCourseProductDetails({
-        productId: formData.id,
-        details: productData,
-      })
+      updateCourseProductDetails(productData)
     )
       .unwrap()
       .then((data) => {
@@ -271,6 +272,10 @@ const CreateCourse: React.FC = () => {
                 onFilesChange={handleImageChange}
                 allowedFileTypes={['image/*']}
               />
+            </div>
+
+            <div className="sections-container">
+              <h3>Sections</h3>
             </div>
 
             <Button type="primary" text="Save" htmlType="submit" />
