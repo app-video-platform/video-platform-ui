@@ -178,7 +178,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
         }
 
 
-        if (data && uploadedFilesWithSection.length > 0) {
+        if (data && data.sections && uploadedFilesWithSection.length > 0) {
           uploadFilesInBackground(uploadedFilesWithSection, formData.sections, data.sections);
         }
 

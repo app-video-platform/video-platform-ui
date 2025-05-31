@@ -1,9 +1,21 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { addImageToProductAPI, CeSaZic, createNewProductAPI, getAllProductsByUserIdAPI, updateProductAPI } from '../../api/products-api';
-import { ICreateProduct, IUpdateProduct } from '../../models/product/product';
+import {
+  addImageToProductAPI,
+  CeSaZic,
+  createCourseProductAPI,
+  createNewProductAPI,
+  getAllProductsByUserIdAPI,
+  updateProductAPI,
+} from '../../api/products-api';
+import {
+  ICreateProduct,
+  INewProductPayload,
+  IUpdateProduct,
+} from '../../models/product/product';
 
 interface ProductState {
   products: null | CeSaZic[];
+  currentProduct: CeSaZic | null; // the product we’re currently creating/editing
   loading: boolean;
   error: string | null;
   // Optional: you might want to store a message (for creating/editing/removing status)
@@ -12,15 +24,30 @@ interface ProductState {
 
 const initialState: ProductState = {
   products: null,
+  currentProduct: null, // the product we’re currently creating/editing
   loading: false,
   error: null,
   message: null,
 };
 
+export const createCourseProduct = createAsyncThunk<
+  string, // what this thunk returns on success
+  INewProductPayload, // the argument you pass in
+  { rejectValue: string }
+>('products/createCourseProduct', async (payload, thunkAPI) => {
+  try {
+    const response = await createCourseProductAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || err.message || 'Failed to create product'
+    );
+  }
+});
 
 export const getAllProductsByUserId = createAsyncThunk<
-  CeSaZic[],  // Return type: Product[]
-  string,     // Argument type (userId)
+  CeSaZic[], // Return type: Product[]
+  string, // Argument type (userId)
   { rejectValue: string } // Error type
 >('products/getAllProductsByUserId', async (idToken, { rejectWithValue }) => {
   try {
@@ -32,44 +59,55 @@ export const getAllProductsByUserId = createAsyncThunk<
 });
 
 export const createNewProduct = createAsyncThunk<
-  CeSaZic,  // Return type: Product[]
-  ICreateProduct,     // Argument type (userId)
+  CeSaZic, // Return type: Product[]
+  ICreateProduct, // Argument type (userId)
   { rejectValue: string } // Error type
 >('products/createNewProduct', async (product, { rejectWithValue }) => {
   try {
     const response = await createNewProductAPI(product);
     return response; // API returns user info with token
   } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Creating Product Failed');
+    return rejectWithValue(
+      error.response?.data?.message || 'Creating Product Failed'
+    );
   }
 });
 
 export const updateProductDetails = createAsyncThunk<
-  CeSaZic,  // Return type: Product[]
-  IUpdateProduct,     // Argument type (userId)
+  CeSaZic, // Return type: Product[]
+  IUpdateProduct, // Argument type (userId)
   { rejectValue: string } // Error type
->('products/updateProductDetails', async (updatedProduct, { rejectWithValue }) => {
-  try {
-    const response = await updateProductAPI(updatedProduct);
-    return response; // API returns user info with token
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Updating Product Failed');
+>(
+  'products/updateProductDetails',
+  async (updatedProduct, { rejectWithValue }) => {
+    try {
+      const response = await updateProductAPI(updatedProduct);
+      return response; // API returns user info with token
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Updating Product Failed'
+      );
+    }
   }
-});
+);
 
 export const addImageToProduct = createAsyncThunk<
-  string,  // Return type: Product[]
-  { productId: string; image: File },     // Argument type (productId)
+  string, // Return type: Product[]
+  { productId: string; image: File }, // Argument type (productId)
   { rejectValue: string } // Error type
->('products/addImageToProduct', async ({ productId, image }, { rejectWithValue }) => {
-  try {
-    const response = await addImageToProductAPI(image, productId);
-    return response; // API returns user info with token
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Creating Product Failed');
+>(
+  'products/addImageToProduct',
+  async ({ productId, image }, { rejectWithValue }) => {
+    try {
+      const response = await addImageToProductAPI(image, productId);
+      return response; // API returns user info with token
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Creating Product Failed'
+      );
+    }
   }
-});
-
+);
 
 const productsSlice = createSlice({
   name: 'products',
@@ -83,9 +121,16 @@ const productsSlice = createSlice({
     addProduct(state, action: PayloadAction<CeSaZic>) {
       state.products?.push(action.payload);
     },
+    clearCurrentProduct(state) {
+      state.currentProduct = null;
+      state.message = null;
+      state.error = null;
+    },
     // Update an existing product by id
     updateProduct(state, action: PayloadAction<CeSaZic>) {
-      const index = state.products?.findIndex(p => p.id === action.payload.id);
+      const index = state.products?.findIndex(
+        (p) => p.id === action.payload.id
+      );
       if (state.products && index && index !== -1) {
         state.products[index] = action.payload;
       }
@@ -93,7 +138,7 @@ const productsSlice = createSlice({
     // Remove a product by id
     removeProduct(state, action: PayloadAction<string>) {
       if (state.products) {
-        state.products = state.products.filter(p => p.id !== action.payload);
+        state.products = state.products.filter((p) => p.id !== action.payload);
       }
     },
     // Set loading state
@@ -113,10 +158,13 @@ const productsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(getAllProductsByUserId.fulfilled, (state, action: PayloadAction<CeSaZic[]>) => {
-        state.loading = false;
-        state.products = action.payload;
-      })
+      .addCase(
+        getAllProductsByUserId.fulfilled,
+        (state, action: PayloadAction<CeSaZic[]>) => {
+          state.loading = false;
+          state.products = action.payload;
+        }
+      )
       .addCase(getAllProductsByUserId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error retrieving products';
@@ -127,11 +175,14 @@ const productsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createNewProduct.fulfilled, (state, action: PayloadAction<CeSaZic>) => {
-        state.loading = false;
-        state.products ??= [];
-        state.products.push(action.payload);
-      })
+      .addCase(
+        createNewProduct.fulfilled,
+        (state, action: PayloadAction<CeSaZic>) => {
+          state.loading = false;
+          state.products ??= [];
+          state.products.push(action.payload);
+        }
+      )
       .addCase(createNewProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error creating new product';
@@ -142,16 +193,21 @@ const productsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateProductDetails.fulfilled, (state, action: PayloadAction<CeSaZic>) => {
-        state.loading = false;
-        if (state.products) {
-          const updatedProduct = action.payload;
-          const index = state.products?.findIndex(product => product.id === updatedProduct.id);
-          if (index !== -1) {
-            state.products[index] = updatedProduct;
+      .addCase(
+        updateProductDetails.fulfilled,
+        (state, action: PayloadAction<CeSaZic>) => {
+          state.loading = false;
+          if (state.products) {
+            const updatedProduct = action.payload;
+            const index = state.products?.findIndex(
+              (product) => product.id === updatedProduct.id
+            );
+            if (index !== -1) {
+              state.products[index] = updatedProduct;
+            }
           }
         }
-      })
+      )
       .addCase(updateProductDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error updating product';
@@ -160,13 +216,40 @@ const productsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(addImageToProduct.fulfilled, (state, action: PayloadAction<string>) => {
-        state.loading = false;
-        state.message = action.payload;
-      })
+      .addCase(
+        addImageToProduct.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.loading = false;
+          state.message = action.payload;
+        }
+      )
       .addCase(addImageToProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error uploading image';
+      })
+
+      .addCase(createCourseProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(
+        createCourseProduct.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.loading = false;
+          state.error = null;
+
+          state.currentProduct = {
+            id: action.payload,
+          };
+
+          state.message = 'Product created successfully';
+        }
+      )
+      .addCase(createCourseProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.message = null;
       });
   },
 });

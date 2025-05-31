@@ -51,6 +51,7 @@ const UserDashboard: React.FC = () => {
             <div>
               <p>You don&apos;t have any products yet. Go ahead and create one right now!</p>
               <Button onClick={() => navigate('products/create')} text='Create Product' type='primary' />
+              <Button onClick={() => navigate('products/create-course')} text='(tmp) Create COURSE' type='primary' />
             </div>
           )
         }

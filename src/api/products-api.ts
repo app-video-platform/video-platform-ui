@@ -1,18 +1,22 @@
 import { DownloadProduct } from '../models/product/download-product';
-import { BaseProduct, ICreateProduct, IUpdateProduct } from '../models/product/product';
+import {
+  BaseProduct,
+  ICreateProduct,
+  INewProductPayload,
+  IUpdateProduct,
+} from '../models/product/product';
 import { ProductType } from '../models/product/product.types';
 import httpClient from './http-client';
 
-
 export interface CeSaZic {
-  type: string;
+  type?: string;
   id: string;
-  name: string;
-  description: string;
-  status: string;
-  price: 'free' | number;
-  userId: string;
-  sections: Sectiunile[];
+  name?: string;
+  description?: string;
+  status?: string;
+  price?: 'free' | number;
+  userId?: string;
+  sections?: Sectiunile[];
 }
 
 export interface Sectiunile {
@@ -20,11 +24,26 @@ export interface Sectiunile {
   title: string;
   description: string;
   position: number;
+  content?: any; // Can be text, video, etc.
 }
+
+export const createCourseProductAPI = async (payload: INewProductPayload) => {
+  try {
+    const response = await httpClient.post<string>('api/products', payload, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+};
 
 export const getAllProductsByUserIdAPI = async (userId: string) => {
   try {
-    const response = await httpClient.get<CeSaZic[]>('api/products?userId=' + userId);
+    const response = await httpClient.get<CeSaZic[]>(
+      'api/products?userId=' + userId
+    );
     return response.data;
   } catch (error) {
     console.error('Error getting all products:', error);
@@ -34,7 +53,9 @@ export const getAllProductsByUserIdAPI = async (userId: string) => {
 
 export const createNewProductAPI = async (product: ICreateProduct) => {
   try {
-    const response = await httpClient.post<CeSaZic>('api/products', product, { withCredentials: true });
+    const response = await httpClient.post<CeSaZic>('api/products', product, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error('Error creating new product:', error);
@@ -42,9 +63,14 @@ export const createNewProductAPI = async (product: ICreateProduct) => {
   }
 };
 
-export const getProductByProductIdAPI = async (productId: string, productType: ProductType) => {
+export const getProductByProductIdAPI = async (
+  productId: string,
+  productType: ProductType
+) => {
   try {
-    const response = await httpClient.get<DownloadProduct>(`api/products/getProduct?productId=${productId}&type=${productType}`);
+    const response = await httpClient.get<DownloadProduct>(
+      `api/products/getProduct?productId=${productId}&type=${productType}`
+    );
     return response.data;
   } catch (error) {
     console.error(`Error retrieving product with id ${productId}:`, error);
@@ -54,17 +80,26 @@ export const getProductByProductIdAPI = async (productId: string, productType: P
 
 export const updateProductAPI = async (updatedProduct: IUpdateProduct) => {
   try {
-    const response = await httpClient.put<CeSaZic>('api/products', updatedProduct);
+    const response = await httpClient.put<CeSaZic>(
+      'api/products',
+      updatedProduct
+    );
     return response.data;
   } catch (error) {
-    console.error(`Error updating product with id ${updatedProduct.id}:`, error);
+    console.error(
+      `Error updating product with id ${updatedProduct.id}:`,
+      error
+    );
     throw error;
   }
 };
 
 export const addImageToProductAPI = async (image: File, productId: string) => {
   try {
-    const response = await httpClient.post<string>(`api/products/image?productId=${productId}`, image);
+    const response = await httpClient.post<string>(
+      `api/products/image?productId=${productId}`,
+      image
+    );
     return response.data;
   } catch (error) {
     console.error(`Error adding image to product with id ${productId}:`, error);
@@ -74,7 +109,10 @@ export const addImageToProductAPI = async (image: File, productId: string) => {
 
 export const addFileToSectionAPI = async (file: File, sectionId: string) => {
   try {
-    const response = await httpClient.post<string>('api/files/upload-section-file', { file, sectionId });
+    const response = await httpClient.post<string>(
+      'api/files/upload-section-file',
+      { file, sectionId }
+    );
     return response.data;
   } catch (error) {
     console.error(`Error adding file to section with id ${sectionId}:`, error);
@@ -82,31 +120,40 @@ export const addFileToSectionAPI = async (file: File, sectionId: string) => {
   }
 };
 
-export const getPresignedUrlAPI = async (sectionId: string, fileName: string) => {
+export const getPresignedUrlAPI = async (
+  sectionId: string,
+  fileName: string
+) => {
   try {
     const response = await httpClient.get('/api/files/presigned-url', {
       params: {
         sectionId,
         folderType: 'DOWNLOAD_SECTION_FILES',
-        filename: fileName
-      }
+        filename: fileName,
+      },
     });
     return response.data; // { fileId, presignedUrl, key, fileUrl }
   } catch (error) {
-    console.error(`Error getting presigned URL for section ${sectionId}:`, error);
+    console.error(
+      `Error getting presigned URL for section ${sectionId}:`,
+      error
+    );
     throw error;
   }
 };
 
 // STEP 2: Upload file to presigned URL
-export const uploadToPresignedUrl = async (presignedUrl: string, file: File) => {
+export const uploadToPresignedUrl = async (
+  presignedUrl: string,
+  file: File
+) => {
   try {
     const response = await fetch(presignedUrl, {
       method: 'PUT',
       headers: {
-        'Content-Type': file.type
+        'Content-Type': file.type,
       },
-      body: file
+      body: file,
     });
 
     if (!response.ok) {
@@ -131,12 +178,16 @@ export const confirmFileUploadAPI = async (payload: {
   fileType: string;
 }) => {
   try {
-    const response = await httpClient.post('/api/files/confirm-upload', payload, {
-      withCredentials: true,
-      headers: {
-        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? ''
+    const response = await httpClient.post(
+      '/api/files/confirm-upload',
+      payload,
+      {
+        withCredentials: true,
+        headers: {
+          'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? '',
+        },
       }
-    });
+    );
 
     return response.data;
   } catch (error) {

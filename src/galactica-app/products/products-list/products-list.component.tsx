@@ -27,6 +27,7 @@ const ProductsList: React.FC = () => {
     <div>
       <div className='products-header'>
         <h1>Products</h1>
+        <button className='add-product-btn' onClick={() => navigate('create-course')}>+ (tmp) Add COURSE</button>
         <button className='add-product-btn' onClick={() => navigate('create')}>+ Add product</button>
       </div>
       {
