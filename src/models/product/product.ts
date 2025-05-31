@@ -49,7 +49,7 @@ export interface IUpdateCourseProduct {
   status?: ProductStatus;
   userId: string;
   price?: 'free' | number;
-  productId: string;
+  id: string;
 }
 
 export interface IUpdateCourseDetailsPayload {
