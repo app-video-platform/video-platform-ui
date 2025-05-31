@@ -49,7 +49,7 @@ export const updateCourseDetailsAPI = async (
   payload: ICreateCourseProduct
 ) => {
   try {
-    const response = await httpClient.put<string>(
+    const response = await httpClient.put<IProductResponse>(
       `api/products?productId=${productId}`,
       payload,
       {

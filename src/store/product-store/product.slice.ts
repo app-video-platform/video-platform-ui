@@ -48,7 +48,7 @@ export const createCourseProduct = createAsyncThunk<
 });
 
 export const updateCourseProductDetails = createAsyncThunk<
-  string, // what this thunk returns on success
+  IProductResponse, // what this thunk returns on success
   IUpdateCourseDetailsPayload, // the argument you pass in
   { rejectValue: string }
 >('products/updateCourseProductDetails', async (payload, thunkAPI) => {
@@ -265,6 +265,28 @@ const productsSlice = createSlice({
         }
       )
       .addCase(createCourseProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.message = null;
+      })
+
+      .addCase(updateCourseProductDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(
+        updateCourseProductDetails.fulfilled,
+        (state, action: PayloadAction<IProductResponse>) => {
+          state.loading = false;
+          state.error = null;
+
+          state.currentProduct = action.payload;
+
+          state.message = 'Product updated successfully';
+        }
+      )
+      .addCase(updateCourseProductDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         state.message = null;
