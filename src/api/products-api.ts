@@ -48,7 +48,7 @@ export const createCourseProductAPI = async (payload: INewProductPayload) => {
 export const updateCourseDetailsAPI = async (payload: IUpdateCourseProduct) => {
   try {
     const response = await httpClient.put<IProductResponse>(
-      'api/product',
+      'api/products',
       payload,
       {
         withCredentials: true,
