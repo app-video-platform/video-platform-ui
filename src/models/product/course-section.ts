@@ -1,9 +1,7 @@
-export interface CourseSection {
-  localId?: string;
+export interface ICourseSection {
   id?: string;
-  title: string;
-  description: string;
-  type: 'VIDEO' | 'TEXT' | 'QUIZ' | 'ASSIGNMENT';
+  title?: string;
+  description?: string;
   videoUrl?: string;
   textContent?: string;
   position?: number;
