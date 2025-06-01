@@ -61,6 +61,9 @@ module.exports = {
       'process.env.REACT_APP_GOOGLE_CLIENT_ID': JSON.stringify(
         process.env.REACT_APP_GOOGLE_CLIENT_ID
       ),
+      'process.env.REACT_APP_USE_MOCKS': JSON.stringify(
+        process.env.REACT_APP_USE_MOCKS
+      ),
       'process.env.PUBLIC_URL': JSON.stringify(''),
     }),
   ],

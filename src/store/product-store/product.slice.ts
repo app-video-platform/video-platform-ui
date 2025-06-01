@@ -7,7 +7,7 @@ import {
   getAllProductsByUserIdAPI,
   updateCourseDetailsAPI,
   updateProductAPI,
-} from '../../api/products-api';
+} from '../../api/services/products/products-api';
 import {
   ICreateProduct,
   INewProductPayload,

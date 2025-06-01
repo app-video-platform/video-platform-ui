@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -53,7 +54,7 @@ const UserPagePreview: React.FC = () => {
           ' cu chilotii in spate, ca sa nu atace pestele nebun. Asa mai astept si eu putin descrierea pacii.',
         id: '2',
         image: '',
-        name: '1:1 sex chat \'consultation\'',
+        name: "1:1 sex chat 'consultation'",
         price: 1.99,
         status: 'draft',
         type: 'CONSULTATION',
@@ -222,7 +223,7 @@ const UserPagePreview: React.FC = () => {
           'Quisque tristique mollis risus, nec fringilla diam scelerisque et. Vestibulum fringilla ligula vel ex sagittis pulvinar.',
         id: '11',
         image: '',
-        name: 'Unlocking the Secrets of the Unicorn\'s Mane',
+        name: "Unlocking the Secrets of the Unicorn's Mane",
         price: 14.99,
         status: 'published',
         type: 'COURSE',
@@ -369,6 +370,10 @@ const UserPagePreview: React.FC = () => {
           image: '',
           type: product.type as ProductType,
           status: product.status as ProductStatus,
+          name: product.name || 'Untitled Product',
+          description: product.description || 'No description available',
+          price: product.price || 'free',
+          userId: product.userId || '',
         };
 
         return updatedProduct;

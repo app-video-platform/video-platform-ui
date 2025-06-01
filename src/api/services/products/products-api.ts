@@ -1,4 +1,4 @@
-import { DownloadProduct } from '../models/product/download-product';
+import { DownloadProduct } from '../../../models/product/download-product';
 import {
   BaseProduct,
   ICreateCourseProduct,
@@ -6,9 +6,9 @@ import {
   INewProductPayload,
   IUpdateCourseProduct,
   IUpdateProduct,
-} from '../models/product/product';
-import { ProductType } from '../models/product/product.types';
-import httpClient from './http-client';
+} from '../../../models/product/product';
+import { ProductType } from '../../../models/product/product.types';
+import httpClient from '../../http-client';
 
 export interface IProductResponse {
   type?: string;
