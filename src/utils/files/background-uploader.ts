@@ -1,7 +1,12 @@
 import { Sectiunile } from '../../api/services/products/products-api';
-import { IFilesWithSection } from '../../galactica-app/products/create-product/create-product.component';
+// import { IFilesWithSection } from '../../galactica-app/products/create-product/create-product.component';
 import { DownloadSection } from '../../models/product/download-section';
 import { uploadFileToSection } from './upload-file';
+
+interface IFilesWithSection {
+  sectionLocalId: string;
+  files: File[];
+}
 
 export const uploadFilesInBackground = async (
   uploadedFiles: IFilesWithSection[],

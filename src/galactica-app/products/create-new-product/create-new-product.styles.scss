@@ -1,5 +1,28 @@
 @use 'sass:color';
 
+.price-selector-wrapper, .sections-container {
+  margin-top: 40px;
+}
+
+.image-uploader {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin-top: 40px;
+
+  .image-uploader-box {
+    width: 50%;
+  }
+}
+
+
+.action-btns-wrapper {
+  display: flex;
+  width: 100%;
+  margin-top: 40px;
+  justify-content: center;
+}
+
 .type-selectors-container {
   display: flex;
   width: 60%;
@@ -45,5 +68,20 @@
 
   &:hover {
     background-color: color.scale(black, $lightness: 10%);
+  }
+}
+
+.type-box__disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+
+.course-continue-button-wrapper {
+  width: 100%;
+  
+  .create-course-continue-button {
+    margin: 20px auto;
+    display: block;
   }
 }

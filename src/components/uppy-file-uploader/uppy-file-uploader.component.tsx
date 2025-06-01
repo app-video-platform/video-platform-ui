@@ -8,6 +8,8 @@ import Dropbox from '@uppy/dropbox';
 import OneDrive from '@uppy/onedrive';
 import Url from '@uppy/url';
 import Unsplash from '@uppy/unsplash';
+import en_US from '@uppy/locales/lib/en_US';
+import Locale from '@uppy/core';
 
 // Import Uppy styles
 import '@uppy/core/dist/style.css';
@@ -22,14 +24,20 @@ interface UppyFileUploaderProps {
   maxNumberOfFiles?: number;
   // Maximum file size (in bytes)
   maxFileSize?: number;
+
+  /**
+   * If true, do not load any “import/Companion” plugins (GoogleDrive, Dropbox, etc.)
+   */
+  disableImporters?: boolean;
 }
 
 const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onFilesChange = () => { },
+  onFilesChange = () => {},
   allowedFileTypes, // default to image uploads
   maxNumberOfFiles,
   maxFileSize = 5 * 1024 * 1024, // default to 5 MB
+  disableImporters = false,
 }) => {
   // Use state to hold the Uppy instance so that re-render occurs when it’s created
   const [uppy, setUppy] = useState<UppyType<any, any> | null>(null);
@@ -44,6 +52,7 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
         maxFileSize: maxFileSize || 100 * 1024 * 1024, // 100 MB in bytes
       },
       autoProceed: false,
+      locale: en_US,
     });
 
     // Configure the upload endpoint (adjust '/upload' as needed)
@@ -54,11 +63,16 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
     });
 
     // Add additional plugins with the default Companion service
-    uppyInstance.use(GoogleDrive, { companionUrl: 'https://companion.uppy.io' });
-    uppyInstance.use(Dropbox, { companionUrl: 'https://companion.uppy.io' });
-    uppyInstance.use(OneDrive, { companionUrl: 'https://companion.uppy.io' });
-    uppyInstance.use(Url, { companionUrl: 'https://companion.uppy.io' });
-    uppyInstance.use(Unsplash, { companionUrl: 'https://companion.uppy.io' });
+
+    if (!disableImporters) {
+      uppyInstance.use(GoogleDrive, {
+        companionUrl: 'https://companion.uppy.io',
+      });
+      uppyInstance.use(Dropbox, { companionUrl: 'https://companion.uppy.io' });
+      uppyInstance.use(OneDrive, { companionUrl: 'https://companion.uppy.io' });
+      uppyInstance.use(Url, { companionUrl: 'https://companion.uppy.io' });
+      uppyInstance.use(Unsplash, { companionUrl: 'https://companion.uppy.io' });
+    }
 
     // If image uploads are allowed, add the ThumbnailGenerator plugin
     if (allowedFileTypes && allowedFileTypes.includes('image/*')) {
@@ -70,7 +84,9 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
 
     // Listen for file-added and file-removed events to update the file list
     const updateFiles = () => {
-      const files: File[] = uppyInstance.getFiles().map((file) => file.data as File);
+      const files: File[] = uppyInstance
+        .getFiles()
+        .map((file) => file.data as File);
       memoizedOnFilesChange(files);
     };
 
@@ -97,16 +113,32 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
       uppyInstance.destroy();
       // }
     };
-  }, []);
+  }, [
+    allowedFileTypes,
+    maxFileSize,
+    maxNumberOfFiles,
+    memoizedOnFilesChange,
+    disableImporters,
+  ]);
+
+  // const mergedLocale: Locale<number> | undefined = customDropText ? {...en_US, strings: {
+  //         ...en_US.strings,
+  //         dropPasteImport: customDropText,
+  //       },
+  //     }
+  //   : undefined;
 
   return (
     <div className="custom-uppy-dashboard">
       {uppy ? (
         <Dashboard
           uppy={uppy}
-          // You can enable additional plugins in the Dashboard UI by specifying them here:
-          plugins={['GoogleDrive', 'Dropbox', 'OneDrive', 'Url', 'Unsplash']}
-          height={400}
+          plugins={
+            disableImporters
+              ? []
+              : ['GoogleDrive', 'Dropbox', 'OneDrive', 'Url', 'Unsplash']
+          }
+          height={disableImporters ? 200 : 400}
           note="Images only, up to 5MB"
           hideUploadButton={true}
           proudlyDisplayPoweredByUppy={true}

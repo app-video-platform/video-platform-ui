@@ -3,7 +3,7 @@
   display: flex;
   gap: 0.5rem;
   padding: 0;
-  margin: 80px 0 0 200px;
+  margin: 30px 0 0 150px;
   align-items: center;
 }
 
@@ -50,7 +50,7 @@
     content: '';
     position: absolute;
     top: 0;
-    right: -10px; /* Adjust this to move the arrow tip closer or farther */
+    right: -9px; /* Adjust this to move the arrow tip closer or farther */
     width: 0;
     height: 0;
     border-top: 12px solid transparent;

@@ -12,14 +12,13 @@ import Contact from './pages/contact/contact.component';
 import NotFoundPage from './pages/errors/not-found/not-found.component';
 import UnauthorizedPage from './pages/errors/unauthorized/unauthorized.component';
 import Dashboard from './galactica-app/dashboard/dashboard.component';
-import ProductForm from './galactica-app/products/create-product/create-product.component';
 import ProductsList from './galactica-app/products/products-list/products-list.component';
 import ProductsLayout from './galactica-app/products/products-layout.component';
 import UserPagePreview from './galactica-app/user-page-preview/user-page-preview.component';
 import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
 import Onboarding from './galactica-app/onboarding/onboarding.component';
 import ForgotPassword from './pages/forgot-password/forgot-password.component';
-import CreateCourse from './galactica-app/products/course/create-course/create-course.component';
+import CreateNewProduct from './galactica-app/products/create-new-product/create-new-product.component';
 
 const App = () => (
   <AppInitializer>
@@ -37,19 +36,20 @@ const App = () => (
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      <Route path='onboarding' element={<Onboarding />} />
+      <Route path="onboarding" element={<Onboarding />} />
       <Route path="dashboard" element={<Dashboard />}>
         <Route index element={<UserDashboard />} />
-        <Route path="products" element={<ProductsLayout />} >
+        <Route path="products" element={<ProductsLayout />}>
           <Route index element={<ProductsList />} />
-          <Route path='create' element={<ProductForm mode='create' />} />
-          <Route path='create-course' element={<CreateCourse />} />
-          <Route path="edit/:type/:id" element={<ProductForm mode='edit' />} />
+          {/* <Route path='create' element={<ProductForm mode='create' />} /> */}
+          <Route path="create" element={<CreateNewProduct />} />
+
+          {/* <Route path="create-course" element={<CreateCourse />} /> */}
+          {/* <Route path="edit/:type/:id" element={<ProductForm mode="edit" />} /> */}
         </Route>
-        <Route path='my-page-preview' element={<UserPagePreview />} />
+        <Route path="my-page-preview" element={<UserPagePreview />} />
       </Route>
     </Routes>
-
   </AppInitializer>
 );
 

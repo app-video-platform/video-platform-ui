@@ -6,3 +6,5 @@ export type ProductType = 'COURSE' | 'DOWNLOAD' | 'CONSULTATION';
 export type ProductStatus = 'draft' | 'published' | 'hidden';
 
 export type Product = DownloadProduct | CourseProduct;
+
+export type LessonType = 'VIDEO' | 'TEXT' | 'QUIZ' | 'ASSIGNMENT';
