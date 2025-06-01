@@ -17,7 +17,7 @@ export const uploadFilesInBackground = async (
 
   for (const saved of savedSections) {
     const match = localSections.find((s) => s.position === saved.position);
-    if (match?.localId) {
+    if (match?.localId && saved.id) {
       localIdToBackendId.set(match.localId, saved.id);
     }
   }
