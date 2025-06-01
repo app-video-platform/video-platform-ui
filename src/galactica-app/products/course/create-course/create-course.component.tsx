@@ -25,7 +25,7 @@ import {
   updateCourseProductDetails,
 } from '../../../../store/product-store/product.slice';
 import { set } from 'react-hook-form';
-import CourseSection from './course-section/course-section.component';
+// import CourseSection from './course-section/course-section.component';
 
 const CreateCourse: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -123,11 +123,7 @@ const CreateCourse: React.FC = () => {
     console.log('SAVE PRODUCT', productData);
     console.log('PRODUCT ID', formData.id);
 
-    
-
-    dispatch(
-      updateCourseProductDetails(productData)
-    )
+    dispatch(updateCourseProductDetails(productData))
       .unwrap()
       .then((data) => {
         console.log('response', data);
@@ -277,8 +273,6 @@ const CreateCourse: React.FC = () => {
 
             <div className="sections-container">
               <h3>Sections</h3>
-
-             
             </div>
 
             <Button type="primary" text="Save" htmlType="submit" />
