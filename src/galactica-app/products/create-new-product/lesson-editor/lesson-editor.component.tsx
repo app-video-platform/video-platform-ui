@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import React, { use, useEffect, useState } from 'react';
 
 import './lesson-editor.styles.scss';
@@ -7,11 +8,22 @@ import Button from '../../../../components/button/button.component';
 import { AppDispatch } from '../../../../store/store';
 import { useDispatch } from 'react-redux';
 import { createLesson } from '../../../../store/product-store/product.slice';
+import { LessonType } from '../../../../models/product/product.types';
+import BoxSelector from '../../../../components/box-selector/box-selector.component';
+import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
+import { set } from 'react-hook-form';
 
 interface LessonEditorProps {
   lesson: ILesson;
   index: number;
   sectionId: string;
+}
+
+interface LessonFormData {
+  title: string;
+  description: string;
+  content: string;
+  type?: LessonType; // Optional, depending on your requirements
 }
 
 const LessonEditor: React.FC<LessonEditorProps> = ({
@@ -21,11 +33,14 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = React.useState<LessonFormData>({
     title: '',
     description: '',
     content: '',
+    type: '' as LessonType,
   });
+
+  const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
 
   const [isLessonCreated, setIsLessonCreated] = useState(false);
 
@@ -70,16 +85,53 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       .unwrap()
       .then((response) => {
         console.log('Lesson created successfully:', response);
-        // Optionally, you can update the lesson state with the new lesson ID
-        // setFormData((prev) => ({
-        //   ...prev,
-        //   id: response.id, // Assuming response contains the new lesson ID
-        // }));
         setIsLessonCreated(true);
       })
       .catch((error) => {
         console.error('Failed to create lesson:', error);
       });
+  };
+
+  const onVideoUploadChange = (files: File[]) => {
+    console.log('Video files uploaded:', files);
+    setUploadedVideo(files[0] || null);
+  };
+
+  const renderContentField = () => {
+    switch (formData.type) {
+      case 'VIDEO':
+        return (
+          <UppyFileUploader
+            onFilesChange={onVideoUploadChange}
+            allowedFileTypes={['video/*']}
+          />
+        );
+
+      case 'TEXT':
+        return (
+          <div className="form-input-group">
+            <p>Here\s gon be a som som</p>
+          </div>
+        );
+
+      case 'QUIZ':
+        return (
+          <div className="quiz-editor-placeholder">
+            <p>Quiz editor will go here.</p>
+          </div>
+        );
+
+      case 'ASSIGNMENT':
+        return (
+          <div className="assignment-editor-placeholder">
+            <p>Assignment editor will go here.</p>
+          </div>
+        );
+
+      default:
+        // If no valid type is selected, return null or a message
+        return null;
+    }
   };
 
   return (
@@ -102,14 +154,15 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           onChange={handleChange}
         />
 
+        <BoxSelector<LessonType>
+          selectedOption={formData.type}
+          onSelect={(type) => setFormData((prev) => ({ ...prev, type }))}
+          availableOptions={['VIDEO', 'TEXT', 'QUIZ']} // Example lesson types
+          disabledOptions={[]} // Add any disabled options if needed
+        />
+
         {isLessonCreated ? (
-          <FormInput
-            label="Lesson Content"
-            type="text"
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-          />
+          renderContentField()
         ) : (
           <Button
             type="primary"

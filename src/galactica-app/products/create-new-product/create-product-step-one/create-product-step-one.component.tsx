@@ -8,7 +8,6 @@ import {
   FormErrors,
   NewProductFormData,
 } from '../create-new-product.component';
-import ProductTypeSelector from '../../../../components/product-type-selector/product-type-selector.component';
 import FormInput from '../../../../components/form-input/form-input.component';
 import Button from '../../../../components/button/button.component';
 import { INewProductPayload } from '../../../../models/product/product';
@@ -16,6 +15,7 @@ import { ProductType } from '../../../../models/product/product.types';
 import { createCourseProduct } from '../../../../store/product-store/product.slice';
 
 import './create-product-step-one.styles.scss';
+import BoxSelector from '../../../../components/box-selector/box-selector.component';
 
 interface CreateProductStepOneProps {
   formData: NewProductFormData;
@@ -29,6 +29,8 @@ interface CreateProductStepOneProps {
   setShowLoadingRestOfForm: (loading: boolean) => void;
   setShowRestOfForm: (show: boolean) => void;
 }
+
+const AVAILABLE_TYPES: ProductType[] = ['COURSE', 'DOWNLOAD', 'CONSULTATION'];
 
 const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
   formData,
@@ -103,10 +105,13 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
       <h3>Choose a type</h3>
 
       <div className="type-selectors">
-        <ProductTypeSelector
-          selectedType={formData.type}
+        <BoxSelector<ProductType>
+          selectedOption={formData.type}
           onSelect={(t) => setField('type', t)}
+          disabledOptions={[]}
+          availableOptions={AVAILABLE_TYPES}
         />
+
         {errors.type && <p className="error-text-red">{errors.type}</p>}
       </div>
 
