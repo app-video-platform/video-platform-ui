@@ -8,8 +8,13 @@ import './section-editor.styles.scss';
 import { ProductType } from '../../../../../models/product/product.types';
 import UppyFileUploader from '../../../../../components/uppy-file-uploader/uppy-file-uploader.component';
 import CourseLessons from './course-lessons/course-lessons.component';
+import { AppDispatch } from '../../../../../store/store';
+import { useDispatch } from 'react-redux';
+import {
+  createSection,
+  updateSectionDetails,
+} from '../../../../../store/product-store/product.slice';
 
-// Re‐use the same interface for a section’s data shape
 export interface NewProductSectionFormData {
   id: string;
   title: string;
@@ -23,17 +28,7 @@ interface SectionEditorProps {
   index: number;
   sectionData: NewProductSectionFormData;
   productType: ProductType;
-  // // Callback when an input (title/description) changes
-  // onFieldChange: (
-  //   index: number,
-  //   fieldName: 'title' | 'description',
-  //   newValue: string
-  // ) => void;
-
-  // // Called when Save is clicked
-  // onSave: (index: number) => void;
-
-  // Called when Remove is clicked
+  showRemoveButton?: boolean;
   onRemoveFromParent: (index: number) => void;
 }
 
@@ -41,8 +36,11 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   index,
   sectionData,
   productType,
+  showRemoveButton,
   onRemoveFromParent,
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [localData, setLocalData] =
     useState<NewProductSectionFormData>(sectionData);
   const [files, setFiles] = useState<File[]>([]);
@@ -60,36 +58,83 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   };
 
   const handleRemove = () => {
-    // If you have a backend‐side delete, you can dispatch it here:
-    // dispatch(deleteSection(localData.id))
-    //   .unwrap()
-    //   .then(() => {
-    //     console.log('Section deleted from backend:', localData.id);
-    //     // Then tell parent to remove this item from its array
-    //     onRemoveFromParent(index);
-    //   })
-    //   .catch((err) => {
-    //     console.error('Failed to delete section (child):', err);
-    //   });
-
     console.log('Remove section:', localData.id);
     onRemoveFromParent(index);
+
+    if (localData.id) {
+      console.info('[TODO] Remove section:', localData.id);
+      // dispatch(deleteSection(localData.id))
+      //   .unwrap()
+      //   .then(() => {
+      //     console.log('Section deleted from backend:', localData.id);
+      //   })
+      //   .catch((err) => {
+      //     console.error('Failed to delete section (child):', err);
+      //   });
+    }
   };
 
-  const handleSave = () => {
+  const handleUpdate = () => {
+    const updatedSection = {
+      ...localData,
+      position: index,
+    };
+
     // Dispatch the update from inside the child
-    // dispatch(updateSectionDetails(localData))
-    //   .unwrap()
-    //   .then((updated) => {
-    //     console.log('Section updated from child:', updated);
-    //     // Optionally sync localData to match the “confirmed” updated data:
-    //     setLocalData(updated);
-    //   })
-    //   .catch((err) => {
-    //     console.error('Failed to save section (child):', err);
-    //   });
+    dispatch(updateSectionDetails(updatedSection))
+      .unwrap()
+      .then((updated) => {
+        console.log('Section updated from child:', updated);
+        // Optionally sync localData to match the “confirmed” updated data:
+        setLocalData({
+          ...updated,
+          id: updated.id ?? '',
+          title: updated.title ?? '',
+          description: updated.description ?? '',
+        });
+      })
+      .catch((err) => {
+        console.error('Failed to save section (child):', err);
+      });
 
     console.log('Save section:', localData);
+  };
+
+  const handleSectionCreation = () => {
+    if (localData.id) {
+      console.warn(
+        'Section already exists, cannot create again:',
+        localData.id
+      );
+      return;
+    }
+
+    if (!localData.title) {
+      console.warn('Section title is required for creation');
+      window.alert('Section title is required for creation');
+      return;
+    }
+    const newSection = {
+      ...localData,
+      position: index,
+    };
+
+    dispatch(createSection(newSection))
+      .unwrap()
+      .then((createdSection) => {
+        console.log('Section created from child:', createdSection);
+        // Optionally sync localData to match the “confirmed” created data:
+        setLocalData({
+          ...createdSection,
+          id: createdSection.id ?? '',
+          title: createdSection.title ?? '',
+          description: createdSection.description ?? '',
+        });
+      })
+      .catch((err) => {
+        console.error('Failed to create section (child):', err);
+      });
+    console.log('Create section:', localData);
   };
 
   const handleFilesChange = (files: File[]) => {
@@ -99,19 +144,36 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     console.log('files', files);
   };
 
+  const isUnchanged =
+    localData.title === sectionData.title &&
+    localData.description === sectionData.description;
+
   return (
     <div className="section-container">
       <div className="section-header-line">
         <h3>Section {index + 1}</h3>
-        <Button onClick={handleSave} text="Update section" type="primary" />
-        <Button onClick={handleRemove} text="Remove" type="secondary" />
+
+        {localData.id && (
+          <>
+            <Button
+              onClick={handleUpdate}
+              text="Update section"
+              type="primary"
+              disabled={isUnchanged}
+            />
+
+            {showRemoveButton && (
+              <Button onClick={handleRemove} text="Remove" type="secondary" />
+            )}
+          </>
+        )}
       </div>
 
       <FormInput
         label="Section Title"
         type="text"
         name="title"
-        value={sectionData.title}
+        value={localData.title}
         onChange={handleChange}
       />
 
@@ -119,32 +181,41 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         label="Section Description"
         type="text"
         name="description"
-        value={sectionData.description}
+        value={localData.description}
         onChange={handleChange}
       />
 
-      {(() => {
-        switch (productType) {
-          case 'COURSE':
-            return (
-              <div className="course-specific-fields">
-                <CourseLessons
-                  sectionId={localData.id}
-                  lessons={sectionData.lessons || []}
-                />
-              </div>
-            );
-          case 'DOWNLOAD':
-            return (
-              <div className="download-specific-fields">
-                <UppyFileUploader onFilesChange={handleFilesChange} />
-              </div>
-            );
+      {!localData.id && (
+        <Button
+          onClick={handleSectionCreation}
+          text="Create section"
+          type="primary"
+        />
+      )}
 
-          default:
-            return null;
-        }
-      })()}
+      {localData.id &&
+        (() => {
+          switch (productType) {
+            case 'COURSE':
+              return (
+                <div className="course-specific-fields">
+                  <CourseLessons
+                    sectionId={localData.id}
+                    lessons={sectionData.lessons || []}
+                  />
+                </div>
+              );
+            case 'DOWNLOAD':
+              return (
+                <div className="download-specific-fields">
+                  <UppyFileUploader onFilesChange={handleFilesChange} />
+                </div>
+              );
+
+            default:
+              return null;
+          }
+        })()}
     </div>
   );
 };

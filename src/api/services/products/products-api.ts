@@ -1,11 +1,17 @@
 import { DownloadProduct } from '../../../models/product/download-product';
 import {
+  ICreateLessonPayload,
+  ICreateLessonResponse,
+  ILesson,
+} from '../../../models/product/lesson';
+import {
   BaseProduct,
   ICreateCourseProduct,
   ICreateProduct,
   INewProductPayload,
   IUpdateCourseProduct,
   IUpdateProduct,
+  IUpdateSectionDetails,
 } from '../../../models/product/product';
 import { ProductType } from '../../../models/product/product.types';
 import httpClient from '../../http-client';
@@ -22,11 +28,12 @@ export interface IProductResponse {
 }
 
 export interface Sectiunile {
-  id: string;
+  id?: string;
   title?: string;
   description?: string;
   position?: number;
   content?: any; // Can be text, video, etc.
+  lessons?: ILesson[];
 }
 
 export const createCourseProductAPI = async (payload: INewProductPayload) => {
@@ -49,6 +56,72 @@ export const updateCourseDetailsAPI = async (payload: IUpdateCourseProduct) => {
   try {
     const response = await httpClient.put<IProductResponse>(
       'api/products',
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+};
+
+export const createSectionAPI = async (payload: IUpdateSectionDetails) => {
+  try {
+    const response = await httpClient.post<IUpdateSectionDetails>(
+      'api/products/section',
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+};
+
+export const updateSectionDetailsAPI = async (
+  payload: IUpdateSectionDetails
+) => {
+  try {
+    const response = await httpClient.put<IUpdateSectionDetails>(
+      'api/products/sectionnnn',
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+};
+
+export const createLessonAPI = async (payload: ICreateLessonPayload) => {
+  try {
+    const response = await httpClient.post<ICreateLessonResponse>(
+      'api/products/section/lesson',
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating lesson:', error);
+    throw error;
+  }
+};
+
+export const updateLessonDetailsAPI = async (payload: ILesson) => {
+  try {
+    const response = await httpClient.put<ILesson>(
+      'api/products/section/lesson',
       payload,
       {
         withCredentials: true,

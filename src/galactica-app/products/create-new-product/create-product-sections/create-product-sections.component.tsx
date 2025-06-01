@@ -87,8 +87,21 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
           sectionData={sectionData}
           onRemoveFromParent={handleRemoveFromParent}
           productType={productType}
+          showRemoveButton={formDataList.length > 1}
         />
       ))}
+
+      <Button
+        type="secondary"
+        text="Add Section"
+        htmlType="button"
+        onClick={() => {
+          setFormDataList((prev) => [
+            ...prev,
+            { id: '', title: '', description: '' },
+          ]);
+        }}
+      />
     </div>
   );
 };

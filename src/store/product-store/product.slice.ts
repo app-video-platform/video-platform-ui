@@ -7,6 +7,11 @@ import {
   getAllProductsByUserIdAPI,
   updateCourseDetailsAPI,
   updateProductAPI,
+  Sectiunile,
+  updateSectionDetailsAPI,
+  createSectionAPI,
+  createLessonAPI,
+  updateLessonDetailsAPI,
 } from '../../api/services/products/products-api';
 import {
   ICreateProduct,
@@ -14,7 +19,13 @@ import {
   IUpdateCourseDetailsPayload,
   IUpdateCourseProduct,
   IUpdateProduct,
+  IUpdateSectionDetails,
 } from '../../models/product/product';
+import {
+  ICreateLessonPayload,
+  ICreateLessonResponse,
+  ILesson,
+} from '../../models/product/lesson';
 
 interface ProductState {
   products: null | IProductResponse[];
@@ -59,6 +70,70 @@ export const updateCourseProductDetails = createAsyncThunk<
   } catch (err: any) {
     return thunkAPI.rejectWithValue(
       err.response?.data?.message || err.message || 'Failed to update product'
+    );
+  }
+});
+
+export const createSection = createAsyncThunk<
+  IUpdateSectionDetails, // what this thunk returns on success
+  IUpdateSectionDetails, // the argument you pass in
+  { rejectValue: string }
+>('products/createSection', async (payload, thunkAPI) => {
+  try {
+    const response = await createSectionAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || err.message || 'Failed to create section'
+    );
+  }
+});
+
+export const updateSectionDetails = createAsyncThunk<
+  IUpdateSectionDetails, // what this thunk returns on success
+  IUpdateSectionDetails, // the argument you pass in
+  { rejectValue: string }
+>('products/updateSectionDetails', async (payload, thunkAPI) => {
+  try {
+    const response = await updateSectionDetailsAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message ||
+        err.message ||
+        'Failed to update section details'
+    );
+  }
+});
+
+export const createLesson = createAsyncThunk<
+  ICreateLessonResponse, // what this thunk returns on success
+  ICreateLessonPayload, // the argument you pass in
+  { rejectValue: string }
+>('products/createLesson', async (payload, thunkAPI) => {
+  try {
+    const response = await createLessonAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || err.message || 'Failed to create lesson'
+    );
+  }
+});
+
+export const updateLessonDetails = createAsyncThunk<
+  ILesson, // what this thunk returns on success
+  ILesson, // the argument you pass in
+  { rejectValue: string }
+>('products/updateLessonDetails', async (payload, thunkAPI) => {
+  try {
+    const response = await updateLessonDetailsAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message ||
+        err.message ||
+        'Failed to update lesson details'
     );
   }
 });
@@ -285,6 +360,161 @@ const productsSlice = createSlice({
         }
       )
       .addCase(updateCourseProductDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.message = null;
+      })
+
+      .addCase(createSection.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(
+        createSection.fulfilled,
+        (state, action: PayloadAction<IUpdateSectionDetails>) => {
+          state.loading = false;
+          state.error = null;
+
+          const updatedSection = action.payload;
+          const prod = state.currentProduct;
+
+          if (prod) {
+            if (!prod.sections) {
+              prod.sections = [updatedSection];
+            } else {
+              prod.sections.push(updatedSection);
+            }
+          }
+
+          state.message = 'Section created successfully';
+        }
+      )
+      .addCase(createSection.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.message = null;
+      })
+
+      .addCase(updateSectionDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(
+        updateSectionDetails.fulfilled,
+        (state, action: PayloadAction<IUpdateSectionDetails>) => {
+          state.loading = false;
+          state.error = null;
+
+          const updatedSection = action.payload;
+          const prod = state.currentProduct;
+
+          if (prod) {
+            // If sections is undefined, initialize it to an array with the new section
+            if (!prod.sections) {
+              prod.sections = [updatedSection];
+            } else {
+              // Otherwise, look for an existing section with the same id
+              const idx = prod.sections.findIndex(
+                (s) => s.id === updatedSection.id
+              );
+              if (idx !== -1) {
+                // Replace (or merge) the existing entry
+                prod.sections[idx] = {
+                  ...prod.sections[idx],
+                  ...updatedSection,
+                };
+              } else {
+                // Not found: just push it onto the array
+                prod.sections.push(updatedSection);
+              }
+            }
+          }
+
+          state.message = 'Section updated successfully';
+        }
+      )
+      .addCase(updateSectionDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.message = null;
+      })
+
+      .addCase(createLesson.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(
+        createLesson.fulfilled,
+        (state, action: PayloadAction<ICreateLessonResponse>) => {
+          state.loading = false;
+          state.error = null;
+
+          const createdLesson = action.payload;
+          const section = state.currentProduct?.sections?.find(
+            (sec) => sec.id === createdLesson.sectionId
+          );
+          if (section) {
+            // If sections is undefined, initialize it to an array with the new section
+            if (!section.lessons) {
+              section.lessons = [createdLesson];
+            } else {
+              section.lessons.push(createdLesson);
+            }
+          }
+
+          state.message = 'Section created successfully';
+        }
+      )
+      .addCase(createLesson.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.message = null;
+      })
+
+      .addCase(updateLessonDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(
+        updateLessonDetails.fulfilled,
+        (state, action: PayloadAction<ILesson>) => {
+          state.loading = false;
+          state.error = null;
+
+          const updatedLesson = action.payload;
+          const section = state.currentProduct?.sections?.find(
+            (sec) => sec.id === updatedLesson.sectionId
+          );
+          if (section) {
+            // If lessons is undefined, initialize it to an array with the new lesson
+            if (!section.lessons) {
+              section.lessons = [updatedLesson];
+            } else {
+              // Otherwise, look for an existing lesson with the same id
+              const idx = section.lessons.findIndex(
+                (l) => l.id === updatedLesson.id
+              );
+              if (idx !== -1) {
+                // Replace (or merge) the existing entry
+                section.lessons[idx] = {
+                  ...section.lessons[idx],
+                  ...updatedLesson,
+                };
+              } else {
+                // Not found: just push it onto the array
+                section.lessons.push(updatedLesson);
+              }
+            }
+          }
+
+          state.message = 'Section updated successfully';
+        }
+      )
+      .addCase(updateLessonDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         state.message = null;

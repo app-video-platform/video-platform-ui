@@ -67,3 +67,13 @@ export interface IUpdateProduct {
   price: 'free' | number;
   sections: DownloadSection[];
 }
+
+export interface IUpdateSectionDetails {
+  productId?: string;
+  id?: string;
+  title?: string;
+  description?: string;
+  position: number;
+  content?: any;
+  files?: File[];
+}
