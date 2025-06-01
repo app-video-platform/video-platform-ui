@@ -1,7 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User, UserRegisterData } from '../../models/user/user';
-import { googleAPI, logoutAPI, registerUser, signInUser, verifyEmailApi } from '../../api/auth-api';
-import { getUserProfileAPI } from '../../api/user-api';
+import {
+  googleAPI,
+  logoutAPI,
+  registerUser,
+  signInUser,
+  verifyEmailApi,
+} from '../../api/services/auth/auth-api';
+import { getUserProfileAPI } from '../../api/services/user/user-api';
 
 import { SignInFormData } from '../../pages/sign-in/sign-in.component';
 import { Notification } from '../../models/user/notification';
@@ -21,13 +27,13 @@ const initialState: AuthState = {
   error: null,
   message: null,
   isUserLoggedIn: null,
-  notifications: []
+  notifications: [],
 };
 
 // Registration thunk: returns a success message from the backend.
 export const signupUser = createAsyncThunk<
   { response: string }, // Return type: success message
-  UserRegisterData,     // Argument type (user data)
+  UserRegisterData, // Argument type (user data)
   { rejectValue: string } // Error type
 >('auth/signupUser', async (userData, { rejectWithValue }) => {
   try {
@@ -54,8 +60,8 @@ export const verifyEmail = createAsyncThunk<
 
 // Sign in thunk: returns the user info along with a token.
 export const signinUser = createAsyncThunk<
-  string,  // Return type: user login response
-  SignInFormData,     // Argument type (user data)
+  string, // Return type: user login response
+  SignInFormData, // Argument type (user data)
   { rejectValue: string } // Error type
 >('auth/signinUser', async (userData, { rejectWithValue }) => {
   try {
@@ -67,8 +73,8 @@ export const signinUser = createAsyncThunk<
 });
 
 export const googleSignInUser = createAsyncThunk<
-  string,  // Return type: google login response
-  string,     // Argument type (token)
+  string, // Return type: google login response
+  string, // Argument type (token)
   { rejectValue: string } // Error type
 >('auth/googleSignInUser', async (idToken, { rejectWithValue }) => {
   try {
@@ -84,15 +90,17 @@ export const googleSignInUser = createAsyncThunk<
 });
 
 export const getUserProfile = createAsyncThunk<
-  User,  // Return type: user login response
-  void,// Argument type (user data)
+  User, // Return type: user login response
+  void, // Argument type (user data)
   { rejectValue: string } // Error type
 >('auth/getUserProfile', async (any, { rejectWithValue }) => {
   try {
     const response = await getUserProfileAPI();
     return response; // API returns user info with token
   } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Retrieving user profile failed');
+    return rejectWithValue(
+      error.response?.data?.message || 'Retrieving user profile failed'
+    );
   }
 });
 
@@ -134,7 +142,9 @@ const authSlice = createSlice({
       state.notifications.push(action.payload);
     },
     markNotificationAsRead: (state, action: PayloadAction<Notification>) => {
-      const foundNotification = state.notifications.find(notif => notif.id === action.payload.id);
+      const foundNotification = state.notifications.find(
+        (notif) => notif.id === action.payload.id
+      );
       if (foundNotification) {
         foundNotification.isRead = true;
       }
@@ -147,11 +157,14 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(signupUser.fulfilled, (state, action: PayloadAction<{ response: string }>) => {
-        state.loading = false;
-        // Instead of updating user/token, we store the success message.
-        state.message = action.payload.response;
-      })
+      .addCase(
+        signupUser.fulfilled,
+        (state, action: PayloadAction<{ response: string }>) => {
+          state.loading = false;
+          // Instead of updating user/token, we store the success message.
+          state.message = action.payload.response;
+        }
+      )
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Signup failed';
@@ -161,11 +174,14 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyEmail.fulfilled, (state, action: PayloadAction<string>) => {
-        state.loading = false;
-        // You could optionally store the verification success message
-        state.message = action.payload;
-      })
+      .addCase(
+        verifyEmail.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.loading = false;
+          // You could optionally store the verification success message
+          state.message = action.payload;
+        }
+      )
       .addCase(verifyEmail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Verification failed';
@@ -192,15 +208,18 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(googleSignInUser.fulfilled, (state, action: PayloadAction<string>) => {
-        state.loading = false;
-        // console.log('in case', action.payload);
+      .addCase(
+        googleSignInUser.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.loading = false;
+          // console.log('in case', action.payload);
 
-        state.isUserLoggedIn = true;
-        // if (action.payload === 'Login successful') {
-        //   state.isUserLoggedIn = true;
-        // }
-      })
+          state.isUserLoggedIn = true;
+          // if (action.payload === 'Login successful') {
+          //   state.isUserLoggedIn = true;
+          // }
+        }
+      )
       .addCase(googleSignInUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Google Signin failed';
@@ -210,11 +229,14 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUserProfile.fulfilled, (state, action: PayloadAction<User>) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.isUserLoggedIn = true;
-      })
+      .addCase(
+        getUserProfile.fulfilled,
+        (state, action: PayloadAction<User>) => {
+          state.loading = false;
+          state.user = action.payload;
+          state.isUserLoggedIn = true;
+        }
+      )
       .addCase(getUserProfile.rejected, (state) => {
         state.loading = false;
         state.error = 'Get User Profile failed';
@@ -231,5 +253,11 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, resetMessage, setUserProfile, addNotification, markNotificationAsRead } = authSlice.actions;
+export const {
+  logout,
+  resetMessage,
+  setUserProfile,
+  addNotification,
+  markNotificationAsRead,
+} = authSlice.actions;
 export default authSlice.reducer;

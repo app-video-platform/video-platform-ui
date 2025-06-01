@@ -1,8 +1,8 @@
-import { User } from '../models/user/user';
-import httpClient from './http-client';
+import { User } from '../../../models/user/user';
+import httpClient from '../../http-client';
 import { getUserProfileAPI } from './user-api';
 
-jest.mock('./http-client');
+jest.mock('../../http-client');
 
 const mockedHttpClient = httpClient as jest.Mocked<typeof httpClient>;
 
@@ -21,7 +21,9 @@ describe('User API functions', () => {
 
       const result = await getUserProfileAPI();
       expect(result).toEqual(fakeResponse);
-      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/user/userInfo', { 'headers': { 'X-CSRF-Force': true } });
+      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/user/userInfo', {
+        headers: { 'X-CSRF-Force': true },
+      });
     });
 
     it('should throw error when httpClient.get rejects', async () => {
@@ -29,7 +31,9 @@ describe('User API functions', () => {
 
       mockedHttpClient.get.mockRejectedValueOnce(error);
 
-      await expect(getUserProfileAPI()).rejects.toThrow('Retrieving user info error');
+      await expect(getUserProfileAPI()).rejects.toThrow(
+        'Retrieving user info error'
+      );
     });
   });
 });

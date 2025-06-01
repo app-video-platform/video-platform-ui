@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from '@testing-library/react';
 import SignIn, { SignInFormData } from './sign-in.component';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +49,9 @@ describe('SignIn component', () => {
     // Check that the password input is rendered
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     // Check that the submit button is rendered (using Button component, so role "button")
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /sign in/i })
+    ).toBeInTheDocument();
     // Check that the toggle password button is rendered.
     // (Since the toggle button has no accessible name, we select by its role and class if needed)
     expect(document.querySelector('.toggle-password-btn')).toBeInTheDocument();
@@ -74,9 +82,13 @@ describe('SignIn component', () => {
   it('toggles password visibility', () => {
     render(<SignIn />);
     // Cast the returned element to HTMLInputElement so we can access its type property.
-    const passwordInput = screen.getByLabelText(/password/i) as HTMLInputElement;
+    const passwordInput = screen.getByLabelText(
+      /password/i
+    ) as HTMLInputElement;
     // The toggle button is rendered as a button with class "toggle-password-btn"
-    const toggleBtn = document.querySelector('.toggle-password-btn') as HTMLButtonElement;
+    const toggleBtn = document.querySelector(
+      '.toggle-password-btn'
+    ) as HTMLButtonElement;
 
     // Initially, the password input type should be 'password'
     expect(passwordInput.type).toBe('password');
@@ -95,15 +107,19 @@ describe('SignIn component', () => {
 
     // Define two different thunk results.
     const mockThunkResultSignin = {
-      unwrap: () => Promise.resolve()
+      unwrap: () => Promise.resolve(),
     };
     const mockThunkResultProfile = {
-      unwrap: () => Promise.resolve(dummyUserProfile)
+      unwrap: () => Promise.resolve(dummyUserProfile),
     };
 
     // Update the mocks for the thunk creators.
-    (signinUser as unknown as jest.Mock).mockReturnValue(() => mockThunkResultSignin);
-    (getUserProfile as unknown as jest.Mock).mockReturnValue(() => mockThunkResultProfile);
+    (signinUser as unknown as jest.Mock).mockReturnValue(
+      () => mockThunkResultSignin
+    );
+    (getUserProfile as unknown as jest.Mock).mockReturnValue(
+      () => mockThunkResultProfile
+    );
 
     // Set up the dispatch mock so that it returns our thunk results
     let callCount = 0;
@@ -137,7 +153,7 @@ describe('SignIn component', () => {
     // Verify that dispatch was called (at least two times for signinUser and getUserProfile).
     expect(mockDispatch).toHaveBeenCalledTimes(2);
     // Verify navigation to dashboard.
-    expect(mockNavigate).toHaveBeenCalledWith('dashboard');
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
   it('submits the form with valid data and navigates to onboarding if onboardingCompleted is false', async () => {
@@ -145,15 +161,19 @@ describe('SignIn component', () => {
 
     // Create mock thunk results with an unwrap method.
     const mockThunkResultSignin = {
-      unwrap: () => Promise.resolve()
+      unwrap: () => Promise.resolve(),
     };
     const mockThunkResultProfile = {
-      unwrap: () => Promise.resolve(dummyUserProfile)
+      unwrap: () => Promise.resolve(dummyUserProfile),
     };
 
     // Update the thunk mocks to return functions that yield our mock thunk results.
-    (signinUser as unknown as jest.Mock).mockReturnValue(() => mockThunkResultSignin);
-    (getUserProfile as unknown as jest.Mock).mockReturnValue(() => mockThunkResultProfile);
+    (signinUser as unknown as jest.Mock).mockReturnValue(
+      () => mockThunkResultSignin
+    );
+    (getUserProfile as unknown as jest.Mock).mockReturnValue(
+      () => mockThunkResultProfile
+    );
 
     // Set up the dispatch mock so that when a thunk function is dispatched,
     // it returns the corresponding mock thunk result.
@@ -188,9 +208,8 @@ describe('SignIn component', () => {
       password: 'password123',
     });
     expect(getUserProfile).toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith('onboarding');
+    expect(mockNavigate).toHaveBeenCalledWith('/onboarding');
   });
-
 
   it('does not submit the form when validation fails', () => {
     render(<SignIn />);

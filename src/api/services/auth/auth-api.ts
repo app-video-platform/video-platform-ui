@@ -1,6 +1,6 @@
-import { UserRegisterData } from '../models/user/user';
-import { SignInFormData } from '../pages/sign-in/sign-in.component';
-import httpClient from './http-client';
+import { UserRegisterData } from '../../../models/user/user';
+import { SignInFormData } from '../../../pages/sign-in/sign-in.component';
+import httpClient from '../../http-client';
 
 export const getNewAPI = async () => {
   try {
@@ -14,7 +14,11 @@ export const getNewAPI = async () => {
 
 export const registerUser = async (userData: UserRegisterData) => {
   try {
-    const response = await httpClient.post<string>('api/auth/register', userData, { withCredentials: false });
+    const response = await httpClient.post<string>(
+      'api/auth/register',
+      userData,
+      { withCredentials: false }
+    );
     return response.data;
   } catch (error) {
     console.error('Error registering new user:', error);
@@ -22,8 +26,8 @@ export const registerUser = async (userData: UserRegisterData) => {
   }
 };
 
-
-export const verifyEmailApi = (token: string) => httpClient.get('api/auth/verify?token=' + token, { withCredentials: false });
+export const verifyEmailApi = (token: string) =>
+  httpClient.get('api/auth/verify?token=' + token, { withCredentials: false });
 
 export const signInUser = async (userData: SignInFormData) => {
   try {
@@ -48,14 +52,15 @@ export const logoutAPI = async () => {
 
 export const googleAPI = async (idToken: string) => {
   try {
-    const response = await httpClient.post<string>('api/auth/googleSignIn', { idToken: idToken });
+    const response = await httpClient.post<string>('api/auth/googleSignIn', {
+      idToken: idToken,
+    });
     return response.data;
   } catch (error) {
     console.error('Error signing in with Google:', error);
     throw error;
   }
 };
-
 
 export const forgotPasswordAPI = async (email: string) => {
   try {
