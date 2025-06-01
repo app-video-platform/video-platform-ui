@@ -42,7 +42,12 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
       {localLessons &&
         localLessons.length > 0 &&
         localLessons.map((lesson, index) => (
-          <LessonEditor key={index} index={index} lesson={lesson} />
+          <LessonEditor
+            key={index}
+            index={index}
+            lesson={lesson}
+            sectionId={sectionId}
+          />
         ))}
 
       <Button

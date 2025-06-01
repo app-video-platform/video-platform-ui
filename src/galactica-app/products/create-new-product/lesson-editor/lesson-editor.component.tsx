@@ -4,13 +4,23 @@ import './lesson-editor.styles.scss';
 import FormInput from '../../../../components/form-input/form-input.component';
 import { ILesson } from '../../../../models/product/lesson';
 import Button from '../../../../components/button/button.component';
+import { AppDispatch } from '../../../../store/store';
+import { useDispatch } from 'react-redux';
+import { createLesson } from '../../../../store/product-store/product.slice';
 
 interface LessonEditorProps {
   lesson: ILesson;
   index: number;
+  sectionId: string;
 }
 
-const LessonEditor: React.FC<LessonEditorProps> = ({ lesson, index }) => {
+const LessonEditor: React.FC<LessonEditorProps> = ({
+  lesson,
+  index,
+  sectionId,
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [formData, setFormData] = React.useState({
     title: '',
     description: '',
@@ -48,7 +58,28 @@ const LessonEditor: React.FC<LessonEditorProps> = ({ lesson, index }) => {
   const handleCreateLesson = () => {
     // Logic to create a new lesson
     console.log('Creating lesson with data:', formData);
-    setIsLessonCreated(true);
+
+    const createLessonPayload = {
+      title: formData.title,
+      description: formData.description,
+      position: index + 1, // Assuming position is based on the index
+      sectionId: sectionId, // Assuming lesson has a sectionId
+    };
+
+    dispatch(createLesson(createLessonPayload))
+      .unwrap()
+      .then((response) => {
+        console.log('Lesson created successfully:', response);
+        // Optionally, you can update the lesson state with the new lesson ID
+        // setFormData((prev) => ({
+        //   ...prev,
+        //   id: response.id, // Assuming response contains the new lesson ID
+        // }));
+        setIsLessonCreated(true);
+      })
+      .catch((error) => {
+        console.error('Failed to create lesson:', error);
+      });
   };
 
   return (
@@ -85,6 +116,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({ lesson, index }) => {
             text="Create Lesson"
             htmlType="button"
             onClick={handleCreateLesson}
+            disabled={!formData.title}
           />
         )}
       </form>

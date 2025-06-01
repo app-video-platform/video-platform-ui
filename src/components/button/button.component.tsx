@@ -8,6 +8,7 @@ interface ButtonProps {
   onClick?: () => void;
   htmlType?: 'button' | 'submit' | 'reset';
   customClassName?: string;
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -16,11 +17,13 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   htmlType,
   customClassName,
+  disabled = false,
 }) => (
   <button
     onClick={onClick}
     type={htmlType}
     className={`vp-button vp-button--${type} ${customClassName}`}
+    disabled={disabled}
   >
     {text}
   </button>

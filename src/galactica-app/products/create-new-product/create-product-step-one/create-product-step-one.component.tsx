@@ -118,6 +118,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
             onClick={() => handleContinue()}
             text="Continue"
             customClassName="create-course-continue-button"
+            disabled={!formData.name}
           />
         </div>
       )}
