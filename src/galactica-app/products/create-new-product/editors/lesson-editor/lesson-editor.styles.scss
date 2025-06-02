@@ -1,0 +1,17 @@
+.lesson-editor {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 30px;
+  margin-bottom: 10px;
+
+  .lesson-editor-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.content-field {
+  margin-top: 30px;
+}

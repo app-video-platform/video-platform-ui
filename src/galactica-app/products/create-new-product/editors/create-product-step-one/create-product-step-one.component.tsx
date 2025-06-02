@@ -2,20 +2,20 @@
 import React from 'react';
 
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../../../store/store';
+import { AppDispatch } from '../../../../../store/store';
 
 import {
   FormErrors,
   NewProductFormData,
-} from '../create-new-product.component';
-import FormInput from '../../../../components/form-input/form-input.component';
-import Button from '../../../../components/button/button.component';
-import { createCourseProduct } from '../../../../store/product-store/product.slice';
+} from '../../create-new-product.component';
+import FormInput from '../../../../../components/form-input/form-input.component';
+import Button from '../../../../../components/button/button.component';
+import { createCourseProduct } from '../../../../../store/product-store/product.slice';
 
 import './create-product-step-one.styles.scss';
-import BoxSelector from '../../../../components/box-selector/box-selector.component';
-import { ProductType } from '../../../../api/models/product/product.types';
-import { INewProductPayload } from '../../../../api/models/product/product';
+import BoxSelector from '../../../../../components/box-selector/box-selector.component';
+import { ProductType } from '../../../../../api/models/product/product.types';
+import { INewProductPayload } from '../../../../../api/models/product/product';
 
 interface CreateProductStepOneProps {
   formData: NewProductFormData;
@@ -97,6 +97,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
         label="Description"
         type="text"
         name="description"
+        inputType="textarea"
         value={formData.description}
         onChange={(e: { target: { value: string } }) =>
           setField('description', e.target.value)

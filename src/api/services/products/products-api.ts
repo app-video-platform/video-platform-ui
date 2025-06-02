@@ -61,7 +61,19 @@ export const updateCourseDetailsAPI = async (payload: IUpdateCourseProduct) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Error updating product:', error);
+    throw error;
+  }
+};
+
+export const deleteProductAPI = async (payload: string) => {
+  try {
+    const response = await httpClient.delete<string>(
+      'api/products?productId=' + payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting product:', error);
     throw error;
   }
 };
@@ -77,7 +89,7 @@ export const createSectionAPI = async (payload: IUpdateSectionDetails) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Error creating section:', error);
     throw error;
   }
 };
@@ -95,7 +107,19 @@ export const updateSectionDetailsAPI = async (
     );
     return response.data;
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Error updating section details:', error);
+    throw error;
+  }
+};
+
+export const deleteSectionAPI = async (payload: string) => {
+  try {
+    const response = await httpClient.delete<string>(
+      'api/products/section?sectionId=' + payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting section:', error);
     throw error;
   }
 };
@@ -127,7 +151,19 @@ export const updateLessonDetailsAPI = async (payload: ILesson) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Error updating lesson:', error);
+    throw error;
+  }
+};
+
+export const deleteLessonAPI = async (payload: string) => {
+  try {
+    const response = await httpClient.delete<string>(
+      'api/products/section/lesson?lessonId=' + payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting lesson:', error);
     throw error;
   }
 };

@@ -9,7 +9,7 @@ import { updateCourseProductDetails } from '../../../store/product-store/product
 import Button from '../../../components/button/button.component';
 import PriceSelector from '../../../components/price-selector/price-selector.component';
 import UppyFileUploader from '../../../components/uppy-file-uploader/uppy-file-uploader.component';
-import CreateProductStepOne from './create-product-step-one/create-product-step-one.component';
+import CreateProductStepOne from './editors/create-product-step-one/create-product-step-one.component';
 import CreateProductSections from './create-product-sections/create-product-sections.component';
 import { IUpdateCourseProduct } from '../../../api/models/product/product';
 import { ProductType } from '../../../api/models/product/product.types';
@@ -110,13 +110,14 @@ const CreateNewProduct: React.FC = () => {
       .then((data) => {
         console.log('response', data);
         if (data) {
-          window.alert('Course product created successfully!');
+          window.alert('Course product updated successfully!');
+          console.log('Updated product data:', data);
         }
       })
       .catch((error) => {
-        console.error('Error creating course product:', error);
+        console.error('Error updating course product:', error);
         setErrors({
-          api: 'Failed to create course product. Please try again.',
+          api: 'Failed to update course product. Please try again.',
         });
       })
       .finally(() => {
@@ -140,9 +141,19 @@ const CreateNewProduct: React.FC = () => {
 
   return (
     <div>
-      <h2>Create NEW PRODUCT</h2>
-
       <form onSubmit={handleSubmit}>
+        <div className="create-new-product-header">
+          <h1>Create New Product</h1>
+
+          {showRestOfForm && (
+            <Button
+              type="primary"
+              text="Update product details"
+              htmlType="submit"
+            />
+          )}
+        </div>
+
         <CreateProductStepOne
           formData={formData}
           setField={setField}
@@ -180,12 +191,13 @@ const CreateNewProduct: React.FC = () => {
               <CreateProductSections
                 sections={formData.sections || []}
                 productType={formData.type}
+                productId={formData.id}
               />
             </div>
 
-            <div className="action-btns-wrapper">
+            {/* <div className="action-btns-wrapper">
               <Button type="primary" text="Save Changes" htmlType="submit" />
-            </div>
+            </div> */}
           </>
         )}
       </form>
