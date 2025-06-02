@@ -10,6 +10,7 @@ import { getUserProfileAPI } from '../../api/services/user/user-api';
 
 import { SignInFormData } from '../../pages/sign-in/sign-in.component';
 import { User, UserRegisterData } from '../../api/models/user/user';
+import { INotification } from '../../api/models/user/notification';
 
 interface AuthState {
   user: null | User;
@@ -17,7 +18,7 @@ interface AuthState {
   error: string | null;
   message: string | null;
   isUserLoggedIn: boolean | null;
-  notifications: Notification[];
+  notifications: INotification[];
 }
 
 const initialState: AuthState = {
@@ -137,17 +138,17 @@ const authSlice = createSlice({
       state.message = null;
     },
 
-    addNotification: (state, action: PayloadAction<Notification>) => {
+    addNotification: (state, action: PayloadAction<INotification>) => {
       state.notifications.push(action.payload);
     },
-    // markNotificationAsRead: (state, action: PayloadAction<Notification>) => {
-    //   const foundNotification = state.notifications.find(
-    //     (notif) => notif.id === action.payload.id
-    //   );
-    //   if (foundNotification) {
-    //     foundNotification.isRead = true;
-    //   }
-    // },
+    markNotificationAsRead: (state, action: PayloadAction<INotification>) => {
+      const foundNotification = state.notifications.find(
+        (notif) => notif.id === action.payload.id
+      );
+      if (foundNotification) {
+        foundNotification.isRead = true;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
