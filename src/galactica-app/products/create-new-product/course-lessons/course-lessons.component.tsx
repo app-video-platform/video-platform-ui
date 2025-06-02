@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import Button from '../../../../../../components/button/button.component';
-import LessonEditor from '../../../lesson-editor/lesson-editor.component';
-
 import './course-lessons.styles.scss';
+import LessonEditor from '../lesson-editor/lesson-editor.component';
+import Button from '../../../../components/button/button.component';
 
 interface CourseLessonsProps {
   sectionId: string;
