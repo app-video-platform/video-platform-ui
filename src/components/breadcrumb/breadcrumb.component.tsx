@@ -10,8 +10,15 @@ const Breadcrumbs: React.FC = () => {
   // e.g. "/dashboard/products/new" -> ["dashboard", "products", "new"]
   const pathnames = location.pathname.split('/').filter((x) => x);
 
+  // No breadcrumbs to show if there are less than 2 segments
+  if (pathnames.length < 2) {
+    return null;
+  }
+
   const toCamelCase = (segment: string): string => {
-    if (segment && !segment.includes('-')) { return segment; }
+    if (segment && !segment.includes('-')) {
+      return segment;
+    }
     const words = segment.split('-');
     return words
       .map((word, index) => {
@@ -31,8 +38,11 @@ const Breadcrumbs: React.FC = () => {
     edit: 'Edit Product',
   };
 
-  const editIndex = pathnames.findIndex(segment => toCamelCase(segment) === 'edit');
-  const filteredPathnames = editIndex >= 0 ? pathnames.slice(0, editIndex + 1) : pathnames;
+  const editIndex = pathnames.findIndex(
+    (segment) => toCamelCase(segment) === 'edit'
+  );
+  const filteredPathnames =
+    editIndex >= 0 ? pathnames.slice(0, editIndex + 1) : pathnames;
 
   return (
     <nav aria-label="breadcrumb">
@@ -50,7 +60,9 @@ const Breadcrumbs: React.FC = () => {
               {isLast ? (
                 <span className="breadcrumb-current">{label}</span>
               ) : (
-                <Link to={to} className='breadcrumb-element'>{label}</Link>
+                <Link to={to} className="breadcrumb-element">
+                  {label}
+                </Link>
               )}
             </li>
           );

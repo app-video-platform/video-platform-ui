@@ -2,8 +2,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ProductCard from './product-box.component';
-import { ProductStatus, ProductType } from '../../models/product/product.types';
 import '@testing-library/jest-dom';
+import {
+  ProductType,
+  ProductStatus,
+} from '../../api/models/product/product.types';
 
 // Create a dummy placeholder value as used in your component.
 // In your component, placeholderImage is imported via require.
@@ -19,7 +22,7 @@ describe('ProductCard component', () => {
   const formattedDate = dateForTesting.toLocaleString('en-GB', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   });
 
   const baseProductWithImage = {
@@ -33,7 +36,7 @@ describe('ProductCard component', () => {
     status: statusForTesting,
     userId: '',
     customers: 0,
-    createdAt: dateForTesting
+    createdAt: dateForTesting,
   };
 
   const baseProductWithoutImage = {
@@ -47,14 +50,16 @@ describe('ProductCard component', () => {
     status: statusForTesting,
     userId: '',
     customers: 0,
-    createdAt: dateForTesting
+    createdAt: dateForTesting,
   };
 
   it('renders product details with a valid image', () => {
     render(<ProductCard product={baseProductWithImage} />);
 
     // Verify that the image src is the product image.
-    const imageEl = screen.getByRole('img', { name: baseProductWithImage.name });
+    const imageEl = screen.getByRole('img', {
+      name: baseProductWithImage.name,
+    });
     expect(imageEl).toBeInTheDocument();
     expect(imageEl).toHaveAttribute('src', baseProductWithImage.image);
 
@@ -66,22 +71,29 @@ describe('ProductCard component', () => {
     expect(screen.getByText(formattedDate)).toBeInTheDocument();
 
     // Verify product type is rendered in lower case.
-    expect(screen.getByText(baseProductWithImage.type.toLowerCase())).toBeInTheDocument();
+    expect(
+      screen.getByText(baseProductWithImage.type.toLowerCase())
+    ).toBeInTheDocument();
 
     // Check the container for type and price details.
-    const typeAndPriceContainer = screen.getByText((content, element) =>
-      !!element && element.classList.contains('type-and-price-line')
+    const typeAndPriceContainer = screen.getByText(
+      (content, element) =>
+        !!element && element.classList.contains('type-and-price-line')
     );
     expect(typeAndPriceContainer).toBeInTheDocument();
 
     // Verify that the euro symbol and price are part of the content.
     expect(typeAndPriceContainer.textContent).toContain('€');
-    expect(typeAndPriceContainer.textContent).toContain(String(baseProductWithImage.price));
+    expect(typeAndPriceContainer.textContent).toContain(
+      String(baseProductWithImage.price)
+    );
   });
 
   it('falls back to the placeholder image when image is missing or empty', () => {
     render(<ProductCard product={baseProductWithoutImage} />);
-    const imageEl = screen.getByRole('img', { name: baseProductWithoutImage.name });
+    const imageEl = screen.getByRole('img', {
+      name: baseProductWithoutImage.name,
+    });
     expect(imageEl).toBeInTheDocument();
     // Should use the placeholder image from our mock
     expect(imageEl).toHaveAttribute('src', 'placeholder-image.jpg');
@@ -91,8 +103,8 @@ describe('ProductCard component', () => {
     render(<ProductCard product={baseProductWithoutImage} />);
 
     // Check the container for type and price details.
-    const typeAndPriceContainer = screen.getByText((content, element) =>
-      !!element?.classList.contains('type-and-price-line')
+    const typeAndPriceContainer = screen.getByText(
+      (content, element) => !!element?.classList.contains('type-and-price-line')
     );
     expect(typeAndPriceContainer).toBeInTheDocument();
 

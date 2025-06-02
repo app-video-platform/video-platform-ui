@@ -1,15 +1,18 @@
 /* eslint-disable quotes */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { selectAllProducts } from '../../store/product-store/product.selectors';
-import { User } from '../../models/user/user';
-import { BaseProduct } from '../../models/product/product';
 import ProductCard from '../../components/product-box/product-box.component';
 
 import './user-page-preview.styles.scss';
-import { ProductStatus, ProductType } from '../../models/product/product.types';
+import { BaseProduct } from '../../api/models/product/product';
+import {
+  ProductType,
+  ProductStatus,
+} from '../../api/models/product/product.types';
+import { User } from '../../api/models/user/user';
 
 const UserPagePreview: React.FC = () => {
   const user = useSelector(selectAuthUser);

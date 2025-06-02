@@ -7,25 +7,23 @@ import {
   getAllProductsByUserIdAPI,
   updateCourseDetailsAPI,
   updateProductAPI,
-  Sectiunile,
   updateSectionDetailsAPI,
   createSectionAPI,
   createLessonAPI,
   updateLessonDetailsAPI,
 } from '../../api/services/products/products-api';
 import {
-  ICreateProduct,
-  INewProductPayload,
-  IUpdateCourseDetailsPayload,
-  IUpdateCourseProduct,
-  IUpdateProduct,
-  IUpdateSectionDetails,
-} from '../../models/product/product';
-import {
-  ICreateLessonPayload,
   ICreateLessonResponse,
+  ICreateLessonPayload,
   ILesson,
-} from '../../models/product/lesson';
+} from '../../api/models/product/lesson';
+import {
+  INewProductPayload,
+  IUpdateCourseProduct,
+  IUpdateSectionDetails,
+  ICreateProduct,
+  IUpdateProduct,
+} from '../../api/models/product/product';
 
 interface ProductState {
   products: null | IProductResponse[];

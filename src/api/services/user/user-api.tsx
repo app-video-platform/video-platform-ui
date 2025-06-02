@@ -1,5 +1,5 @@
-import { User } from '../../../models/user/user';
 import httpClient from '../../http-client';
+import { User } from '../../models/user/user';
 
 export const getUserProfileAPI = async () => {
   try {

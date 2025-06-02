@@ -1,19 +1,19 @@
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-import Button from '../../../../../components/button/button.component';
-import FormInput from '../../../../../components/form-input/form-input.component';
+import { ProductType } from '../../../../api/models/product/product.types';
+import Button from '../../../../components/button/button.component';
+import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
+import {
+  updateSectionDetails,
+  createSection,
+} from '../../../../store/product-store/product.slice';
+import { AppDispatch } from '../../../../store/store';
+import CourseLessons from '../course-lessons/course-lessons.component';
+import FormInput from '../../../../components/form-input/form-input.component';
 
 import './section-editor.styles.scss';
-import { ProductType } from '../../../../../models/product/product.types';
-import UppyFileUploader from '../../../../../components/uppy-file-uploader/uppy-file-uploader.component';
-import CourseLessons from './course-lessons/course-lessons.component';
-import { AppDispatch } from '../../../../../store/store';
-import { useDispatch } from 'react-redux';
-import {
-  createSection,
-  updateSectionDetails,
-} from '../../../../../store/product-store/product.slice';
 
 export interface NewProductSectionFormData {
   id: string;

@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../store'; // Ensure your store exports RootState
-import { ProductType } from '../../models/product/product.types';
+import { ProductType } from '../../api/models/product/product.types';
 
 export const selectAllProducts = (state: RootState) => state.products.products;
 

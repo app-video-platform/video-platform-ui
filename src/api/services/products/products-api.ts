@@ -1,20 +1,18 @@
-import { DownloadProduct } from '../../../models/product/download-product';
+import httpClient from '../../http-client';
+import { DownloadProduct } from '../../models/product/download-product';
 import {
+  ILesson,
   ICreateLessonPayload,
   ICreateLessonResponse,
-  ILesson,
-} from '../../../models/product/lesson';
+} from '../../models/product/lesson';
 import {
-  BaseProduct,
-  ICreateCourseProduct,
-  ICreateProduct,
   INewProductPayload,
   IUpdateCourseProduct,
-  IUpdateProduct,
   IUpdateSectionDetails,
-} from '../../../models/product/product';
-import { ProductType } from '../../../models/product/product.types';
-import httpClient from '../../http-client';
+  ICreateProduct,
+  IUpdateProduct,
+} from '../../models/product/product';
+import { ProductType } from '../../models/product/product.types';
 
 export interface IProductResponse {
   type?: string;
