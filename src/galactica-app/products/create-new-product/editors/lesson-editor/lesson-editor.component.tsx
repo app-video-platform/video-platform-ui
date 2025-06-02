@@ -1,25 +1,33 @@
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 
-import FormInput from '../../../../components/form-input/form-input.component';
-import Button from '../../../../components/button/button.component';
-import { AppDispatch } from '../../../../store/store';
+import FormInput from '../../../../../components/form-input/form-input.component';
+import Button from '../../../../../components/button/button.component';
+import { AppDispatch } from '../../../../../store/store';
 import { useDispatch } from 'react-redux';
-import { createLesson } from '../../../../store/product-store/product.slice';
-import BoxSelector from '../../../../components/box-selector/box-selector.component';
-import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
-// import RichTextEditor from '../../../../components/rich-text-editor/rich-text-editor.component';
-import { ILesson } from '../../../../api/models/product/lesson';
-import { LessonType } from '../../../../api/models/product/product.types';
+import {
+  createLesson,
+  deleteLesson,
+  updateLessonDetails,
+} from '../../../../../store/product-store/product.slice';
+import BoxSelector from '../../../../../components/box-selector/box-selector.component';
+import UppyFileUploader from '../../../../../components/uppy-file-uploader/uppy-file-uploader.component';
+import RichTextEditor from '../../../../../components/rich-text-editor/rich-text-editor.component';
+import { ILesson } from '../../../../../api/models/product/lesson';
+import { LessonType } from '../../../../../api/models/product/product.types';
 
+import { MdDeleteForever } from 'react-icons/md';
 import './lesson-editor.styles.scss';
+import { set } from 'react-hook-form';
 interface LessonEditorProps {
   lesson: ILesson;
   index: number;
   sectionId: string;
+  removeLessonFromList: (index: number) => void;
 }
 
 interface LessonFormData {
+  id?: string; // Optional, will be set after lesson creation
   title: string;
   description: string;
   content: string;
@@ -30,6 +38,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   lesson,
   index,
   sectionId,
+  removeLessonFromList,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -38,6 +47,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     description: '',
     content: '',
     type: '' as LessonType,
+    id: lesson.id || '', // Set the ID if it exists
   });
 
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
@@ -85,6 +95,13 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     dispatch(createLesson(createLessonPayload))
       .unwrap()
       .then((response) => {
+        setFormData({
+          title: response.title,
+          description: response.description ?? '',
+          content: '',
+          id: response.id, // Set the ID after creation
+          type: response.type || ('VIDEO' as LessonType), // Default to VIDEO if not specified
+        });
         console.log('Lesson created successfully:', response);
         setIsLessonCreated(true);
       })
@@ -93,9 +110,49 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       });
   };
 
+  const handleUpdateLesson = () => {
+    // Logic to update an existing lesson
+    console.log('Updating lesson with data:', formData);
+
+    const updateLessonPayload: ILesson = {
+      ...formData,
+      id: lesson.id || formData.id, // Assuming lesson has an id
+      sectionId: sectionId, // Assuming lesson has a sectionId
+      position: index + 1, // Assuming position is based on the index
+    };
+
+    dispatch(updateLessonDetails(updateLessonPayload))
+      .unwrap()
+      .then((response) => {
+        console.log('Lesson updated successfully:', response);
+      })
+      .catch((error) => {
+        console.error('Failed to update lesson:', error);
+      });
+  };
+
   const onVideoUploadChange = (files: File[]) => {
     console.log('Video files uploaded:', files);
     setUploadedVideo(files[0] || null);
+  };
+
+  const handleDeleteLesson = () => {
+    console.log('Deleting lesson:', formData.id);
+
+    if (formData.id) {
+      dispatch(deleteLesson(formData.id))
+        .unwrap()
+        .then(() => {
+          console.log('Lesson deleted successfully');
+          removeLessonFromList(index);
+        })
+        .catch((error) => {
+          console.error('Failed to delete lesson:', error);
+        });
+    } else {
+      removeLessonFromList(index);
+      console.log('No lesson ID found, removing from list only');
+    }
   };
 
   const renderContentField = () => {
@@ -111,10 +168,10 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       case 'TEXT':
         return (
           <div className="form-input-group">
-            {/* <RichTextEditor
+            <RichTextEditor
               initialContent={contentJSON}
               onChange={(json) => setContentJSON(json)}
-            /> */}
+            />
           </div>
         );
 
@@ -140,8 +197,23 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
 
   return (
     <div className="lesson-editor">
-      <h4>Lesson {index + 1}</h4>
-      <form>
+      <div className="lesson-editor-header">
+        <h4>Lesson {index + 1}</h4>
+        <button
+          className="remove-lesson-button"
+          type="button"
+          onClick={handleDeleteLesson}
+        >
+          {React.createElement(
+            MdDeleteForever as React.FC<{ size: number; color: string }>,
+            {
+              size: 24,
+              color: 'red',
+            }
+          )}
+        </button>
+      </div>
+      <div>
         <FormInput
           label="Lesson Title"
           type="text"
@@ -165,18 +237,28 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           disabledOptions={[]} // Add any disabled options if needed
         />
 
-        {isLessonCreated ? (
-          renderContentField()
-        ) : (
-          <Button
-            type="primary"
-            text="Create Lesson"
-            htmlType="button"
-            onClick={handleCreateLesson}
-            disabled={!formData.title}
-          />
-        )}
-      </form>
+        <div className="content-field">
+          {isLessonCreated ? (
+            <>
+              {renderContentField()}
+              <Button
+                type="primary"
+                text="Update Lesson"
+                htmlType="button"
+                onClick={handleUpdateLesson}
+              />
+            </>
+          ) : (
+            <Button
+              type="primary"
+              text="Create Lesson"
+              htmlType="button"
+              onClick={handleCreateLesson}
+              disabled={!formData.title}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

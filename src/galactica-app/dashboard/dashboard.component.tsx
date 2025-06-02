@@ -15,9 +15,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <div className='dashboard-top'>
-        <h2>Galactica dashboard</h2>
-        <div className='app-nav-links'>
+      <div className="dashboard-top">
+        <h2>Galactica</h2>
+        <div className="app-nav-links">
           <Link to={''}>Dashboard</Link>
           <Link to={'products'}>Products</Link>
           <Link to={''}>Sales & Analytics</Link>
@@ -28,15 +28,12 @@ const Dashboard: React.FC = () => {
         <UserProfileDropdown />
       </div>
       <Breadcrumbs />
-      <div className='dashboard-outlet'>
+      <div className="dashboard-outlet">
         {/* <UserDashboard /> */}
         <Outlet />
       </div>
     </div>
-
   );
-}
-
-  ;
+};
 
 export default Dashboard;

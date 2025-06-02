@@ -11,6 +11,9 @@ import {
   createSectionAPI,
   createLessonAPI,
   updateLessonDetailsAPI,
+  deleteLessonAPI,
+  deleteSectionAPI,
+  deleteProductAPI,
 } from '../../api/services/products/products-api';
 import {
   ICreateLessonResponse,
@@ -72,6 +75,21 @@ export const updateCourseProductDetails = createAsyncThunk<
   }
 });
 
+export const deleteProduct = createAsyncThunk<
+  string, // what this thunk returns on success
+  string, // the argument you pass in
+  { rejectValue: string }
+>('products/deleteProduct', async (payload, thunkAPI) => {
+  try {
+    const response = await deleteProductAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || err.message || 'Failed to delete product'
+    );
+  }
+});
+
 export const createSection = createAsyncThunk<
   IUpdateSectionDetails, // what this thunk returns on success
   IUpdateSectionDetails, // the argument you pass in
@@ -104,6 +122,21 @@ export const updateSectionDetails = createAsyncThunk<
   }
 });
 
+export const deleteSection = createAsyncThunk<
+  string, // what this thunk returns on success
+  string, // the argument you pass in
+  { rejectValue: string }
+>('products/deleteSection', async (payload, thunkAPI) => {
+  try {
+    const response = await deleteSectionAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || err.message || 'Failed to delete section'
+    );
+  }
+});
+
 export const createLesson = createAsyncThunk<
   ICreateLessonResponse, // what this thunk returns on success
   ICreateLessonPayload, // the argument you pass in
@@ -132,6 +165,21 @@ export const updateLessonDetails = createAsyncThunk<
       err.response?.data?.message ||
         err.message ||
         'Failed to update lesson details'
+    );
+  }
+});
+
+export const deleteLesson = createAsyncThunk<
+  string, // what this thunk returns on success
+  string, // the argument you pass in
+  { rejectValue: string }
+>('products/deleteLesson', async (payload, thunkAPI) => {
+  try {
+    const response = await deleteLessonAPI(payload);
+    return response;
+  } catch (err: any) {
+    return thunkAPI.rejectWithValue(
+      err.response?.data?.message || err.message || 'Failed to delete lesson'
     );
   }
 });
@@ -239,6 +287,41 @@ const productsSlice = createSlice({
     // Set error state
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
+    },
+
+    deleteProductFromStore(state, action: PayloadAction<string>) {
+      if (state.products) {
+        state.products = state.products.filter(
+          (product) => product.id !== action.payload
+        );
+      }
+      if (state.currentProduct && state.currentProduct.id === action.payload) {
+        state.currentProduct = null; // Clear current product if it was deleted
+      }
+    },
+
+    deleteSectionFromStore(state, action: PayloadAction<string>) {
+      if (state.currentProduct) {
+        state.currentProduct.sections = state.currentProduct.sections?.filter(
+          (section) => section.id !== action.payload
+        );
+      }
+    },
+
+    deleteLessonFromStore(
+      state,
+      action: PayloadAction<{ sectionId: string; lessonId: string }>
+    ) {
+      if (state.currentProduct) {
+        const section = state.currentProduct.sections?.find(
+          (sec) => sec.id === action.payload.sectionId
+        );
+        if (section && section.lessons) {
+          section.lessons = section.lessons.filter(
+            (lesson) => lesson.id !== action.payload.lessonId
+          );
+        }
+      }
     },
   },
 

@@ -2,18 +2,20 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { ProductType } from '../../../../api/models/product/product.types';
-import Button from '../../../../components/button/button.component';
-import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
+import { ProductType } from '../../../../../api/models/product/product.types';
+import Button from '../../../../../components/button/button.component';
+import UppyFileUploader from '../../../../../components/uppy-file-uploader/uppy-file-uploader.component';
 import {
   updateSectionDetails,
   createSection,
-} from '../../../../store/product-store/product.slice';
-import { AppDispatch } from '../../../../store/store';
-import CourseLessons from '../course-lessons/course-lessons.component';
-import FormInput from '../../../../components/form-input/form-input.component';
+  deleteSection,
+} from '../../../../../store/product-store/product.slice';
+import { AppDispatch } from '../../../../../store/store';
+import CourseLessons from '../../course-lessons/course-lessons.component';
+import FormInput from '../../../../../components/form-input/form-input.component';
 
 import './section-editor.styles.scss';
+import { IUpdateSectionDetails } from '../../../../../api/models/product/product';
 
 export interface NewProductSectionFormData {
   id: string;
@@ -29,6 +31,7 @@ interface SectionEditorProps {
   sectionData: NewProductSectionFormData;
   productType: ProductType;
   showRemoveButton?: boolean;
+  productId: string;
   onRemoveFromParent: (index: number) => void;
 }
 
@@ -37,17 +40,33 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   sectionData,
   productType,
   showRemoveButton,
+  productId,
   onRemoveFromParent,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [localData, setLocalData] =
-    useState<NewProductSectionFormData>(sectionData);
+  const [localData, setLocalData] = useState<NewProductSectionFormData>({
+    id: sectionData.id || '',
+    title: sectionData.title || '',
+    description: sectionData.description || '',
+    lessons: sectionData.lessons ? [...sectionData.lessons] : [],
+    files: sectionData.files ? [...sectionData.files] : [],
+  });
   const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
-    setLocalData(sectionData);
-  }, [sectionData]);
+    if (sectionData.id !== localData.id) {
+      setLocalData({
+        id: sectionData.id || '',
+        title: sectionData.title || '',
+        description: sectionData.description || '',
+        lessons: sectionData.lessons ? [...sectionData.lessons] : [],
+        files: sectionData.files ? [...sectionData.files] : [],
+      });
+    }
+    // We intentionally omit localData from the dependency array here,
+    // because we only want to sync when sectionData.id itself changes.
+  }, [sectionData.id, sectionData.title, sectionData.description]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,25 +78,28 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
 
   const handleRemove = () => {
     console.log('Remove section:', localData.id);
-    onRemoveFromParent(index);
 
     if (localData.id) {
-      console.info('[TODO] Remove section:', localData.id);
-      // dispatch(deleteSection(localData.id))
-      //   .unwrap()
-      //   .then(() => {
-      //     console.log('Section deleted from backend:', localData.id);
-      //   })
-      //   .catch((err) => {
-      //     console.error('Failed to delete section (child):', err);
-      //   });
+      dispatch(deleteSection(localData.id))
+        .unwrap()
+        .then(() => {
+          console.log('Section deleted from backend:', localData.id);
+          onRemoveFromParent(index);
+        })
+        .catch((err) => {
+          console.error('Failed to delete section (child):', err);
+        });
+    } else {
+      console.log('No section ID to remove, removing from local list only');
+      onRemoveFromParent(index);
     }
   };
 
   const handleUpdate = () => {
-    const updatedSection = {
+    const updatedSection: IUpdateSectionDetails = {
       ...localData,
       position: index,
+      productId: productId,
     };
 
     // Dispatch the update from inside the child
@@ -94,10 +116,10 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         });
       })
       .catch((err) => {
-        console.error('Failed to save section (child):', err);
+        console.error('Failed to update section (child):', err);
       });
 
-    console.log('Save section:', localData);
+    console.log('Update section:', localData);
   };
 
   const handleSectionCreation = () => {
@@ -114,9 +136,13 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       window.alert('Section title is required for creation');
       return;
     }
+
     const newSection = {
-      ...localData,
+      // ...localData,
+      title: localData.title,
+      description: localData.description,
       position: index,
+      productId: productId,
     };
 
     dispatch(createSection(newSection))
@@ -152,21 +178,25 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     <div className="section-container">
       <div className="section-header-line">
         <h3>Section {index + 1}</h3>
-
-        {localData.id && (
-          <>
+        <>
+          {localData.id && (
             <Button
               onClick={handleUpdate}
               text="Update section"
               type="primary"
               disabled={isUnchanged}
+              htmlType="button"
             />
-
-            {showRemoveButton && (
-              <Button onClick={handleRemove} text="Remove" type="secondary" />
-            )}
-          </>
-        )}
+          )}
+          {showRemoveButton && (
+            <Button
+              onClick={handleRemove}
+              text="Remove"
+              type="secondary"
+              htmlType="button"
+            />
+          )}
+        </>
       </div>
 
       <FormInput
@@ -190,6 +220,8 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           onClick={handleSectionCreation}
           text="Create section"
           type="primary"
+          htmlType="button"
+          disabled={!localData.title}
         />
       )}
 
@@ -200,8 +232,9 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
               return (
                 <div className="course-specific-fields">
                   <CourseLessons
+                    key={localData.id}
                     sectionId={localData.id}
-                    lessons={sectionData.lessons || []}
+                    lessons={localData.lessons || []}
                   />
                 </div>
               );

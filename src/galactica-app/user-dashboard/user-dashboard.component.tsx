@@ -25,20 +25,23 @@ const UserDashboard: React.FC = () => {
   return (
     <div className="user-dashboard-container">
       {/* <FaUser className="user-avatar" /> */}
-      {React.createElement(FaUser as React.FC<{ className: string }>, {
-        className: 'user-avatar',
-      })}
-      <div className="user-profile">
-        <div className="user-info-box">
-          <h2>
-            {user?.firstName} {user?.lastName}
-          </h2>
-          <span>{user?.email}</span>
-          <span>Content Creator</span>
-          <span>
-            Member since: <strong>12 March 2025</strong>
-          </span>
+      <div className="user-banner">
+        {React.createElement(FaUser as React.FC<{ className: string }>, {
+          className: 'user-avatar',
+        })}
+        <div className="user-profile">
+          <div className="user-info-box">
+            <h2>
+              {user?.firstName} {user?.lastName}
+            </h2>
+            <span>{user?.email}</span>
+            <span>Content Creator</span>
+            <span>
+              Member since: <strong>12 March 2025</strong>
+            </span>
+          </div>
         </div>
+
         <div className="action-buttons-container">
           <Button
             onClick={() => navigate('my-page-preview')}
@@ -65,11 +68,11 @@ const UserDashboard: React.FC = () => {
               text="Create Product"
               type="primary"
             />
-            <Button
+            {/* <Button
               onClick={() => navigate('products/create-course')}
               text="(tmp) Create COURSE"
               type="primary"
-            />
+            /> */}
           </div>
         )}
       </div>

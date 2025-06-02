@@ -13,6 +13,22 @@ describe('FormInput component', () => {
     expect(inputElement).toHaveAttribute('placeholder', 'Enter email');
   });
 
+  it('renders the textarea element with the correct attributes', () => {
+    render(
+      <FormInput
+        name="description"
+        value=""
+        placeholder="Describe here"
+        inputType="textarea"
+      />
+    );
+    const inputElement = screen.getByTestId('textarea-description');
+    expect(inputElement).toBeInTheDocument();
+    expect(inputElement).toHaveAttribute('name', 'description');
+    expect(inputElement).toHaveAttribute('placeholder', 'Describe here');
+    expect(inputElement.tagName).toBe('TEXTAREA');
+  });
+
   it('applies the required attribute when specified', () => {
     render(<FormInput name="username" value="" required />);
     const inputElement = screen.getByTestId('input-username');
@@ -20,7 +36,9 @@ describe('FormInput component', () => {
   });
 
   it('renders the label when provided and associates it correctly with the input', () => {
-    const { container } = render(<FormInput name="firstName" label="First Name" value="" />);
+    const { container } = render(
+      <FormInput name="firstName" label="First Name" value="" />
+    );
     // Query the label directly using container
     const labelElement = container.querySelector('label');
     expect(labelElement).toBeInTheDocument();
@@ -29,13 +47,17 @@ describe('FormInput component', () => {
   });
 
   it('adds the "shrink" class to the label when value is non-empty', () => {
-    const { container } = render(<FormInput name="lastName" label="Last Name" value="Doe" />);
+    const { container } = render(
+      <FormInput name="lastName" label="Last Name" value="Doe" />
+    );
     const labelElement = container.querySelector('label');
     expect(labelElement).toHaveClass('shrink');
   });
 
   it('does not add the "shrink" class to the label when value is empty', () => {
-    const { container } = render(<FormInput name="lastName" label="Last Name" value="" />);
+    const { container } = render(
+      <FormInput name="lastName" label="Last Name" value="" />
+    );
     const labelElement = container.querySelector('label');
     expect(labelElement).not.toHaveClass('shrink');
   });
