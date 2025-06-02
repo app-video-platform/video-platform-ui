@@ -1,6 +1,6 @@
-import { UserRegisterData } from '../../../models/user/user';
 import { SignInFormData } from '../../../pages/sign-in/sign-in.component';
 import httpClient from '../../http-client';
+import { UserRegisterData } from '../../models/user/user';
 
 export const getNewAPI = async () => {
   try {

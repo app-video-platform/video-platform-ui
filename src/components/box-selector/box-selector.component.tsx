@@ -1,7 +1,10 @@
 /* eslint-disable indent */
 import React from 'react';
 
-import { LessonType, ProductType } from '../../models/product/product.types';
+import {
+  ProductType,
+  LessonType,
+} from '../../api/models/product/product.types';
 
 import './box-selector.styles.scss';
 

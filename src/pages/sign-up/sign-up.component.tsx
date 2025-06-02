@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react'; // Importing eye icons for toggle
+import { Eye, EyeOff } from 'lucide-react';
 
 import FormInput from '../../components/form-input/form-input.component';
-import './sign-up.styles.scss';
 import { AppDispatch } from '../../store/store';
 import { useDispatch } from 'react-redux';
 import { signupUser } from '../../store/auth-store/auth.slice';
 import { useNavigate } from 'react-router-dom';
-import { UserRegisterData } from '../../models/user/user';
 import Button from '../../components/button/button.component';
+import { UserRegisterData } from '../../api/models/user/user';
 
+import './sign-up.styles.scss';
 export interface SignupFormData {
   firstName: string;
   lastName: string;
@@ -17,7 +17,6 @@ export interface SignupFormData {
   password: string;
   confirmPassword: string;
 }
-
 
 const SignUp: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,14 +31,37 @@ const SignUp: React.FC = () => {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState({ password: false, confirmPassword: false });
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
 
   const passwordValidationRules = [
-    { id: 'length', label: 'At least 8 characters', test: (pw: string) => pw.length >= 8 },
-    { id: 'lowercase', label: 'At least one lowercase letter', test: (pw: string) => /[a-z]/.test(pw) },
-    { id: 'uppercase', label: 'At least one uppercase letter', test: (pw: string) => /[A-Z]/.test(pw) },
-    { id: 'number', label: 'At least one number', test: (pw: string) => /\d/.test(pw) },
-    { id: 'special', label: 'At least one special character (!@#$%^&*)', test: (pw: string) => /[!@#$%^&*]/.test(pw) },
+    {
+      id: 'length',
+      label: 'At least 8 characters',
+      test: (pw: string) => pw.length >= 8,
+    },
+    {
+      id: 'lowercase',
+      label: 'At least one lowercase letter',
+      test: (pw: string) => /[a-z]/.test(pw),
+    },
+    {
+      id: 'uppercase',
+      label: 'At least one uppercase letter',
+      test: (pw: string) => /[A-Z]/.test(pw),
+    },
+    {
+      id: 'number',
+      label: 'At least one number',
+      test: (pw: string) => /\d/.test(pw),
+    },
+    {
+      id: 'special',
+      label: 'At least one special character (!@#$%^&*)',
+      test: (pw: string) => /[!@#$%^&*]/.test(pw),
+    },
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,8 +72,12 @@ const SignUp: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.firstName) { newErrors.firstName = 'First name is required'; }
-    if (!formData.lastName) { newErrors.lastName = 'Last name is required'; }
+    if (!formData.firstName) {
+      newErrors.firstName = 'First name is required';
+    }
+    if (!formData.lastName) {
+      newErrors.lastName = 'Last name is required';
+    }
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -60,7 +86,9 @@ const SignUp: React.FC = () => {
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else {
-      const failedRules = passwordValidationRules.filter(rule => !rule.test(formData.password));
+      const failedRules = passwordValidationRules.filter(
+        (rule) => !rule.test(formData.password)
+      );
       if (failedRules.length > 0) {
         newErrors.password = 'Password does not meet all requirements';
       }
@@ -89,12 +117,12 @@ const SignUp: React.FC = () => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       };
       dispatch(signupUser(registerData))
         .unwrap() // unwrap() turns the thunk result into a "normal" promise
         .then(() => {
-          navigate('/email-sent');  // example redirect (requires useNavigate)
+          navigate('/email-sent'); // example redirect (requires useNavigate)
         })
         .catch((error) => {
           // ❌ Failed signup, show error message
@@ -103,21 +131,24 @@ const SignUp: React.FC = () => {
     }
   };
 
-
-
   return (
     <div>
-      <div className='sign-up-container'>
-        <h1 className="text-2xl font-bold mb-4" data-testid='sign-up-header'>Sign Up</h1>
+      <div className="sign-up-container">
+        <h1 className="text-2xl font-bold mb-4" data-testid="sign-up-header">
+          Sign Up
+        </h1>
         <form onSubmit={handleSubmit}>
-
-          <FormInput label="First Name"
+          <FormInput
+            label="First Name"
             type="text"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
-            required />
-          {errors.firstName && <p className="error-text-red">{errors.firstName}</p>}
+            required
+          />
+          {errors.firstName && (
+            <p className="error-text-red">{errors.firstName}</p>
+          )}
 
           <FormInput
             label="Last Name"
@@ -127,7 +158,9 @@ const SignUp: React.FC = () => {
             onChange={handleChange}
             required
           />
-          {errors.lastName && <p className="error-text-red">{errors.lastName}</p>}
+          {errors.lastName && (
+            <p className="error-text-red">{errors.lastName}</p>
+          )}
 
           <FormInput
             label="Email"
@@ -139,7 +172,7 @@ const SignUp: React.FC = () => {
           />
           {errors.email && <p className="error-text-red">{errors.email}</p>}
 
-          <div className='password-group'>
+          <div className="password-group">
             <FormInput
               label="Password"
               type={showPassword.password ? 'text' : 'password'} // Toggle input type
@@ -154,25 +187,29 @@ const SignUp: React.FC = () => {
               type="button"
               className="toggle-password-btn"
               onClick={() => togglePasswordVisibility('password')}
-              data-testid='toggle-password-password'
+              data-testid="toggle-password-password"
             >
               {showPassword.password ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
-          {errors.password && <p className="error-text-red">{errors.password}</p>}
-          {
-            isPasswordFocused &&
+          {errors.password && (
+            <p className="error-text-red">{errors.password}</p>
+          )}
+          {isPasswordFocused && (
             <ul className="password-rules">
               {passwordValidationRules.map((rule) => (
                 <li
                   key={rule.id}
-                  className={`password-rule ${isPasswordFocused ? 'red' : 'grey'} ${rule.test(formData.password) ? 'green' : ''}`}
+                  className={`password-rule ${
+                    isPasswordFocused ? 'red' : 'grey'
+                  } ${rule.test(formData.password) ? 'green' : ''}`}
                 >
                   {rule.label}
                 </li>
               ))}
-            </ul>}
-          <div className='password-group'>
+            </ul>
+          )}
+          <div className="password-group">
             <FormInput
               label="Confirm Password"
               type={showPassword.confirmPassword ? 'text' : 'password'} // Toggle input type
@@ -186,12 +223,18 @@ const SignUp: React.FC = () => {
               className="toggle-password-btn"
               onClick={() => togglePasswordVisibility('confirmPassword')}
             >
-              {showPassword.confirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+              {showPassword.confirmPassword ? (
+                <Eye size={20} />
+              ) : (
+                <EyeOff size={20} />
+              )}
             </button>
           </div>
-          {errors.confirmPassword && <p className="error-text-red">{errors.confirmPassword}</p>}
+          {errors.confirmPassword && (
+            <p className="error-text-red">{errors.confirmPassword}</p>
+          )}
 
-          <Button text='Sign Up' htmlType='submit' type="primary" />
+          <Button text="Sign Up" htmlType="submit" type="primary" />
         </form>
       </div>
     </div>

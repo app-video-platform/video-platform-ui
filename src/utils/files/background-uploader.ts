@@ -1,6 +1,6 @@
+import { DownloadSection } from '../../api/models/product/download-section';
 import { Sectiunile } from '../../api/services/products/products-api';
 // import { IFilesWithSection } from '../../galactica-app/products/create-product/create-product.component';
-import { DownloadSection } from '../../models/product/download-section';
 import { uploadFileToSection } from './upload-file';
 
 interface IFilesWithSection {

@@ -10,12 +10,12 @@ import {
 } from '../create-new-product.component';
 import FormInput from '../../../../components/form-input/form-input.component';
 import Button from '../../../../components/button/button.component';
-import { INewProductPayload } from '../../../../models/product/product';
-import { ProductType } from '../../../../models/product/product.types';
 import { createCourseProduct } from '../../../../store/product-store/product.slice';
 
 import './create-product-step-one.styles.scss';
 import BoxSelector from '../../../../components/box-selector/box-selector.component';
+import { ProductType } from '../../../../api/models/product/product.types';
+import { INewProductPayload } from '../../../../api/models/product/product';
 
 interface CreateProductStepOneProps {
   formData: NewProductFormData;

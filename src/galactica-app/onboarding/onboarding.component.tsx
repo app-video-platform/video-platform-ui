@@ -4,8 +4,8 @@ import './onboarding.styles.scss';
 import { useSelector } from 'react-redux';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import MultiStepForm from './multi-step-form/multi-step-form.component';
-import { User } from '../../models/user/user';
 import CountdownRedirect from './countdown-redirect/countdown-redirect.component';
+import { User } from '../../api/models/user/user';
 
 const Onboarding: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -18,26 +18,24 @@ const Onboarding: React.FC = () => {
       lastName: 'Hagi',
       role: ['User'],
       id: '',
-      onboardingCompleted: false
+      onboardingCompleted: false,
     };
     if (user) {
       setOtherUser(user);
     } else {
       setOtherUser(mockUser);
     }
-
   }, [user]);
 
-  return <div className='onboarding-page'>
-    {
-      !otherUser?.onboardingCompleted ? (
+  return (
+    <div className="onboarding-page">
+      {!otherUser?.onboardingCompleted ? (
         <MultiStepForm />
-
       ) : (
         <CountdownRedirect />
-      )
-    }
-  </div>;
+      )}
+    </div>
+  );
 };
 
 export default Onboarding;

@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { AppDispatch } from '../../../store/store';
 import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
-import { ProductType } from '../../../models/product/product.types';
 
 import './create-new-product.styles.scss';
 import { updateCourseProductDetails } from '../../../store/product-store/product.slice';
-import { IUpdateCourseProduct } from '../../../models/product/product';
 import Button from '../../../components/button/button.component';
 import PriceSelector from '../../../components/price-selector/price-selector.component';
 import UppyFileUploader from '../../../components/uppy-file-uploader/uppy-file-uploader.component';
 import CreateProductStepOne from './create-product-step-one/create-product-step-one.component';
 import CreateProductSections from './create-product-sections/create-product-sections.component';
+import { IUpdateCourseProduct } from '../../../api/models/product/product';
+import { ProductType } from '../../../api/models/product/product.types';
 
 export interface NewProductFormData {
   id: string; // Initially empty, will be set after product creation

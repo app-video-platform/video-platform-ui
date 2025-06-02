@@ -1,18 +1,18 @@
 /* eslint-disable indent */
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import './lesson-editor.styles.scss';
 import FormInput from '../../../../components/form-input/form-input.component';
-import { ILesson } from '../../../../models/product/lesson';
 import Button from '../../../../components/button/button.component';
 import { AppDispatch } from '../../../../store/store';
 import { useDispatch } from 'react-redux';
 import { createLesson } from '../../../../store/product-store/product.slice';
-import { LessonType } from '../../../../models/product/product.types';
 import BoxSelector from '../../../../components/box-selector/box-selector.component';
 import UppyFileUploader from '../../../../components/uppy-file-uploader/uppy-file-uploader.component';
-import { set } from 'react-hook-form';
+// import RichTextEditor from '../../../../components/rich-text-editor/rich-text-editor.component';
+import { ILesson } from '../../../../api/models/product/lesson';
+import { LessonType } from '../../../../api/models/product/product.types';
 
+import './lesson-editor.styles.scss';
 interface LessonEditorProps {
   lesson: ILesson;
   index: number;
@@ -41,6 +41,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   });
 
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
+  const [contentJSON, setContentJSON] = React.useState<any>(null);
 
   const [isLessonCreated, setIsLessonCreated] = useState(false);
 
@@ -110,7 +111,10 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       case 'TEXT':
         return (
           <div className="form-input-group">
-            <p>Here\s gon be a som som</p>
+            {/* <RichTextEditor
+              initialContent={contentJSON}
+              onChange={(json) => setContentJSON(json)}
+            /> */}
           </div>
         );
 

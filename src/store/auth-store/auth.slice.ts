@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User, UserRegisterData } from '../../models/user/user';
 import {
   googleAPI,
   logoutAPI,
@@ -10,7 +9,8 @@ import {
 import { getUserProfileAPI } from '../../api/services/user/user-api';
 
 import { SignInFormData } from '../../pages/sign-in/sign-in.component';
-import { Notification } from '../../models/user/notification';
+import { User, UserRegisterData } from '../../api/models/user/user';
+import { INotification } from '../../api/models/user/notification';
 
 interface AuthState {
   user: null | User;
@@ -18,7 +18,7 @@ interface AuthState {
   error: string | null;
   message: string | null;
   isUserLoggedIn: boolean | null;
-  notifications: Notification[];
+  notifications: INotification[];
 }
 
 const initialState: AuthState = {
@@ -138,10 +138,10 @@ const authSlice = createSlice({
       state.message = null;
     },
 
-    addNotification: (state, action: PayloadAction<Notification>) => {
+    addNotification: (state, action: PayloadAction<INotification>) => {
       state.notifications.push(action.payload);
     },
-    markNotificationAsRead: (state, action: PayloadAction<Notification>) => {
+    markNotificationAsRead: (state, action: PayloadAction<INotification>) => {
       const foundNotification = state.notifications.find(
         (notif) => notif.id === action.payload.id
       );
@@ -258,6 +258,6 @@ export const {
   resetMessage,
   setUserProfile,
   addNotification,
-  markNotificationAsRead,
+  // markNotificationAsRead,
 } = authSlice.actions;
 export default authSlice.reducer;

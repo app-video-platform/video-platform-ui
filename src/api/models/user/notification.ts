@@ -1,6 +1,6 @@
 import { NotificationType } from './notifications.types';
 
-export interface Notification {
+export interface INotification {
   title: string;
   message: string;
   isRead: boolean;

@@ -1,5 +1,5 @@
-import { User } from '../../../models/user/user';
 import httpClient from '../../http-client';
+import { User } from '../../models/user/user';
 import { getUserProfileAPI } from './user-api';
 
 jest.mock('../../http-client');

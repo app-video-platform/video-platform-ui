@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-import './create-product-sections.styles.scss';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../store/store';
 import Button from '../../../../components/button/button.component';
-import FormInput from '../../../../components/form-input/form-input.component';
-import SectionEditor from './section-editor/section-editor.component';
-import { ProductType } from '../../../../models/product/product.types';
+import SectionEditor from './../section-editor/section-editor.component';
+import { ProductType } from '../../../../api/models/product/product.types';
 
+import './create-product-sections.styles.scss';
 interface CreateProductSectionsProps {
   sections: any[];
   productType: ProductType;

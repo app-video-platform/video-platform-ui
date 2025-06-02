@@ -7,13 +7,14 @@ import '@testing-library/jest-dom';
 
 describe('Breadcrumbs component', () => {
   // A helper to render the component with a given initial route.
-  const renderWithRouter = (initialPath: string) => render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <Routes>
-        <Route path="*" element={<Breadcrumbs />} />
-      </Routes>
-    </MemoryRouter>
-  );
+  const renderWithRouter = (initialPath: string) =>
+    render(
+      <MemoryRouter initialEntries={[initialPath]}>
+        <Routes>
+          <Route path="*" element={<Breadcrumbs />} />
+        </Routes>
+      </MemoryRouter>
+    );
 
   it('renders correct breadcrumbs for "/dashboard/products/new"', () => {
     renderWithRouter('/dashboard/products/new');
@@ -36,7 +37,7 @@ describe('Breadcrumbs component', () => {
     // When no mapping exists in labelMap, the component falls back to the original segment.
     // Given a segment like "my-perfect-formatted-page", toCamelCase returns "myPerfectFormattedPage"
     // but since "myPerfectFormattedPage" is not in labelMap, the original segment is used.
-    renderWithRouter('/my-perfect-formatted-page');
+    renderWithRouter('/my-perfect-formatted-page/path-with-dashes');
 
     // Expect the breadcrumb to display the original segment text.
     const breadcrumb = screen.getByText('my-perfect-formatted-page');

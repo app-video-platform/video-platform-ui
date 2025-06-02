@@ -1,4 +1,5 @@
 // auth.slice.test.ts
+import { User } from '../../api/models/user/user';
 import authReducer, {
   logout,
   resetMessage,
@@ -7,7 +8,6 @@ import authReducer, {
   verifyEmail,
   signinUser,
 } from './auth.slice';
-import { User, UserLoginResponse } from '../../models/user/user';
 
 // Define an initial state matching your AuthState interface
 const initialState = {
@@ -16,11 +16,10 @@ const initialState = {
   error: null,
   message: null,
   isUserLoggedIn: null,
-  notifications: []
+  notifications: [],
 };
 
 describe('auth slice reducers', () => {
-
   it('should handle setUserProfile', () => {
     const user = {
       firstName: 'Alice',
@@ -36,7 +35,12 @@ describe('auth slice reducers', () => {
   it('should handle logout', () => {
     const modifiedState = {
       ...initialState,
-      user: { firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', role: ['user'] },
+      user: {
+        firstName: 'Alice',
+        lastName: 'Smith',
+        email: 'alice@example.com',
+        role: ['user'],
+      },
       token: 'abc123',
       message: 'some message',
     };
