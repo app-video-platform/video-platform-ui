@@ -45,17 +45,20 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const [localData, setLocalData] = useState<NewProductSectionFormData>({
-    id: sectionData.id || '',
-    title: sectionData.title || '',
-    description: sectionData.description || '',
-    lessons: sectionData.lessons ? [...sectionData.lessons] : [],
-    files: sectionData.files ? [...sectionData.files] : [],
-  });
+  const safeSectionData: NewProductSectionFormData = {
+    id: sectionData?.id || '',
+    title: sectionData?.title || '',
+    description: sectionData?.description || '',
+    lessons: sectionData?.lessons ? [...sectionData.lessons] : [],
+    files: sectionData?.files ? [...sectionData.files] : [],
+  };
+
+  const [localData, setLocalData] =
+    useState<NewProductSectionFormData>(safeSectionData);
   const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
-    if (sectionData.id !== localData.id) {
+    if (sectionData && sectionData.id !== localData.id) {
       setLocalData({
         id: sectionData.id || '',
         title: sectionData.title || '',

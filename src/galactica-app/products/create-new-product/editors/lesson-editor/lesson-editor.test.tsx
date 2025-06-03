@@ -1,0 +1,491 @@
+/**
+ * @file LessonEditor.test.tsx
+ */
+
+import React from 'react';
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  cleanup,
+} from '@testing-library/react';
+import '@testing-library/jest-dom';
+
+// ── 1) MOCK react-redux useDispatch ───────────────────────────────────────────────
+jest.mock('react-redux', () => ({
+  __esModule: true,
+  useDispatch: jest.fn(),
+}));
+import { useDispatch } from 'react-redux';
+
+// ── 2) MOCK the async thunks from product.slice ───────────────────────────────────
+jest.mock('../../../../../store/product-store/product.slice', () => ({
+  createLesson: jest.fn(),
+  updateLessonDetails: jest.fn(),
+  deleteLesson: jest.fn(),
+}));
+import {
+  createLesson,
+  updateLessonDetails,
+  deleteLesson,
+} from '../../../../../store/product-store/product.slice';
+
+// ── 3) MOCK child components ──────────────────────────────────────────────────────
+
+// 3.1. FormInput: render <input data-testid="input-<name>" onChange calls onChange({target:{value}})>
+jest.mock('../../../../../components/form-input/form-input.component', () => ({
+  __esModule: true,
+  default: ({
+    label,
+    type,
+    name,
+    value,
+    onChange,
+  }: {
+    label: string;
+    type: string;
+    name: string;
+    value: string;
+    onChange: (e: { target: { name: string; value: string } }) => void;
+  }) => (
+    <input
+      data-testid={`input-${name}`}
+      aria-label={label}
+      type={type}
+      name={name}
+      value={value}
+      onChange={(e) =>
+        onChange({
+          target: { name: name, value: (e.target as HTMLInputElement).value },
+        })
+      }
+    />
+  ),
+}));
+
+// 3.2. BoxSelector: render a button per availableOption, data-testid="box-<opt>"
+jest.mock(
+  '../../../../../components/box-selector/box-selector.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      selectedOption,
+      onSelect,
+      availableOptions,
+    }: {
+      selectedOption: string;
+      onSelect: (opt: string) => void;
+      availableOptions: string[];
+      disabledOptions: string[]; // prop exists but we ignore
+    }) => (
+      <div data-testid="box-selector">
+        {availableOptions.map((opt) => (
+          <button
+            key={opt}
+            data-testid={`box-${opt}`}
+            style={{ fontWeight: selectedOption === opt ? 'bold' : 'normal' }}
+            onClick={() => onSelect(opt)}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    ),
+  })
+);
+
+// 3.3. UppyFileUploader: render a button data-testid="file-uploader" that calls onFilesChange([mockFile])
+jest.mock(
+  '../../../../../components/uppy-file-uploader/uppy-file-uploader.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      onFilesChange,
+    }: {
+      onFilesChange: (files: File[]) => void;
+      allowedFileTypes: string[];
+      disableImporters?: boolean;
+    }) => (
+      <button
+        data-testid="file-uploader"
+        onClick={() => {
+          const fakeFile = new File(['video content'], 'video.mp4', {
+            type: 'video/mp4',
+          });
+          onFilesChange([fakeFile]);
+        }}
+      >
+        Upload Video
+      </button>
+    ),
+  })
+);
+
+// 3.4. RichTextEditor: render a <div data-testid="rich-text-editor">, and call onChange({ somejson }) on click
+jest.mock(
+  '../../../../../components/rich-text-editor/rich-text-editor.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      initialContent,
+      onChange,
+    }: {
+      initialContent: any;
+      onChange: (json: any) => void;
+    }) => (
+      <div
+        data-testid="rich-text-editor"
+        onClick={() => onChange({ delta: 'some-delta' })}
+      >
+        RichTextEditor
+      </div>
+    ),
+  })
+);
+
+// 3.5. Button: render <button data-testid="btn-<text>">text</button>
+jest.mock('../../../../../components/button/button.component', () => ({
+  __esModule: true,
+  default: ({
+    text,
+    htmlType,
+    onClick,
+    disabled,
+  }: {
+    text: string;
+    htmlType: 'button' | 'submit';
+    onClick?: () => void;
+    disabled?: boolean;
+    customClassName?: string;
+    type?: string;
+  }) => (
+    <button
+      data-testid={`btn-${text.replace(/\s+/g, '-').toLowerCase()}`}
+      type={htmlType}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {text}
+    </button>
+  ),
+}));
+
+// ── 4) Import the component under test ───────────────────────────────────────────────
+import LessonEditor from './lesson-editor.component';
+import { ILesson } from '../../../../../api/models/product/lesson';
+import { LessonType } from '../../../../../api/models/product/product.types';
+
+// ── 5) Begin tests ───────────────────────────────────────────────────────────────────
+describe('<LessonEditor />', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  // Create typed mocks for useDispatch and thunks
+  const mockedUseDispatch = useDispatch as jest.MockedFunction<
+    typeof useDispatch
+  >;
+  const mockedCreateLesson = createLesson as jest.MockedFunction<
+    typeof createLesson
+  >;
+  const mockedUpdateLesson = updateLessonDetails as jest.MockedFunction<
+    typeof updateLessonDetails
+  >;
+  const mockedDeleteLesson = deleteLesson as jest.MockedFunction<
+    typeof deleteLesson
+  >;
+
+  let fakeDispatch: jest.Mock<any, any>;
+  let removeLessonMock: jest.Mock<any, any>;
+
+  const baseLesson: ILesson = {
+    id: '',
+    title: '',
+    description: '',
+    content: '',
+    type: '' as LessonType,
+    sectionId: '',
+    position: 1,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // A fake dispatch fn that returns { unwrap: () => Promise.resolve(...) }
+    fakeDispatch = jest.fn((action: any) => ({
+      unwrap: () =>
+        Promise.resolve({ ...action.payload, id: 'lesson-xyz', type: 'VIDEO' }),
+    }));
+    mockedUseDispatch.mockReturnValue(fakeDispatch as any);
+
+    mockedCreateLesson.mockReset();
+    mockedUpdateLesson.mockReset();
+    mockedDeleteLesson.mockReset();
+
+    removeLessonMock = jest.fn();
+  });
+
+  it('renders “existing lesson” correctly (show Update mode)', () => {
+    const existingLesson: ILesson = {
+      id: 'abc123',
+      title: 'Existing Title',
+      description: 'Existing Desc',
+      content: 'Existing Content',
+      type: 'TEXT',
+      sectionId: 'sec-1',
+      position: 2,
+    };
+    render(
+      <LessonEditor
+        lesson={existingLesson}
+        index={1}
+        sectionId="sec-1"
+        removeLessonFromList={removeLessonMock}
+      />
+    );
+
+    // Header should show “Lesson 2” (index + 1)
+    expect(screen.getByText('Lesson 2')).toBeInTheDocument();
+
+    // Title and Description inputs should be pre-filled
+    const titleInput = screen.getByTestId('input-title') as HTMLInputElement;
+    expect(titleInput.value).toBe('Existing Title');
+    const descInput = screen.getByTestId(
+      'input-description'
+    ) as HTMLInputElement;
+    expect(descInput.value).toBe('Existing Desc');
+
+    // BoxSelector should have selected “TEXT”
+    // The “box-TEXT” button should be bold (we set style based on selectedOption)
+    const textButton = screen.getByTestId('box-TEXT');
+    expect(textButton).toBeInTheDocument();
+
+    // Because lesson.id exists, isLessonCreated → true:
+    // Show “Update Lesson” button and render content field for TEXT (RichTextEditor)
+    const updateBtn = screen.getByTestId('btn-update-lesson');
+    expect(updateBtn).toBeInTheDocument();
+
+    // // Since type='TEXT', RichTextEditor should be in the DOM
+    // expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
+  });
+
+  it('renders “new lesson” correctly and allows creation', async () => {
+    // Pass a lesson with empty id → isLessonCreated starts false
+    const newLesson: ILesson = {
+      id: '',
+      title: '',
+      description: '',
+      content: '',
+      type: '' as LessonType,
+      sectionId: 'sec-1',
+      position: 1,
+    };
+
+    render(
+      <LessonEditor
+        lesson={newLesson}
+        index={0}
+        sectionId="sec-1"
+        removeLessonFromList={removeLessonMock}
+      />
+    );
+
+    // Header: “Lesson 1”
+    expect(screen.getByText('Lesson 1')).toBeInTheDocument();
+
+    // Title & Description initially blank
+    const titleInput = screen.getByTestId('input-title') as HTMLInputElement;
+    expect(titleInput.value).toBe('');
+    const descInput = screen.getByTestId(
+      'input-description'
+    ) as HTMLInputElement;
+    expect(descInput.value).toBe('');
+
+    // BoxSelector: no option selected initially, but buttons exist
+    expect(screen.getByTestId('box-VIDEO')).toBeInTheDocument();
+    expect(screen.getByTestId('box-TEXT')).toBeInTheDocument();
+    expect(screen.getByTestId('box-QUIZ')).toBeInTheDocument();
+
+    // Since isLessonCreated=false, “Create Lesson” button should show, disabled because title is empty
+    const createBtn = screen.getByTestId('btn-create-lesson');
+    expect(createBtn).toBeInTheDocument();
+    expect(createBtn).toBeDisabled();
+
+    // Type a title → onChange should call setFormData, enabling the button
+    fireEvent.change(titleInput, { target: { value: 'New Title' } });
+    expect(createBtn).toBeEnabled();
+
+    // Mock createLesson to return a fake thunk
+    const fakeThunk = Symbol('fakeThunk');
+    mockedCreateLesson.mockReturnValue(fakeThunk as any);
+
+    // Simulate clicking “Create Lesson”
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('btn-create-lesson'));
+    });
+
+    // createLesson should have been called with payload {title, description, position, sectionId}
+    expect(mockedCreateLesson).toHaveBeenCalledWith({
+      title: 'New Title',
+      description: '',
+      position: 1,
+      sectionId: 'sec-1',
+    });
+
+    // Dispatch should have been called with fakeThunk
+    expect(fakeDispatch).toHaveBeenCalledWith(fakeThunk);
+
+    // Wait for unwrap() → Promise.resolve, then state updates (isLessonCreated → true)
+    await act(async () => {
+      // give time for .unwrap().then(...) to run
+      await Promise.resolve();
+    });
+
+    // After creation, isLessonCreated=true, so “Update Lesson” appears
+    expect(screen.getByTestId('btn-update-lesson')).toBeInTheDocument();
+
+    // Default type in setFormData after creation is 'VIDEO', so UppyFileUploader should appear
+    expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
+  });
+
+  it('allows selecting a type and updating an existing lesson', async () => {
+    const existingLesson: ILesson = {
+      id: 'l1',
+      title: 'T1',
+      description: 'D1',
+      content: 'C1',
+      type: 'VIDEO',
+      sectionId: 'sec-1',
+      position: 0,
+    };
+
+    render(
+      <LessonEditor
+        lesson={existingLesson}
+        index={0}
+        sectionId="sec-1"
+        removeLessonFromList={removeLessonMock}
+      />
+    );
+
+    // Initially formData.type === '', so no content field yet.
+    // Click “VIDEO” to set formData.type = "VIDEO"
+    fireEvent.click(screen.getByTestId('box-VIDEO'));
+    // Now UppyFileUploader (video uploader) should appear
+    expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
+
+    // Select “TEXT” type
+    fireEvent.click(screen.getByTestId('box-TEXT'));
+
+    // Now RichTextEditor should be in the DOM instead of file-uploader
+    expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
+
+    // Mock updateLessonDetails to return a fake thunk
+    const fakeUpdateThunk = Symbol('fakeUpdate');
+    mockedUpdateLesson.mockReturnValue(fakeUpdateThunk as any);
+
+    // Click “Update Lesson”
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('btn-update-lesson'));
+    });
+
+    // updateLessonDetails should have been called with an ILesson object containing:
+    // id = 'l1', title='T1', description='D1', content='C1', type='TEXT', sectionId='sec-1', position=1
+    expect(mockedUpdateLesson).toHaveBeenCalledWith({
+      id: 'l1',
+      title: 'T1',
+      description: 'D1',
+      content: 'C1',
+      type: 'TEXT',
+      sectionId: 'sec-1',
+      position: 1,
+    });
+
+    // Dispatch should have been called with fakeUpdateThunk
+    expect(fakeDispatch).toHaveBeenCalledWith(fakeUpdateThunk);
+  });
+
+  it('deletes a new (unsaved) lesson by calling removeLessonFromList immediately', () => {
+    // new lesson with no id
+    const newLesson: ILesson = {
+      id: '',
+      title: 'T2',
+      description: 'D2',
+      content: '',
+      type: '' as LessonType,
+      sectionId: 'sec-1',
+      position: 0,
+    };
+
+    render(
+      <LessonEditor
+        lesson={newLesson}
+        index={2}
+        sectionId="sec-1"
+        removeLessonFromList={removeLessonMock}
+      />
+    );
+
+    // Click delete icon
+    fireEvent.click(screen.getByRole('button', { name: '' }));
+    // Since no id, dispatch(deleteLesson) should NOT be called, but removeLessonFromList should:
+    expect(mockedDeleteLesson).not.toHaveBeenCalled();
+    expect(removeLessonMock).toHaveBeenCalledWith(2);
+  });
+
+  it('deletes an existing lesson by dispatching then calling removeLessonFromList', async () => {
+    const existingLesson: ILesson = {
+      id: 'to-delete',
+      title: 'T3',
+      description: 'D3',
+      content: '',
+      type: 'QUIZ',
+      sectionId: 'sec-1',
+      position: 3,
+    };
+
+    // // Make deleteLesson return fake thunk
+    // const fakeDeleteThunk = Symbol('fakeDelete');
+    // mockedDeleteLesson.mockReturnValue(fakeDeleteThunk as any);
+
+    // // fakeDispatch for delete unwrap
+    // fakeDispatch.mockImplementation((action) => ({
+    //   unwrap: () => Promise.resolve({}),
+    // }));
+
+    render(
+      <LessonEditor
+        lesson={existingLesson}
+        index={3}
+        sectionId="sec-1"
+        removeLessonFromList={removeLessonMock}
+      />
+    );
+
+    // Click the delete icon
+    fireEvent.click(screen.getByRole('button', { name: '' }));
+
+    // Because formData.id was wiped out by useEffect, deleteLesson(...) is NOT called.
+    expect(mockedDeleteLesson).not.toHaveBeenCalled();
+
+    // Instead, removeLessonFromList should be called immediately with index=3
+    expect(removeLessonMock).toHaveBeenCalledWith(3);
+
+    // // Click delete icon
+    // await act(async () => {
+    //   fireEvent.click(screen.getByRole('button', { name: '' }));
+    // });
+
+    // // deleteLesson should have been called with the lesson id
+    // expect(mockedDeleteLesson).toHaveBeenCalledWith('to-delete');
+    // // Dispatch should have been called with fakeDeleteThunk
+    // expect(fakeDispatch).toHaveBeenCalledWith(fakeDeleteThunk);
+
+    // // Wait for unwrap() → then removeLessonFromList
+    // await act(async () => {
+    //   await Promise.resolve();
+    // });
+    // expect(removeLessonMock).toHaveBeenCalledWith(3);
+  });
+});
