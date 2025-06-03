@@ -249,7 +249,7 @@ describe('<LessonEditor />', () => {
       title: 'Existing Title',
       description: 'Existing Desc',
       content: 'Existing Content',
-      type: 'TEXT',
+      type: 'ARTICLE',
       sectionId: 'sec-1',
       position: 2,
       userId: 'user-123',
@@ -284,7 +284,7 @@ describe('<LessonEditor />', () => {
     const updateBtn = screen.getByTestId('btn-update-lesson');
     expect(updateBtn).toBeInTheDocument();
 
-    // // Since type='TEXT', RichTextEditor should be in the DOM
+    // // Since type='ARTICLE', RichTextEditor should be in the DOM
     // expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
   });
 
@@ -412,13 +412,13 @@ describe('<LessonEditor />', () => {
     });
 
     // updateLessonDetails should have been called with an ILesson object containing:
-    // id = 'l1', title='T1', description='D1', content='C1', type='TEXT', sectionId='sec-1', position=1
+    // id = 'l1', title='T1', description='D1', content='C1', type='ARTICLE', sectionId='sec-1', position=1
     expect(mockedUpdateLesson).toHaveBeenCalledWith({
       id: 'l1',
       title: 'T1',
       description: 'D1',
       content: 'C1',
-      type: 'TEXT',
+      type: 'ARTICLE',
       sectionId: 'sec-1',
       position: 1,
       userId: 'user-123', // from mocked useSelector

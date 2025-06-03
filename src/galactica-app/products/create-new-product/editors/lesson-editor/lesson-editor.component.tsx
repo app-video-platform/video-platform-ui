@@ -201,7 +201,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           />
         );
 
-      case 'TEXT':
+      case 'ARTICLE':
         return (
           <div className="form-input-group">
             <RichTextEditor
@@ -269,7 +269,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         <BoxSelector<LessonType>
           selectedOption={formData.type}
           onSelect={(type) => setFormData((prev) => ({ ...prev, type }))}
-          availableOptions={['VIDEO', 'TEXT', 'QUIZ']} // Example lesson types
+          availableOptions={['VIDEO', 'ARTICLE', 'QUIZ']} // Example lesson types
           disabledOptions={[]} // Add any disabled options if needed
         />
 

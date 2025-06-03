@@ -7,4 +7,4 @@ export type ProductStatus = 'draft' | 'published' | 'hidden';
 
 export type Product = DownloadProduct | CourseProduct;
 
-export type LessonType = 'VIDEO' | 'TEXT' | 'QUIZ' | 'ASSIGNMENT';
+export type LessonType = 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT';
