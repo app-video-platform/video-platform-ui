@@ -75,5 +75,6 @@ export interface IUpdateSectionDetails {
   description?: string;
   position: number;
   content?: any;
+  userId: string;
   files?: File[];
 }

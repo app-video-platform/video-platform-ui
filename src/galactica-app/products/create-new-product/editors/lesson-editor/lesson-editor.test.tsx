@@ -16,8 +16,14 @@ import '@testing-library/jest-dom';
 jest.mock('react-redux', () => ({
   __esModule: true,
   useDispatch: jest.fn(),
+  useSelector: jest.fn(),
 }));
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+jest.mock('../../../../../store/auth-store/auth.selectors', () => ({
+  selectAuthUser: jest.fn(),
+}));
+import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
 
 // ── 2) MOCK the async thunks from product.slice ───────────────────────────────────
 jest.mock('../../../../../store/product-store/product.slice', () => ({
@@ -186,6 +192,9 @@ describe('<LessonEditor />', () => {
   const mockedUseDispatch = useDispatch as jest.MockedFunction<
     typeof useDispatch
   >;
+  const mockedUseSelector = useSelector as jest.MockedFunction<
+    typeof useSelector
+  >;
   const mockedCreateLesson = createLesson as jest.MockedFunction<
     typeof createLesson
   >;
@@ -207,6 +216,7 @@ describe('<LessonEditor />', () => {
     type: '' as LessonType,
     sectionId: '',
     position: 1,
+    userId: 'user-123', // Mocked user ID
   };
 
   beforeEach(() => {
@@ -218,6 +228,13 @@ describe('<LessonEditor />', () => {
         Promise.resolve({ ...action.payload, id: 'lesson-xyz', type: 'VIDEO' }),
     }));
     mockedUseDispatch.mockReturnValue(fakeDispatch as any);
+
+    mockedUseSelector.mockImplementation((selector) => {
+      if (selector === selectAuthUser) {
+        return { id: 'user-123' };
+      }
+      return undefined;
+    });
 
     mockedCreateLesson.mockReset();
     mockedUpdateLesson.mockReset();
@@ -235,6 +252,7 @@ describe('<LessonEditor />', () => {
       type: 'TEXT',
       sectionId: 'sec-1',
       position: 2,
+      userId: 'user-123',
     };
     render(
       <LessonEditor
@@ -280,6 +298,7 @@ describe('<LessonEditor />', () => {
       type: '' as LessonType,
       sectionId: 'sec-1',
       position: 1,
+      userId: 'user-123',
     };
 
     render(
@@ -331,6 +350,7 @@ describe('<LessonEditor />', () => {
       description: '',
       position: 1,
       sectionId: 'sec-1',
+      userId: 'user-123', // from mocked useSelector
     });
 
     // Dispatch should have been called with fakeThunk
@@ -358,6 +378,7 @@ describe('<LessonEditor />', () => {
       type: 'VIDEO',
       sectionId: 'sec-1',
       position: 0,
+      userId: 'user-123',
     };
 
     render(
@@ -400,6 +421,7 @@ describe('<LessonEditor />', () => {
       type: 'TEXT',
       sectionId: 'sec-1',
       position: 1,
+      userId: 'user-123', // from mocked useSelector
     });
 
     // Dispatch should have been called with fakeUpdateThunk
@@ -416,6 +438,7 @@ describe('<LessonEditor />', () => {
       type: '' as LessonType,
       sectionId: 'sec-1',
       position: 0,
+      userId: 'user-123',
     };
 
     render(
@@ -443,6 +466,7 @@ describe('<LessonEditor />', () => {
       type: 'QUIZ',
       sectionId: 'sec-1',
       position: 3,
+      userId: 'user-123',
     };
 
     // // Make deleteLesson return fake thunk

@@ -14,6 +14,8 @@ import {
   deleteLessonAPI,
   deleteSectionAPI,
   deleteProductAPI,
+  IRemoveItemPayload,
+  IRemoveProductPayload,
 } from '../../api/services/products/products-api';
 import {
   ICreateLessonResponse,
@@ -77,7 +79,7 @@ export const updateCourseProductDetails = createAsyncThunk<
 
 export const deleteProduct = createAsyncThunk<
   string, // what this thunk returns on success
-  string, // the argument you pass in
+  IRemoveProductPayload, // the argument you pass in
   { rejectValue: string }
 >('products/deleteProduct', async (payload, thunkAPI) => {
   try {
@@ -106,7 +108,7 @@ export const createSection = createAsyncThunk<
 });
 
 export const updateSectionDetails = createAsyncThunk<
-  IUpdateSectionDetails, // what this thunk returns on success
+  string, // what this thunk returns on success
   IUpdateSectionDetails, // the argument you pass in
   { rejectValue: string }
 >('products/updateSectionDetails', async (payload, thunkAPI) => {
@@ -124,7 +126,7 @@ export const updateSectionDetails = createAsyncThunk<
 
 export const deleteSection = createAsyncThunk<
   string, // what this thunk returns on success
-  string, // the argument you pass in
+  IRemoveItemPayload, // the argument you pass in
   { rejectValue: string }
 >('products/deleteSection', async (payload, thunkAPI) => {
   try {
@@ -153,7 +155,7 @@ export const createLesson = createAsyncThunk<
 });
 
 export const updateLessonDetails = createAsyncThunk<
-  ILesson, // what this thunk returns on success
+  string, // what this thunk returns on success
   ILesson, // the argument you pass in
   { rejectValue: string }
 >('products/updateLessonDetails', async (payload, thunkAPI) => {
@@ -171,7 +173,7 @@ export const updateLessonDetails = createAsyncThunk<
 
 export const deleteLesson = createAsyncThunk<
   string, // what this thunk returns on success
-  string, // the argument you pass in
+  IRemoveItemPayload, // the argument you pass in
   { rejectValue: string }
 >('products/deleteLesson', async (payload, thunkAPI) => {
   try {
@@ -484,36 +486,11 @@ const productsSlice = createSlice({
       })
       .addCase(
         updateSectionDetails.fulfilled,
-        (state, action: PayloadAction<IUpdateSectionDetails>) => {
+        (state, action: PayloadAction<string>) => {
           state.loading = false;
           state.error = null;
 
-          const updatedSection = action.payload;
-          const prod = state.currentProduct;
-
-          if (prod) {
-            // If sections is undefined, initialize it to an array with the new section
-            if (!prod.sections) {
-              prod.sections = [updatedSection];
-            } else {
-              // Otherwise, look for an existing section with the same id
-              const idx = prod.sections.findIndex(
-                (s) => s.id === updatedSection.id
-              );
-              if (idx !== -1) {
-                // Replace (or merge) the existing entry
-                prod.sections[idx] = {
-                  ...prod.sections[idx],
-                  ...updatedSection,
-                };
-              } else {
-                // Not found: just push it onto the array
-                prod.sections.push(updatedSection);
-              }
-            }
-          }
-
-          state.message = 'Section updated successfully';
+          state.message = action.payload;
         }
       )
       .addCase(updateSectionDetails.rejected, (state, action) => {
@@ -562,37 +539,11 @@ const productsSlice = createSlice({
       })
       .addCase(
         updateLessonDetails.fulfilled,
-        (state, action: PayloadAction<ILesson>) => {
+        (state, action: PayloadAction<string>) => {
           state.loading = false;
           state.error = null;
 
-          const updatedLesson = action.payload;
-          const section = state.currentProduct?.sections?.find(
-            (sec) => sec.id === updatedLesson.sectionId
-          );
-          if (section) {
-            // If lessons is undefined, initialize it to an array with the new lesson
-            if (!section.lessons) {
-              section.lessons = [updatedLesson];
-            } else {
-              // Otherwise, look for an existing lesson with the same id
-              const idx = section.lessons.findIndex(
-                (l) => l.id === updatedLesson.id
-              );
-              if (idx !== -1) {
-                // Replace (or merge) the existing entry
-                section.lessons[idx] = {
-                  ...section.lessons[idx],
-                  ...updatedLesson,
-                };
-              } else {
-                // Not found: just push it onto the array
-                section.lessons.push(updatedLesson);
-              }
-            }
-          }
-
-          state.message = 'Section updated successfully';
+          state.message = action.payload;
         }
       )
       .addCase(updateLessonDetails.rejected, (state, action) => {

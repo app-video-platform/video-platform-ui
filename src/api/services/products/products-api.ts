@@ -34,6 +34,15 @@ export interface Sectiunile {
   lessons?: ILesson[];
 }
 
+export interface IRemoveItemPayload {
+  id: string;
+  userId: string;
+}
+
+export interface IRemoveProductPayload extends IRemoveItemPayload {
+  productType: ProductType;
+}
+
 export const createCourseProductAPI = async (payload: INewProductPayload) => {
   try {
     const response = await httpClient.post<IProductResponse>(
@@ -66,10 +75,10 @@ export const updateCourseDetailsAPI = async (payload: IUpdateCourseProduct) => {
   }
 };
 
-export const deleteProductAPI = async (payload: string) => {
+export const deleteProductAPI = async (payload: IRemoveProductPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      'api/products?productId=' + payload
+      `api/products?userId=${payload.userId}&productType=${payload.productType}&id=${payload.id}`
     );
     return response.data;
   } catch (error) {
@@ -81,7 +90,7 @@ export const deleteProductAPI = async (payload: string) => {
 export const createSectionAPI = async (payload: IUpdateSectionDetails) => {
   try {
     const response = await httpClient.post<IUpdateSectionDetails>(
-      'api/products/section',
+      'api/products/course/section',
       payload,
       {
         withCredentials: true,
@@ -98,8 +107,8 @@ export const updateSectionDetailsAPI = async (
   payload: IUpdateSectionDetails
 ) => {
   try {
-    const response = await httpClient.put<IUpdateSectionDetails>(
-      'api/products/sectionnnn',
+    const response = await httpClient.put<string>(
+      'api/products/course/section',
       payload,
       {
         withCredentials: true,
@@ -112,10 +121,10 @@ export const updateSectionDetailsAPI = async (
   }
 };
 
-export const deleteSectionAPI = async (payload: string) => {
+export const deleteSectionAPI = async (payload: IRemoveItemPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      'api/products/section?sectionId=' + payload
+      `api/products/section?userId=${payload.userId}&id=${payload.id}`
     );
     return response.data;
   } catch (error) {
@@ -127,7 +136,7 @@ export const deleteSectionAPI = async (payload: string) => {
 export const createLessonAPI = async (payload: ICreateLessonPayload) => {
   try {
     const response = await httpClient.post<ICreateLessonResponse>(
-      'api/products/section/lesson',
+      'api/products/course/section/lesson',
       payload,
       {
         withCredentials: true,
@@ -142,8 +151,8 @@ export const createLessonAPI = async (payload: ICreateLessonPayload) => {
 
 export const updateLessonDetailsAPI = async (payload: ILesson) => {
   try {
-    const response = await httpClient.put<ILesson>(
-      'api/products/section/lesson',
+    const response = await httpClient.put<string>(
+      'api/products/course/section/lesson',
       payload,
       {
         withCredentials: true,
@@ -156,10 +165,10 @@ export const updateLessonDetailsAPI = async (payload: ILesson) => {
   }
 };
 
-export const deleteLessonAPI = async (payload: string) => {
+export const deleteLessonAPI = async (payload: IRemoveItemPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      'api/products/section/lesson?lessonId=' + payload
+      `api/products/section/lesson?userId=${payload.userId}&id=${payload.id}`
     );
     return response.data;
   } catch (error) {

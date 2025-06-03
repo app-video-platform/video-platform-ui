@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { ProductType } from '../../../../../api/models/product/product.types';
 import Button from '../../../../../components/button/button.component';
@@ -16,6 +16,8 @@ import FormInput from '../../../../../components/form-input/form-input.component
 
 import './section-editor.styles.scss';
 import { IUpdateSectionDetails } from '../../../../../api/models/product/product';
+import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
+import { IRemoveItemPayload } from '../../../../../api/services/products/products-api';
 
 export interface NewProductSectionFormData {
   id: string;
@@ -44,6 +46,8 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   onRemoveFromParent,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+
+  const user = useSelector(selectAuthUser);
 
   const safeSectionData: NewProductSectionFormData = {
     id: sectionData?.id || '',
@@ -80,10 +84,20 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   };
 
   const handleRemove = () => {
+    if (!user || !user.id) {
+      console.error('User ID is not available for removal');
+      return;
+    }
+
     console.log('Remove section:', localData.id);
 
     if (localData.id) {
-      dispatch(deleteSection(localData.id))
+      const removeSectionPayload: IRemoveItemPayload = {
+        id: localData.id,
+        userId: user.id, // Replace with actual user ID from auth state if needed
+      };
+
+      dispatch(deleteSection(removeSectionPayload))
         .unwrap()
         .then(() => {
           console.log('Section deleted from backend:', localData.id);
@@ -99,10 +113,16 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   };
 
   const handleUpdate = () => {
+    if (!user || !user.id) {
+      console.error('User ID is not available for update');
+      return;
+    }
+
     const updatedSection: IUpdateSectionDetails = {
       ...localData,
       position: index,
       productId: productId,
+      userId: user.id, // Replace with actual user ID from auth state if needed
     };
 
     // Dispatch the update from inside the child
@@ -111,12 +131,6 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       .then((updated) => {
         console.log('Section updated from child:', updated);
         // Optionally sync localData to match the “confirmed” updated data:
-        setLocalData({
-          ...updated,
-          id: updated.id ?? '',
-          title: updated.title ?? '',
-          description: updated.description ?? '',
-        });
       })
       .catch((err) => {
         console.error('Failed to update section (child):', err);
@@ -134,6 +148,11 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       return;
     }
 
+    if (!user || !user.id) {
+      console.error('User ID is not available for creation');
+      return;
+    }
+
     if (!localData.title) {
       console.warn('Section title is required for creation');
       window.alert('Section title is required for creation');
@@ -146,6 +165,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       description: localData.description,
       position: index,
       productId: productId,
+      userId: user.id, // Replace with actual user ID from auth state if needed
     };
 
     dispatch(createSection(newSection))
