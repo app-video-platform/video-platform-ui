@@ -13,7 +13,10 @@ import {
 import BoxSelector from '../../../../../components/box-selector/box-selector.component';
 import UppyFileUploader from '../../../../../components/uppy-file-uploader/uppy-file-uploader.component';
 import RichTextEditor from '../../../../../components/rich-text-editor/rich-text-editor.component';
-import { ILesson } from '../../../../../api/models/product/lesson';
+import {
+  ICreateLessonPayload,
+  ILesson,
+} from '../../../../../api/models/product/lesson';
 import { LessonType } from '../../../../../api/models/product/product.types';
 
 import { MdDeleteForever } from 'react-icons/md';
@@ -93,8 +96,18 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       return;
     }
 
-    const createLessonPayload = {
+    if (!formData.title) {
+      window.alert('Lesson title is required');
+      return;
+    }
+    if (!formData.type) {
+      window.alert('Lesson type is required');
+      return;
+    }
+
+    const createLessonPayload: ICreateLessonPayload = {
       title: formData.title,
+      type: formData.type, // Default to VIDEO if not specified
       description: formData.description,
       position: index + 1, // Assuming position is based on the index
       sectionId: sectionId, // Assuming lesson has a sectionId
@@ -259,6 +272,8 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           availableOptions={['VIDEO', 'TEXT', 'QUIZ']} // Example lesson types
           disabledOptions={[]} // Add any disabled options if needed
         />
+
+        {}
 
         <div className="content-field">
           {isLessonCreated ? (

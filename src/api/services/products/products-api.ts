@@ -124,7 +124,7 @@ export const updateSectionDetailsAPI = async (
 export const deleteSectionAPI = async (payload: IRemoveItemPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      `api/products/section?userId=${payload.userId}&id=${payload.id}`
+      `api/products/course/section?userId=${payload.userId}&id=${payload.id}`
     );
     return response.data;
   } catch (error) {
@@ -168,7 +168,7 @@ export const updateLessonDetailsAPI = async (payload: ILesson) => {
 export const deleteLessonAPI = async (payload: IRemoveItemPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      `api/products/section/lesson?userId=${payload.userId}&id=${payload.id}`
+      `api/products/course/section/lesson?userId=${payload.userId}&id=${payload.id}`
     );
     return response.data;
   } catch (error) {
