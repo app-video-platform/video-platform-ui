@@ -3,7 +3,7 @@
  * (Place this file in the same directory as section-editor.component.tsx)
  */
 
-import React from 'react';
+import React, { use } from 'react';
 import {
   render,
   screen,
@@ -17,8 +17,14 @@ import '@testing-library/jest-dom';
 jest.mock('react-redux', () => ({
   __esModule: true,
   useDispatch: jest.fn(),
+  useSelector: jest.fn(),
 }));
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+jest.mock('../../../../../store/auth-store/auth.selectors', () => ({
+  selectAuthUser: jest.fn(),
+}));
+import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
 
 // ── 2) MOCK product-store thunks ─────────────────────────────────────────────────
 jest.mock('../../../../../store/product-store/product.slice', () => ({
@@ -147,6 +153,9 @@ describe('<SectionEditor />', () => {
   const mockedUseDispatch = useDispatch as jest.MockedFunction<
     typeof useDispatch
   >;
+  const mockedUseSelector = useSelector as jest.MockedFunction<
+    typeof useSelector
+  >;
   const mockedCreateSection = createSection as jest.MockedFunction<
     typeof createSection
   >;
@@ -184,6 +193,12 @@ describe('<SectionEditor />', () => {
     }));
     mockedUseDispatch.mockReturnValue(fakeDispatch as any);
 
+    mockedUseSelector.mockImplementation((selector) => {
+      if (selector === selectAuthUser) {
+        return { id: 'user-123' };
+      }
+      return undefined;
+    });
     mockedCreateSection.mockReset();
     mockedUpdateSection.mockReset();
     mockedDeleteSection.mockReset();
@@ -249,7 +264,10 @@ describe('<SectionEditor />', () => {
     });
 
     // Verify deleteSection call
-    expect(mockedDeleteSection).toHaveBeenCalledWith('to-remove');
+    expect(mockedDeleteSection).toHaveBeenCalledWith({
+      id: 'to-remove',
+      userId: 'user-123',
+    });
     expect(fakeDispatch).toHaveBeenCalledWith(fakeThunk);
 
     // Wait for unwrap() → then parent callback

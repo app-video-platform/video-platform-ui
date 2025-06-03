@@ -5,7 +5,10 @@ import { AppDispatch } from '../../../store/store';
 import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 
 import './create-new-product.styles.scss';
-import { updateCourseProductDetails } from '../../../store/product-store/product.slice';
+import {
+  deleteProduct,
+  updateCourseProductDetails,
+} from '../../../store/product-store/product.slice';
 import Button from '../../../components/button/button.component';
 import PriceSelector from '../../../components/price-selector/price-selector.component';
 import UppyFileUploader from '../../../components/uppy-file-uploader/uppy-file-uploader.component';
@@ -13,6 +16,7 @@ import CreateProductStepOne from './editors/create-product-step-one/create-produ
 import CreateProductSections from './create-product-sections/create-product-sections.component';
 import { IUpdateCourseProduct } from '../../../api/models/product/product';
 import { ProductType } from '../../../api/models/product/product.types';
+import { IRemoveProductPayload } from '../../../api/services/products/products-api';
 
 export interface NewProductFormData {
   id: string; // Initially empty, will be set after product creation
@@ -135,6 +139,36 @@ const CreateNewProduct: React.FC = () => {
     []
   );
 
+  const handleProductRemove = async () => {
+    if (!formData.id) {
+      console.error('Product ID is not set. Cannot remove product.');
+      return;
+    }
+
+    if (!user || !user.id) {
+      console.error('User ID is not available for product removal');
+      return;
+    }
+
+    const deleteProductPayload: IRemoveProductPayload = {
+      id: formData.id,
+      userId: user.id,
+      productType: formData.type, // Assuming the product type is 'COURSE'
+    };
+
+    dispatch(deleteProduct(deleteProductPayload))
+      .unwrap()
+      .then(() => {
+        console.log('Product removed successfully');
+        window.alert('Product removed successfully');
+        // Optionally redirect or reset form state here
+      })
+      .catch((error) => {
+        console.error('Failed to remove product:', error);
+        window.alert('Failed to remove product. Please try again.');
+      });
+  };
+
   if (!user || !user.id) {
     return <p>You must be logged in to create a product.</p>;
   }
@@ -146,11 +180,20 @@ const CreateNewProduct: React.FC = () => {
           <h1>Create New Product</h1>
 
           {showRestOfForm && (
-            <Button
-              type="primary"
-              text="Update product details"
-              htmlType="submit"
-            />
+            <>
+              <Button
+                type="primary"
+                text="Update product details"
+                htmlType="submit"
+              />
+
+              <Button
+                type="secondary"
+                text="DELETE"
+                htmlType="button"
+                onClick={handleProductRemove}
+              />
+            </>
           )}
         </div>
 

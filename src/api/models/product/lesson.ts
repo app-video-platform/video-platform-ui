@@ -10,6 +10,7 @@ export interface ILesson {
   duration?: number; // Duration in seconds
   position: number; // Position in the section
   videoUrl?: string; // URL for video content
+  userId: string; // ID of the user who created the lesson
 }
 
 export interface ICreateLessonPayload {
@@ -18,6 +19,7 @@ export interface ICreateLessonPayload {
   type?: LessonType;
   position: number; // Position in the section
   sectionId: string; // ID of the section to which this lesson belongs
+  userId: string; // ID of the user creating the lesson
 }
 
 export interface ICreateLessonResponse {
@@ -27,4 +29,7 @@ export interface ICreateLessonResponse {
   type?: LessonType;
   sectionId: string;
   position: number;
+  userId: string;
+  content?: string; // URL or text content
+  videoUrl?: string; // URL for video content
 }

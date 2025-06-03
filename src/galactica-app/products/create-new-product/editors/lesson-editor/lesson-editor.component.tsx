@@ -1,10 +1,10 @@
 /* eslint-disable indent */
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 
 import FormInput from '../../../../../components/form-input/form-input.component';
 import Button from '../../../../../components/button/button.component';
 import { AppDispatch } from '../../../../../store/store';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   createLesson,
   deleteLesson,
@@ -19,6 +19,8 @@ import { LessonType } from '../../../../../api/models/product/product.types';
 import { MdDeleteForever } from 'react-icons/md';
 import './lesson-editor.styles.scss';
 import { set } from 'react-hook-form';
+import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
+import { IRemoveItemPayload } from '../../../../../api/services/products/products-api';
 interface LessonEditorProps {
   lesson: ILesson;
   index: number;
@@ -41,6 +43,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   removeLessonFromList,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector(selectAuthUser);
 
   const [formData, setFormData] = React.useState<LessonFormData>({
     title: '',
@@ -85,11 +88,17 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     // Logic to create a new lesson
     console.log('Creating lesson with data:', formData);
 
+    if (!user || !user.id) {
+      console.error('User ID is not available');
+      return;
+    }
+
     const createLessonPayload = {
       title: formData.title,
       description: formData.description,
       position: index + 1, // Assuming position is based on the index
       sectionId: sectionId, // Assuming lesson has a sectionId
+      userId: user.id, // User ID from the auth state
     };
 
     dispatch(createLesson(createLessonPayload))
@@ -111,6 +120,10 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   };
 
   const handleUpdateLesson = () => {
+    if (!user || !user.id) {
+      console.error('User ID is not available for update');
+      return;
+    }
     // Logic to update an existing lesson
     console.log('Updating lesson with data:', formData);
 
@@ -119,6 +132,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       id: lesson.id || formData.id, // Assuming lesson has an id
       sectionId: sectionId, // Assuming lesson has a sectionId
       position: index + 1, // Assuming position is based on the index
+      userId: user.id, // User ID from the auth state
     };
 
     dispatch(updateLessonDetails(updateLessonPayload))
@@ -137,10 +151,19 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   };
 
   const handleDeleteLesson = () => {
+    if (!user || !user.id) {
+      console.error('User ID is not available for deletion');
+      return;
+    }
     console.log('Deleting lesson:', formData.id);
 
     if (formData.id) {
-      dispatch(deleteLesson(formData.id))
+      const removeLessonPayload: IRemoveItemPayload = {
+        id: formData.id, // Use the ID from formData
+        userId: user.id, // Ensure user ID is available
+      };
+
+      dispatch(deleteLesson(removeLessonPayload))
         .unwrap()
         .then(() => {
           console.log('Lesson deleted successfully');
