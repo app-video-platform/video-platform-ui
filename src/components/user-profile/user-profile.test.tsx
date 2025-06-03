@@ -9,11 +9,11 @@ import '@testing-library/jest-dom';
 // Mock react-redux and react-router-dom hooks
 jest.mock('react-redux', () => ({
   useDispatch: jest.fn(),
-  useSelector: jest.fn()
+  useSelector: jest.fn(),
 }));
 
 jest.mock('react-router-dom', () => ({
-  useNavigate: jest.fn()
+  useNavigate: jest.fn(),
 }));
 
 describe('UserProfileDropdown component', () => {
@@ -21,7 +21,7 @@ describe('UserProfileDropdown component', () => {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john.doe@example.com',
-    role: ['admin', 'user']
+    role: ['admin', 'user'],
   };
 
   let mockDispatch: jest.Mock;
@@ -49,7 +49,7 @@ describe('UserProfileDropdown component', () => {
   it('renders the user profile button and toggles dropdown on click', () => {
     render(<UserProfileDropdown />);
     // Verify the profile button displays the user's first and last name.
-    const profileButton = screen.getByRole('button', { name: /john doe/i });
+    const profileButton = screen.getByRole('button', { name: /jd/i });
     expect(profileButton).toBeInTheDocument();
 
     // Initially, the dropdown menu should not be visible.
@@ -63,7 +63,7 @@ describe('UserProfileDropdown component', () => {
 
   it('closes the dropdown when clicking outside', () => {
     render(<UserProfileDropdown />);
-    const profileButton = screen.getByRole('button', { name: /john doe/i });
+    const profileButton = screen.getByRole('button', { name: /jd/i });
     // Open the dropdown.
     fireEvent.click(profileButton);
     expect(screen.getByText(/john\.doe@example\.com/i)).toBeInTheDocument();
@@ -79,7 +79,7 @@ describe('UserProfileDropdown component', () => {
     mockDispatch.mockReturnValueOnce({ unwrap: () => Promise.resolve() }); // For dispatch(logoutUser())
 
     render(<UserProfileDropdown />);
-    const profileButton = screen.getByRole('button', { name: /john doe/i });
+    const profileButton = screen.getByRole('button', { name: /jd/i });
     // Open the dropdown.
     fireEvent.click(profileButton);
 

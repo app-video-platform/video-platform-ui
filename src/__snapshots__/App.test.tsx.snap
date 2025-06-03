@@ -35,9 +35,15 @@ exports[`App Component matches snapshot after navigation 1`] = `
             Pricing
           </a>
         </li>
-        <li>
-          Galactica App
-        </li>
+        <div
+          class="galactica-dropdown"
+        >
+          <button
+            class="galactica-dropdown-button"
+          >
+            Galactica App
+          </button>
+        </div>
         <li>
           <a
             href="/contact"

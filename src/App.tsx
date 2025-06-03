@@ -19,6 +19,7 @@ import UserDashboard from './galactica-app/user-dashboard/user-dashboard.compone
 import Onboarding from './galactica-app/onboarding/onboarding.component';
 import ForgotPassword from './pages/forgot-password/forgot-password.component';
 import CreateNewProduct from './galactica-app/products/create-new-product/create-new-product.component';
+import Pricing from './pages/pricing/pricing.component';
 
 const App = () => (
   <AppInitializer>
@@ -27,6 +28,7 @@ const App = () => (
         <Route index element={<Home />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="pricing" element={<Pricing />} />
       </Route>
       <Route path="signup" element={<SignUp />} />
       <Route path="signin" element={<SignIn />} />

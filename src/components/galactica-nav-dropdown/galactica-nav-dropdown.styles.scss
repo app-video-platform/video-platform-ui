@@ -1,0 +1,13 @@
+.galactica-dropdown {
+  position: relative;
+
+  .galactica-dropdown-menu {
+    position: absolute;
+    right: 0;
+    width: 150px;
+    background-color: lightblue;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

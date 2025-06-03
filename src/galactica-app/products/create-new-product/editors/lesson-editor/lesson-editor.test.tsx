@@ -276,7 +276,7 @@ describe('<LessonEditor />', () => {
 
     // BoxSelector should have selected “TEXT”
     // The “box-TEXT” button should be bold (we set style based on selectedOption)
-    const textButton = screen.getByTestId('box-TEXT');
+    const textButton = screen.getByTestId('box-ARTICLE');
     expect(textButton).toBeInTheDocument();
 
     // Because lesson.id exists, isLessonCreated → true:
@@ -323,7 +323,7 @@ describe('<LessonEditor />', () => {
 
     // BoxSelector: no option selected initially, but buttons exist
     expect(screen.getByTestId('box-VIDEO')).toBeInTheDocument();
-    expect(screen.getByTestId('box-TEXT')).toBeInTheDocument();
+    expect(screen.getByTestId('box-ARTICLE')).toBeInTheDocument();
     expect(screen.getByTestId('box-QUIZ')).toBeInTheDocument();
 
     // Since isLessonCreated=false, “Create Lesson” button should show, disabled because title is empty
@@ -333,6 +333,7 @@ describe('<LessonEditor />', () => {
 
     // Type a title → onChange should call setFormData, enabling the button
     fireEvent.change(titleInput, { target: { value: 'New Title' } });
+    fireEvent.click(screen.getByTestId('box-VIDEO'));
     expect(createBtn).toBeEnabled();
 
     // Mock createLesson to return a fake thunk
@@ -349,6 +350,7 @@ describe('<LessonEditor />', () => {
       title: 'New Title',
       description: '',
       position: 1,
+      type: 'VIDEO',
       sectionId: 'sec-1',
       userId: 'user-123', // from mocked useSelector
     });
@@ -397,7 +399,7 @@ describe('<LessonEditor />', () => {
     expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
 
     // Select “TEXT” type
-    fireEvent.click(screen.getByTestId('box-TEXT'));
+    fireEvent.click(screen.getByTestId('box-ARTICLE'));
 
     // Now RichTextEditor should be in the DOM instead of file-uploader
     expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();

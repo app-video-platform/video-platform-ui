@@ -9,12 +9,11 @@ import './nav.styles.scss';
 import { useSelector } from 'react-redux';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import Footer from '../../components/footer/footer.component';
+import GalacticaNavDropdown from '../../components/galactica-nav-dropdown/galactica-nav-dropdown.component';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
-
-
 
   const handleRedirect = (url: '/signup' | '/signin') => {
     navigate(url);
@@ -22,17 +21,25 @@ const Navigation: React.FC = () => {
 
   return (
     <Fragment>
-      <nav className='website-navbar'>
-        <div className='navbar-content'>
+      <nav className="website-navbar">
+        <div className="navbar-content">
           <div className="logo-container"></div>
           {/* <div className="nav-links"> */}
           <ul className="nav-link-list">
-            <li><Link to={'/'}>Home</Link></li>
-            <li><Link to={'/about'}>About</Link></li>
-            <li><Link to={'/pricing'}>Pricing</Link></li>
-            <li>Galactica App</li>
+            <li>
+              <Link to={'/'}>Home</Link>
+            </li>
+            <li>
+              <Link to={'/about'}>About</Link>
+            </li>
+            <li>
+              <Link to={'/pricing'}>Pricing</Link>
+            </li>
+            <GalacticaNavDropdown />
 
-            <li><Link to={'/contact'}>Contact Us</Link></li>
+            <li>
+              <Link to={'/contact'}>Contact Us</Link>
+            </li>
 
             {/* <li>Home</li>
             <li>About</li>
@@ -50,10 +57,18 @@ const Navigation: React.FC = () => {
                   <GoogleSignInButton data-test-id='google-sign-in-button' />
                 </li> */}
                   <li>
-                    <Button onClick={() => handleRedirect('/signin')} type='secondary' text='Sign In' />
+                    <Button
+                      onClick={() => handleRedirect('/signin')}
+                      type="secondary"
+                      text="Sign In"
+                    />
                   </li>
                   <li>
-                    <Button onClick={() => handleRedirect('/signup')} type='primary' text='Register' />
+                    <Button
+                      onClick={() => handleRedirect('/signup')}
+                      type="primary"
+                      text="Register"
+                    />
                   </li>
                 </ul>
               )}

@@ -6,7 +6,7 @@ import { logout, logoutUser } from '../../store/auth-store/auth.slice';
 import './user-profile.styles.scss';
 import { useNavigate } from 'react-router-dom';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
-
+import { get } from 'http';
 
 // Custom hook to handle clicks outside of a given ref.
 function useOnClickOutside<T extends HTMLElement>(
@@ -40,7 +40,7 @@ const UserProfileDropdown: React.FC = () => {
 
   // Toggle dropdown open/close
   const handleToggle = () => {
-    setOpen(prev => !prev);
+    setOpen((prev) => !prev);
   };
 
   // Log the user out
@@ -59,12 +59,20 @@ const UserProfileDropdown: React.FC = () => {
       });
   };
 
-  if (!user) { return null; }
+  const getProfileNameInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
+    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+    return `${firstInitial}${lastInitial}`;
+  };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="user-profile-dropdown" ref={dropdownRef}>
       <button onClick={handleToggle} className="user-profile-button">
-        {user.firstName} {user.lastName}
+        {getProfileNameInitials(user.firstName, user.lastName)}
       </button>
       {open && (
         <div className="dropdown-menu">
@@ -72,7 +80,10 @@ const UserProfileDropdown: React.FC = () => {
             <span>{user.email}</span>
           </div>
           <div className="dropdown-item">
-            <span>Role: {Array.isArray(user.role) ? user.role.join(', ') : user.role}</span>
+            <span>
+              Role:{' '}
+              {Array.isArray(user.role) ? user.role.join(', ') : user.role}
+            </span>
           </div>
           <hr />
           <div className="dropdown-item logout-btn" onClick={handleLogout}>
