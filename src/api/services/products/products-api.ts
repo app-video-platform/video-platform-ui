@@ -15,7 +15,7 @@ import {
 import { ProductType } from '../../models/product/product.types';
 
 export interface IProductResponse {
-  type?: string;
+  type?: ProductType;
   id: string;
   name?: string;
   description?: string;
@@ -210,7 +210,7 @@ export const getProductByProductIdAPI = async (
   productType: ProductType
 ) => {
   try {
-    const response = await httpClient.get<DownloadProduct>(
+    const response = await httpClient.get<IProductResponse>(
       `api/products/getProduct?productId=${productId}&type=${productType}`
     );
     return response.data;

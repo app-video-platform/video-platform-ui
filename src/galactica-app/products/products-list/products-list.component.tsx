@@ -19,56 +19,62 @@ const ProductsList: React.FC = () => {
     if (user && user.id) {
       dispatch(getAllProductsByUserId(user.id));
     } else {
-      dispatch(getAllProductsByUserId('user-id-alex-bej')).unwrap().then(data => console.log('data from call in useeffect', data));
+      dispatch(getAllProductsByUserId('user-id-alex-bej'))
+        .unwrap()
+        .then((data) => console.log('data from call in useeffect', data));
     }
   }, [dispatch, user]);
 
   return (
     <div>
-      <div className='products-header'>
+      <div className="products-header">
         <h1>Products</h1>
-        <button className='add-product-btn' onClick={() => navigate('create-course')}>+ (tmp) Add COURSE</button>
-        <button className='add-product-btn' onClick={() => navigate('create')}>+ Add product</button>
+        <button
+          className="add-product-btn"
+          onClick={() => navigate('create-course')}
+        >
+          + (tmp) Add COURSE
+        </button>
+        <button className="add-product-btn" onClick={() => navigate('create')}>
+          + Add product
+        </button>
       </div>
-      {
-        products && products.length > 0 ? (
-
-          <table className='products-table'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Customers</th>
-                <th>Actions</th>
-
-
+      {products && products.length > 0 ? (
+        <table className="products-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Customers</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products?.map((product) => (
+              <tr key={product.id}>
+                <td>{product.name}</td>
+                <td>{product.type}</td>
+                <td>{product.price}</td>
+                <td>{product.status}</td>
+                <td>000</td>
+                <td>
+                  <button
+                    onClick={() =>
+                      navigate(`edit/${product.type}/${product.id}`)
+                    }
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {products?.map((product) => (
-
-                <tr key={product.id}>
-                  <td>{product.name}</td>
-                  <td>{product.type}</td>
-                  <td>{product.price}</td>
-                  <td>{product.status}</td>
-                  {/* <td>{product.customers}</td> */}
-                  <td><button onClick={() => navigate(`edit/${product.type}/${product.id}`)}>Edit</button></td>
-                </tr>
-              ))}
-
-            </tbody>
-          </table>
-
-
-        ) : (
-          <p>There are no products to show</p>
-        )
-
-      }
-
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>There are no products to show</p>
+      )}
     </div>
   );
 };

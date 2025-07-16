@@ -4,10 +4,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../../store/store';
 
-import {
-  FormErrors,
-  NewProductFormData,
-} from '../../create-new-product.component';
+import { FormErrors, NewProductFormData } from '../../product-form.component';
 import FormInput from '../../../../../components/form-input/form-input.component';
 import Button from '../../../../../components/button/button.component';
 import { createCourseProduct } from '../../../../../store/product-store/product.slice';

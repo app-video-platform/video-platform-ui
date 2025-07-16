@@ -1,12 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AppDispatch } from '../../../store/store';
 import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 
-import './create-new-product.styles.scss';
+import './product-form.styles.scss';
 import {
   deleteProduct,
+  getProductByProductId,
   updateCourseProductDetails,
 } from '../../../store/product-store/product.slice';
 import Button from '../../../components/button/button.component';
@@ -17,6 +18,7 @@ import CreateProductSections from './create-product-sections/create-product-sect
 import { IUpdateCourseProduct } from '../../../api/models/product/product';
 import { ProductType } from '../../../api/models/product/product.types';
 import { IRemoveProductPayload } from '../../../api/services/products/products-api';
+import { useParams } from 'react-router-dom';
 
 export interface NewProductFormData {
   id: string; // Initially empty, will be set after product creation
@@ -33,7 +35,9 @@ export interface FormErrors {
   api?: string;
 }
 
-const CreateNewProduct: React.FC = () => {
+const ProductForm: React.FC = () => {
+  const { type, id } = useParams();
+  const isEditMode = Boolean(id);
   const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector(selectAuthUser);
@@ -53,6 +57,34 @@ const CreateNewProduct: React.FC = () => {
   const [showLoadingRestOfForm, setShowLoadingRestOfForm] = useState(false);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    if (isEditMode && id) {
+      dispatch(
+        getProductByProductId({
+          productId: id,
+          productType: type as ProductType,
+        })
+      )
+        .unwrap()
+        .then((product) => {
+          console.log('Loaded product data:', product);
+          setFormData({
+            id: product.id,
+            name: product.name ?? '',
+            description: product.description ?? '',
+            type: product.type ?? ('COURSE' as ProductType),
+            price: product.price ?? 'free',
+            sections: product.sections || [],
+          });
+          setShowRestOfForm(true);
+        })
+        .catch((error) => {
+          console.error('Failed to load product data', error);
+          setErrors({ api: 'Could not load product data' });
+        });
+    }
+  }, [isEditMode, id]);
 
   const handleSetPrice = (price: number | 'free') => {
     setFormData((prev) => ({ ...prev, price: price }));
@@ -248,4 +280,4 @@ const CreateNewProduct: React.FC = () => {
   );
 };
 
-export default CreateNewProduct;
+export default ProductForm;

@@ -16,6 +16,7 @@ import {
   deleteProductAPI,
   IRemoveItemPayload,
   IRemoveProductPayload,
+  getProductByProductIdAPI,
 } from '../../api/services/products/products-api';
 import {
   ICreateLessonResponse,
@@ -29,6 +30,7 @@ import {
   ICreateProduct,
   IUpdateProduct,
 } from '../../api/models/product/product';
+import { ProductType } from '../../api/models/product/product.types';
 
 interface ProductState {
   products: null | IProductResponse[];
@@ -245,6 +247,24 @@ export const addImageToProduct = createAsyncThunk<
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Creating Product Failed'
+      );
+    }
+  }
+);
+
+export const getProductByProductId = createAsyncThunk<
+  IProductResponse, // Return type: Product[]
+  { productId: string; productType: ProductType }, // Argument type (productId, productType)
+  { rejectValue: string } // Error type
+>(
+  'products/getProductByProductId',
+  async ({ productId, productType }, { rejectWithValue }) => {
+    try {
+      const response = await getProductByProductIdAPI(productId, productType);
+      return response; // API returns user info with token
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Retrieving Product Failed'
       );
     }
   }
@@ -547,6 +567,26 @@ const productsSlice = createSlice({
         }
       )
       .addCase(updateLessonDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.message = null;
+      })
+
+      .addCase(getProductByProductId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.message = null;
+      })
+      .addCase(
+        getProductByProductId.fulfilled,
+        (state, action: PayloadAction<IProductResponse>) => {
+          state.loading = false;
+          state.error = null;
+
+          state.currentProduct = action.payload;
+        }
+      )
+      .addCase(getProductByProductId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         state.message = null;
