@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /**
- * create-new-product.test.tsx
+ * product-form.test.tsx
  */
 
 import React from 'react';
@@ -143,7 +143,7 @@ afterEach(() => {
   cleanup();
 });
 
-describe('<CreateNewProduct />', () => {
+describe('<ProductForm />', () => {
   test('renders “must be logged in” if no user', () => {
     mockedUseSelector.mockImplementation((selector) => {
       if (selector === selectAuthUser) {
@@ -153,10 +153,8 @@ describe('<CreateNewProduct />', () => {
     });
 
     // Import the component normally (uses the default mock CreateProductStepOne)
-    const {
-      default: CreateNewProduct,
-    } = require('./create-new-product.component');
-    render(<CreateNewProduct />);
+    const { default: ProductForm } = require('./product-form.component');
+    render(<ProductForm />);
 
     expect(
       screen.getByText('You must be logged in to create a product.')
@@ -171,10 +169,8 @@ describe('<CreateNewProduct />', () => {
       return undefined;
     });
 
-    const {
-      default: CreateNewProduct,
-    } = require('./create-new-product.component');
-    render(<CreateNewProduct />);
+    const { default: ProductForm } = require('./product-form.component');
+    render(<ProductForm />);
 
     expect(screen.getByTestId('step-one-continue')).toBeInTheDocument();
     expect(screen.queryByTestId('price-selector')).not.toBeInTheDocument();
@@ -193,10 +189,8 @@ describe('<CreateNewProduct />', () => {
       return undefined;
     });
 
-    const {
-      default: CreateNewProduct,
-    } = require('./create-new-product.component');
-    render(<CreateNewProduct />);
+    const { default: ProductForm } = require('./product-form.component');
+    render(<ProductForm />);
 
     fireEvent.click(screen.getByTestId('step-one-continue'));
 
@@ -218,9 +212,7 @@ describe('<CreateNewProduct />', () => {
 
     // Use the original CreateProductStepOne (the one that *does* fill id/name/type)
     // Since we mocked it at top, we can just re‐require the component:
-    const {
-      default: CreateNewProduct,
-    } = require('./create-new-product.component');
+    const { default: ProductForm } = require('./product-form.component');
 
     // When updateCourseProductDetails is called, return a fake thunk
     const fakeThunk = Symbol('fakeThunk');
@@ -237,7 +229,7 @@ describe('<CreateNewProduct />', () => {
     // Spy on alert
     const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
-    render(<CreateNewProduct />);
+    render(<ProductForm />);
 
     // 1) Click the “Continue” button (populates formData and sets showRestOfForm=true)
     fireEvent.click(screen.getByTestId('step-one-continue'));
