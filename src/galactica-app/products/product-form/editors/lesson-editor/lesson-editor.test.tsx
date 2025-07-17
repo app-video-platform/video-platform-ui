@@ -471,14 +471,14 @@ describe('<LessonEditor />', () => {
       userId: 'user-123',
     };
 
-    // // Make deleteLesson return fake thunk
-    // const fakeDeleteThunk = Symbol('fakeDelete');
-    // mockedDeleteLesson.mockReturnValue(fakeDeleteThunk as any);
+    // Mock deleteLesson to return a thunk
+    const fakeDeleteThunk = Symbol('fakeDelete');
+    mockedDeleteLesson.mockReturnValue(fakeDeleteThunk as any);
 
-    // // fakeDispatch for delete unwrap
-    // fakeDispatch.mockImplementation((action) => ({
-    //   unwrap: () => Promise.resolve({}),
-    // }));
+    // Set up dispatch to handle the thunk and unwrap
+    fakeDispatch.mockImplementation((action) => ({
+      unwrap: () => Promise.resolve({}),
+    }));
 
     render(
       <LessonEditor
@@ -490,28 +490,15 @@ describe('<LessonEditor />', () => {
     );
 
     // Click the delete icon
-    fireEvent.click(screen.getByRole('button', { name: '' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '' }));
+    });
 
-    // Because formData.id was wiped out by useEffect, deleteLesson(...) is NOT called.
-    expect(mockedDeleteLesson).not.toHaveBeenCalled();
-
-    // Instead, removeLessonFromList should be called immediately with index=3
+    expect(mockedDeleteLesson).toHaveBeenCalledWith({
+      id: 'to-delete',
+      userId: 'user-123',
+    });
+    expect(fakeDispatch).toHaveBeenCalledWith(fakeDeleteThunk);
     expect(removeLessonMock).toHaveBeenCalledWith(3);
-
-    // // Click delete icon
-    // await act(async () => {
-    //   fireEvent.click(screen.getByRole('button', { name: '' }));
-    // });
-
-    // // deleteLesson should have been called with the lesson id
-    // expect(mockedDeleteLesson).toHaveBeenCalledWith('to-delete');
-    // // Dispatch should have been called with fakeDeleteThunk
-    // expect(fakeDispatch).toHaveBeenCalledWith(fakeDeleteThunk);
-
-    // // Wait for unwrap() → then removeLessonFromList
-    // await act(async () => {
-    //   await Promise.resolve();
-    // });
-    // expect(removeLessonMock).toHaveBeenCalledWith(3);
   });
 });

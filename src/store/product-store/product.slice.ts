@@ -1,12 +1,10 @@
+/* eslint-disable indent */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   addImageToProductAPI,
-  IProductResponse,
   createCourseProductAPI,
-  createNewProductAPI,
   getAllProductsByUserIdAPI,
   updateCourseDetailsAPI,
-  updateProductAPI,
   updateSectionDetailsAPI,
   createSectionAPI,
   createLessonAPI,
@@ -14,23 +12,19 @@ import {
   deleteLessonAPI,
   deleteSectionAPI,
   deleteProductAPI,
-  IRemoveItemPayload,
-  IRemoveProductPayload,
   getProductByProductIdAPI,
 } from '../../api/services/products/products-api';
-import {
-  ICreateLessonResponse,
-  ICreateLessonPayload,
-  ILesson,
-} from '../../api/models/product/lesson';
+import { ICreateLessonPayload, ILesson } from '../../api/models/product/lesson';
 import {
   INewProductPayload,
   IUpdateCourseProduct,
   IUpdateSectionDetails,
-  ICreateProduct,
-  IUpdateProduct,
+  IProductResponse,
+  IRemoveProductPayload,
+  IRemoveItemPayload,
 } from '../../api/models/product/product';
 import { ProductType } from '../../api/models/product/product.types';
+import { AxiosError } from 'axios';
 
 interface ProductState {
   products: null | IProductResponse[];
@@ -49,6 +43,15 @@ const initialState: ProductState = {
   message: null,
 };
 
+export const extractErrorMessage = (err: unknown): string => {
+  if (err instanceof AxiosError && err.response?.data?.message) {
+    return err.response.data.message;
+  } else if (err instanceof Error) {
+    return err.message;
+  }
+  return 'An unknown error occurred';
+};
+
 export const createCourseProduct = createAsyncThunk<
   IProductResponse, // what this thunk returns on success
   INewProductPayload, // the argument you pass in
@@ -57,10 +60,8 @@ export const createCourseProduct = createAsyncThunk<
   try {
     const response = await createCourseProductAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message || err.message || 'Failed to create product'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -72,10 +73,8 @@ export const updateCourseProductDetails = createAsyncThunk<
   try {
     const response = await updateCourseDetailsAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message || err.message || 'Failed to update product'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -87,10 +86,8 @@ export const deleteProduct = createAsyncThunk<
   try {
     const response = await deleteProductAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message || err.message || 'Failed to delete product'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -102,10 +99,8 @@ export const createSection = createAsyncThunk<
   try {
     const response = await createSectionAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message || err.message || 'Failed to create section'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -117,12 +112,8 @@ export const updateSectionDetails = createAsyncThunk<
   try {
     const response = await updateSectionDetailsAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message ||
-        err.message ||
-        'Failed to update section details'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -134,25 +125,21 @@ export const deleteSection = createAsyncThunk<
   try {
     const response = await deleteSectionAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message || err.message || 'Failed to delete section'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
 export const createLesson = createAsyncThunk<
-  ICreateLessonResponse, // what this thunk returns on success
+  ILesson, // what this thunk returns on success
   ICreateLessonPayload, // the argument you pass in
   { rejectValue: string }
 >('products/createLesson', async (payload, thunkAPI) => {
   try {
     const response = await createLessonAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message || err.message || 'Failed to create lesson'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -164,12 +151,8 @@ export const updateLessonDetails = createAsyncThunk<
   try {
     const response = await updateLessonDetailsAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message ||
-        err.message ||
-        'Failed to update lesson details'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -181,10 +164,8 @@ export const deleteLesson = createAsyncThunk<
   try {
     const response = await deleteLessonAPI(payload);
     return response;
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(
-      err.response?.data?.message || err.message || 'Failed to delete lesson'
-    );
+  } catch (err: unknown) {
+    return thunkAPI.rejectWithValue(extractErrorMessage(err));
   }
 });
 
@@ -196,43 +177,10 @@ export const getAllProductsByUserId = createAsyncThunk<
   try {
     const response = await getAllProductsByUserIdAPI(idToken);
     return response; // API returns user info with token
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Signin failed');
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
   }
 });
-
-export const createNewProduct = createAsyncThunk<
-  IProductResponse, // Return type: Product[]
-  ICreateProduct, // Argument type (userId)
-  { rejectValue: string } // Error type
->('products/createNewProduct', async (product, { rejectWithValue }) => {
-  try {
-    const response = await createNewProductAPI(product);
-    return response; // API returns user info with token
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || 'Creating Product Failed'
-    );
-  }
-});
-
-export const updateProductDetails = createAsyncThunk<
-  IProductResponse, // Return type: Product[]
-  IUpdateProduct, // Argument type (userId)
-  { rejectValue: string } // Error type
->(
-  'products/updateProductDetails',
-  async (updatedProduct, { rejectWithValue }) => {
-    try {
-      const response = await updateProductAPI(updatedProduct);
-      return response; // API returns user info with token
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || 'Updating Product Failed'
-      );
-    }
-  }
-);
 
 export const addImageToProduct = createAsyncThunk<
   string, // Return type: Product[]
@@ -244,10 +192,8 @@ export const addImageToProduct = createAsyncThunk<
     try {
       const response = await addImageToProductAPI(image, productId);
       return response; // API returns user info with token
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || 'Creating Product Failed'
-      );
+    } catch (error: unknown) {
+      return rejectWithValue(extractErrorMessage(error));
     }
   }
 );
@@ -262,10 +208,8 @@ export const getProductByProductId = createAsyncThunk<
     try {
       const response = await getProductByProductIdAPI(productId, productType);
       return response; // API returns user info with token
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || 'Retrieving Product Failed'
-      );
+    } catch (error: unknown) {
+      return rejectWithValue(extractErrorMessage(error));
     }
   }
 );
@@ -366,48 +310,6 @@ const productsSlice = createSlice({
         state.error = action.payload || 'Error retrieving products';
       })
 
-      // createNewProduct
-      .addCase(createNewProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        createNewProduct.fulfilled,
-        (state, action: PayloadAction<IProductResponse>) => {
-          state.loading = false;
-          state.products ??= [];
-          state.products.push(action.payload);
-        }
-      )
-      .addCase(createNewProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Error creating new product';
-      })
-
-      // updateProductDetails
-      .addCase(updateProductDetails.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        updateProductDetails.fulfilled,
-        (state, action: PayloadAction<IProductResponse>) => {
-          state.loading = false;
-          if (state.products) {
-            const updatedProduct = action.payload;
-            const index = state.products?.findIndex(
-              (product) => product.id === updatedProduct.id
-            );
-            if (index !== -1) {
-              state.products[index] = updatedProduct;
-            }
-          }
-        }
-      )
-      .addCase(updateProductDetails.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Error updating product';
-      })
       .addCase(addImageToProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -526,7 +428,7 @@ const productsSlice = createSlice({
       })
       .addCase(
         createLesson.fulfilled,
-        (state, action: PayloadAction<ICreateLessonResponse>) => {
+        (state, action: PayloadAction<ILesson>) => {
           state.loading = false;
           state.error = null;
 

@@ -1,3 +1,7 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -15,9 +19,11 @@ import PriceSelector from '../../../components/price-selector/price-selector.com
 import UppyFileUploader from '../../../components/uppy-file-uploader/uppy-file-uploader.component';
 import CreateProductStepOne from './editors/create-product-step-one/create-product-step-one.component';
 import CreateProductSections from './create-product-sections/create-product-sections.component';
-import { IUpdateCourseProduct } from '../../../api/models/product/product';
+import {
+  IRemoveProductPayload,
+  IUpdateCourseProduct,
+} from '../../../api/models/product/product';
 import { ProductType } from '../../../api/models/product/product.types';
-import { IRemoveProductPayload } from '../../../api/services/products/products-api';
 import { useParams } from 'react-router-dom';
 
 export interface NewProductFormData {

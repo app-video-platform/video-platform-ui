@@ -1,4 +1,5 @@
 import { DownloadSection } from './download-section';
+import { ILesson } from './lesson';
 import { ProductType, ProductStatus } from './product.types';
 
 export interface BaseProduct {
@@ -33,13 +34,15 @@ export interface INewProductPayload {
   status: 'draft';
 }
 
-export interface ICreateCourseProduct {
-  name?: string;
-  description?: string; // Limit 420 characters
+export interface IProductResponse {
   type?: ProductType;
-  status?: ProductStatus;
-  userId: string;
+  id: string;
+  name?: string;
+  description?: string;
+  status?: string;
   price?: 'free' | number;
+  userId?: string;
+  sections?: Sectiunile[];
 }
 
 export interface IUpdateCourseProduct {
@@ -52,22 +55,6 @@ export interface IUpdateCourseProduct {
   id: string;
 }
 
-export interface IUpdateCourseDetailsPayload {
-  productId: string;
-  details: ICreateCourseProduct;
-}
-
-export interface IUpdateProduct {
-  id: string;
-  name: string;
-  description: string; // Limit 420 characters
-  type: ProductType;
-  status: ProductStatus;
-  userId: string;
-  price: 'free' | number;
-  sections: DownloadSection[];
-}
-
 export interface IUpdateSectionDetails {
   productId?: string;
   id?: string;
@@ -77,4 +64,22 @@ export interface IUpdateSectionDetails {
   content?: any;
   userId: string;
   files?: File[];
+}
+
+export interface Sectiunile {
+  id?: string;
+  title?: string;
+  description?: string;
+  position?: number;
+  content?: any; // Can be text, video, etc.
+  lessons?: ILesson[];
+}
+
+export interface IRemoveItemPayload {
+  id: string;
+  userId: string;
+}
+
+export interface IRemoveProductPayload extends IRemoveItemPayload {
+  productType: ProductType;
 }

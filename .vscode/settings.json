@@ -18,5 +18,6 @@
   },
   "editor.rulers": [
     150
-  ]
+  ],
+  "workbench.preferredDarkColorTheme": "Default High Contrast Light"
 }

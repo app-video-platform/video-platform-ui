@@ -1,47 +1,15 @@
+/* eslint-disable no-console */
 import httpClient from '../../http-client';
-import { DownloadProduct } from '../../models/product/download-product';
-import {
-  ILesson,
-  ICreateLessonPayload,
-  ICreateLessonResponse,
-} from '../../models/product/lesson';
+import { ILesson, ICreateLessonPayload } from '../../models/product/lesson';
 import {
   INewProductPayload,
+  IProductResponse,
+  IRemoveItemPayload,
+  IRemoveProductPayload,
   IUpdateCourseProduct,
   IUpdateSectionDetails,
-  ICreateProduct,
-  IUpdateProduct,
 } from '../../models/product/product';
 import { ProductType } from '../../models/product/product.types';
-
-export interface IProductResponse {
-  type?: ProductType;
-  id: string;
-  name?: string;
-  description?: string;
-  status?: string;
-  price?: 'free' | number;
-  userId?: string;
-  sections?: Sectiunile[];
-}
-
-export interface Sectiunile {
-  id?: string;
-  title?: string;
-  description?: string;
-  position?: number;
-  content?: any; // Can be text, video, etc.
-  lessons?: ILesson[];
-}
-
-export interface IRemoveItemPayload {
-  id: string;
-  userId: string;
-}
-
-export interface IRemoveProductPayload extends IRemoveItemPayload {
-  productType: ProductType;
-}
 
 export const createCourseProductAPI = async (payload: INewProductPayload) => {
   try {
@@ -135,7 +103,7 @@ export const deleteSectionAPI = async (payload: IRemoveItemPayload) => {
 
 export const createLessonAPI = async (payload: ICreateLessonPayload) => {
   try {
-    const response = await httpClient.post<ICreateLessonResponse>(
+    const response = await httpClient.post<ILesson>(
       'api/products/course/section/lesson',
       payload,
       {
@@ -189,22 +157,6 @@ export const getAllProductsByUserIdAPI = async (userId: string) => {
   }
 };
 
-export const createNewProductAPI = async (product: ICreateProduct) => {
-  try {
-    const response = await httpClient.post<IProductResponse>(
-      'api/products',
-      product,
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error creating new product:', error);
-    return Promise.reject(error || 'Failed to create product');
-  }
-};
-
 export const getProductByProductIdAPI = async (
   productId: string,
   productType: ProductType
@@ -220,22 +172,6 @@ export const getProductByProductIdAPI = async (
   }
 };
 
-export const updateProductAPI = async (updatedProduct: IUpdateProduct) => {
-  try {
-    const response = await httpClient.put<IProductResponse>(
-      'api/products',
-      updatedProduct
-    );
-    return response.data;
-  } catch (error) {
-    console.error(
-      `Error updating product with id ${updatedProduct.id}:`,
-      error
-    );
-    throw error;
-  }
-};
-
 export const addImageToProductAPI = async (image: File, productId: string) => {
   try {
     const response = await httpClient.post<string>(
@@ -245,19 +181,6 @@ export const addImageToProductAPI = async (image: File, productId: string) => {
     return response.data;
   } catch (error) {
     console.error(`Error adding image to product with id ${productId}:`, error);
-    throw error;
-  }
-};
-
-export const addFileToSectionAPI = async (file: File, sectionId: string) => {
-  try {
-    const response = await httpClient.post<string>(
-      'api/files/upload-section-file',
-      { file, sectionId }
-    );
-    return response.data;
-  } catch (error) {
-    console.error(`Error adding file to section with id ${sectionId}:`, error);
     throw error;
   }
 };

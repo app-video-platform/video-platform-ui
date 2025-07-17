@@ -1,3 +1,7 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,9 +19,11 @@ import CourseLessons from '../../course-lessons/course-lessons.component';
 import FormInput from '../../../../../components/form-input/form-input.component';
 
 import './section-editor.styles.scss';
-import { IUpdateSectionDetails } from '../../../../../api/models/product/product';
+import {
+  IRemoveItemPayload,
+  IUpdateSectionDetails,
+} from '../../../../../api/models/product/product';
 import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
-import { IRemoveItemPayload } from '../../../../../api/services/products/products-api';
 
 export interface NewProductSectionFormData {
   id: string;

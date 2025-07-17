@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
 /* eslint-disable indent */
 import React, { use, useEffect, useState } from 'react';
 
@@ -23,7 +27,8 @@ import { MdDeleteForever } from 'react-icons/md';
 import './lesson-editor.styles.scss';
 import { set } from 'react-hook-form';
 import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
-import { IRemoveItemPayload } from '../../../../../api/services/products/products-api';
+import { IRemoveItemPayload } from '../../../../../api/models/product/product';
+
 interface LessonEditorProps {
   lesson: ILesson;
   index: number;
@@ -71,6 +76,8 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         title: lesson.title || '',
         description: lesson.description || '',
         content: lesson.content || '',
+        id: lesson.id || '',
+        type: lesson.type || ('VIDEO' as LessonType),
       });
     }
 
@@ -140,9 +147,16 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     // Logic to update an existing lesson
     console.log('Updating lesson with data:', formData);
 
+    const lessonId = lesson.id ?? formData.id;
+
+    if (!lessonId) {
+      console.error('Lesson ID is not available for update');
+      return;
+    }
+
     const updateLessonPayload: ILesson = {
       ...formData,
-      id: lesson.id || formData.id, // Assuming lesson has an id
+      id: lessonId,
       sectionId: sectionId, // Assuming lesson has a sectionId
       position: index + 1, // Assuming position is based on the index
       userId: user.id, // User ID from the auth state
