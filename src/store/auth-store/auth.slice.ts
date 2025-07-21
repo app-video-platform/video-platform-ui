@@ -10,24 +10,29 @@ import { getUserProfileAPI } from '../../api/services/user/user-api';
 
 import { SignInFormData } from '../../pages/sign-in/sign-in.component';
 import { User, UserRegisterData } from '../../api/models/user/user';
-import { INotification } from '../../api/models/user/notification';
+import { AxiosError } from 'axios';
 
 interface AuthState {
   user: null | User;
   loading: boolean;
   error: string | null;
-  message: string | null;
   isUserLoggedIn: boolean | null;
-  notifications: INotification[];
 }
 
 const initialState: AuthState = {
   user: null,
   loading: false,
   error: null,
-  message: null,
   isUserLoggedIn: null,
-  notifications: [],
+};
+
+export const extractErrorMessage = (err: unknown): string => {
+  if (err instanceof AxiosError && err.response?.data?.message) {
+    return err.response.data.message;
+  } else if (err instanceof Error) {
+    return err.message;
+  }
+  return 'An unknown error occurred';
 };
 
 // Registration thunk: returns a success message from the backend.
@@ -39,8 +44,8 @@ export const signupUser = createAsyncThunk<
   try {
     const response = await registerUser(userData);
     return { response }; // API returns a success message
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Signup failed');
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
   }
 });
 
@@ -53,8 +58,8 @@ export const verifyEmail = createAsyncThunk<
   try {
     const response = await verifyEmailApi(token);
     return response.data; // API returns a success message
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Verification failed');
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
   }
 });
 
@@ -63,12 +68,15 @@ export const signinUser = createAsyncThunk<
   string, // Return type: user login response
   SignInFormData, // Argument type (user data)
   { rejectValue: string } // Error type
->('auth/signinUser', async (userData, { rejectWithValue }) => {
+>('auth/signinUser', async (userData, { dispatch, rejectWithValue }) => {
   try {
     const response = await signInUser(userData);
+    if (response === 'Login successful') {
+      dispatch(getUserProfile());
+    }
     return response; // API returns user info with token
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Signin failed');
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
   }
 });
 
@@ -76,16 +84,17 @@ export const googleSignInUser = createAsyncThunk<
   string, // Return type: google login response
   string, // Argument type (token)
   { rejectValue: string } // Error type
->('auth/googleSignInUser', async (idToken, { rejectWithValue }) => {
+>('auth/googleSignInUser', async (idToken, { dispatch, rejectWithValue }) => {
   try {
     const response = await googleAPI(idToken);
     if (!response) {
       // If response is null or falsy, reject with an error message.
       return rejectWithValue('Signin failed');
     }
+    dispatch(getUserProfile());
     return response; // API returns user info with token
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Signin failed');
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
   }
 });
 
@@ -97,10 +106,8 @@ export const getUserProfile = createAsyncThunk<
   try {
     const response = await getUserProfileAPI();
     return response; // API returns user info with token
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || 'Retrieving user profile failed'
-    );
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
   }
 });
 
@@ -112,8 +119,8 @@ export const logoutUser = createAsyncThunk<
   try {
     // Assuming httpClient is your axios instance configured to include credentials.
     await logoutAPI();
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data || 'Logout failed');
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
   }
 });
 
@@ -131,23 +138,6 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isUserLoggedIn = null;
-      state.message = null;
-    },
-    // Optional: reset the message state after it has been shown
-    resetMessage: (state) => {
-      state.message = null;
-    },
-
-    addNotification: (state, action: PayloadAction<INotification>) => {
-      state.notifications.push(action.payload);
-    },
-    markNotificationAsRead: (state, action: PayloadAction<INotification>) => {
-      const foundNotification = state.notifications.find(
-        (notif) => notif.id === action.payload.id
-      );
-      if (foundNotification) {
-        foundNotification.isRead = true;
-      }
     },
   },
   extraReducers: (builder) => {
@@ -157,14 +147,9 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        signupUser.fulfilled,
-        (state, action: PayloadAction<{ response: string }>) => {
-          state.loading = false;
-          // Instead of updating user/token, we store the success message.
-          state.message = action.payload.response;
-        }
-      )
+      .addCase(signupUser.fulfilled, (state) => {
+        state.loading = false;
+      })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Signup failed';
@@ -174,14 +159,9 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        verifyEmail.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.loading = false;
-          // You could optionally store the verification success message
-          state.message = action.payload;
-        }
-      )
+      .addCase(verifyEmail.fulfilled, (state) => {
+        state.loading = false;
+      })
       .addCase(verifyEmail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Verification failed';
@@ -191,13 +171,8 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(signinUser.fulfilled, (state, action: PayloadAction<string>) => {
+      .addCase(signinUser.fulfilled, (state) => {
         state.loading = false;
-        // console.log('in case', action.payload);
-
-        if (action.payload === 'Login successful') {
-          state.isUserLoggedIn = true;
-        }
       })
       .addCase(signinUser.rejected, (state, action) => {
         state.loading = false;
@@ -208,18 +183,9 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        googleSignInUser.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.loading = false;
-          // console.log('in case', action.payload);
-
-          state.isUserLoggedIn = true;
-          // if (action.payload === 'Login successful') {
-          //   state.isUserLoggedIn = true;
-          // }
-        }
-      )
+      .addCase(googleSignInUser.fulfilled, (state) => {
+        state.loading = false;
+      })
       .addCase(googleSignInUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Google Signin failed';
@@ -239,12 +205,12 @@ const authSlice = createSlice({
       )
       .addCase(getUserProfile.rejected, (state) => {
         state.loading = false;
+        state.isUserLoggedIn = false;
         state.error = 'Get User Profile failed';
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isUserLoggedIn = null;
-        state.message = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         // Optionally handle logout errors here.
@@ -253,11 +219,5 @@ const authSlice = createSlice({
   },
 });
 
-export const {
-  logout,
-  resetMessage,
-  setUserProfile,
-  addNotification,
-  // markNotificationAsRead,
-} = authSlice.actions;
+export const { logout, setUserProfile } = authSlice.actions;
 export default authSlice.reducer;

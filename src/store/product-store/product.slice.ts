@@ -31,8 +31,6 @@ interface ProductState {
   currentProduct: IProductResponse | null; // the product we’re currently creating/editing
   loading: boolean;
   error: string | null;
-  // Optional: you might want to store a message (for creating/editing/removing status)
-  message: string | null;
 }
 
 const initialState: ProductState = {
@@ -40,7 +38,6 @@ const initialState: ProductState = {
   currentProduct: null, // the product we’re currently creating/editing
   loading: false,
   error: null,
-  message: null,
 };
 
 export const extractErrorMessage = (err: unknown): string => {
@@ -218,41 +215,9 @@ const productsSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {
-    // Set a list of products
-    setProducts(state, action: PayloadAction<IProductResponse[]>) {
-      state.products = action.payload;
-    },
-    // Add a single product
-    addProduct(state, action: PayloadAction<IProductResponse>) {
-      state.products?.push(action.payload);
-    },
     clearCurrentProduct(state) {
       state.currentProduct = null;
-      state.message = null;
       state.error = null;
-    },
-    // Update an existing product by id
-    updateProduct(state, action: PayloadAction<IProductResponse>) {
-      const index = state.products?.findIndex(
-        (p) => p.id === action.payload.id
-      );
-      if (state.products && index && index !== -1) {
-        state.products[index] = action.payload;
-      }
-    },
-    // Remove a product by id
-    removeProduct(state, action: PayloadAction<string>) {
-      if (state.products) {
-        state.products = state.products.filter((p) => p.id !== action.payload);
-      }
-    },
-    // Set loading state
-    setLoading(state, action: PayloadAction<boolean>) {
-      state.loading = action.payload;
-    },
-    // Set error state
-    setError(state, action: PayloadAction<string | null>) {
-      state.error = action.payload;
     },
 
     deleteProductFromStore(state, action: PayloadAction<string>) {
@@ -314,13 +279,6 @@ const productsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        addImageToProduct.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.loading = false;
-          state.message = action.payload;
-        }
-      )
       .addCase(addImageToProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error uploading image';
@@ -329,7 +287,6 @@ const productsSlice = createSlice({
       .addCase(createCourseProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.message = null;
       })
       .addCase(
         createCourseProduct.fulfilled,
@@ -338,20 +295,16 @@ const productsSlice = createSlice({
           state.error = null;
 
           state.currentProduct = action.payload;
-
-          state.message = 'Product created successfully';
         }
       )
       .addCase(createCourseProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.message = null;
       })
 
       .addCase(updateCourseProductDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.message = null;
       })
       .addCase(
         updateCourseProductDetails.fulfilled,
@@ -360,20 +313,16 @@ const productsSlice = createSlice({
           state.error = null;
 
           state.currentProduct = action.payload;
-
-          state.message = 'Product updated successfully';
         }
       )
       .addCase(updateCourseProductDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.message = null;
       })
 
       .addCase(createSection.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.message = null;
       })
       .addCase(
         createSection.fulfilled,
@@ -391,40 +340,29 @@ const productsSlice = createSlice({
               prod.sections.push(updatedSection);
             }
           }
-
-          state.message = 'Section created successfully';
         }
       )
       .addCase(createSection.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.message = null;
       })
 
       .addCase(updateSectionDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.message = null;
       })
-      .addCase(
-        updateSectionDetails.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.loading = false;
-          state.error = null;
-
-          state.message = action.payload;
-        }
-      )
+      .addCase(updateSectionDetails.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
       .addCase(updateSectionDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.message = null;
       })
 
       .addCase(createLesson.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.message = null;
       })
       .addCase(
         createLesson.fulfilled,
@@ -444,40 +382,29 @@ const productsSlice = createSlice({
               section.lessons.push(createdLesson);
             }
           }
-
-          state.message = 'Section created successfully';
         }
       )
       .addCase(createLesson.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.message = null;
       })
 
       .addCase(updateLessonDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.message = null;
       })
-      .addCase(
-        updateLessonDetails.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.loading = false;
-          state.error = null;
-
-          state.message = action.payload;
-        }
-      )
+      .addCase(updateLessonDetails.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
       .addCase(updateLessonDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.message = null;
       })
 
       .addCase(getProductByProductId.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.message = null;
       })
       .addCase(
         getProductByProductId.fulfilled,
@@ -491,18 +418,8 @@ const productsSlice = createSlice({
       .addCase(getProductByProductId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        state.message = null;
       });
   },
 });
-
-export const {
-  setProducts,
-  addProduct,
-  updateProduct,
-  removeProduct,
-  setLoading,
-  setError,
-} = productsSlice.actions;
 
 export default productsSlice.reducer;

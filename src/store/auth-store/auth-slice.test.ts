@@ -2,7 +2,6 @@
 import { User } from '../../api/models/user/user';
 import authReducer, {
   logout,
-  resetMessage,
   setUserProfile,
   signupUser,
   verifyEmail,
@@ -14,9 +13,7 @@ const initialState = {
   user: null,
   loading: false,
   error: null,
-  message: null,
   isUserLoggedIn: null,
-  notifications: [],
 };
 
 describe('auth slice reducers', () => {
@@ -46,13 +43,6 @@ describe('auth slice reducers', () => {
     };
     const state = authReducer(modifiedState, logout());
     expect(state.user).toBeNull();
-    expect(state.message).toBeNull();
-  });
-
-  it('should handle resetMessage', () => {
-    const modifiedState = { ...initialState, message: 'test message' };
-    const state = authReducer(modifiedState, resetMessage());
-    expect(state.message).toBeNull();
   });
 });
 
@@ -65,7 +55,6 @@ describe('auth slice async thunks', () => {
     };
     const state = authReducer({ ...initialState, loading: true }, action);
     expect(state.loading).toBe(false);
-    expect(state.message).toBe('Registration successful');
     expect(state.error).toBeNull();
   });
 
@@ -88,7 +77,6 @@ describe('auth slice async thunks', () => {
     };
     const state = authReducer({ ...initialState, loading: true }, action);
     expect(state.loading).toBe(false);
-    expect(state.message).toBe('Verification successful');
   });
 
   // Simulate the rejected state for verifyEmail
@@ -111,7 +99,6 @@ describe('auth slice async thunks', () => {
     };
     const state = authReducer({ ...initialState, loading: true }, action);
     expect(state.loading).toBe(false);
-    expect(state.isUserLoggedIn).toEqual(true);
   });
 
   // Simulate the rejected state for signinUser
