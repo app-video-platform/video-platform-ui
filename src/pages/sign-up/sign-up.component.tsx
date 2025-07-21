@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
-import FormInput from '../../components/form-input/form-input.component';
+import FormInputX from '../../components/form-input/form-input.component';
 import { AppDispatch } from '../../store/store';
 import { useDispatch } from 'react-redux';
 import { signupUser } from '../../store/auth-store/auth.slice';
@@ -138,7 +138,7 @@ const SignUp: React.FC = () => {
           Sign Up
         </h1>
         <form onSubmit={handleSubmit}>
-          <FormInput
+          <FormInputX
             label="First Name"
             type="text"
             name="firstName"
@@ -150,7 +150,7 @@ const SignUp: React.FC = () => {
             <p className="error-text-red">{errors.firstName}</p>
           )}
 
-          <FormInput
+          <FormInputX
             label="Last Name"
             type="text"
             name="lastName"
@@ -162,7 +162,7 @@ const SignUp: React.FC = () => {
             <p className="error-text-red">{errors.lastName}</p>
           )}
 
-          <FormInput
+          <FormInputX
             label="Email"
             type="email"
             name="email"
@@ -173,7 +173,7 @@ const SignUp: React.FC = () => {
           {errors.email && <p className="error-text-red">{errors.email}</p>}
 
           <div className="password-group">
-            <FormInput
+            <FormInputX
               label="Password"
               type={showPassword.password ? 'text' : 'password'} // Toggle input type
               name="password"
@@ -210,7 +210,7 @@ const SignUp: React.FC = () => {
             </ul>
           )}
           <div className="password-group">
-            <FormInput
+            <FormInputX
               label="Confirm Password"
               type={showPassword.confirmPassword ? 'text' : 'password'} // Toggle input type
               name="confirmPassword"

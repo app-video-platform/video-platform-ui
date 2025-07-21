@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { FaUser } from 'react-icons/fa';
+import IconComponent from '../../components/icon-component/gal-icon.component';
 
 import './user-dashboard.styles.scss';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
@@ -26,9 +27,7 @@ const UserDashboard: React.FC = () => {
     <div className="user-dashboard-container">
       {/* <FaUser className="user-avatar" /> */}
       <div className="user-banner">
-        {React.createElement(FaUser as React.FC<{ className: string }>, {
-          className: 'user-avatar',
-        })}
+        <IconComponent icon={FaUser} className="user-avatar" />
         <div className="user-profile">
           <div className="user-info-box">
             <h2>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import FormInput from '../form-input/form-input.component';
+import FormInputX from '../form-input/form-input.component';
 
 interface PriceSelectorProps {
   price: 'free' | number;
@@ -7,9 +7,10 @@ interface PriceSelectorProps {
   setPrice: (price: 'free' | number) => void;
 }
 
-
 const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
-  const [selectedPriceMode, setSelectedPriceMode] = useState<'free' | 'paid'>('free');
+  const [selectedPriceMode, setSelectedPriceMode] = useState<'free' | 'paid'>(
+    'free'
+  );
 
   useEffect(() => {
     if (price === 'free') {
@@ -19,7 +20,9 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
     }
   }, [price]);
 
-  const handlePriceModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePriceModeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { value } = event.target;
     setSelectedPriceMode(value as 'free' | 'paid');
     if (value === 'free') {
@@ -36,7 +39,7 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
       <label>
         <input
           type="radio"
-          name="price"           // ensure both radio buttons share the same name
+          name="price" // ensure both radio buttons share the same name
           value="free"
           checked={selectedPriceMode === 'free'}
           onChange={handlePriceModeChange}
@@ -55,14 +58,15 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({ price, setPrice }) => {
         Paid
       </label>
 
-      {
-        selectedPriceMode === 'paid' &&
-        <FormInput label="Price"
+      {selectedPriceMode === 'paid' && (
+        <FormInputX
+          label="Price"
           type="text"
           name="price"
           value={price}
-          onChange={handlePriceChange} />
-      }
+          onChange={handlePriceChange}
+        />
+      )}
     </div>
   );
 };

@@ -16,7 +16,7 @@ import {
 } from '../../../../../store/product-store/product.slice';
 import { AppDispatch } from '../../../../../store/store';
 import CourseLessons from '../../course-lessons/course-lessons.component';
-import FormInput from '../../../../../components/form-input/form-input.component';
+import FormInputX from '../../../../../components/form-input/form-input.component';
 
 import './section-editor.styles.scss';
 import {
@@ -228,7 +228,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         </>
       </div>
 
-      <FormInput
+      <FormInputX
         label="Section Title"
         type="text"
         name="title"
@@ -236,7 +236,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         onChange={handleChange}
       />
 
-      <FormInput
+      <FormInputX
         label="Section Description"
         type="text"
         name="description"

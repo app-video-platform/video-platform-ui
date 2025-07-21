@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { IoIosNotifications } from 'react-icons/io';
+import IconComponent from '../icon-component/gal-icon.component';
 
 import './notifications-dropdown.styles.scss';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { selectNotifications } from '../../store/notifications/notifications.selectors';
 
-const NotificationsIcon = IoIosNotifications as React.ElementType;
 // Custom hook to handle clicks outside of a given ref.
 function useOnClickOutside<T extends HTMLElement>(
   ref: React.RefObject<T | null>,
@@ -49,7 +49,7 @@ const NotificationsDropdown: React.FC = () => {
   return (
     <div className="notifications-dropdown" ref={notificationsDropdownRef}>
       <button onClick={handleToggle} className="notifications-button">
-        <NotificationsIcon />
+        <IconComponent icon={IoIosNotifications} />
       </button>
       {open && (
         <div className="dropdown-menu">

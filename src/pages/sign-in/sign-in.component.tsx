@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { AppDispatch } from '../../store/store';
-import FormInput from '../../components/form-input/form-input.component';
+import FormInputX from '../../components/form-input/form-input.component';
 import { getUserProfile, signinUser } from '../../store/auth-store/auth.slice';
 import Button from '../../components/button/button.component';
 
@@ -50,7 +50,7 @@ const SignIn: React.FC = () => {
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(prev => !prev);
+    setShowPassword((prev) => !prev);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,19 +63,19 @@ const SignIn: React.FC = () => {
         .then((value) => {
           // console.log(value);
 
-          dispatch(getUserProfile()).unwrap().then(data => {
-            if (data) {
-              if (data.onboardingCompleted) {
-                console.log('GO TO DASHBOARD FROM SIGN IN', data);
-                navigate('/dashboard');
-              } else {
-                console.log('GO TO ONBOARDING FROM SIGN IN', data);
-                navigate('/onboarding');
+          dispatch(getUserProfile())
+            .unwrap()
+            .then((data) => {
+              if (data) {
+                if (data.onboardingCompleted) {
+                  console.log('GO TO DASHBOARD FROM SIGN IN', data);
+                  navigate('/dashboard');
+                } else {
+                  console.log('GO TO ONBOARDING FROM SIGN IN', data);
+                  navigate('/onboarding');
+                }
               }
-
-            }
-          });
-
+            });
         })
         .catch((error) => {
           // ❌ Failed signup, show error message
@@ -84,12 +84,11 @@ const SignIn: React.FC = () => {
     }
   };
 
-
   return (
     <div>
-      <div className='sign-up-container'>
+      <div className="sign-up-container">
         <form onSubmit={handleSubmit} noValidate>
-          <FormInput
+          <FormInputX
             label="Email"
             type="email"
             name="email"
@@ -99,9 +98,8 @@ const SignIn: React.FC = () => {
           />
           {errors.email && <p className="error-text-red">{errors.email}</p>}
 
-
-          <div className='password-group'>
-            <FormInput
+          <div className="password-group">
+            <FormInputX
               label="Password"
               type={showPassword ? 'text' : 'password'} // Toggle input type
               name="password"
@@ -117,20 +115,25 @@ const SignIn: React.FC = () => {
               {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
-          {errors.password && <p className="error-text-red">{errors.password}</p>}
-          <Button type="primary" htmlType='submit' text='Sign In' />
+          {errors.password && (
+            <p className="error-text-red">{errors.password}</p>
+          )}
+          <Button type="primary" htmlType="submit" text="Sign In" />
         </form>
 
-        <GoogleSignInButton data-test-id='google-sign-in-button' />
+        <GoogleSignInButton data-test-id="google-sign-in-button" />
 
-        <div className='forgot-password-button-container'>
-          <button className='forgot-password-btn' onClick={() => navigate('/forgot-password')}>I forgot my password</button>
-
+        <div className="forgot-password-button-container">
+          <button
+            className="forgot-password-btn"
+            onClick={() => navigate('/forgot-password')}
+          >
+            I forgot my password
+          </button>
         </div>
       </div>
     </div>
   );
 };
-
 
 export default SignIn;

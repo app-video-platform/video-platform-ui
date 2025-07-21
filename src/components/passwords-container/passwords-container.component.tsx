@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import './passwords-container.styles.scss';
-import FormInput from '../form-input/form-input.component';
+import FormInputX from '../form-input/form-input.component';
 import { Eye, EyeOff } from 'lucide-react';
 
 interface PasswordsContainerProps {
@@ -65,7 +65,7 @@ const PasswordsContainer: React.FC<PasswordsContainerProps> = ({
   return (
     <>
       <div className="password-group">
-        <FormInput
+        <FormInputX
           label="Password"
           type={showPassword.password ? 'text' : 'password'} // Toggle input type
           name="password"
@@ -90,14 +90,17 @@ const PasswordsContainer: React.FC<PasswordsContainerProps> = ({
           {passwordValidationRules.map((rule) => (
             <li
               key={rule.id}
-              className={`password-rule ${isPasswordFocused ? 'red' : 'grey'} ${rule.test(passwordInput) ? 'green' : ''}`}>
+              className={`password-rule ${isPasswordFocused ? 'red' : 'grey'} ${
+                rule.test(passwordInput) ? 'green' : ''
+              }`}
+            >
               {rule.label}
             </li>
           ))}
         </ul>
       )}
       <div className="password-group">
-        <FormInput
+        <FormInputX
           label="Confirm Password"
           type={showPassword.confirmPassword ? 'text' : 'password'} // Toggle input type
           name="confirmPassword"

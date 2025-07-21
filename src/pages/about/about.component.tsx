@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FaCheckSquare } from 'react-icons/fa';
+import IconComponent from '../../components/icon-component/gal-icon.component';
 import './about.styles.scss';
 import CtaSection from '../../components/cta-section/cta-section.component';
 
@@ -68,43 +69,19 @@ const About: React.FC = () => (
       {/* <div className="different-list-container"> */}
       <ul className="different-list">
         <li className="different-item">
-          {React.createElement(
-            FaCheckSquare as React.FC<{ color: string; size: number }>,
-            {
-              color: 'green',
-              size: 24,
-            }
-          )}
+          <IconComponent icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          {React.createElement(
-            FaCheckSquare as React.FC<{ color: string; size: number }>,
-            {
-              color: 'green',
-              size: 24,
-            }
-          )}
+          <IconComponent icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          {React.createElement(
-            FaCheckSquare as React.FC<{ color: string; size: number }>,
-            {
-              color: 'green',
-              size: 24,
-            }
-          )}
+          <IconComponent icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          {React.createElement(
-            FaCheckSquare as React.FC<{ color: string; size: number }>,
-            {
-              color: 'green',
-              size: 24,
-            }
-          )}
+          <IconComponent icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
       </ul>

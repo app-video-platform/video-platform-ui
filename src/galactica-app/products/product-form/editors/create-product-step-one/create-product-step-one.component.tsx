@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../../store/store';
 
 import { FormErrors, NewProductFormData } from '../../product-form.component';
-import FormInput from '../../../../../components/form-input/form-input.component';
+import FormInputX from '../../../../../components/form-input/form-input.component';
 import Button from '../../../../../components/button/button.component';
 import { createCourseProduct } from '../../../../../store/product-store/product.slice';
 
@@ -79,7 +79,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
 
   return (
     <div>
-      <FormInput
+      <FormInputX
         label="Title"
         type="text"
         name="name"
@@ -90,7 +90,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
       />
       {errors.name && <p className="error-text-red">{errors.name}</p>}
 
-      <FormInput
+      <FormInputX
         label="Description"
         type="text"
         name="description"

@@ -17,7 +17,7 @@ module.exports = {
 
   // Tells Jest explicitly which node_modules need transformation
   transformIgnorePatterns: [
-    '/node_modules/(?!(axios|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error)/)',
+    '/node_modules/(?!(axios|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error|react-icons)/)',
   ],
 
   // File extensions Jest recognizes during module resolution
@@ -27,6 +27,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|scss)$': 'identity-obj-proxy',
     '\\.(png|jpe?g|gif|svg)$': '<rootDir>/src/utils/file.mock.js',
+    '^react-icons/(.*)': 'identity-obj-proxy',
   },
 
   // Treat `.ts` and `.tsx` explicitly as ES Modules

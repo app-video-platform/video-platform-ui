@@ -1,17 +1,12 @@
 import React from 'react';
 import { CiCircleCheck } from 'react-icons/ci';
+import IconComponent from '../../components/icon-component/gal-icon.component';
 
 import './email-sent.styles.scss';
 
 const EmailSent: React.FC = () => (
   <div className="email-sent-message-container">
-    {React.createElement(
-      CiCircleCheck as React.FC<{ color: string; size: number }>,
-      {
-        color: 'green',
-        size: 100,
-      }
-    )}
+    <IconComponent icon={CiCircleCheck} color="green" size={100} />
     {/* <CiCircleCheck color='green' size={100} /> */}
 
     <h2>Check your email</h2>

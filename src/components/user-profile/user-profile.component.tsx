@@ -6,7 +6,7 @@ import { logout, logoutUser } from '../../store/auth-store/auth.slice';
 import './user-profile.styles.scss';
 import { useNavigate } from 'react-router-dom';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
-import { get } from 'http';
+
 
 // Custom hook to handle clicks outside of a given ref.
 function useOnClickOutside<T extends HTMLElement>(

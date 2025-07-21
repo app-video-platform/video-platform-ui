@@ -1,12 +1,12 @@
 // FormInput.test.tsx
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import FormInput from './form-input.component';
+import FormInputX from './form-input.component';
 import '@testing-library/jest-dom';
 
-describe('FormInput component', () => {
+describe('FormInputX component', () => {
   it('renders the input element with the correct attributes', () => {
-    render(<FormInput name="email" value="" placeholder="Enter email" />);
+    render(<FormInputX name="email" value="" placeholder="Enter email" />);
     const inputElement = screen.getByTestId('input-email');
     expect(inputElement).toBeInTheDocument();
     expect(inputElement).toHaveAttribute('name', 'email');
@@ -15,7 +15,7 @@ describe('FormInput component', () => {
 
   it('renders the textarea element with the correct attributes', () => {
     render(
-      <FormInput
+      <FormInputX
         name="description"
         value=""
         placeholder="Describe here"
@@ -30,14 +30,14 @@ describe('FormInput component', () => {
   });
 
   it('applies the required attribute when specified', () => {
-    render(<FormInput name="username" value="" required />);
+    render(<FormInputX name="username" value="" required />);
     const inputElement = screen.getByTestId('input-username');
     expect(inputElement).toBeRequired();
   });
 
   it('renders the label when provided and associates it correctly with the input', () => {
     const { container } = render(
-      <FormInput name="firstName" label="First Name" value="" />
+      <FormInputX name="firstName" label="First Name" value="" />
     );
     // Query the label directly using container
     const labelElement = container.querySelector('label');
@@ -48,7 +48,7 @@ describe('FormInput component', () => {
 
   it('adds the "shrink" class to the label when value is non-empty', () => {
     const { container } = render(
-      <FormInput name="lastName" label="Last Name" value="Doe" />
+      <FormInputX name="lastName" label="Last Name" value="Doe" />
     );
     const labelElement = container.querySelector('label');
     expect(labelElement).toHaveClass('shrink');
@@ -56,14 +56,14 @@ describe('FormInput component', () => {
 
   it('does not add the "shrink" class to the label when value is empty', () => {
     const { container } = render(
-      <FormInput name="lastName" label="Last Name" value="" />
+      <FormInputX name="lastName" label="Last Name" value="" />
     );
     const labelElement = container.querySelector('label');
     expect(labelElement).not.toHaveClass('shrink');
   });
 
   it('displays the required asterisk in the label when required is true', () => {
-    render(<FormInput name="password" label="Password" value="" required />);
+    render(<FormInputX name="password" label="Password" value="" required />);
     // Query the label by its text content. This will return the label element.
     const labelElement = screen.getByText(/Password/i);
     expect(labelElement.textContent).toMatch(/\*/);

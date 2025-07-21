@@ -4,6 +4,7 @@ import LessonEditor from '../editors/lesson-editor/lesson-editor.component';
 
 import { IoIosAddCircleOutline } from 'react-icons/io';
 import './course-lessons.styles.scss';
+import IconComponent from '../../../../components/icon-component/gal-icon.component';
 
 interface CourseLessonsProps {
   sectionId: string;
@@ -56,13 +57,7 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
           className="add-lesson-button"
           type="button"
         >
-          {React.createElement(
-            IoIosAddCircleOutline as React.FC<{ color: string; size: number }>,
-            {
-              color: 'blue',
-              size: 24,
-            }
-          )}
+          <IconComponent icon={IoIosAddCircleOutline} color="blue" size={24} />
         </button>
       </div>
       {localLessons &&

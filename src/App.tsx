@@ -22,6 +22,7 @@ import ProductForm from './galactica-app/products/product-form/product-form.comp
 import Pricing from './pages/pricing/pricing.component';
 import SalesPage from './galactica-app/sales-page/sales-page.component';
 import MarketingPage from './galactica-app/marketing-page/marketing-page.component';
+import GalacticaHome from './galactica-app/galactica-home/galactica-home.component';
 
 const App = () => (
   <AppInitializer>
@@ -52,6 +53,7 @@ const App = () => (
         <Route path="sales" element={<SalesPage />} />
         <Route path="marketing" element={<MarketingPage />} />
       </Route>
+      <Route path="app-home" element={<GalacticaHome />} />
     </Routes>
   </AppInitializer>
 );

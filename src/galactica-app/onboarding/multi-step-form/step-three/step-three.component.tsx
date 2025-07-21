@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 
 import './step-three.styles.scss';
 import { MultiStepFormData } from '../multi-step-form.component';
-import FormInput from '../../../../components/form-input/form-input.component';
+import FormInputX from '../../../../components/form-input/form-input.component';
 
 interface StepThreeProps {
   initialData: MultiStepFormData;
-  setData: any,
+  setData: any;
   // nextStep: (data: Partial<FormData>) => void;
 }
 
 const StepThree: React.FC<StepThreeProps> = ({ initialData, setData }) => {
-
   const handleSubmit = (e: React.FormEvent) => {
     // e.preventDefault();
     // if (!bio) {
@@ -21,25 +20,25 @@ const StepThree: React.FC<StepThreeProps> = ({ initialData, setData }) => {
     // submitForm({ description });
   };
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     setData({ ...initialData, [e.target.name]: e.target.value });
   };
 
   return (
     <form onSubmit={handleSubmit} className="form-step">
-      <h2 className='step-header'>About You</h2>
+      <h2 className="step-header">About You</h2>
       <div>
-        <FormInput
+        <FormInputX
           type="text"
           value={initialData.bio}
-          label='Your Bio'
+          label="Your Bio"
           name="bio"
           onChange={handleChange}
         />
-        <FormInput
+        <FormInputX
           type="text"
           value={initialData.tagline}
-          label='Your Tagline / Mission'
+          label="Your Tagline / Mission"
           name="tagline"
           onChange={handleChange}
         />

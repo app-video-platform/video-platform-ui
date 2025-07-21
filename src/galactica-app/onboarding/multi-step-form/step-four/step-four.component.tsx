@@ -1,49 +1,46 @@
 import React from 'react';
 
 import { MultiStepFormData } from '../multi-step-form.component';
-import FormInput from '../../../../components/form-input/form-input.component';
+import FormInputX from '../../../../components/form-input/form-input.component';
 
 import './step-four.styles.scss';
 
 interface StepFourProps {
   initialData: MultiStepFormData;
-  setData: any,
+  setData: any;
 }
 
 const StepFour: React.FC<StepFourProps> = ({ initialData, setData }) => {
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('multi step form data', initialData);
-
-
   };
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     setData({ ...initialData, [e.target.name]: e.target.value });
   };
 
   return (
     <form onSubmit={handleSubmit} className="form-step">
-      <h2 className='step-header'>Additional information</h2>
-      <FormInput
+      <h2 className="step-header">Additional information</h2>
+      <FormInputX
         type="text"
         value={initialData.website}
-        label='Your Website'
+        label="Your Website"
         name="website"
         onChange={handleChange}
       />
-      <FormInput
+      <FormInputX
         type="text"
         value={initialData.location}
-        label='Your Location'
+        label="Your Location"
         name="location"
         onChange={handleChange}
       />
-      <FormInput
+      <FormInputX
         type="text"
         value={initialData.socialLinks}
-        label='Your Social Media Links'
+        label="Your Social Media Links"
         name="socialLinks"
         onChange={handleChange}
       />

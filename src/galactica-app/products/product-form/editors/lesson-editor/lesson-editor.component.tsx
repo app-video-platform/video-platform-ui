@@ -5,7 +5,7 @@
 /* eslint-disable indent */
 import React, { use, useEffect, useState } from 'react';
 
-import FormInput from '../../../../../components/form-input/form-input.component';
+import FormInputX from '../../../../../components/form-input/form-input.component';
 import Button from '../../../../../components/button/button.component';
 import { AppDispatch } from '../../../../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,8 +24,8 @@ import {
 import { LessonType } from '../../../../../api/models/product/product.types';
 
 import { MdDeleteForever } from 'react-icons/md';
+import IconComponent from '../../../../../components/icon-component/gal-icon.component';
 import './lesson-editor.styles.scss';
-import { set } from 'react-hook-form';
 import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
 import { IRemoveItemPayload } from '../../../../../api/models/product/product';
 
@@ -254,17 +254,11 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           type="button"
           onClick={handleDeleteLesson}
         >
-          {React.createElement(
-            MdDeleteForever as React.FC<{ size: number; color: string }>,
-            {
-              size: 24,
-              color: 'red',
-            }
-          )}
+          <IconComponent icon={MdDeleteForever} size={24} color="red" />
         </button>
       </div>
       <div>
-        <FormInput
+        <FormInputX
           label="Lesson Title"
           type="text"
           name="title"
@@ -272,7 +266,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           onChange={handleChange}
         />
 
-        <FormInput
+        <FormInputX
           label="Lesson Description"
           type="text"
           name="description"
