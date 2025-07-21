@@ -18,10 +18,10 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-top">
         <h2>Galactica</h2>
         <div className="app-nav-links">
-          <Link to={''}>Dashboard</Link>
+          <Link to={''}>Overview</Link>
           <Link to={'products'}>Products</Link>
-          <Link to={''}>Sales & Analytics</Link>
-          <Link to={''}>Marketing and Communication</Link>
+          <Link to={'sales'}>Sales & Analytics</Link>
+          <Link to={'marketing'}>Marketing and Communication</Link>
         </div>
         <button onClick={() => navigate('/')}>Go to website</button>
         <NotificationsDropdown />

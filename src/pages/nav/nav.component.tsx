@@ -24,7 +24,6 @@ const Navigation: React.FC = () => {
       <nav className="website-navbar">
         <div className="navbar-content">
           <div className="logo-container"></div>
-          {/* <div className="nav-links"> */}
           <ul className="nav-link-list">
             <li>
               <Link to={'/'}>Home</Link>
@@ -40,22 +39,13 @@ const Navigation: React.FC = () => {
             <li>
               <Link to={'/contact'}>Contact Us</Link>
             </li>
-
-            {/* <li>Home</li>
-            <li>About</li>
-            <li>Pricing</li> */}
-            {/* <li>Contact Us</li> */}
           </ul>
-          {/* </div> */}
           <div className="user-buttons">
             <ul className="nav-link-list">
               {user ? (
                 <UserProfileDropdown />
               ) : (
                 <ul className="nav-link-list">
-                  {/* <li>
-                  <GoogleSignInButton data-test-id='google-sign-in-button' />
-                </li> */}
                   <li>
                     <Button
                       onClick={() => handleRedirect('/signin')}

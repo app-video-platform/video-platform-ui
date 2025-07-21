@@ -20,6 +20,8 @@ import Onboarding from './galactica-app/onboarding/onboarding.component';
 import ForgotPassword from './pages/forgot-password/forgot-password.component';
 import ProductForm from './galactica-app/products/product-form/product-form.component';
 import Pricing from './pages/pricing/pricing.component';
+import SalesPage from './galactica-app/sales-page/sales-page.component';
+import MarketingPage from './galactica-app/marketing-page/marketing-page.component';
 
 const App = () => (
   <AppInitializer>
@@ -47,6 +49,8 @@ const App = () => (
           <Route path="edit/:type/:id" element={<ProductForm />} />
         </Route>
         <Route path="my-page-preview" element={<UserPagePreview />} />
+        <Route path="sales" element={<SalesPage />} />
+        <Route path="marketing" element={<MarketingPage />} />
       </Route>
     </Routes>
   </AppInitializer>
