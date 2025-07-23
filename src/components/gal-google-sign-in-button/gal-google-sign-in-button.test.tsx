@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-empty-function */
 // GalGoogleSignInButton.test.tsx
 import React from 'react';
 import { render, act } from '@testing-library/react';
@@ -89,7 +92,6 @@ describe('GalGoogleSignInButton component', () => {
 
   it('handles credential response and navigates to dashboard on success', async () => {
     // Prepare a fake callback variable that will be set via initialize.
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     let callbackFn: (
       response: google.accounts.id.CredentialResponse
     ) => void = () => {};
