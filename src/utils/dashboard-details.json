@@ -1,0 +1,337 @@
+{
+  "sections": [
+    {
+      "header": "Intro",
+      "paragraphs": [
+        "Welcome to the developer dashboard. Here you can manage your development tasks and monitor progress.",
+        "So, mă gândeam să fac pagina asta ca să avem un track la chestiile implementate pe aici, poate și cum funcționează, poate și ce ar mai trebui făcut la ele. Așa, chestii random.",
+        "În principiu, aici ar trebui să fie un fel de dashboard pentru dezvoltatori, unde să putem vedea ce am implementat, ce mai trebuie făcut și poate și cum funcționează fiecare feature.",
+        "Holy fuck, dude, paragraful de sus o fost generat în perfectă română de VS Code Copilot AI (chiar dacă doar a rescris paragraful meu 😂). Noice.",
+        "Și da, în caz că te întrebai, m-am chinuit oțâră să scriu asta cu diacritice."
+      ]
+    },
+    {
+      "header": "Routes created",
+      "subsections": [
+        {
+          "header": "Static Pages",
+          "items": [
+            {
+              "title": "Galactica Landing Page",
+              "path": "/",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "The first thing users see when navigating to galactica.com"
+                },
+                {
+                  "type": "text",
+                  "text": "Depending on the route we take, the URL will probably be galactica.com, currently:"
+                },
+                {
+                  "type": "link",
+                  "text": "app.serious-debauchery.click",
+                  "url": "https://app.serious-debauchery.click"
+                }
+              ]
+            },
+            {
+              "title": "About Page",
+              "path": "/about",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic about page"
+                }
+              ]
+            },
+            {
+              "title": "Pricing Page",
+              "path": "/pricing",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic pricing page"
+                }
+              ]
+            },
+            {
+              "title": "Contact Page",
+              "path": "/contact",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic contact page"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "header": "User Authentication",
+          "items": [
+            {
+              "title": "Sign Up Page",
+              "path": "/signup",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic sign up form"
+                }
+              ]
+            },
+            {
+              "title": "Sign In Page",
+              "path": "/signin",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic sign in form"
+                }
+              ]
+            },
+            {
+              "title": "Forgot Password Page",
+              "path": "/forgot-password",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic forgot password flow (built in a step-by-step wizard style)"
+                },
+                {
+                  "type": "orderedList",
+                  "items": [
+                    "User enters their email and clicks continue (step 1)",
+                    "User enters the OTP received in email in the OTP input and clicks continue (step 2)",
+                    "User enters the new password (2 times) and clicks change password (step 3)",
+                    "User is redirected to the sign in page (step 4)"
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "Email Verification Page",
+              "path": "/verify-email",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic email verification flow"
+                }
+              ]
+            },
+            {
+              "title": "Email Sent Confirmation Page",
+              "path": "/email-sent",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic email confirmation"
+                }
+              ]
+            },
+            {
+              "title": "Not Found Page",
+              "path": "/not-found",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic not found error page"
+                }
+              ]
+            },
+            {
+              "title": "Unauthorized Page",
+              "path": "/unauthorized",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic unauthorized error page"
+                }
+              ]
+            },
+            {
+              "title": "Onboarding Page",
+              "path": "/onboarding",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "Classic user onboarding flow (step-by-step wizard)"
+                },
+                {
+                  "type": "orderedList",
+                  "items": [
+                    "Welcome page with next steps explanation, where user can skip or continue (step 1)",
+                    "Basic profile info, like a profile photo and the title. Here user can also go back (step 2)",
+                    "Some other basic profile info, like bio and the user's mission (step 3)",
+                    "Some additional info, like website, location (city, country) and the user's social media (step 4)",
+                    "Success tab, with options to continue onboarding (not yet implemented), go back, or go directly to dashboard (step 5)",
+                    "There is one more tab which says that the onboarding is already completed, and it redirects in 10 seconds to dashboard"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "header": "Galactica App",
+          "items": [
+            {
+              "title": "Instructor Dashboard",
+              "path": "/dashboard",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "This is the main page a user with role INSTRUCTOR/TEACHER/CREATOR is redirected"
+                },
+                {
+                  "type": "text",
+                  "text": "Depending on the route we take, the URL will probably be app.galactica.com, currently:"
+                },
+                {
+                  "type": "link",
+                  "text": "app.serious-debauchery.click/dashboard",
+                  "url": "https://app.serious-debauchery.click/dashboard"
+                },
+                {
+                  "type": "text",
+                  "text": "Here they have a navbar/sidenav specific to them, with products, sales info, marketing, and routing to all the pages specific to their role"
+                },
+                {
+                  "type": "text",
+                  "text": "Usually here the user has their basic info regarding everything, like best products, highest sales, etc."
+                }
+              ]
+            },
+            {
+              "title": "Products",
+              "path": "/dashboard/products",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "A page seen only by users with role INSTRUCTOR/TEACHER/CREATOR"
+                },
+                {
+                  "type": "text",
+                  "text": "Here they can manage their created products, see details about customers, sales, etc. for each one, edit them, and create new ones"
+                }
+              ]
+            },
+            {
+              "title": "Create Product",
+              "path": "/dashboard/products/create",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "This is the page specifically for creating new products"
+                },
+                {
+                  "type": "text",
+                  "text": "The flow chosen follows best practices for this situation, but the UX needs improvements (too many buttons, too many clicks)"
+                }
+              ]
+            },
+            {
+              "title": "Edit Product",
+              "path": "/dashboard/products/edit/COURSE/course-id",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "This is the page specifically for editing existing products"
+                },
+                {
+                  "type": "text",
+                  "text": "Technically it's still the same component as creating a product, but with parameters in the URL"
+                }
+              ]
+            },
+            {
+              "title": "Instructor Storefront Preview",
+              "path": "/dashboard/my-page-preview",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "User's storefront page"
+                },
+                {
+                  "type": "text",
+                  "text": "Can edit themes, colors, items, information"
+                },
+                {
+                  "type": "text",
+                  "text": "The settings created in this page will be used for the creators real storefront (seen by customers)"
+                }
+              ]
+            },
+            {
+              "title": "Sales Page",
+              "path": "/dashboard/sales",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "User's sale information page"
+                },
+                {
+                  "type": "text",
+                  "text": "Here they can see details about purchases, can edit prices, can see analytics and sale trends"
+                }
+              ]
+            },
+            {
+              "title": "Marketing Page",
+              "path": "/dashboard/marketing",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "User's marketing page"
+                },
+                {
+                  "type": "text",
+                  "text": "Here they can see their marketing campaigns, can create new ones, can edit existing ones, and can see analytics"
+                },
+                {
+                  "type": "text",
+                  "text": "Also reviews from customers are shown here"
+                },
+                {
+                  "type": "text",
+                  "text": "This is also a hub for communication (messages, live sessions)"
+                }
+              ]
+            },
+            {
+              "title": "Normal User Dashboard Page",
+              "path": "/app-home",
+              "details": [
+                {
+                  "type": "text",
+                  "text": "This is the page seen by users with role STUDENT/BUYER/CUSTOMER"
+                },
+                {
+                  "type": "text",
+                  "text": "Depending on the route we take, the URL will probably be app.galactica.com, currently:"
+                },
+                {
+                  "type": "link",
+                  "text": "app.serious-debauchery.click/app-home",
+                  "url": "https://app.serious-debauchery.click/app-home"
+                },
+                {
+                  "type": "text",
+                  "text": "This is the creator's main hub, with a navbar with a search bar, link to course, cart, and notification"
+                },
+                {
+                  "type": "text",
+                  "text": "Here they can search for courses, products, or creators"
+                },
+                {
+                  "type": "text",
+                  "text": "Here they can see their most recently started courses, and other categories of products tailored to the user's preferences"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -56,7 +56,6 @@ const GalExpansionPanel: React.FC<GalExpansionPanelProps> = ({
           }`}
           aria-hidden="true"
         >
-          {/* Simple arrow indicator */}
           {isOpen ? '▾' : '▸'}
         </span>
       </button>

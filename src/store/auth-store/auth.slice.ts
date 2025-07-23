@@ -139,6 +139,19 @@ const authSlice = createSlice({
       state.user = null;
       state.isUserLoggedIn = null;
     },
+    resetOnboarding: (state) => {
+      // Reset any onboarding state if needed
+      // This can be expanded based on your onboarding logic
+      state.user = {
+        id: 'mocked-user-id',
+        firstName: 'Aleb',
+        lastName: 'Mocked',
+        email: 'aleb-mocked@example.com',
+        role: ['User'],
+        onboardingCompleted: false,
+      };
+      state.isUserLoggedIn = true;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -219,5 +232,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setUserProfile } = authSlice.actions;
+export const { logout, setUserProfile, resetOnboarding } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,0 +1,66 @@
+.dev-dashboard {
+  padding: 40px;
+
+  .dev-dashboard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+  }
+
+  .dev-dashboard-main {
+    margin-top: 40px;
+
+    .dev-dashboard-hello {
+      width: 800px;
+
+      p:nth-of-type(even) {
+        // margin-left: 100px;
+        margin: 50px;
+      }
+    }
+
+    .dev-panel-content {
+      padding: 30px 50px;
+
+      .dev-item-box {
+        display: grid;
+        grid-template-columns: 450px 150px; /* two fixed-width columns */
+        grid-template-rows: auto auto; /* two rows, height by content */
+        gap: 1rem;
+        align-items: center;
+
+        .item-box-header {
+          grid-column: 1; /* first column */
+          grid-row: 1;
+          margin-top: 20px;
+        }
+
+        .route-info {
+          grid-column: 2; /* second column */
+          grid-row: 1;
+        }
+
+        .item-box-content {
+          grid-column: 1 / -1; /* span from column line 1 to the last column line */
+          grid-row: 2;
+          margin-left: 30px;
+
+          ul {
+            font-size: 14px;
+          }
+
+          ol {
+            margin-left: 40px;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

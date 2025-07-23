@@ -24,6 +24,7 @@ import Pricing from './pages/pricing/pricing.component';
 import SalesPage from './galactica-app/sales-page/sales-page.component';
 import MarketingPage from './galactica-app/marketing-page/marketing-page.component';
 import GalacticaHome from './galactica-app/galactica-home/galactica-home.component';
+import DevDashboard from './pages/dev-dashboard/dev-dashboard.component';
 
 const App = () => (
   <AppInitializer>
@@ -41,23 +42,27 @@ const App = () => (
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/dev-dashboard" element={<DevDashboard />} />
 
-      <Route
+      {/* <Route
         path="onboarding"
         element={
           <ProtectedRoute>
             <Onboarding />
           </ProtectedRoute>
         }
-      />
-      <Route
+      /> */}
+
+      <Route path="onboarding" element={<Onboarding />} />
+      {/* <Route
         path="dashboard"
         element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         }
-      >
+      > */}
+      <Route path="dashboard" element={<Dashboard />}>
         <Route index element={<UserDashboard />} />
         <Route path="products" element={<ProductsLayout />}>
           <Route index element={<ProductsList />} />

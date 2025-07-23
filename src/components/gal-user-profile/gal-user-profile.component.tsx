@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { AppDispatch } from '../../store/store';
 import { logout, logoutUser } from '../../store/auth-store/auth.slice';
-
-import { useNavigate } from 'react-router-dom';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
 import './gal-user-profile.styles.scss';
@@ -76,7 +76,12 @@ const GalUserProfileDropdown: React.FC = () => {
         {getProfileNameInitials(user.firstName, user.lastName)}
       </button>
       {open && (
-        <div className="dropdown-menu">
+        <div className="user-profile-dropdown-menu">
+          <div className="dropdown-item">
+            <h3>
+              {user.firstName} {user.lastName}
+            </h3>
+          </div>
           <div className="dropdown-item">
             <span>{user.email}</span>
           </div>
@@ -85,6 +90,9 @@ const GalUserProfileDropdown: React.FC = () => {
               Role:{' '}
               {Array.isArray(user.role) ? user.role.join(', ') : user.role}
             </span>
+          </div>
+          <div className="dropdown-item">
+            <Link to="/dev-dashboard">Dev Dashboard</Link>
           </div>
           <hr />
           <div className="dropdown-item logout-btn" onClick={handleLogout}>

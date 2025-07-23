@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GalButton from '../../../components/gal-button/gal-button.component';
+import { AppDispatch } from '../../../store/store';
+import { useDispatch } from 'react-redux';
+import { resetOnboarding } from '../../../store/auth-store/auth.slice';
 
 const CountdownRedirect: React.FC = () => {
   const [seconds, setSeconds] = useState<number>(10);
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     if (seconds === 0) {
@@ -19,6 +23,14 @@ const CountdownRedirect: React.FC = () => {
     // Cleanup the timeout when component unmounts or seconds changes
     return () => clearTimeout(timer);
   }, [seconds, navigate]);
+
+  const handleReset = () => {
+    setTimeout(() => {
+      setSeconds(10); // Reset countdown to 10 seconds
+      navigate('/onboarding'); // Navigate to the dashboard
+      dispatch(resetOnboarding()); // Reset onboarding state if needed
+    }, 300); // Reset countdown to 10 seconds
+  };
 
   return (
     <div>
@@ -35,6 +47,7 @@ const CountdownRedirect: React.FC = () => {
           text="go now"
           onClick={() => navigate('/dashboard')}
         />
+        <GalButton type="primary" text="RESET" onClick={handleReset} />
       </p>
     </div>
   );
