@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { FaCheckSquare } from 'react-icons/fa';
-import IconComponent from '../../components/icon-component/gal-icon.component';
+import GalIcon from '../../components/gal-icon-component/gal-icon.component';
 import './about.styles.scss';
-import CtaSection from '../../components/cta-section/cta-section.component';
+import GalCtaSection from '../../components/gal-cta-section/gal-cta-section.component';
 
 const About: React.FC = () => (
   <main className="about-page">
@@ -69,19 +69,19 @@ const About: React.FC = () => (
       {/* <div className="different-list-container"> */}
       <ul className="different-list">
         <li className="different-item">
-          <IconComponent icon={FaCheckSquare} color="green" size={24} />
+          <GalIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <IconComponent icon={FaCheckSquare} color="green" size={24} />
+          <GalIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <IconComponent icon={FaCheckSquare} color="green" size={24} />
+          <GalIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <IconComponent icon={FaCheckSquare} color="green" size={24} />
+          <GalIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
       </ul>
@@ -107,7 +107,7 @@ const About: React.FC = () => (
       </div>
     </section>
 
-    <CtaSection
+    <GalCtaSection
       headerText="Start building with us"
       descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
       Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor."

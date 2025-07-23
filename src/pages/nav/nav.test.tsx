@@ -12,19 +12,26 @@ jest.mock('react-redux', () => ({
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+    <a href={to}>{children}</a>
+  ),
 }));
 
 // Mock child components
-jest.mock('../../components/user-profile/user-profile.component', () => {
-  const MockUserProfile = () => <div data-testid="user-profile-dropdown">UserProfileDropdown</div>;
-  MockUserProfile.displayName = 'UserProfileDropdown';
-  return MockUserProfile;
-});
+jest.mock(
+  '../../components/gal-user-profile/gal-user-profile.component',
+  () => {
+    const MockUserProfile = () => (
+      <div data-testid="user-profile-dropdown">GalUserProfileDropdown</div>
+    );
+    MockUserProfile.displayName = 'GalUserProfileDropdown';
+    return MockUserProfile;
+  }
+);
 
-jest.mock('../../components/footer/footer.component', () => {
-  const MockFooter = () => <footer data-testid="footer">Footer</footer>;
-  MockFooter.displayName = 'Footer';
+jest.mock('../../components/gal-footer/gal-footer.component', () => {
+  const MockFooter = () => <footer data-testid="footer">GalFooter</footer>;
+  MockFooter.displayName = 'GalFooter';
   return MockFooter;
 });
 
@@ -52,17 +59,27 @@ describe('Navigation component', () => {
     expect(screen.getByText(/Contact Us/i)).toBeInTheDocument();
 
     // Check buttons
-    expect(screen.getByRole('button', { name: /Register/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Register/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Sign In/i })
+    ).toBeInTheDocument();
   });
 
   it('renders user profile dropdown when a user is present', () => {
-    (useSelector as unknown as jest.Mock).mockReturnValue({ firstName: 'Jane' });
+    (useSelector as unknown as jest.Mock).mockReturnValue({
+      firstName: 'Jane',
+    });
     render(<Navigation />);
 
     expect(screen.getByTestId('user-profile-dropdown')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Register/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Sign In/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Register/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Sign In/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls navigate with "/signup" when Register button is clicked', () => {
@@ -83,7 +100,7 @@ describe('Navigation component', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/signin');
   });
 
-  it('renders the Outlet and Footer component', () => {
+  it('renders the Outlet and GalFooter component', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
     render(<Navigation />);
 

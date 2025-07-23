@@ -60,21 +60,21 @@ jest.mock(
   })
 );
 
-// ── (4) Mock the other child components and <Button> exactly as before ──
+// ── (4) Mock the other child components and <GalButton> exactly as before ──
 jest.mock(
-  '../../../components/price-selector/price-selector.component',
+  '../../../components/gal-price-selector/gal-price-selector.component',
   () => ({
     __esModule: true,
     default: ({ price }: any) => (
       <div data-testid="price-selector">
-        PriceSelector (current: {String(price)})
+        GalPriceSelector (current: {String(price)})
       </div>
     ),
   })
 );
 
 jest.mock(
-  '../../../components/uppy-file-uploader/uppy-file-uploader.component',
+  '../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
   () => ({
     __esModule: true,
     default: ({ onFilesChange }: any) => (
@@ -105,7 +105,7 @@ jest.mock(
   })
 );
 
-jest.mock('../../../components/button/button.component', () => ({
+jest.mock('../../../components/gal-button/gal-button.component', () => ({
   __esModule: true,
   default: ({ text, htmlType }: any) => (
     <button

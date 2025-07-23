@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { MultiStepFormData } from '../multi-step-form.component';
 
 import './step-two.styles.scss';
-import FormInputX from '../../../../components/form-input/form-input.component';
+import GalFormInput from '../../../../components/gal-form-input/gal-form-input.component';
 
 interface StepTwoProps {
   initialData: MultiStepFormData;
@@ -25,14 +25,14 @@ const StepTwo: React.FC<StepTwoProps> = ({ initialData, setData }) => {
   return (
     <form onSubmit={handleSubmit} className="form-step">
       <h2 className="step-header">Basic Profile</h2>
-      <FormInputX
+      <GalFormInput
         type="text"
         value={initialData.profileImage}
         label="Your Profile Picture (for now an input)"
         name="profileImage"
         onChange={handleChange}
       />
-      <FormInputX
+      <GalFormInput
         type="text"
         value={initialData.title}
         label="Your Title"

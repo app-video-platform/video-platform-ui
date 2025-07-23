@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 
 import './enter-code.styles.scss';
-import Button from '../../../components/button/button.component';
-import OTPInputComponent from '../../../components/otp-input/otp-input.component';
+import GalButton from '../../../components/gal-button/gal-button.component';
+import GalOTPInput from '../../../components/gal-otp-input/gal-otp-input.component';
 
 interface EnterCodeProps {
   emailInput: string;
   // eslint-disable-next-line no-unused-vars
   sendEmail: () => void;
-  setStep: (value: number) => void
+  setStep: (value: number) => void;
 }
 
-const EnterCode: React.FC<EnterCodeProps> = ({ emailInput, sendEmail, setStep }) => {
+const EnterCode: React.FC<EnterCodeProps> = ({
+  emailInput,
+  sendEmail,
+  setStep,
+}) => {
   const [code, setCode] = useState('');
 
   const handleChange = (code: string) => {
@@ -26,15 +30,15 @@ const EnterCode: React.FC<EnterCodeProps> = ({ emailInput, sendEmail, setStep })
 
   return (
     <div className="enter-code-step">
-      <h1>
-        Enter code
-      </h1>
-      <p>We sent a code to <strong>{emailInput}</strong></p>
-      <div className='otp-container'>
-        <OTPInputComponent value={code} onChange={handleChange} numInputs={4} />
+      <h1>Enter code</h1>
+      <p>
+        We sent a code to <strong>{emailInput}</strong>
+      </p>
+      <div className="otp-container">
+        <GalOTPInput value={code} onChange={handleChange} numInputs={4} />
       </div>
       <div className="button-container">
-        <Button
+        <GalButton
           text="Continue"
           htmlType="button"
           type="primary"
@@ -43,14 +47,14 @@ const EnterCode: React.FC<EnterCodeProps> = ({ emailInput, sendEmail, setStep })
         />
       </div>
 
-      <p className='resend-email'>
+      <p className="resend-email">
         Did not receive an email?
-        <Button
+        <GalButton
           text="Send it again!"
           htmlType="button"
           type="neutral"
           onClick={() => sendEmail}
-          customClassName='send-again-email'
+          customClassName="send-again-email"
         />
       </p>
     </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import './step-three.styles.scss';
 import { MultiStepFormData } from '../multi-step-form.component';
-import FormInputX from '../../../../components/form-input/form-input.component';
+import GalFormInput from '../../../../components/gal-form-input/gal-form-input.component';
 
 interface StepThreeProps {
   initialData: MultiStepFormData;
@@ -28,14 +28,14 @@ const StepThree: React.FC<StepThreeProps> = ({ initialData, setData }) => {
     <form onSubmit={handleSubmit} className="form-step">
       <h2 className="step-header">About You</h2>
       <div>
-        <FormInputX
+        <GalFormInput
           type="text"
           value={initialData.bio}
           label="Your Bio"
           name="bio"
           onChange={handleChange}
         />
-        <FormInputX
+        <GalFormInput
           type="text"
           value={initialData.tagline}
           label="Your Tagline / Mission"

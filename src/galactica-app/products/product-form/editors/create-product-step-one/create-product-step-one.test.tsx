@@ -26,52 +26,55 @@ jest.mock('../../../../../store/product-store/product.slice', () => ({
 import { createCourseProduct } from '../../../../../store/product-store/product.slice';
 
 // ── 3) MOCK child components ──────────────────────────────────────────────────────
-// 3.1. FormInput: render a simple input/textarea that calls `onChange({ target: { value } })`
-jest.mock('../../../../../components/form-input/form-input.component', () => ({
-  __esModule: true,
-  default: ({
-    label,
-    type,
-    name,
-    value,
-    inputType,
-    onChange,
-  }: {
-    label: string;
-    type: string;
-    name: string;
-    value: string;
-    inputType?: string;
-    onChange: (e: { target: { value: string } }) => void;
-  }) => {
-    // For testing, give data-testid="input-<name>"
-    if (inputType === 'textarea') {
+// 3.1. GalFormInput: render a simple input/textarea that calls `onChange({ target: { value } })`
+jest.mock(
+  '../../../../../components/gal-form-input/gal-form-input.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      label,
+      type,
+      name,
+      value,
+      inputType,
+      onChange,
+    }: {
+      label: string;
+      type: string;
+      name: string;
+      value: string;
+      inputType?: string;
+      onChange: (e: { target: { value: string } }) => void;
+    }) => {
+      // For testing, give data-testid="input-<name>"
+      if (inputType === 'textarea') {
+        return (
+          <textarea
+            data-testid={`input-${name}`}
+            aria-label={label}
+            name={name}
+            value={value}
+            onChange={(e) => onChange({ target: { value: e.target.value } })}
+          />
+        );
+      }
       return (
-        <textarea
+        <input
           data-testid={`input-${name}`}
           aria-label={label}
+          type={type}
           name={name}
           value={value}
           onChange={(e) => onChange({ target: { value: e.target.value } })}
         />
       );
-    }
-    return (
-      <input
-        data-testid={`input-${name}`}
-        aria-label={label}
-        type={type}
-        name={name}
-        value={value}
-        onChange={(e) => onChange({ target: { value: e.target.value } })}
-      />
-    );
-  },
-}));
+    },
+  })
+);
 
-// 3.2. BoxSelector: render one button per availableOption that calls `onSelect(option)`
+// 3.2. GalBoxSelector: render one button per availableOption that calls `onSelect(option)`
 jest.mock(
-  '../../../../../components/box-selector/box-selector.component',
+  '../../../../../components/gal-box-selector/gal-box-selector.component',
   () => ({
     __esModule: true,
     default: ({
@@ -101,8 +104,8 @@ jest.mock(
   })
 );
 
-// 3.3. Button: render a button with onClick, disabled, and text; give it data-testid="btn-<text>"
-jest.mock('../../../../../components/button/button.component', () => ({
+// 3.3. GalButton: render a button with onClick, disabled, and text; give it data-testid="btn-<text>"
+jest.mock('../../../../../components/gal-button/gal-button.component', () => ({
   __esModule: true,
   default: ({
     text,
@@ -191,7 +194,7 @@ describe('<CreateProductStepOne />', () => {
     expect(screen.getByTestId('input-name')).toBeInTheDocument();
     // 2) Description textarea
     expect(screen.getByTestId('input-description')).toBeInTheDocument();
-    // 3) Type selectors (BoxSelector)
+    // 3) Type selectors (GalBoxSelector)
     expect(screen.getByTestId('box-selector')).toBeInTheDocument();
     // 4) Continue button must be present and disabled because name is empty
     const continueBtn = screen.getByTestId('btn-continue');
@@ -255,7 +258,7 @@ describe('<CreateProductStepOne />', () => {
       'A great course'
     );
 
-    // Simulate selecting a type (BoxSelector buttons)
+    // Simulate selecting a type (GalBoxSelector buttons)
     // AVAILABLE_TYPES = ['COURSE','DOWNLOAD','CONSULTATION']
     const courseBtn = screen.getByTestId('box-COURSE');
     fireEvent.click(courseBtn);

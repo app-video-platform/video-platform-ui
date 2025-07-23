@@ -48,7 +48,7 @@ describe('SignIn component', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     // Check that the password input is rendered
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    // Check that the submit button is rendered (using Button component, so role "button")
+    // Check that the submit button is rendered (using GalButton component, so role "button")
     expect(
       screen.getByRole('button', { name: /sign in/i })
     ).toBeInTheDocument();

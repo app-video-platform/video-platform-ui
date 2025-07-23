@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
-import FormInputX from '../../components/form-input/form-input.component';
+import GalFormInput from '../../components/gal-form-input/gal-form-input.component';
 import { AppDispatch } from '../../store/store';
 import { useDispatch } from 'react-redux';
 import { signupUser } from '../../store/auth-store/auth.slice';
 import { useNavigate } from 'react-router-dom';
-import Button from '../../components/button/button.component';
+import GalButton from '../../components/gal-button/gal-button.component';
 import { UserRegisterData } from '../../api/models/user/user';
 
 import './sign-up.styles.scss';
@@ -138,7 +138,7 @@ const SignUp: React.FC = () => {
           Sign Up
         </h1>
         <form onSubmit={handleSubmit}>
-          <FormInputX
+          <GalFormInput
             label="First Name"
             type="text"
             name="firstName"
@@ -150,7 +150,7 @@ const SignUp: React.FC = () => {
             <p className="error-text-red">{errors.firstName}</p>
           )}
 
-          <FormInputX
+          <GalFormInput
             label="Last Name"
             type="text"
             name="lastName"
@@ -162,7 +162,7 @@ const SignUp: React.FC = () => {
             <p className="error-text-red">{errors.lastName}</p>
           )}
 
-          <FormInputX
+          <GalFormInput
             label="Email"
             type="email"
             name="email"
@@ -173,7 +173,7 @@ const SignUp: React.FC = () => {
           {errors.email && <p className="error-text-red">{errors.email}</p>}
 
           <div className="password-group">
-            <FormInputX
+            <GalFormInput
               label="Password"
               type={showPassword.password ? 'text' : 'password'} // Toggle input type
               name="password"
@@ -210,7 +210,7 @@ const SignUp: React.FC = () => {
             </ul>
           )}
           <div className="password-group">
-            <FormInputX
+            <GalFormInput
               label="Confirm Password"
               type={showPassword.confirmPassword ? 'text' : 'password'} // Toggle input type
               name="confirmPassword"
@@ -234,7 +234,7 @@ const SignUp: React.FC = () => {
             <p className="error-text-red">{errors.confirmPassword}</p>
           )}
 
-          <Button text="Sign Up" htmlType="submit" type="primary" />
+          <GalButton text="Sign Up" htmlType="submit" type="primary" />
         </form>
       </div>
     </div>

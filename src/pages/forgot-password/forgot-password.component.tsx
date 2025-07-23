@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 import './forgot-password.styles.scss';
-import Button from '../../components/button/button.component';
+import GalButton from '../../components/gal-button/gal-button.component';
 import EnterEmail from './enter-email/enter-email.component';
 import EnterCode from './enter-code/enter-code.component';
 import ChangePassword from './change-password/change-password.component';
@@ -12,7 +12,7 @@ const ForgotPassword: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [step, setStep] = useState(1);
 
-  const handleChange = (e: { target: { value: string; }; }) => {
+  const handleChange = (e: { target: { value: string } }) => {
     setEmailInput(e.target.value);
   };
 
@@ -28,8 +28,6 @@ const ForgotPassword: React.FC = () => {
     console.log('change password email', emailInput);
 
     setStep(step + 1);
-
-
   };
 
   const sendEmail = () => {
@@ -39,9 +37,22 @@ const ForgotPassword: React.FC = () => {
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <EnterEmail emailInput={emailInput} error={error} handleChange={handleChange} handleSubmit={handleSubmit} />;
+        return (
+          <EnterEmail
+            emailInput={emailInput}
+            error={error}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+          />
+        );
       case 2:
-        return <EnterCode emailInput={emailInput} sendEmail={sendEmail} setStep={setStep} />;
+        return (
+          <EnterCode
+            emailInput={emailInput}
+            sendEmail={sendEmail}
+            setStep={setStep}
+          />
+        );
       case 3:
         return <ChangePassword />;
       default:
@@ -49,11 +60,18 @@ const ForgotPassword: React.FC = () => {
     }
   };
 
-  return <div className="forgot-password-page">
-    {renderStep()}
+  return (
+    <div className="forgot-password-page">
+      {renderStep()}
 
-    <Button text='Back to Sign In' htmlType='button' type='neutral' customClassName='back-btn' />
-  </div>;
+      <GalButton
+        text="Back to Sign In"
+        htmlType="button"
+        type="neutral"
+        customClassName="back-btn"
+      />
+    </div>
+  );
 };
 
 export default ForgotPassword;

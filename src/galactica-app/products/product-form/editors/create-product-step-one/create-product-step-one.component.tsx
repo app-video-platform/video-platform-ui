@@ -5,12 +5,12 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../../store/store';
 
 import { FormErrors, NewProductFormData } from '../../product-form.component';
-import FormInputX from '../../../../../components/form-input/form-input.component';
-import Button from '../../../../../components/button/button.component';
+import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
+import GalButton from '../../../../../components/gal-button/gal-button.component';
 import { createCourseProduct } from '../../../../../store/product-store/product.slice';
 
 import './create-product-step-one.styles.scss';
-import BoxSelector from '../../../../../components/box-selector/box-selector.component';
+import GalBoxSelector from '../../../../../components/gal-box-selector/gal-box-selector.component';
 import { ProductType } from '../../../../../api/models/product/product.types';
 import { INewProductPayload } from '../../../../../api/models/product/product';
 
@@ -79,7 +79,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
 
   return (
     <div>
-      <FormInputX
+      <GalFormInput
         label="Title"
         type="text"
         name="name"
@@ -90,7 +90,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
       />
       {errors.name && <p className="error-text-red">{errors.name}</p>}
 
-      <FormInputX
+      <GalFormInput
         label="Description"
         type="text"
         name="description"
@@ -103,7 +103,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
       <h3>Choose a type</h3>
 
       <div className="type-selectors">
-        <BoxSelector<ProductType>
+        <GalBoxSelector<ProductType>
           selectedOption={formData.type}
           onSelect={(t) => setField('type', t)}
           disabledOptions={[]}
@@ -115,7 +115,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
 
       {!showRestOfForm && (
         <div className="course-continue-button-wrapper">
-          <Button
+          <GalButton
             type="primary"
             htmlType="button"
             onClick={() => handleContinue()}

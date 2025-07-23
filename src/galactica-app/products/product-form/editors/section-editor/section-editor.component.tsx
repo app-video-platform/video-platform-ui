@@ -7,8 +7,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ProductType } from '../../../../../api/models/product/product.types';
-import Button from '../../../../../components/button/button.component';
-import UppyFileUploader from '../../../../../components/uppy-file-uploader/uppy-file-uploader.component';
+import GalButton from '../../../../../components/gal-button/gal-button.component';
+import GalUppyFileUploader from '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
 import {
   updateSectionDetails,
   createSection,
@@ -16,7 +16,7 @@ import {
 } from '../../../../../store/product-store/product.slice';
 import { AppDispatch } from '../../../../../store/store';
 import CourseLessons from '../../course-lessons/course-lessons.component';
-import FormInputX from '../../../../../components/form-input/form-input.component';
+import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
 
 import './section-editor.styles.scss';
 import {
@@ -193,7 +193,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   };
 
   const handleFilesChange = (files: File[]) => {
-    // Callback to update the form's state with files from UppyFileUploader
+    // Callback to update the form's state with files from GalUppyFileUploader
     setFiles(files);
 
     console.log('files', files);
@@ -209,7 +209,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         <h3>Section {index + 1}</h3>
         <>
           {localData.id && (
-            <Button
+            <GalButton
               onClick={handleUpdate}
               text="Update section"
               type="primary"
@@ -218,7 +218,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
             />
           )}
           {showRemoveButton && (
-            <Button
+            <GalButton
               onClick={handleRemove}
               text="Remove"
               type="secondary"
@@ -228,7 +228,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         </>
       </div>
 
-      <FormInputX
+      <GalFormInput
         label="Section Title"
         type="text"
         name="title"
@@ -236,7 +236,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         onChange={handleChange}
       />
 
-      <FormInputX
+      <GalFormInput
         label="Section Description"
         type="text"
         name="description"
@@ -245,7 +245,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       />
 
       {!localData.id && (
-        <Button
+        <GalButton
           onClick={handleSectionCreation}
           text="Create section"
           type="primary"
@@ -270,7 +270,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
             case 'DOWNLOAD':
               return (
                 <div className="download-specific-fields">
-                  <UppyFileUploader onFilesChange={handleFilesChange} />
+                  <GalUppyFileUploader onFilesChange={handleFilesChange} />
                 </div>
               );
 

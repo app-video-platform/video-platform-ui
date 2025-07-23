@@ -1,9 +1,9 @@
 import React from 'react';
-import ContactForm from '../../components/contact-form/contact-form.component';
+import ContactForm from '../../components/gal-contact-form/gal-contact-form.component';
 
 import './contact.styles.scss';
-import CtaSection from '../../components/cta-section/cta-section.component';
-import ExpansionPanel from '../../components/expansion-panel/expansion-panel.component';
+import GalCtaSection from '../../components/gal-cta-section/gal-cta-section.component';
+import GalExpansionPanel from '../../components/gal-expansion-panel/gal-expansion-panel.component';
 
 const Contact: React.FC = () => (
   <main className="contact-page">
@@ -31,14 +31,14 @@ const Contact: React.FC = () => (
       <h1>Frequently Asked Questions</h1>
       <p className="subheading">Find here answers to some common questions</p>
       <div className="faq-list">
-        <ExpansionPanel header="How do I reset my password?">
+        <GalExpansionPanel header="How do I reset my password?">
           <p>
             Click on &quot;Forgot Password&quot; at the login page and follow
             the instructions.
           </p>
-        </ExpansionPanel>
+        </GalExpansionPanel>
 
-        <ExpansionPanel
+        <GalExpansionPanel
           header="Where can I find my purchase history?"
           defaultExpanded
         >
@@ -47,15 +47,15 @@ const Contact: React.FC = () => (
             You can reach our support team via the contact form above or email
             us directly.
           </p>
-        </ExpansionPanel>
+        </GalExpansionPanel>
 
-        <ExpansionPanel header="How can I contact support?">
+        <GalExpansionPanel header="How can I contact support?">
           <p>This panel can’t be opened because it’s disabled. (haha no)</p>
-        </ExpansionPanel>
+        </GalExpansionPanel>
       </div>
     </div>
 
-    <CtaSection
+    <GalCtaSection
       headerText="Not a member yet?"
       descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     />

@@ -3,12 +3,12 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 
-import UserProfileDropdown from '../../components/user-profile/user-profile.component';
+import GalUserProfileDropdown from '../../components/gal-user-profile/gal-user-profile.component';
 
 import './dashboard.styles.scss';
 import UserDashboard from '../user-dashboard/user-dashboard.component';
-import Breadcrumbs from '../../components/breadcrumb/breadcrumb.component';
-import NotificationsDropdown from '../../components/notifications-dropdown/notifications-dropdown.component';
+import GalBreadcrumbs from '../../components/gal-breadcrumb/gal-breadcrumb.component';
+import GalNotificationsDropdown from '../../components/gal-notifications-dropdown/gal-notifications-dropdown.component';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -24,10 +24,10 @@ const Dashboard: React.FC = () => {
           <Link to={'marketing'}>Marketing and Communication</Link>
         </div>
         <button onClick={() => navigate('/')}>Go to website</button>
-        <NotificationsDropdown />
-        <UserProfileDropdown />
+        <GalNotificationsDropdown />
+        <GalUserProfileDropdown />
       </div>
-      <Breadcrumbs />
+      <GalBreadcrumbs />
       <div className="dashboard-outlet">
         {/* <UserDashboard /> */}
         <Outlet />

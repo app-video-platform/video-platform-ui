@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Fragment } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
-import UserProfileDropdown from '../../components/user-profile/user-profile.component';
-import Button from '../../components/button/button.component';
+import GalUserProfileDropdown from '../../components/gal-user-profile/gal-user-profile.component';
+import GalButton from '../../components/gal-button/gal-button.component';
 
 import './nav.styles.scss';
 import { useSelector } from 'react-redux';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
-import Footer from '../../components/footer/footer.component';
-import GalacticaNavDropdown from '../../components/galactica-nav-dropdown/galactica-nav-dropdown.component';
+import GalFooter from '../../components/gal-footer/gal-footer.component';
+import GalNavDropdown from '../../components/gal-nav-dropdown/gal-nav-dropdown.component';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const Navigation: React.FC = () => {
             <li>
               <Link to={'/pricing'}>Pricing</Link>
             </li>
-            <GalacticaNavDropdown />
+            <GalNavDropdown />
 
             <li>
               <Link to={'/contact'}>Contact Us</Link>
@@ -43,18 +43,18 @@ const Navigation: React.FC = () => {
           <div className="user-buttons">
             <ul className="nav-link-list">
               {user ? (
-                <UserProfileDropdown />
+                <GalUserProfileDropdown />
               ) : (
                 <ul className="nav-link-list">
                   <li>
-                    <Button
+                    <GalButton
                       onClick={() => handleRedirect('/signin')}
                       type="secondary"
                       text="Sign In"
                     />
                   </li>
                   <li>
-                    <Button
+                    <GalButton
                       onClick={() => handleRedirect('/signup')}
                       type="primary"
                       text="Register"
@@ -67,7 +67,7 @@ const Navigation: React.FC = () => {
         </div>
       </nav>
       <Outlet />
-      <Footer />
+      <GalFooter />
     </Fragment>
   );
 };

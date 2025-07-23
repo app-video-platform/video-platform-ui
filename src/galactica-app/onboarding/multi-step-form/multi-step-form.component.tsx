@@ -10,7 +10,7 @@ import StepThree from './step-three/step-three.component';
 import StepFour from './step-four/step-four.component';
 import StepFive from './step-five/step-five.component';
 import { useNavigate } from 'react-router-dom';
-import Button from '../../../components/button/button.component';
+import GalButton from '../../../components/gal-button/gal-button.component';
 
 export interface MultiStepFormData {
   profileImage: string;
@@ -26,8 +26,8 @@ const MultiStepForm: React.FC = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
-  const nextStep = () => setStep(prev => prev + 1);
-  const prevStep = () => setStep(prev => prev - 1);
+  const nextStep = () => setStep((prev) => prev + 1);
+  const prevStep = () => setStep((prev) => prev - 1);
 
   const [formData, setFormData] = useState({
     profileImage: '',
@@ -36,7 +36,7 @@ const MultiStepForm: React.FC = () => {
     socialLinks: '',
     website: '',
     location: '',
-    tagline: ''
+    tagline: '',
   });
 
   const handleNextStep = (type: 'next' | 'continue') => {
@@ -60,7 +60,6 @@ const MultiStepForm: React.FC = () => {
   const handleSkip = () => {
     console.log('SHOULD SET onboardingCompleted TO TRUE');
     navigate('/dashboard');
-
   };
 
   const renderStep = () => {
@@ -68,11 +67,17 @@ const MultiStepForm: React.FC = () => {
       case 1:
         return <StepOne key={step} />;
       case 2:
-        return <StepTwo key={step} initialData={formData} setData={setFormData} />;
+        return (
+          <StepTwo key={step} initialData={formData} setData={setFormData} />
+        );
       case 3:
-        return <StepThree key={step} initialData={formData} setData={formData} />;
+        return (
+          <StepThree key={step} initialData={formData} setData={formData} />
+        );
       case 4:
-        return <StepFour key={step} initialData={formData} setData={formData} />;
+        return (
+          <StepFour key={step} initialData={formData} setData={formData} />
+        );
       case 5:
         return <StepFive key={step} />;
       default:
@@ -80,25 +85,33 @@ const MultiStepForm: React.FC = () => {
     }
   };
 
-  return <div className='multi-step-container'>
-    <MultiStepProgressBar step={step} totalSteps={5} />
-    <div className='step-container'>
-      {renderStep()}
-    </div>
-    <div className='step-action-buttons'>
-      <Button onClick={() => handleSkip()} text='Skip' type='neutral' />
-      {
-        step !== 1 && <Button onClick={prevStep} text='Back' type='primary' />
-      }
-      {
-        step !== 5 && <Button onClick={() => handleNextStep('next')} type='primary' text='Next' />
-      }
+  return (
+    <div className="multi-step-container">
+      <MultiStepProgressBar step={step} totalSteps={5} />
+      <div className="step-container">{renderStep()}</div>
+      <div className="step-action-buttons">
+        <GalButton onClick={() => handleSkip()} text="Skip" type="neutral" />
+        {step !== 1 && (
+          <GalButton onClick={prevStep} text="Back" type="primary" />
+        )}
+        {step !== 5 && (
+          <GalButton
+            onClick={() => handleNextStep('next')}
+            type="primary"
+            text="Next"
+          />
+        )}
 
-      {
-        step === 5 && <Button onClick={() => handleNextStep('continue')} text='Continue' type='primary' />
-      }
+        {step === 5 && (
+          <GalButton
+            onClick={() => handleNextStep('continue')}
+            text="Continue"
+            type="primary"
+          />
+        )}
+      </div>
     </div>
-  </div>;
+  );
 };
 
 export default MultiStepForm;

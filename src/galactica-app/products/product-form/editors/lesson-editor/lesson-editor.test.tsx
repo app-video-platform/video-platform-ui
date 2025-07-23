@@ -39,40 +39,43 @@ import {
 
 // ── 3) MOCK child components ──────────────────────────────────────────────────────
 
-// 3.1. FormInput: render <input data-testid="input-<name>" onChange calls onChange({target:{value}})>
-jest.mock('../../../../../components/form-input/form-input.component', () => ({
-  __esModule: true,
-  default: ({
-    label,
-    type,
-    name,
-    value,
-    onChange,
-  }: {
-    label: string;
-    type: string;
-    name: string;
-    value: string;
-    onChange: (e: { target: { name: string; value: string } }) => void;
-  }) => (
-    <input
-      data-testid={`input-${name}`}
-      aria-label={label}
-      type={type}
-      name={name}
-      value={value}
-      onChange={(e) =>
-        onChange({
-          target: { name: name, value: (e.target as HTMLInputElement).value },
-        })
-      }
-    />
-  ),
-}));
-
-// 3.2. BoxSelector: render a button per availableOption, data-testid="box-<opt>"
+// 3.1. GalFormInput: render <input data-testid="input-<name>" onChange calls onChange({target:{value}})>
 jest.mock(
-  '../../../../../components/box-selector/box-selector.component',
+  '../../../../../components/gal-form-input/gal-form-input.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      label,
+      type,
+      name,
+      value,
+      onChange,
+    }: {
+      label: string;
+      type: string;
+      name: string;
+      value: string;
+      onChange: (e: { target: { name: string; value: string } }) => void;
+    }) => (
+      <input
+        data-testid={`input-${name}`}
+        aria-label={label}
+        type={type}
+        name={name}
+        value={value}
+        onChange={(e) =>
+          onChange({
+            target: { name: name, value: (e.target as HTMLInputElement).value },
+          })
+        }
+      />
+    ),
+  })
+);
+
+// 3.2. GalBoxSelector: render a button per availableOption, data-testid="box-<opt>"
+jest.mock(
+  '../../../../../components/gal-box-selector/gal-box-selector.component',
   () => ({
     __esModule: true,
     default: ({
@@ -101,9 +104,9 @@ jest.mock(
   })
 );
 
-// 3.3. UppyFileUploader: render a button data-testid="file-uploader" that calls onFilesChange([mockFile])
+// 3.3. GalUppyFileUploader: render a button data-testid="file-uploader" that calls onFilesChange([mockFile])
 jest.mock(
-  '../../../../../components/uppy-file-uploader/uppy-file-uploader.component',
+  '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
   () => ({
     __esModule: true,
     default: ({
@@ -128,9 +131,9 @@ jest.mock(
   })
 );
 
-// 3.4. RichTextEditor: render a <div data-testid="rich-text-editor">, and call onChange({ somejson }) on click
+// 3.4. GalRichTextEditor: render a <div data-testid="rich-text-editor">, and call onChange({ somejson }) on click
 jest.mock(
-  '../../../../../components/rich-text-editor/rich-text-editor.component',
+  '../../../../../components/rich-text-editor/gal-rich-text-editor.component',
   () => ({
     __esModule: true,
     default: ({
@@ -144,14 +147,14 @@ jest.mock(
         data-testid="rich-text-editor"
         onClick={() => onChange({ delta: 'some-delta' })}
       >
-        RichTextEditor
+        GalRichTextEditor
       </div>
     ),
   })
 );
 
-// 3.5. Button: render <button data-testid="btn-<text>">text</button>
-jest.mock('../../../../../components/button/button.component', () => ({
+// 3.5. GalButton: render <button data-testid="btn-<text>">text</button>
+jest.mock('../../../../../components/gal-button/gal-button.component', () => ({
   __esModule: true,
   default: ({
     text,
@@ -274,17 +277,17 @@ describe('<LessonEditor />', () => {
     ) as HTMLInputElement;
     expect(descInput.value).toBe('Existing Desc');
 
-    // BoxSelector should have selected “TEXT”
+    // GalBoxSelector should have selected “TEXT”
     // The “box-TEXT” button should be bold (we set style based on selectedOption)
     const textButton = screen.getByTestId('box-ARTICLE');
     expect(textButton).toBeInTheDocument();
 
     // Because lesson.id exists, isLessonCreated → true:
-    // Show “Update Lesson” button and render content field for TEXT (RichTextEditor)
+    // Show “Update Lesson” button and render content field for TEXT (GalRichTextEditor)
     const updateBtn = screen.getByTestId('btn-update-lesson');
     expect(updateBtn).toBeInTheDocument();
 
-    // // Since type='ARTICLE', RichTextEditor should be in the DOM
+    // // Since type='ARTICLE', GalRichTextEditor should be in the DOM
     // expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
   });
 
@@ -321,7 +324,7 @@ describe('<LessonEditor />', () => {
     ) as HTMLInputElement;
     expect(descInput.value).toBe('');
 
-    // BoxSelector: no option selected initially, but buttons exist
+    // GalBoxSelector: no option selected initially, but buttons exist
     expect(screen.getByTestId('box-VIDEO')).toBeInTheDocument();
     expect(screen.getByTestId('box-ARTICLE')).toBeInTheDocument();
     expect(screen.getByTestId('box-QUIZ')).toBeInTheDocument();
@@ -367,7 +370,7 @@ describe('<LessonEditor />', () => {
     // After creation, isLessonCreated=true, so “Update Lesson” appears
     expect(screen.getByTestId('btn-update-lesson')).toBeInTheDocument();
 
-    // Default type in setFormData after creation is 'VIDEO', so UppyFileUploader should appear
+    // Default type in setFormData after creation is 'VIDEO', so GalUppyFileUploader should appear
     expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
   });
 
@@ -395,13 +398,13 @@ describe('<LessonEditor />', () => {
     // Initially formData.type === '', so no content field yet.
     // Click “VIDEO” to set formData.type = "VIDEO"
     fireEvent.click(screen.getByTestId('box-VIDEO'));
-    // Now UppyFileUploader (video uploader) should appear
+    // Now GalUppyFileUploader (video uploader) should appear
     expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
 
     // Select “TEXT” type
     fireEvent.click(screen.getByTestId('box-ARTICLE'));
 
-    // Now RichTextEditor should be in the DOM instead of file-uploader
+    // Now GalRichTextEditor should be in the DOM instead of file-uploader
     expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
 
     // Mock updateLessonDetails to return a fake thunk

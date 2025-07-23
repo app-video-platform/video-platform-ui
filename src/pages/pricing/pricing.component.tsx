@@ -1,7 +1,7 @@
 import React from 'react';
 
 import './pricing.styles.scss';
-import Button from '../../components/button/button.component';
+import GalButton from '../../components/gal-button/gal-button.component';
 import { useNavigate } from 'react-router-dom';
 
 const Pricing: React.FC = () => {
@@ -32,7 +32,7 @@ const Pricing: React.FC = () => {
               <h3>Monthly</h3>
               <p>Pay monthly, no commitment</p>
             </div>
-            <Button
+            <GalButton
               type="primary"
               text="Get Started"
               onClick={() => console.log('Monthly plan selected')}
@@ -51,7 +51,7 @@ const Pricing: React.FC = () => {
               <h3>Bi-yearly</h3>
               <p>Save 10% on a 6 month commitment</p>
             </div>
-            <Button
+            <GalButton
               type="primary"
               text="Get Started"
               onClick={() => console.log('Bi-yearly plan selected')}
@@ -70,7 +70,7 @@ const Pricing: React.FC = () => {
               <h3>Yearly</h3>
               <p>Best value! Save 20% with a yearly subscription</p>
             </div>
-            <Button
+            <GalButton
               type="primary"
               text="Get Started"
               onClick={() => console.log('Yearly plan selected')}
@@ -87,8 +87,12 @@ const Pricing: React.FC = () => {
           tortor dolor.
         </p>
         <div className="cta-action-buttons">
-          <Button type="primary" text="Contact Us" onClick={handleContactUs} />
-          <Button
+          <GalButton
+            type="primary"
+            text="Contact Us"
+            onClick={handleContactUs}
+          />
+          <GalButton
             type="secondary"
             text="Learn More"
             onClick={() => console.log('Contact Us clicked')}
