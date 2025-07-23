@@ -50,7 +50,7 @@ const GalNotificationsDropdown: React.FC = () => {
   return (
     <div className="notifications-dropdown" ref={notificationsDropdownRef}>
       <button onClick={handleToggle} className="notifications-button">
-        <GalIcon icon={IoIosNotifications} />
+        <GalIcon icon={IoIosNotifications} size={16} />
       </button>
       {open && (
         <div className="dropdown-menu">

@@ -1,3 +1,26 @@
 .galactica-home-page {
   padding: 20px;
+  width: 100%;
+
+  .galactica-home-nav {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    .galactica-home-search {
+      width: 550px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      // margin-left: auto;
+    }
+  }
+
+  .galactica-home-main {
+    margin-top: 50px;
+  }
 }

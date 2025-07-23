@@ -7,12 +7,14 @@ import './gal-search.styles.scss';
 
 type GalSearchProps = {
   placeholder?: string;
+  customClassName?: string;
   // eslint-disable-next-line no-unused-vars
   onSearch: (query: string) => void;
 };
 
 const GalSearch: React.FC<GalSearchProps> = ({
   placeholder = 'Search...',
+  customClassName = '',
   onSearch,
 }) => {
   const [query, setQuery] = useState('');
@@ -23,7 +25,7 @@ const GalSearch: React.FC<GalSearchProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="search-form">
+    <form onSubmit={handleSubmit} className={`search-form ${customClassName}`}>
       <input
         type="text"
         name="search"
