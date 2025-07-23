@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { selectAllProducts } from '../../store/product-store/product.selectors';
-import ProductCard from '../../components/product-box/product-box.component';
+import GalProductCard from '../../components/gal-product-box/gal-product-box.component';
 
 import './user-page-preview.styles.scss';
 import { BaseProduct } from '../../api/models/product/product';
@@ -436,7 +436,7 @@ const UserPagePreview: React.FC = () => {
         <div className="products-list">
           {downloads.map((item) => (
             <div key={item.id}>
-              <ProductCard product={item} />
+              <GalProductCard product={item} />
             </div>
           ))}
         </div>
@@ -445,7 +445,7 @@ const UserPagePreview: React.FC = () => {
         <div className="products-list">
           {courses.map((item) => (
             <div key={item.id}>
-              <ProductCard product={item} />
+              <GalProductCard product={item} />
             </div>
           ))}
         </div>
@@ -454,7 +454,7 @@ const UserPagePreview: React.FC = () => {
         <div className="products-list">
           {consultations.map((item) => (
             <div key={item.id}>
-              <ProductCard product={item} />
+              <GalProductCard product={item} />
             </div>
           ))}
         </div>

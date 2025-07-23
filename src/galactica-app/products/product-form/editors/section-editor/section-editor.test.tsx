@@ -40,8 +40,8 @@ import {
 
 // ── 3) MOCK child components ──────────────────────────────────────────────────────
 
-// 3.1. Button → renders a simple <button data-testid="btn-<text>">text</button>
-jest.mock('../../../../../components/button/button.component', () => ({
+// 3.1. GalButton → renders a simple <button data-testid="btn-<text>">text</button>
+jest.mock('../../../../../components/gal-button/gal-button.component', () => ({
   __esModule: true,
   default: ({
     text,
@@ -67,43 +67,46 @@ jest.mock('../../../../../components/button/button.component', () => ({
   ),
 }));
 
-// 3.2. FormInput → renders <input data-testid="input-<name>" …>
-jest.mock('../../../../../components/form-input/form-input.component', () => ({
-  __esModule: true,
-  default: ({
-    label,
-    type,
-    name,
-    value,
-    onChange,
-  }: {
-    label: string;
-    type: string;
-    name: string;
-    value: string;
-    onChange: (e: { target: { name: string; value: string } }) => void;
-  }) => (
-    <input
-      data-testid={`input-${name}`}
-      aria-label={label}
-      type={type}
-      name={name}
-      value={value}
-      onChange={(e) =>
-        onChange({
-          target: {
-            name,
-            value: (e.target as HTMLInputElement).value,
-          },
-        })
-      }
-    />
-  ),
-}));
-
-// 3.3. UppyFileUploader → renders <button data-testid="file-uploader">Upload File</button>
+// 3.2. GalFormInput → renders <input data-testid="input-<name>" …>
 jest.mock(
-  '../../../../../components/uppy-file-uploader/uppy-file-uploader.component',
+  '../../../../../components/gal-form-input/gal-form-input.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      label,
+      type,
+      name,
+      value,
+      onChange,
+    }: {
+      label: string;
+      type: string;
+      name: string;
+      value: string;
+      onChange: (e: { target: { name: string; value: string } }) => void;
+    }) => (
+      <input
+        data-testid={`input-${name}`}
+        aria-label={label}
+        type={type}
+        name={name}
+        value={value}
+        onChange={(e) =>
+          onChange({
+            target: {
+              name,
+              value: (e.target as HTMLInputElement).value,
+            },
+          })
+        }
+      />
+    ),
+  })
+);
+
+// 3.3. GalUppyFileUploader → renders <button data-testid="file-uploader">Upload File</button>
+jest.mock(
+  '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
   () => ({
     __esModule: true,
     default: ({

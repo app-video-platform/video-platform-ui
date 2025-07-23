@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../store/store';
-import Button from '../../../../components/button/button.component';
+import GalButton from '../../../../components/gal-button/gal-button.component';
 import SectionEditor from '../editors/section-editor/section-editor.component';
 import { ProductType } from '../../../../api/models/product/product.types';
 
@@ -55,7 +55,7 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
         />
       ))}
 
-      <Button
+      <GalButton
         type="secondary"
         text="Add Section"
         htmlType="button"

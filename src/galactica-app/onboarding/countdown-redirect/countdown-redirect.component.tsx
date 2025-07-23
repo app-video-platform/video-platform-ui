@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../../../components/button/button.component';
+import GalButton from '../../../components/gal-button/gal-button.component';
 
 const CountdownRedirect: React.FC = () => {
   const [seconds, setSeconds] = useState<number>(10);
@@ -30,7 +30,7 @@ const CountdownRedirect: React.FC = () => {
       <p>You will be redirected to your dashboard in {seconds} seconds</p>;
       <p>
         Or you can{' '}
-        <Button
+        <GalButton
           type="primary"
           text="go now"
           onClick={() => navigate('/dashboard')}

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { MultiStepFormData } from '../multi-step-form.component';
-import FormInputX from '../../../../components/form-input/form-input.component';
+import GalFormInput from '../../../../components/gal-form-input/gal-form-input.component';
 
 import './step-four.styles.scss';
 
@@ -23,21 +23,21 @@ const StepFour: React.FC<StepFourProps> = ({ initialData, setData }) => {
   return (
     <form onSubmit={handleSubmit} className="form-step">
       <h2 className="step-header">Additional information</h2>
-      <FormInputX
+      <GalFormInput
         type="text"
         value={initialData.website}
         label="Your Website"
         name="website"
         onChange={handleChange}
       />
-      <FormInputX
+      <GalFormInput
         type="text"
         value={initialData.location}
         label="Your Location"
         name="location"
         onChange={handleChange}
       />
-      <FormInputX
+      <GalFormInput
         type="text"
         value={initialData.socialLinks}
         label="Your Social Media Links"

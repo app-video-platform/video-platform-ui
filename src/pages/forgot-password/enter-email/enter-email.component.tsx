@@ -1,8 +1,8 @@
 import React from 'react';
 
 import './enter-email.styles.scss';
-import FormInputX from '../../../components/form-input/form-input.component';
-import Button from '../../../components/button/button.component';
+import GalFormInput from '../../../components/gal-form-input/gal-form-input.component';
+import GalButton from '../../../components/gal-button/gal-button.component';
 
 export interface EnterEmailProps {
   emailInput: string;
@@ -26,7 +26,7 @@ const EnterEmail: React.FC<EnterEmailProps> = ({
       Use that code here to be able to change your password.
     </p>
     <form onSubmit={handleSubmit} className="enter-email-form">
-      <FormInputX
+      <GalFormInput
         type="email"
         value={emailInput}
         label="Enter email address"
@@ -36,7 +36,7 @@ const EnterEmail: React.FC<EnterEmailProps> = ({
       />
       {error && error !== '' && <p className="error-text-red">{error}</p>}
       <div className="button-container">
-        <Button
+        <GalButton
           text="Continue"
           htmlType="submit"
           type="primary"

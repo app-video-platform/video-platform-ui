@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 
 import { AppDispatch } from '../../store/store';
-import FormInputX from '../../components/form-input/form-input.component';
+import GalFormInput from '../../components/gal-form-input/gal-form-input.component';
 import { getUserProfile, signinUser } from '../../store/auth-store/auth.slice';
-import Button from '../../components/button/button.component';
+import GalButton from '../../components/gal-button/gal-button.component';
 
 import './sign-in.styles.scss';
-import GoogleSignInButton from '../../components/google-sign-in-button/google-sign-in-button.component';
+import GalGoogleSignInButton from '../../components/gal-google-sign-in-button/gal-google-sign-in-button.component';
 
 export interface SignInFormData {
   email: string;
@@ -88,7 +88,7 @@ const SignIn: React.FC = () => {
     <div>
       <div className="sign-up-container">
         <form onSubmit={handleSubmit} noValidate>
-          <FormInputX
+          <GalFormInput
             label="Email"
             type="email"
             name="email"
@@ -99,7 +99,7 @@ const SignIn: React.FC = () => {
           {errors.email && <p className="error-text-red">{errors.email}</p>}
 
           <div className="password-group">
-            <FormInputX
+            <GalFormInput
               label="Password"
               type={showPassword ? 'text' : 'password'} // Toggle input type
               name="password"
@@ -118,10 +118,10 @@ const SignIn: React.FC = () => {
           {errors.password && (
             <p className="error-text-red">{errors.password}</p>
           )}
-          <Button type="primary" htmlType="submit" text="Sign In" />
+          <GalButton type="primary" htmlType="submit" text="Sign In" />
         </form>
 
-        <GoogleSignInButton data-test-id="google-sign-in-button" />
+        <GalGoogleSignInButton data-test-id="google-sign-in-button" />
 
         <div className="forgot-password-button-container">
           <button

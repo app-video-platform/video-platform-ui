@@ -39,8 +39,8 @@ jest.mock('../editors/section-editor/section-editor.component', () => ({
   ),
 }));
 
-// 1.2. Mock Button so that “Add Section” appears as a button with data-testid="btn-add-section"
-jest.mock('../../../../components/button/button.component', () => ({
+// 1.2. Mock GalButton so that “Add Section” appears as a button with data-testid="btn-add-section"
+jest.mock('../../../../components/gal-button/gal-button.component', () => ({
   __esModule: true,
   default: ({
     text,

@@ -5,8 +5,8 @@
 /* eslint-disable indent */
 import React, { use, useEffect, useState } from 'react';
 
-import FormInputX from '../../../../../components/form-input/form-input.component';
-import Button from '../../../../../components/button/button.component';
+import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
+import GalButton from '../../../../../components/gal-button/gal-button.component';
 import { AppDispatch } from '../../../../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -14,9 +14,9 @@ import {
   deleteLesson,
   updateLessonDetails,
 } from '../../../../../store/product-store/product.slice';
-import BoxSelector from '../../../../../components/box-selector/box-selector.component';
-import UppyFileUploader from '../../../../../components/uppy-file-uploader/uppy-file-uploader.component';
-import RichTextEditor from '../../../../../components/rich-text-editor/rich-text-editor.component';
+import GalBoxSelector from '../../../../../components/gal-box-selector/gal-box-selector.component';
+import GalUppyFileUploader from '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
+import GalRichTextEditor from '../../../../../components/rich-text-editor/gal-rich-text-editor.component';
 import {
   ICreateLessonPayload,
   ILesson,
@@ -24,7 +24,7 @@ import {
 import { LessonType } from '../../../../../api/models/product/product.types';
 
 import { MdDeleteForever } from 'react-icons/md';
-import IconComponent from '../../../../../components/icon-component/gal-icon.component';
+import GalIcon from '../../../../../components/gal-icon-component/gal-icon.component';
 import './lesson-editor.styles.scss';
 import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
 import { IRemoveItemPayload } from '../../../../../api/models/product/product';
@@ -209,7 +209,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     switch (formData.type) {
       case 'VIDEO':
         return (
-          <UppyFileUploader
+          <GalUppyFileUploader
             onFilesChange={onVideoUploadChange}
             allowedFileTypes={['video/*']}
           />
@@ -218,7 +218,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       case 'ARTICLE':
         return (
           <div className="form-input-group">
-            <RichTextEditor
+            <GalRichTextEditor
               initialContent={contentJSON}
               onChange={(json) => setContentJSON(json)}
             />
@@ -254,11 +254,11 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           type="button"
           onClick={handleDeleteLesson}
         >
-          <IconComponent icon={MdDeleteForever} size={24} color="red" />
+          <GalIcon icon={MdDeleteForever} size={24} color="red" />
         </button>
       </div>
       <div>
-        <FormInputX
+        <GalFormInput
           label="Lesson Title"
           type="text"
           name="title"
@@ -266,7 +266,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           onChange={handleChange}
         />
 
-        <FormInputX
+        <GalFormInput
           label="Lesson Description"
           type="text"
           name="description"
@@ -274,7 +274,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           onChange={handleChange}
         />
 
-        <BoxSelector<LessonType>
+        <GalBoxSelector<LessonType>
           selectedOption={formData.type}
           onSelect={(type) => setFormData((prev) => ({ ...prev, type }))}
           availableOptions={['VIDEO', 'ARTICLE', 'QUIZ']} // Example lesson types
@@ -287,7 +287,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           {isLessonCreated ? (
             <>
               {renderContentField()}
-              <Button
+              <GalButton
                 type="primary"
                 text="Update Lesson"
                 htmlType="button"
@@ -295,7 +295,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
               />
             </>
           ) : (
-            <Button
+            <GalButton
               type="primary"
               text="Create Lesson"
               htmlType="button"

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Search from '../../components/search/search.component';
+import GalSearch from '../../components/gal-search/gal-search.component';
 
 import './galactica-home.styles.scss';
 
@@ -13,7 +13,7 @@ const GalacticaHome: React.FC = () => {
     <div className="galactica-home-page">
       <nav className="galactica-home-nav">
         <div className="logo-container"></div>
-        <Search
+        <GalSearch
           placeholder="Search for what your heart desires"
           onSearch={handleSearch}
         />

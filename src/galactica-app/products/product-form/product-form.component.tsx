@@ -14,9 +14,9 @@ import {
   getProductByProductId,
   updateCourseProductDetails,
 } from '../../../store/product-store/product.slice';
-import Button from '../../../components/button/button.component';
-import PriceSelector from '../../../components/price-selector/price-selector.component';
-import UppyFileUploader from '../../../components/uppy-file-uploader/uppy-file-uploader.component';
+import GalButton from '../../../components/gal-button/gal-button.component';
+import GalPriceSelector from '../../../components/gal-price-selector/gal-price-selector.component';
+import GalUppyFileUploader from '../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
 import CreateProductStepOne from './editors/create-product-step-one/create-product-step-one.component';
 import CreateProductSections from './create-product-sections/create-product-sections.component';
 import {
@@ -97,7 +97,7 @@ const ProductForm: React.FC = () => {
   };
 
   const handleImageChange = (image: File[]) => {
-    // Callback to update the form's state with files from UppyFileUploader
+    // Callback to update the form's state with files from GalUppyFileUploader
     setProductImage(image[0]);
 
     console.log('product image', image[0]);
@@ -219,13 +219,13 @@ const ProductForm: React.FC = () => {
 
           {showRestOfForm && (
             <>
-              <Button
+              <GalButton
                 type="primary"
                 text="Update product details"
                 htmlType="submit"
               />
 
-              <Button
+              <GalButton
                 type="secondary"
                 text="DELETE"
                 htmlType="button"
@@ -251,7 +251,10 @@ const ProductForm: React.FC = () => {
           <>
             <div className="price-selector-wrapper">
               <h3>Choose Your Price Option</h3>
-              <PriceSelector price={formData.price} setPrice={handleSetPrice} />
+              <GalPriceSelector
+                price={formData.price}
+                setPrice={handleSetPrice}
+              />
             </div>
 
             <div className="image-uploader">
@@ -259,7 +262,7 @@ const ProductForm: React.FC = () => {
                 <h3>Upload an image</h3>
               </div>
               <div className="image-uploader-box">
-                <UppyFileUploader
+                <GalUppyFileUploader
                   onFilesChange={handleImageChange}
                   allowedFileTypes={['image/*']}
                   disableImporters={true}
@@ -277,7 +280,7 @@ const ProductForm: React.FC = () => {
             </div>
 
             {/* <div className="action-btns-wrapper">
-              <Button type="primary" text="Save Changes" htmlType="submit" />
+              <GalButton type="primary" text="Save Changes" htmlType="submit" />
             </div> */}
           </>
         )}

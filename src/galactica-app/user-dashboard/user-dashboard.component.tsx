@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { FaUser } from 'react-icons/fa';
-import IconComponent from '../../components/icon-component/gal-icon.component';
+import GalIcon from '../../components/gal-icon-component/gal-icon.component';
 
 import './user-dashboard.styles.scss';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
@@ -10,8 +10,8 @@ import {
   selectAllProducts,
   selectTopThreeProducts,
 } from '../../store/product-store/product.selectors';
-import ProductCard from '../../components/product-box/product-box.component';
-import Button from '../../components/button/button.component';
+import GalProductCard from '../../components/gal-product-box/gal-product-box.component';
+import GalButton from '../../components/gal-button/gal-button.component';
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const UserDashboard: React.FC = () => {
     <div className="user-dashboard-container">
       {/* <FaUser className="user-avatar" /> */}
       <div className="user-banner">
-        <IconComponent icon={FaUser} className="user-avatar" />
+        <GalIcon icon={FaUser} className="user-avatar" />
         <div className="user-profile">
           <div className="user-info-box">
             <h2>
@@ -37,7 +37,7 @@ const UserDashboard: React.FC = () => {
         </div>
 
         <div className="action-buttons-container">
-          <Button
+          <GalButton
             onClick={() => navigate('my-page-preview')}
             text="Preview"
             type="secondary"
@@ -49,7 +49,7 @@ const UserDashboard: React.FC = () => {
         <h2>Most successful products</h2>
         {topThreeProducts && topThreeProducts.length > 0 ? (
           topThreeProducts.map((item) => (
-            <ProductCard key={item.id} product={item} />
+            <GalProductCard key={item.id} product={item} />
           ))
         ) : (
           <div>
@@ -57,12 +57,12 @@ const UserDashboard: React.FC = () => {
               You don&apos;t have any products yet. Go ahead and create one
               right now!
             </p>
-            <Button
+            <GalButton
               onClick={() => navigate('products/create')}
               text="Create Product"
               type="primary"
             />
-            {/* <Button
+            {/* <GalButton
               onClick={() => navigate('products/create-course')}
               text="(tmp) Create COURSE"
               type="primary"
