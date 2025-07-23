@@ -17,7 +17,7 @@ module.exports = {
 
   // Tells Jest explicitly which node_modules need transformation
   transformIgnorePatterns: [
-    '/node_modules/(?!(axios|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error|react-icons)/)',
+    '/node_modules/(?!(axios|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error|react-icons|pretty-bytes)/)',
   ],
 
   // File extensions Jest recognizes during module resolution

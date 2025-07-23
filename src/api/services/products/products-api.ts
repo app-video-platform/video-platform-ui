@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import httpClient from '../../http-client';
+import { getCookie } from '../../../utils/cookie.util';
 import { ILesson, ICreateLessonPayload } from '../../models/product/lesson';
 import {
   INewProductPayload,
@@ -259,10 +260,4 @@ export const confirmFileUploadAPI = async (payload: {
     console.error('Error confirming file upload:', error);
     throw error;
   }
-};
-
-// Utility function to read CSRF cookie
-const getCookie = (name: string): string | null => {
-  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-  return match ? match[2] : null;
 };

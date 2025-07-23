@@ -6,22 +6,17 @@ import IconComponent from '../../components/icon-component/gal-icon.component';
 import './user-dashboard.styles.scss';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { useNavigate } from 'react-router-dom';
-import { selectAllProducts } from '../../store/product-store/product.selectors';
+import {
+  selectAllProducts,
+  selectTopThreeProducts,
+} from '../../store/product-store/product.selectors';
 import ProductCard from '../../components/product-box/product-box.component';
 import Button from '../../components/button/button.component';
-import { BaseProduct } from '../../api/models/product/product';
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
-  const products = useSelector(selectAllProducts);
-  const topThreeProducts: BaseProduct[] = [];
-
-  // if (products) {
-  //   topThreeProducts = products
-  //     .sort((a, b) => b.customers - a.customers)
-  //     .slice(0, 3);
-  // }
+  const topThreeProducts = useSelector(selectTopThreeProducts);
 
   return (
     <div className="user-dashboard-container">

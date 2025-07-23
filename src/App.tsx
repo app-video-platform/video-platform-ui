@@ -11,6 +11,7 @@ import Navigation from './pages/nav/nav.component';
 import Contact from './pages/contact/contact.component';
 import NotFoundPage from './pages/errors/not-found/not-found.component';
 import UnauthorizedPage from './pages/errors/unauthorized/unauthorized.component';
+import ProtectedRoute from './utils/protected-route.util';
 import Dashboard from './galactica-app/dashboard/dashboard.component';
 import ProductsList from './galactica-app/products/products-list/products-list.component';
 import ProductsLayout from './galactica-app/products/products-layout.component';
@@ -41,8 +42,22 @@ const App = () => (
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      <Route path="onboarding" element={<Onboarding />} />
-      <Route path="dashboard" element={<Dashboard />}>
+      <Route
+        path="onboarding"
+        element={
+          <ProtectedRoute>
+            <Onboarding />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<UserDashboard />} />
         <Route path="products" element={<ProductsLayout />}>
           <Route index element={<ProductsList />} />

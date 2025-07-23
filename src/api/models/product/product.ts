@@ -55,13 +55,15 @@ export interface IUpdateCourseProduct {
   id: string;
 }
 
+export type SectionContentType = string;
+
 export interface IUpdateSectionDetails {
   productId?: string;
   id?: string;
   title?: string;
   description?: string;
   position: number;
-  content?: any;
+  content?: SectionContentType;
   userId: string;
   files?: File[];
 }
@@ -71,7 +73,7 @@ export interface Sectiunile {
   title?: string;
   description?: string;
   position?: number;
-  content?: any; // Can be text, video, etc.
+  content?: SectionContentType; // Can be text, video, etc.
   lessons?: ILesson[];
 }
 

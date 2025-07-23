@@ -102,7 +102,7 @@ export const getUserProfile = createAsyncThunk<
   User, // Return type: user login response
   void, // Argument type (user data)
   { rejectValue: string } // Error type
->('auth/getUserProfile', async (any, { rejectWithValue }) => {
+>('auth/getUserProfile', async (_, { rejectWithValue }) => {
   try {
     const response = await getUserProfileAPI();
     return response; // API returns user info with token

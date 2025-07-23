@@ -7,12 +7,14 @@ import { getAllProductsByUserId } from './../../../store/product-store/product.s
 
 import './products-list.styles.scss';
 import { useNavigate } from 'react-router-dom';
-import { selectAllProducts } from '../../../store/product-store/product.selectors';
+import { selectAllProducts, selectProductsLoading, selectProductsError } from '../../../store/product-store/product.selectors';
 
 const ProductsList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const products = useSelector(selectAllProducts);
+  const loading = useSelector(selectProductsLoading);
+  const error = useSelector(selectProductsError);
   const user = useSelector(selectAuthUser);
 
   useEffect(() => {
@@ -39,7 +41,9 @@ const ProductsList: React.FC = () => {
           + Add product
         </button>
       </div>
-      {products && products.length > 0 ? (
+      {loading && <p>Loading products...</p>}
+      {error && <p className="error-message">Error: {error}</p>}
+      {!loading && !error && products && products.length > 0 ? (
         <table className="products-table">
           <thead>
             <tr>
@@ -73,7 +77,7 @@ const ProductsList: React.FC = () => {
           </tbody>
         </table>
       ) : (
-        <p>There are no products to show</p>
+        !loading && !error && <p>There are no products to show</p>
       )}
     </div>
   );
