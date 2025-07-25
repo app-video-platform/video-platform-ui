@@ -2,19 +2,27 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import GalUserProfileDropdown from './gal-user-profile.component';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 import { logout } from '../../store/auth-store/auth.slice';
 import '@testing-library/jest-dom';
 
 // Mock react-redux and react-router-dom hooks
-jest.mock('react-redux', () => ({
-  useDispatch: jest.fn(),
-  useSelector: jest.fn(),
-}));
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: jest.fn(),
+  };
+});
 
-jest.mock('react-router-dom', () => ({
-  useNavigate: jest.fn(),
-}));
+jest.mock('react-redux', () => {
+  const actual = jest.requireActual('react-redux');
+  return {
+    ...actual,
+    useDispatch: jest.fn(),
+    useSelector: jest.fn(),
+  };
+});
 
 describe('GalUserProfileDropdown component', () => {
   const dummyUser = {
@@ -47,7 +55,11 @@ describe('GalUserProfileDropdown component', () => {
   });
 
   it('renders the user profile button and toggles dropdown on click', () => {
-    render(<GalUserProfileDropdown />);
+    render(
+      <MemoryRouter>
+        <GalUserProfileDropdown />
+      </MemoryRouter>
+    );
     // Verify the profile button displays the user's first and last name.
     const profileButton = screen.getByRole('button', { name: /jd/i });
     expect(profileButton).toBeInTheDocument();
@@ -62,7 +74,11 @@ describe('GalUserProfileDropdown component', () => {
   });
 
   it('closes the dropdown when clicking outside', () => {
-    render(<GalUserProfileDropdown />);
+    render(
+      <MemoryRouter>
+        <GalUserProfileDropdown />
+      </MemoryRouter>
+    );
     const profileButton = screen.getByRole('button', { name: /jd/i });
     // Open the dropdown.
     fireEvent.click(profileButton);
@@ -78,7 +94,11 @@ describe('GalUserProfileDropdown component', () => {
     mockDispatch.mockReturnValueOnce(undefined); // For dispatch(logout())
     mockDispatch.mockReturnValueOnce({ unwrap: () => Promise.resolve() }); // For dispatch(logoutUser())
 
-    render(<GalUserProfileDropdown />);
+    render(
+      <MemoryRouter>
+        <GalUserProfileDropdown />
+      </MemoryRouter>
+    );
     const profileButton = screen.getByRole('button', { name: /jd/i });
     // Open the dropdown.
     fireEvent.click(profileButton);

@@ -1,16 +1,16 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Home from './pages/home/home.component';
-import About from './pages/about/about.component';
-import EmailSent from './pages/email-sent/email-sent.component';
-import SignIn from './pages/sign-in/sign-in.component';
-import SignUp from './pages/sign-up/sign-up.component';
-import VerifyEmail from './pages/verify-email/verify-email.component';
+import Home from './static-pages/home/home.component';
+import About from './static-pages/about/about.component';
+import EmailSent from './static-pages/email-sent/email-sent.component';
+import SignIn from './static-pages/sign-in/sign-in.component';
+import SignUp from './static-pages/sign-up/sign-up.component';
+import VerifyEmail from './static-pages/verify-email/verify-email.component';
 import AppInitializer from './utils/app-initializer.util';
-import Navigation from './pages/nav/nav.component';
-import Contact from './pages/contact/contact.component';
-import NotFoundPage from './pages/errors/not-found/not-found.component';
-import UnauthorizedPage from './pages/errors/unauthorized/unauthorized.component';
+import Navigation from './static-pages/nav/nav.component';
+import Contact from './static-pages/contact/contact.component';
+import NotFoundPage from './static-pages/errors/not-found/not-found.component';
+import UnauthorizedPage from './static-pages/errors/unauthorized/unauthorized.component';
 import ProtectedRoute from './utils/protected-route.util';
 import Dashboard from './galactica-app/dashboard/dashboard.component';
 import ProductsList from './galactica-app/products/products-list/products-list.component';
@@ -18,13 +18,13 @@ import ProductsLayout from './galactica-app/products/products-layout.component';
 import UserPagePreview from './galactica-app/user-page-preview/user-page-preview.component';
 import UserDashboard from './galactica-app/user-dashboard/user-dashboard.component';
 import Onboarding from './galactica-app/onboarding/onboarding.component';
-import ForgotPassword from './pages/forgot-password/forgot-password.component';
+import ForgotPassword from './static-pages/forgot-password/forgot-password.component';
 import ProductForm from './galactica-app/products/product-form/product-form.component';
-import Pricing from './pages/pricing/pricing.component';
+import Pricing from './static-pages/pricing/pricing.component';
 import SalesPage from './galactica-app/sales-page/sales-page.component';
 import MarketingPage from './galactica-app/marketing-page/marketing-page.component';
 import GalacticaHome from './galactica-app/galactica-home/galactica-home.component';
-import DevDashboard from './pages/dev-dashboard/dev-dashboard.component';
+import DevDashboard from './static-pages/dev-dashboard/dev-dashboard.component';
 
 const App = () => (
   <AppInitializer>

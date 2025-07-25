@@ -28,6 +28,7 @@ module.exports = {
     '\\.(css|scss)$': 'identity-obj-proxy',
     '\\.(png|jpe?g|gif|svg)$': '<rootDir>/src/utils/file.mock.js',
     '^react-icons/(.*)': 'identity-obj-proxy',
+    '\\.mdx$': '<rootDir>/src/utils/mdx-mock.js',
   },
 
   // Treat `.ts` and `.tsx` explicitly as ES Modules

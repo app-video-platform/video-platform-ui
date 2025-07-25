@@ -8,7 +8,7 @@ import {
 } from '../../api/services/auth/auth-api';
 import { getUserProfileAPI } from '../../api/services/user/user-api';
 
-import { SignInFormData } from '../../pages/sign-in/sign-in.component';
+import { SignInFormData } from '../../static-pages/sign-in/sign-in.component';
 import { User, UserRegisterData } from '../../api/models/user/user';
 import { AxiosError } from 'axios';
 
