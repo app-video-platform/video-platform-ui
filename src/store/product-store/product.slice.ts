@@ -2,9 +2,9 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   addImageToProductAPI,
-  createCourseProductAPI,
+  createProductAPI,
   getAllProductsByUserIdAPI,
-  updateCourseDetailsAPI,
+  updateProductDetailsAPI,
   updateSectionDetailsAPI,
   createSectionAPI,
   createLessonAPI,
@@ -55,7 +55,7 @@ export const createCourseProduct = createAsyncThunk<
   { rejectValue: string }
 >('products/createCourseProduct', async (payload, thunkAPI) => {
   try {
-    const response = await createCourseProductAPI(payload);
+    const response = await createProductAPI(payload);
     return response;
   } catch (err: unknown) {
     return thunkAPI.rejectWithValue(extractErrorMessage(err));
@@ -68,7 +68,7 @@ export const updateCourseProductDetails = createAsyncThunk<
   { rejectValue: string }
 >('products/updateCourseProductDetails', async (payload, thunkAPI) => {
   try {
-    const response = await updateCourseDetailsAPI(payload);
+    const response = await updateProductDetailsAPI(payload);
     return response;
   } catch (err: unknown) {
     return thunkAPI.rejectWithValue(extractErrorMessage(err));

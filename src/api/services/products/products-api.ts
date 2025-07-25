@@ -12,7 +12,7 @@ import {
 } from '../../models/product/product';
 import { ProductType } from '../../models/product/product.types';
 
-export const createCourseProductAPI = async (payload: INewProductPayload) => {
+export const createProductAPI = async (payload: INewProductPayload) => {
   try {
     const response = await httpClient.post<IProductResponse>(
       'api/products',
@@ -28,7 +28,9 @@ export const createCourseProductAPI = async (payload: INewProductPayload) => {
   }
 };
 
-export const updateCourseDetailsAPI = async (payload: IUpdateCourseProduct) => {
+export const updateProductDetailsAPI = async (
+  payload: IUpdateCourseProduct
+) => {
   try {
     const response = await httpClient.put<IProductResponse>(
       'api/products',

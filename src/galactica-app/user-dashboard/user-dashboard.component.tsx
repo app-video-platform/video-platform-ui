@@ -22,7 +22,7 @@ const UserDashboard: React.FC = () => {
     <div className="user-dashboard-container">
       {/* <FaUser className="user-avatar" /> */}
       <div className="user-banner">
-        <GalIcon icon={FaUser} className="user-avatar" />
+        <GalIcon icon={FaUser} size={100} className="user-avatar" />
         <div className="user-profile">
           <div className="user-info-box">
             <h2>

@@ -1,5 +1,7 @@
 .dev-dashboard {
   padding: 40px;
+  max-width: 1200px;
+  margin: auto;
 
   .dev-dashboard-nav {
     display: flex;
@@ -28,21 +30,32 @@
     .dev-panel-content {
       padding: 30px 50px;
 
+      h3 {
+        margin-top: 0;
+      }
+
       .dev-item-box {
         display: grid;
-        grid-template-columns: 450px 150px; /* two fixed-width columns */
+        grid-template-columns: 450px 150px 250px; /* three fixed-width columns */
         grid-template-rows: auto auto; /* two rows, height by content */
         gap: 1rem;
         align-items: center;
+        margin-top: 20px;
 
         .item-box-header {
           grid-column: 1; /* first column */
           grid-row: 1;
-          margin-top: 20px;
+        }
+
+        .method {
+          grid-column: 2;
+          grid-row: 1;
+          font-weight: bold;
+          color: #333;
         }
 
         .route-info {
-          grid-column: 2; /* second column */
+          grid-column: 3; /* third column */
           grid-row: 1;
         }
 
@@ -53,6 +66,11 @@
 
           ul {
             font-size: 14px;
+
+            ul,
+            ol {
+              margin-left: 20px;
+            }
           }
 
           ol {

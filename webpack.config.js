@@ -15,7 +15,7 @@ module.exports = {
     publicPath: '/',
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.mdx'],
   },
   devServer: {
     historyApiFallback: true,
@@ -39,6 +39,17 @@ module.exports = {
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
         type: 'asset/resource',
+      },
+      {
+        test: /\.md$/,
+        use: 'raw-loader',
+      },
+      {
+        test: /\.mdx?$/,
+        use: [
+          'babel-loader', // to transform JSX
+          '@mdx-js/loader', // to convert MDX → JS/JSX
+        ],
       },
     ],
   },
