@@ -801,3 +801,182 @@ Here we got some info about the routes created for the app, split into several c
     </div>
   </GalExpansionPanel>
 </GalExpansionPanel>
+
+<GalExpansionPanel header='UI Component Architecture Proposal'>
+  <div className="dev-panel-content">
+    <div className="dev-item-box">
+      <div className="item-box-content">
+        # Creator Platform - React UI Component Architecture
+
+        This is a modular list of React components for both the public site and authenticated app interface.
+
+        ---
+
+        ## 🌐 Public Site (Static Pages)
+
+          - HomePage
+          - AboutPage
+          - PricingPage
+          - ContactPage
+          - SignInPage
+          - SignUpPage
+          - EmailVerificationPage
+          - TermsAndPrivacyPage
+
+        ---
+
+        ## 🔐 Authentication & Onboarding
+
+          - AuthWrapper (protect routes)
+          - OnboardingStepper
+          - OnboardingProfileForm
+          - OnboardingPreferencesForm
+          - IntroTourOverlay
+
+        ---
+
+        ## 🧭 Layout Components
+
+          - PublicLayout (for static pages)
+          - AppLayout (for authenticated users)
+          - SidebarNavigation
+          - TopNavbar
+          - NotificationBell
+          - UserAvatarDropdown
+
+        ---
+
+        ## 🏠 Dashboard (Creator)
+
+          - DashboardOverview
+          - DashboardMetricsCard
+          - RecentActivityFeed
+          - QuickActionsPanel
+
+        ---
+
+        ## 🛍 Products
+
+          - ProductList
+          - ProductCard
+          - ProductTypeTabs (Courses / Downloads / Sessions)
+          - CreateProductWrapper
+            - CreateCourseForm
+            - CreateDownloadForm
+            - CreateConsultationForm
+          - EditProductPage
+          - ProductDetailsPage
+
+        ---
+
+        ## 📅 Consultations
+
+          - BookingCalendar
+          - TimeSlotPicker
+          - BookingForm
+          - ConsultationConfirmation
+          - MyConsultations (User-side)
+          - ConsultationManager (Creator-side)
+          - JoinSessionButton
+
+        ---
+
+        ## 💳 Checkout & Orders
+
+          - CheckoutPage
+          - PaymentForm (StripeElements)
+          - OrderSummary
+          - OrderHistory (User)
+          - OrdersDashboard (Creator)
+
+        ---
+
+        ## 🎓 Course Viewer
+
+          - CoursePlayer
+          - LessonListSidebar
+          - LessonViewer
+          - MarkAsCompleteButton
+          - ProgressTracker
+
+        ---
+
+        ## 🛒 Storefront
+
+          - CreatorStorefront
+          - StorefrontEditor
+          - FeaturedProducts
+          - StorefrontHeader
+
+        ---
+
+        ## 📈 Analytics
+
+          - AnalyticsDashboard
+          - SalesGraph
+          - ProductPerformanceTable
+          - TrafficStats
+
+        ---
+
+        ## 📣 Marketing & Engagement
+
+          - MarketingDashboard
+          - EmailCampaignForm
+          - AudienceSelector
+          - EmailPreview
+          - CampaignHistory
+          - CouponList
+          - CreateCouponForm
+          - AffiliateDashboard
+          - InviteAffiliateForm
+          - CommissionSettings
+
+        ---
+
+        ## 💬 Communication
+
+          - MessagesInbox
+          - MessageThread
+          - SendMessageForm
+          - ReviewsList
+          - ReviewItem
+          - LeaveReviewForm
+
+        ---
+
+        ## ⚙️ Settings
+
+          - AccountSettings
+          - BillingSettings
+          - ProfileSettings
+          - PasswordChangeForm
+          - ConnectedApps (Zoom, Calendar)
+          - NotificationPreferences
+
+        ---
+
+        ## 🔧 Admin (Optional)
+
+          - AdminDashboard
+          - UserManagementTable
+          - ProductModerationPanel
+          - PlatformMetrics
+
+        ---
+
+        ## 🧱 Utility Components
+
+          - Modal
+          - Tooltip
+          - Button
+          - Input
+          - Select
+          - ToggleSwitch
+          - Avatar
+          - DatePicker
+          - FileUploader
+      </div>
+    </div>
+  </div>
+</GalExpansionPanel>
