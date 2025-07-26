@@ -41,13 +41,11 @@ const GalUserProfileDropdown: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [selectedRole, setSelectedRole] = useState<UserRole>(
-    user?.role[0] || UserRole.USER
-  );
+  const [selectedRole, setSelectedRole] = useState<UserRole>(UserRole.USER);
   useOnClickOutside(dropdownRef, () => setOpen(false));
 
   useEffect(() => {
-    setSelectedRole(user?.role[0] || UserRole.USER);
+    setSelectedRole(UserRole.USER);
   }, [user?.role]);
 
   const handleClick = (role: UserRole) => {
