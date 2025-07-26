@@ -54,7 +54,7 @@ const GalGoogleSignInButton: React.FC = () => {
         if (data) {
           dispatch(getUserProfile()).then((data) => {
             if (data) {
-              navigate('dashboard');
+              navigate('/app');
             }
           });
         }

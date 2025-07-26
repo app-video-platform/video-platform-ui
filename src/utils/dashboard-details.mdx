@@ -181,7 +181,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Instructor Dashboard</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/dashboard'}>Dashboard</Link>
+        <Link className="route-info" to={'/app/dashboard'}>Dashboard</Link>
         <div className="item-box-content">
           - This is the main hub for a user with role INSTRUCTOR/TEACHER/CREATOR
           - Depending on the route we take, the URL will either be app.galactica.com/dashboard or galactica.com/app/dashboard
@@ -193,7 +193,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Products</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/dashboard/products'}>Products</Link>
+        <Link className="route-info" to={'/app//dashboard/products'}>Products</Link>
         <div className="item-box-content">
           - A page seen only by users with role INSTRUCTOR/TEACHER/CREATOR
           - Here they can manage their created products, see details about customers, sales, etc. for each one, edit them, and create new ones
@@ -203,7 +203,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Create Product</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/dashboard/products/create'}>Create Product</Link>
+        <Link className="route-info" to={'/app/dashboard/products/create'}>Create Product</Link>
         <div className="item-box-content">
           - This is the page specifically for creating new products
           - The flow chosen follows best practices for this situation, but the UX needs improvements (too many buttons, too many clicks)
@@ -213,7 +213,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Edit Product</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/dashboard/products/edit/COURSE/course-id'}>Edit Product</Link>
+        <Link className="route-info" to={'/app/dashboard/products/edit/COURSE/course-id'}>Edit Product</Link>
         <div className="item-box-content">
           - This is the page specifically for editing existing products
           - Technically it's still the same component as creating a product, but with parameters in the URL
@@ -223,7 +223,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Instructor Storefront Preview</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/dashboard/my-page-preview'}>Storefront Preview</Link>
+        <Link className="route-info" to={'/app/dashboard/my-page-preview'}>Storefront Preview</Link>
         <div className="item-box-content">
           - User's storefront page
           - Can edit themes, colors, items, information
@@ -234,7 +234,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Sales Page</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/dashboard/sales'}>Sales</Link>
+        <Link className="route-info" to={'/app/dashboard/sales'}>Sales</Link>
         <div className="item-box-content">
           - User's sale information page
           - Here they can see details about purchases, can edit prices, can see analytics and sale trends
@@ -244,7 +244,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Marketing Page</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/dashboard/marketing'}>Marketing</Link>
+        <Link className="route-info" to={'/app/dashboard/marketing'}>Marketing</Link>
         <div className="item-box-content">
           - User's marketing page
           - Here they can see their marketing campaigns, can create new ones, can edit existing ones, and can see analytics
@@ -256,7 +256,7 @@ Here we got some info about the routes created for the app, split into several c
       <div className="dev-item-box">
         <h3 className="item-box-header">Normal User Home/Dashboard Page</h3>
         <span className="method"/>
-        <Link className="route-info" to={'/app-home'}>Home/Dashboard</Link>
+        <Link className="route-info" to={'/app'}>Home/Dashboard</Link>
         <div className="item-box-content">
           - This is the page seen by users with role STUDENT/BUYER/CUSTOMER
           - Depending on the route we take, the URL will probably be app.galactica.com
