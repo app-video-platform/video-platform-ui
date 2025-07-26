@@ -1,5 +1,5 @@
 // auth.slice.test.ts
-import { User } from '../../api/models/user/user';
+import { User, UserRole } from '../../api/models/user/user';
 import authReducer, {
   logout,
   setUserProfile,
@@ -22,7 +22,7 @@ describe('auth slice reducers', () => {
       firstName: 'Alice',
       lastName: 'Smith',
       email: 'alice@example.com',
-      role: ['user'],
+      role: [UserRole.USER],
       onboardingCompleted: true,
     } as User;
     const state = authReducer(initialState, setUserProfile(user));
@@ -36,7 +36,7 @@ describe('auth slice reducers', () => {
         firstName: 'Alice',
         lastName: 'Smith',
         email: 'alice@example.com',
-        role: ['user'],
+        role: [UserRole.USER],
       },
       token: 'abc123',
       message: 'some message',

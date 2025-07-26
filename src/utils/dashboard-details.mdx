@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import GalExpansionPanel from '../components/gal-expansion-panel/gal-expansion-panel.component.tsx';
+import Artboard from '../assets/1x/Artboard 1.png';
 
 # Developer Dashboard
 
@@ -166,14 +167,25 @@ Here we got some info about the routes created for the app, split into several c
   <GalExpansionPanel header="Galactica App">
     <div className="dev-panel-content">
       <div className="dev-item-box">
+        <h3 className="item-box-header">Galactica App Home</h3>
+        <span className="method"/>
+        <Link className="route-info" to={'/app'}>App Hpme</Link>
+        <div className="item-box-content">
+          - This is the main page a user with any role is redirected to 
+          - Depending on the route we take, the URL will either be app.galactica.com or galactica.com/app
+            - currently: [app.serious-debauchery.click/app](https://app.serious-debauchery.click/app) 
+          - Here they have a navbar/sidenav specific to them, with products, sales info, marketing, and routing to all the pages specific to their role  
+          - This is the central hub of the app
+        </div>
+      </div>
+      <div className="dev-item-box">
         <h3 className="item-box-header">Instructor Dashboard</h3>
         <span className="method"/>
         <Link className="route-info" to={'/dashboard'}>Dashboard</Link>
         <div className="item-box-content">
-          - This is the main page a user with role INSTRUCTOR/TEACHER/CREATOR is redirected  
-          - Depending on the route we take, the URL will probably be app.galactica.com 
-            - currently: [app.serious-debauchery.click/dashboard](https://app.serious-debauchery.click/dashboard) 
-          - Here they have a navbar/sidenav specific to them, with products, sales info, marketing, and routing to all the pages specific to their role  
+          - This is the main hub for a user with role INSTRUCTOR/TEACHER/CREATOR
+          - Depending on the route we take, the URL will either be app.galactica.com/dashboard or galactica.com/app/dashboard
+            - currently: [app.serious-debauchery.click/app/dashboard](https://app.serious-debauchery.click/app/dashboard) 
           - Usually here the user has their basic info regarding everything, like best products, highest sales, etc.
         </div>
       </div>
@@ -248,7 +260,7 @@ Here we got some info about the routes created for the app, split into several c
         <div className="item-box-content">
           - This is the page seen by users with role STUDENT/BUYER/CUSTOMER
           - Depending on the route we take, the URL will probably be app.galactica.com
-            - currently: [app.serious-debauchery.click/app-home](https://app.serious-debauchery.click/app-home)
+            - currently: [app.serious-debauchery.click/app](https://app.serious-debauchery.click/app)
           - This is the creator's main hub, with a navbar with a search bar, link to course, cart, and notification
           - Here they can search for courses, products, or creators
           - Here they can see their most recently started courses, and other categories of products tailored to the user's preferences
@@ -697,6 +709,7 @@ Here we got some info about the routes created for the app, split into several c
         <span className="route-info">api/products/getProduct?productId=**productId**&type=**productType**</span>
         <div className="item-box-content">
           - Endpoint used for retrieving a specific product by its ID and type
+          - **DUDE!** Ne trebuie un alt endpoint care duce ca si asta tot produsul, dar fara content, ca sa putem sa afisam pe pagina de product pe care o vad clientii inainte sa cumpere
           - **Payload:** _none (based on productId and productType parameters)_
           - **Response:**
             - ```js
@@ -806,7 +819,114 @@ Here we got some info about the routes created for the app, split into several c
   <div className="dev-panel-content">
     <div className="dev-item-box">
       <div className="item-box-content">
-        # Creator Platform - React UI Component Architecture
+        # So, avem niste architecture Proposal
+        Dar nu e pentru UI, e pentru routing si domain.
+        Ideea ii ca is doua feluri de a face aplicatie ca si a noastra: 
+          - **Subdomain Model**
+          - **Path-Based Model**
+
+        Noi deocamdata folosim Path-Based Model, adica avem un singur domeniu, si in functie de path-ul URL-ului, afisam diferite pagini.
+        Pentru a separa partea statica de partea de galactica app, o sa folosim un path ````/app```` pentru toate paginile
+        
+        Cealalata propunere ar fi sa avem partea statica pe un domeniu normal, si aplicatia pe un subdomeniu, gen app.galactica.com.
+
+        Am avut o discutie cu prietenul nostru comun, si a facut o comparare intre modele, e sub textul asta. Am facut si eu o imagine frumoasa ca acompaniament.
+
+        <img src={Artboard} width={'80%'} style={{margin: '30px auto'}}/>
+
+        # Frontend Architecture Comparison: Split-Subdomain vs Single-Domain Models
+
+        ---
+
+        ## 📘 Model 1: Split-Subdomain Architecture ("Subdomain Model")
+
+        ### 🌍 Domain Structure:
+        - `www.yourwebsite.com` → Public site (landing, about, sign in, etc.)
+        - `app.yourwebsite.com` → Authenticated app (dashboards, products, storefronts)
+
+        ### ✅ Pros:
+        - Clear separation of concerns (marketing vs app)
+        - Independent deployment pipelines
+        - Easier to optimize SEO and performance for the public site
+        - More scalable for future features (e.g., mobile, international versions)
+        - More professional SaaS-like experience
+
+        ### ❌ Cons:
+        - More complex setup (DNS, deployment, routing)
+        - Cross-domain login/session handling may require cookie or token config
+
+        ### 🧱 Minimal Monorepo Folder Structure:
+        ```
+        creator-platform/
+        ├── apps/
+        │   ├── www/         # Public site (React or Next.js)
+        │   ├── app/         # Creator/user dashboard app
+        ├── packages/
+        │   ├── ui/          # Shared UI components
+        │   ├── auth/        # Shared auth logic
+        │   ├── utils/       # Shared helpers
+        ```
+
+        ---
+
+        ## 📗 Model 2: Single-Domain with URL Prefix Architecture ("Path-Based Model")
+
+        ### 🌍 Domain Structure:
+        - `www.yourwebsite.com/` → Public site
+        - `www.yourwebsite.com/app/...` → Authenticated app (dashboard, library, etc.)
+
+        ### ✅ Pros:
+        - Simpler deployment (single domain, single host or service)
+        - Easier cookie/session management (no cross-domain issues)
+        - Can be built as a single SPA (e.g., with route-based layout switching)
+
+        ### ❌ Cons:
+        - Harder to decouple public site from app logic over time
+        - All changes require a single redeploy
+        - May cause confusion or route collision if not managed carefully
+        - SEO tuning and page load performance harder to isolate
+
+        ### 🧱 Minimal Folder Structure (Single App):
+        ```
+        creator-platform/
+        ├── src/
+        │   ├── components/
+        │   ├── pages/
+        │   │   ├── index.jsx             # Home
+        │   │   ├── about.jsx
+        │   │   ├── app/
+        │   │   │   ├── dashboard.jsx     # Creator dashboard
+        │   │   │   ├── library.jsx       # Buyer dashboard
+        │   │   │   ├── explore.jsx       # Product discovery
+        │   ├── layouts/
+        │   │   ├── PublicLayout.jsx
+        │   │   ├── AppLayout.jsx
+        ├── App.js or main.tsx
+        ```
+
+        ---
+
+        ## 🏁 Recommendation
+
+        - Choose **Subdomain Model** if:
+          - You want cleaner codebase separation and professional SaaS UX
+          - You plan to scale long-term (e.g., mobile app, admin portal, marketing team)
+
+        - Choose **Path-Based Model** if:
+          - You're in early MVP stage or working solo/small team
+          - You prefer simplicity over separation right now
+          - You want minimal hosting complexity
+
+        ---
+
+
+
+        <div style={{height: '60px'}}/>
+
+        Deci aici avem o propunere de arhitectura pentru UI, care se bazeaza pe modelul de path-based (cat de cat asa am implementat).
+
+        <div style={{height: '20px'}}/>
+        # Subdomain Model - React UI Component Architecture
 
         This is a modular list of React components for both the public site and authenticated app interface.
 

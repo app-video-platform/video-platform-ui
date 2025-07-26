@@ -70,7 +70,7 @@ describe('GalUserProfileDropdown component', () => {
     // Click the profile button to toggle dropdown open.
     fireEvent.click(profileButton);
     expect(screen.getByText(/john\.doe@example\.com/i)).toBeInTheDocument();
-    expect(screen.getByText(/role: admin, user/i)).toBeInTheDocument();
+    expect(screen.getByText(/role: admin/i)).toBeInTheDocument();
   });
 
   it('closes the dropdown when clicking outside', () => {

@@ -12,7 +12,7 @@ import {
   ProductType,
   ProductStatus,
 } from '../../api/models/product/product.types';
-import { User } from '../../api/models/user/user';
+import { User, UserRole } from '../../api/models/user/user';
 
 const UserPagePreview: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -29,7 +29,7 @@ const UserPagePreview: React.FC = () => {
       email: 'myemail@domain.test',
       firstName: 'Gica',
       lastName: 'Hagi',
-      role: ['User'],
+      role: [UserRole.USER],
       id: '',
     };
 

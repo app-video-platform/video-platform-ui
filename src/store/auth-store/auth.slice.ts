@@ -9,7 +9,7 @@ import {
 import { getUserProfileAPI } from '../../api/services/user/user-api';
 
 import { SignInFormData } from '../../static-pages/sign-in/sign-in.component';
-import { User, UserRegisterData } from '../../api/models/user/user';
+import { User, UserRegisterData, UserRole } from '../../api/models/user/user';
 import { AxiosError } from 'axios';
 
 interface AuthState {
@@ -147,10 +147,16 @@ const authSlice = createSlice({
         firstName: 'Aleb',
         lastName: 'Mocked',
         email: 'aleb-mocked@example.com',
-        role: ['User'],
+        role: [UserRole.CREATOR],
         onboardingCompleted: false,
       };
       state.isUserLoggedIn = true;
+    },
+
+    changeUserRole: (state, action: PayloadAction<UserRole>) => {
+      if (state.user) {
+        state.user.role = [action.payload];
+      }
     },
   },
   extraReducers: (builder) => {
@@ -232,5 +238,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setUserProfile, resetOnboarding } = authSlice.actions;
+export const { logout, setUserProfile, resetOnboarding, changeUserRole } =
+  authSlice.actions;
 export default authSlice.reducer;

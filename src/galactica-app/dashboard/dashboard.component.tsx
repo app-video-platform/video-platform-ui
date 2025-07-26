@@ -10,6 +10,10 @@ import UserDashboard from '../user-dashboard/user-dashboard.component';
 import GalBreadcrumbs from '../../components/gal-breadcrumb/gal-breadcrumb.component';
 import GalNotificationsDropdown from '../../components/gal-notifications-dropdown/gal-notifications-dropdown.component';
 
+//////////////////////////////////////////
+/////////// NO LONGER USED //////////////
+////////////////////////////////////////
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 

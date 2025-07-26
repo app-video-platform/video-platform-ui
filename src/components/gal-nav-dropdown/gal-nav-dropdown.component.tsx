@@ -49,7 +49,7 @@ const GalNavDropdown: React.FC = () => {
           <Link to="/products" className="dropdown-item">
             Products
           </Link>
-          <Link to="/dashboard" className="dropdown-item">
+          <Link to="/app" className="dropdown-item">
             Dashboard
           </Link>
         </div>

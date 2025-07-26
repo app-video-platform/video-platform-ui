@@ -7,6 +7,7 @@ import {
   ProductType,
   ProductStatus,
 } from '../../api/models/product/product.types';
+import { MemoryRouter } from 'react-router-dom';
 
 // Create a dummy placeholder value as used in your component.
 // In your component, placeholderImage is imported via require.
@@ -54,7 +55,11 @@ describe('GalProductCard component', () => {
   };
 
   it('renders product details', () => {
-    render(<GalProductCard product={baseProductWithImage} />);
+    render(
+      <MemoryRouter>
+        <GalProductCard product={baseProductWithImage} />
+      </MemoryRouter>
+    );
 
     // Verify that the image src is the product image.
     // const imageEl = screen.getByRole('img', {
@@ -90,7 +95,11 @@ describe('GalProductCard component', () => {
   });
 
   it('falls back to the placeholder image when image is missing or empty', () => {
-    render(<GalProductCard product={baseProductWithoutImage} />);
+    render(
+      <MemoryRouter>
+        <GalProductCard product={baseProductWithoutImage} />
+      </MemoryRouter>
+    );
     const imageEl = screen.getByRole('img', {
       name: baseProductWithoutImage.name,
     });
@@ -100,7 +109,11 @@ describe('GalProductCard component', () => {
   });
 
   it('renders price without euro symbol when price is "free"', () => {
-    render(<GalProductCard product={baseProductWithoutImage} />);
+    render(
+      <MemoryRouter>
+        <GalProductCard product={baseProductWithoutImage} />
+      </MemoryRouter>
+    );
 
     // Check the container for type and price details.
     const typeAndPriceContainer = screen.getByText(

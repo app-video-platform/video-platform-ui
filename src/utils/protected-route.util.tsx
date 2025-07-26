@@ -3,15 +3,30 @@ import React, { JSX } from 'react';
 import { Navigate } from 'react-router-dom';
 // Example of pulling user state from a React Context or your Auth store:
 import { useSelector } from 'react-redux';
-import { selectIsUserLoggedIn, selectAuthLoading } from '../store/auth-store/auth.selectors';
+import {
+  selectIsUserLoggedIn,
+  selectAuthLoading,
+  selectAuthUser,
+} from '../store/auth-store/auth.selectors';
+import { UserRole } from '../api/models/user/user';
 
 interface ProtectedRouteProps {
+  allowedRoles: UserRole[];
   children: JSX.Element;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles,
+}) => {
   const isUserLoggedIn = useSelector(selectIsUserLoggedIn);
   const authLoading = useSelector(selectAuthLoading);
+  const user = useSelector(selectAuthUser);
+
+  const isAllowed = allowedRoles.some((role) => user?.role.includes(role));
+  if (!isAllowed) {
+    return <Navigate to="/app" replace />;
+  }
 
   if (authLoading) {
     return <p>Loading authentication...</p>; // Or a spinner component

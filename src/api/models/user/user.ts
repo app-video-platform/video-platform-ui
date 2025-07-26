@@ -1,12 +1,11 @@
 export interface User {
-  id?: string,
+  id?: string;
   firstName: string;
   lastName: string;
   email: string;
-  role: string[];
+  role: UserRole[];
   onboardingCompleted?: boolean;
 }
-
 
 export interface UserRegisterData {
   firstName: string;
@@ -21,5 +20,11 @@ export interface UserLoginResponse {
   lastName: string;
   email: string;
   // token: string;
-  role: string[]
+  role: UserRole[];
+}
+
+export enum UserRole {
+  USER = 'User',
+  CREATOR = 'Creator',
+  ADMIN = 'Admin',
 }

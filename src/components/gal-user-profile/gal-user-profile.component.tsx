@@ -3,10 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { AppDispatch } from '../../store/store';
-import { logout, logoutUser } from '../../store/auth-store/auth.slice';
+import {
+  changeUserRole,
+  logout,
+  logoutUser,
+} from '../../store/auth-store/auth.slice';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 
 import './gal-user-profile.styles.scss';
+import { UserRole } from '../../api/models/user/user';
 
 // Custom hook to handle clicks outside of a given ref.
 function useOnClickOutside<T extends HTMLElement>(
@@ -36,8 +41,19 @@ const GalUserProfileDropdown: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const [selectedRole, setSelectedRole] = useState<UserRole>(
+    user?.role[0] || UserRole.USER
+  );
   useOnClickOutside(dropdownRef, () => setOpen(false));
+
+  useEffect(() => {
+    setSelectedRole(user?.role[0] || UserRole.USER);
+  }, [user?.role]);
+
+  const handleClick = (role: UserRole) => {
+    setSelectedRole(role);
+    dispatch(changeUserRole(role));
+  };
 
   // Toggle dropdown open/close
   const handleToggle = () => {
@@ -86,10 +102,20 @@ const GalUserProfileDropdown: React.FC = () => {
             <span>{user.email}</span>
           </div>
           <div className="dropdown-item">
-            <span>
-              Role:{' '}
-              {Array.isArray(user.role) ? user.role.join(', ') : user.role}
-            </span>
+            <span>Role: {selectedRole}</span>
+            <div className="role-selector">
+              {Object.values(UserRole).map((roleValue) => (
+                <button
+                  key={roleValue}
+                  className={`role-button ${
+                    selectedRole === roleValue ? 'selected' : ''
+                  }`}
+                  onClick={() => handleClick(roleValue)}
+                >
+                  {roleValue}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="dropdown-item">
             <Link to="/dev-dashboard">Dev Dashboard</Link>

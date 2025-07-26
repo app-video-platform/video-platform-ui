@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import MultiStepForm from './multi-step-form/multi-step-form.component';
 import CountdownRedirect from './countdown-redirect/countdown-redirect.component';
-import { User } from '../../api/models/user/user';
+import { User, UserRole } from '../../api/models/user/user';
 
 const Onboarding: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -16,7 +16,7 @@ const Onboarding: React.FC = () => {
       email: 'myemail@domain.test',
       firstName: 'Gica',
       lastName: 'Hagi',
-      role: ['User'],
+      role: [UserRole.USER],
       id: '',
       onboardingCompleted: false,
     };

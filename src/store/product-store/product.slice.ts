@@ -411,7 +411,6 @@ const productsSlice = createSlice({
         (state, action: PayloadAction<IProductResponse>) => {
           state.loading = false;
           state.error = null;
-
           state.currentProduct = action.payload;
         }
       )

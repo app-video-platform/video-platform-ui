@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import Home from './static-pages/home/home.component';
 import About from './static-pages/about/about.component';
 import EmailSent from './static-pages/email-sent/email-sent.component';
@@ -25,6 +25,11 @@ import SalesPage from './galactica-app/sales-page/sales-page.component';
 import MarketingPage from './galactica-app/marketing-page/marketing-page.component';
 import GalacticaHome from './galactica-app/galactica-home/galactica-home.component';
 import DevDashboard from './static-pages/dev-dashboard/dev-dashboard.component';
+import AppLayout from './galactica-app/app-layout/app-layout.component';
+import { User } from 'lucide-react';
+import { UserRole } from './api/models/user/user';
+import ProductPage from './galactica-app/product-page/product-page.component';
+import LibraryPage from './galactica-app/library-page/library-page.component';
 
 const App = () => (
   <AppInitializer>
@@ -54,26 +59,50 @@ const App = () => (
       /> */}
 
       <Route path="onboarding" element={<Onboarding />} />
-      {/* <Route
-        path="dashboard"
+      {/* Protected route allowed for all types of users */}
+      <Route
+        path="app"
         element={
-          <ProtectedRoute>
-            <Dashboard />
+          <ProtectedRoute
+            allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}
+          >
+            <AppLayout />
           </ProtectedRoute>
         }
-      > */}
-      <Route path="dashboard" element={<Dashboard />}>
-        <Route index element={<UserDashboard />} />
-        <Route path="products" element={<ProductsLayout />}>
-          <Route index element={<ProductsList />} />
-          <Route path="create" element={<ProductForm />} />
-          <Route path="edit/:type/:id" element={<ProductForm />} />
+      >
+        <Route index element={<GalacticaHome />} />
+        <Route path="product/:id/:type" element={<ProductPage />} />
+
+        {/* Protected route denied for users with role User*/}
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+              {/* Outlet simply renders the matching child route */}
+              <Outlet />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<UserDashboard />} />
+          <Route path="products" element={<ProductsLayout />}>
+            <Route index element={<ProductsList />} />
+            <Route path="create" element={<ProductForm />} />
+            <Route path="edit/:type/:id" element={<ProductForm />} />
+          </Route>
+          <Route path="sales" element={<SalesPage />} />
+          <Route path="my-page-preview" element={<UserPagePreview />} />
+          <Route path="marketing" element={<MarketingPage />} />
         </Route>
-        <Route path="my-page-preview" element={<UserPagePreview />} />
-        <Route path="sales" element={<SalesPage />} />
-        <Route path="marketing" element={<MarketingPage />} />
+
+        <Route
+          path="library"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+              <LibraryPage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
-      <Route path="app-home" element={<GalacticaHome />} />
     </Routes>
   </AppInitializer>
 );

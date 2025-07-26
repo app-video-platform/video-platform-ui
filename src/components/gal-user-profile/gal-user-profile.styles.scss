@@ -1,5 +1,5 @@
 .user-profile-button {
-  padding: 20px;
+  padding: 15px;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
 }
@@ -20,4 +20,23 @@
 
 .logout-btn {
   cursor: pointer;
+}
+
+.role-selector {
+  display: flex;
+  align-items: center;
+
+  .role-button {
+    padding: 0.4rem 0.8rem;
+    background: #fff;
+    cursor: pointer;
+
+    &.selected {
+      font-weight: bold;
+    }
+
+    &:hover {
+      background: #f0f0f0;
+    }
+  }
 }

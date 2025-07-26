@@ -1,22 +1,28 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FaUser } from 'react-icons/fa';
 import GalIcon from '../../components/gal-icon-component/gal-icon.component';
 
 import './user-dashboard.styles.scss';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { useNavigate } from 'react-router-dom';
-import {
-  selectAllProducts,
-  selectTopThreeProducts,
-} from '../../store/product-store/product.selectors';
+import { selectTopThreeProducts } from '../../store/product-store/product.selectors';
 import GalProductCard from '../../components/gal-product-box/gal-product-box.component';
 import GalButton from '../../components/gal-button/gal-button.component';
+import { AppDispatch } from '../../store/store';
+import { getAllProductsByUserId } from '../../store/product-store/product.slice';
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
   const topThreeProducts = useSelector(selectTopThreeProducts);
+
+  useEffect(() => {
+    if (user && user.id) {
+      dispatch(getAllProductsByUserId(user?.id));
+    }
+  }, [user]);
 
   return (
     <div className="user-dashboard-container">
@@ -47,28 +53,25 @@ const UserDashboard: React.FC = () => {
 
       <div className="producs-section">
         <h2>Most successful products</h2>
-        {topThreeProducts && topThreeProducts.length > 0 ? (
-          topThreeProducts.map((item) => (
-            <GalProductCard key={item.id} product={item} />
-          ))
-        ) : (
-          <div>
-            <p>
-              You don&apos;t have any products yet. Go ahead and create one
-              right now!
-            </p>
-            <GalButton
-              onClick={() => navigate('products/create')}
-              text="Create Product"
-              type="primary"
-            />
-            {/* <GalButton
-              onClick={() => navigate('products/create-course')}
-              text="(tmp) Create COURSE"
-              type="primary"
-            /> */}
-          </div>
-        )}
+        <div className="product-cards">
+          {topThreeProducts && topThreeProducts.length > 0 ? (
+            topThreeProducts.map((item) => (
+              <GalProductCard key={item.id} product={item} />
+            ))
+          ) : (
+            <div>
+              <p>
+                You don&apos;t have any products yet. Go ahead and create one
+                right now!
+              </p>
+              <GalButton
+                onClick={() => navigate('products/create')}
+                text="Create Product"
+                type="primary"
+              />
+            </div>
+          )}
+        </div>
       </div>
       <div className="audience-section">
         <h2>Audience</h2>

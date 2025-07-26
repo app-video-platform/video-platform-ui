@@ -1,5 +1,5 @@
 import httpClient from '../../http-client';
-import { User } from '../../models/user/user';
+import { User, UserRole } from '../../models/user/user';
 import { getUserProfileAPI } from './user-api';
 
 jest.mock('../../http-client');
@@ -13,7 +13,7 @@ describe('User API functions', () => {
         firstName: 'Mock',
         lastName: 'User',
         email: 'mock@user.test',
-        role: ['User'],
+        role: [UserRole.USER],
         onboardingCompleted: true,
       };
 
