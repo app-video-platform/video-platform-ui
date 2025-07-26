@@ -69,7 +69,7 @@ const SignIn: React.FC = () => {
               if (data) {
                 if (data.onboardingCompleted) {
                   console.log('GO TO DASHBOARD FROM SIGN IN', data);
-                  navigate('/dashboard');
+                  navigate('/app');
                 } else {
                   console.log('GO TO ONBOARDING FROM SIGN IN', data);
                   navigate('/onboarding');

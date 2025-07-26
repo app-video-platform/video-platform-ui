@@ -45,11 +45,14 @@ const MultiStepForm: React.FC = () => {
         if (step === 4) {
           console.log('SHOULD SAVE HERE', formData);
         }
+        console.log('continue on step', step);
+        console.log('save now form', formData);
+
         nextStep();
         break;
       case 'continue':
         console.log('SHOULD CONTINUE ONBOARDING');
-        navigate('/dashboard');
+        navigate('/app');
         break;
 
       default:
@@ -57,9 +60,13 @@ const MultiStepForm: React.FC = () => {
     }
   };
 
+  const handleUpdate = () => {
+    console.log('form data', formData);
+  };
+
   const handleSkip = () => {
     console.log('SHOULD SET onboardingCompleted TO TRUE');
-    navigate('/dashboard');
+    navigate('/app');
   };
 
   const renderStep = () => {
@@ -68,15 +75,30 @@ const MultiStepForm: React.FC = () => {
         return <StepOne key={step} />;
       case 2:
         return (
-          <StepTwo key={step} initialData={formData} setData={setFormData} />
+          <StepTwo
+            key={step}
+            initialData={formData}
+            setData={setFormData}
+            submitForm={handleUpdate}
+          />
         );
       case 3:
         return (
-          <StepThree key={step} initialData={formData} setData={formData} />
+          <StepThree
+            key={step}
+            initialData={formData}
+            setData={formData}
+            submitForm={handleUpdate}
+          />
         );
       case 4:
         return (
-          <StepFour key={step} initialData={formData} setData={formData} />
+          <StepFour
+            key={step}
+            initialData={formData}
+            setData={formData}
+            submitForm={handleUpdate}
+          />
         );
       case 5:
         return <StepFive key={step} />;

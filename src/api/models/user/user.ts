@@ -28,3 +28,28 @@ export enum UserRole {
   CREATOR = 'Creator',
   ADMIN = 'Admin',
 }
+
+export interface UserDetails {
+  userId: string;
+  title?: string;
+  bio?: string;
+  taglineMission?: string;
+  website?: string;
+  city?: string;
+  country: string;
+  socialLinks?: SocialLink[];
+}
+
+export interface SocialLink {
+  id?: string;
+  platform: SocialPlatforms;
+  url: string;
+}
+
+export enum SocialPlatforms {
+  IG = 'INSTAGRAM',
+  FB = 'FACEBOOK',
+  X = 'X',
+  TT = 'TIKTOK',
+  YT = 'YOUTUBE',
+}

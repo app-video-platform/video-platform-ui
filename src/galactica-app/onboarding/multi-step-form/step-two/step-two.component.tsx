@@ -8,10 +8,14 @@ import GalFormInput from '../../../../components/gal-form-input/gal-form-input.c
 interface StepTwoProps {
   initialData: MultiStepFormData;
   setData: any;
-  // submitForm: (data: Partial<FormData>) => void;
+  submitForm: (data: Partial<FormData>) => void;
 }
 
-const StepTwo: React.FC<StepTwoProps> = ({ initialData, setData }) => {
+const StepTwo: React.FC<StepTwoProps> = ({
+  initialData,
+  setData,
+  submitForm,
+}) => {
   const [bio, setBio] = useState(initialData.bio);
 
   const handleSubmit = (e: React.FormEvent) => {

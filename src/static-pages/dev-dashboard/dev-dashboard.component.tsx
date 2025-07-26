@@ -12,7 +12,7 @@ const DevDashboard: React.FC = () => (
     <nav className="dev-dashboard-nav">
       <div className="logo" />
       <div className="nav-links">
-        <Link to={'/dashboard'}>Normal Dashboard</Link>
+        <Link to={'/app/dashboard'}>Normal Dashboard</Link>
         <Link to={'/'}>Landing page</Link>
       </div>
       <GalUserProfileDropdown />

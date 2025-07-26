@@ -12,7 +12,7 @@ const CountdownRedirect: React.FC = () => {
 
   useEffect(() => {
     if (seconds === 0) {
-      navigate('/dashboard'); // Replace with your target route
+      navigate('/app'); // Replace with your target route
       return;
     }
 
@@ -45,7 +45,7 @@ const CountdownRedirect: React.FC = () => {
         <GalButton
           type="primary"
           text="go now"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/app')}
         />
         <GalButton type="primary" text="RESET" onClick={handleReset} />
       </p>

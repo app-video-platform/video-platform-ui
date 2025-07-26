@@ -7,12 +7,16 @@ import GalFormInput from '../../../../components/gal-form-input/gal-form-input.c
 interface StepThreeProps {
   initialData: MultiStepFormData;
   setData: any;
-  // nextStep: (data: Partial<FormData>) => void;
+  submitForm: (data: Partial<FormData>) => void;
 }
 
-const StepThree: React.FC<StepThreeProps> = ({ initialData, setData }) => {
+const StepThree: React.FC<StepThreeProps> = ({
+  initialData,
+  setData,
+  submitForm,
+}) => {
   const handleSubmit = (e: React.FormEvent) => {
-    // e.preventDefault();
+    e.preventDefault();
     // if (!bio) {
     //   alert('Please enter your bio.');
     //   return;

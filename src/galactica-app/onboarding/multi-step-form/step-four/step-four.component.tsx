@@ -8,9 +8,14 @@ import './step-four.styles.scss';
 interface StepFourProps {
   initialData: MultiStepFormData;
   setData: any;
+  submitForm: (data: Partial<FormData>) => void;
 }
 
-const StepFour: React.FC<StepFourProps> = ({ initialData, setData }) => {
+const StepFour: React.FC<StepFourProps> = ({
+  initialData,
+  setData,
+  submitForm,
+}) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('multi step form data', initialData);
