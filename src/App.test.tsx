@@ -6,14 +6,18 @@ import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import App from './App';
+import { UserRole } from './api/models/user/user';
 
 // Define a dummy thunk middleware with minimal typing (using any to bypass type conflicts)
-const dummyThunk = ({ dispatch, getState }: { dispatch: any; getState: any }) => (next: any) => (action: any): any => {
-  if (typeof action === 'function') {
-    return action(dispatch, getState);
-  }
-  return next(action);
-};
+const dummyThunk =
+  ({ dispatch, getState }: { dispatch: any; getState: any }) =>
+  (next: any) =>
+  (action: any): any => {
+    if (typeof action === 'function') {
+      return action(dispatch, getState);
+    }
+    return next(action);
+  };
 
 // Cast the middleware array as any to avoid type errors from redux-mock-store.
 const middlewares = [dummyThunk] as any;
@@ -21,22 +25,28 @@ const mockStore = configureStore(middlewares);
 
 // Mock getUserProfile and setUserProfile from your auth slice so that the async thunk resolves immediately.
 jest.mock('./store/auth-store/auth.slice', () => ({
-  getUserProfile: jest.fn(() => () =>
-    Promise.resolve({
-      payload: {
-        firstName: 'Test',
-        lastName: 'User',
-        email: 'test@example.com',
-        role: ['user'],
-      },
-    })
+  getUserProfile: jest.fn(
+    () => () =>
+      Promise.resolve({
+        payload: {
+          firstName: 'Test',
+          lastName: 'User',
+          email: 'test@example.com',
+          role: [UserRole.USER],
+        },
+      })
   ),
   setUserProfile: jest.fn(),
 }));
 
 // Mock ProtectedRoute to simply render its children.
 // eslint-disable-next-line react/display-name
-jest.mock('./utils/protected-route.util', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
+jest.mock(
+  './utils/protected-route.util',
+  () =>
+    ({ children }: { children: React.ReactNode }) =>
+      <>{children}</>
+);
 
 // Define an initial auth state with no user so that getUserProfile is dispatched.
 const initialState = {

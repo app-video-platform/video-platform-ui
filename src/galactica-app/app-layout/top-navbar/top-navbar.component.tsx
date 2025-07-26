@@ -17,7 +17,10 @@ const TopNavbar: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
   const location = useLocation();
-  const isUserCreator = user ? user.role.includes(UserRole.CREATOR) : false;
+  const isUserCreator =
+    user && user.role && Object.keys(user.role).length > 0
+      ? user.role.includes(UserRole.CREATOR)
+      : false;
   const isPathDashboard =
     location.pathname.startsWith('/app/dashboard') && isUserCreator;
 

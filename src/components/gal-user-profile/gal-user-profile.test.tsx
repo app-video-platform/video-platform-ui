@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 import { logout } from '../../store/auth-store/auth.slice';
 import '@testing-library/jest-dom';
+import { UserRole } from '../../api/models/user/user';
 
 // Mock react-redux and react-router-dom hooks
 jest.mock('react-router-dom', () => {
@@ -29,7 +30,7 @@ describe('GalUserProfileDropdown component', () => {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john.doe@example.com',
-    role: ['admin', 'user'],
+    role: [UserRole.ADMIN, UserRole.USER],
   };
 
   let mockDispatch: jest.Mock;
