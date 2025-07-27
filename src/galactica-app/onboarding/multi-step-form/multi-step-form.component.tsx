@@ -152,7 +152,6 @@ const MultiStepForm: React.FC = () => {
             onClick={methods.handleSubmit(onStepValid)}
             type="primary"
             text="Next"
-            disabled={!methods.formState.isValid}
           />
         )}
 
