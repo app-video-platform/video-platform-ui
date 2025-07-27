@@ -1,0 +1,93 @@
+$circle-size: 50px;
+$input-width: 300px;
+
+.animated-circle-input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+
+  .circles {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+
+    .circle-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+
+      .circle {
+        width: $circle-size;
+        height: $circle-size;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 2;
+        transition: margin 0.5s;
+        padding-top: 5px;
+
+        .check-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          max-width: 50px;
+          height: 100%;
+          background-color: rgba(0, 128, 0, 0.3);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      .input-panel {
+        display: flex;
+        overflow: hidden;
+        align-items: center;
+        position: absolute;
+        left: calc($circle-size / 2);
+        height: calc($circle-size + 1px);
+
+        input {
+          flex: 1;
+          padding: 10px 10px 10px 30px;
+          border-radius: 0px 36px 36px 0px;
+          height: calc($circle-size - 1px);
+          background-color: #160d35;
+          color: white;
+          border: none;
+          outline: 1px solid transparent;
+          transition: all 0.2s ease-in;
+
+          &:focus {
+            outline-color: white;
+          }
+        }
+
+        button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1px 3px;
+          margin: 5px;
+          border: none;
+          background: #2865a7;
+          color: #fff;
+          border-radius: 3px;
+          cursor: pointer;
+          transition: all 0.15s ease-in;
+
+          &:hover {
+            scale: 1.1;
+          }
+        }
+      }
+    }
+  }
+}

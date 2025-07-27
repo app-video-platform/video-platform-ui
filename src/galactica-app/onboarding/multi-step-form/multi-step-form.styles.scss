@@ -12,12 +12,51 @@
   flex-direction: column;
 
   .step-container {
-    margin-top: 50px;
+    margin: 25px auto;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 80%;
 
     .step-header {
       margin-bottom: 20px;
       text-align: center;
+    }
+
+    .step-content {
+      // background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+
+      .onboarding-input-label {
+        margin-left: 20px;
+      }
+
+      .onboarding-form-input {
+        border-radius: 20px;
+        height: 50px;
+        line-height: 50px;
+        padding-left: 30px;
+        background-color: #160d35;
+        border: none;
+        font-size: 16px;
+        color: white;
+        margin-top: 5px;
+        transition: all 0.2s ease;
+        outline: 1px solid transparent;
+
+        &__bio {
+          min-height: 150px;
+          max-width: 100%;
+          line-height: 18px;
+          font-family: inherit;
+          padding-top: 15px;
+        }
+
+        &:focus {
+          outline: 1px solid white;
+        }
+      }
     }
   }
 

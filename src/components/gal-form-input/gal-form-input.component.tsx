@@ -1,6 +1,7 @@
 import React from 'react';
 
 import './gal-form-input.styles.scss';
+import GalAutoResizeTextarea from './gal-auto-resize-textarea/gal-auto-resize-textarea.component';
 
 interface GalFormInputProps {
   label?: string;
@@ -20,13 +21,13 @@ const GalFormInput: React.FC<GalFormInputProps> = ({
 }) => (
   <div className="group">
     {inputType === 'textarea' ? (
-      <textarea
+      <GalAutoResizeTextarea
+        id={otherProps.name}
+        value={value as string}
         className="form-input"
+        data-testid={`textarea-${otherProps.name}`}
         {...otherProps}
         required={required}
-        id={otherProps.name}
-        data-testid={`textarea-${otherProps.name}`}
-        value={value}
       />
     ) : (
       <input

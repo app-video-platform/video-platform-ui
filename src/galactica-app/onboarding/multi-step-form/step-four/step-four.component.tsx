@@ -1,63 +1,92 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { MultiStepFormData } from '../multi-step-form.component';
 import GalFormInput from '../../../../components/gal-form-input/gal-form-input.component';
+import {
+  GalLocation,
+  OSMLocationSearch,
+} from '../../../../components/gal-location-search/gal-location-search.component';
 
 import './step-four.styles.scss';
+import GalSocialMediaInput from '../../../../components/gal-social-media-input/gal-social-media-input.component';
+import { useSelector } from 'react-redux';
+import { selectAuthUser } from '../../../../store/auth-store/auth.selectors';
+import { SocialLink, SocialPlatforms } from '../../../../api/models/user/user';
 
 interface StepFourProps {
-  initialData: MultiStepFormData;
-  setData: any;
-  submitForm: (data: Partial<FormData>) => void;
+  onSocialMediaChange: (links: SocialLink[]) => void;
 }
 
-const StepFour: React.FC<StepFourProps> = ({
-  initialData,
-  setData,
-  submitForm,
-}) => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('multi step form data', initialData);
+const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
+  const user = useSelector(selectAuthUser);
+  const { control, setValue } = useFormContext<MultiStepFormData>();
+  const [initialLinks, setInitialLinks] = useState<SocialLink[]>([]);
+
+  useEffect(() => {
+    if (user && user.socialLinks) {
+      setInitialLinks(user.socialLinks);
+    } else {
+      setInitialLinks([
+        {
+          id: 'id_1',
+          platform: SocialPlatforms.IG,
+          url: 'InstagramURL',
+        },
+        {
+          id: 'id_2',
+          platform: SocialPlatforms.TT,
+          url: 'TiktokURL',
+        },
+      ]);
+    }
+  }, [user]);
+
+  const handleSelect = (location: GalLocation) => {
+    console.log('select', location);
+    setValue('city', location.city, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    setValue('country', location.country, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
-  const handleChange = (e: { target: { name: any; value: any } }) => {
-    setData({ ...initialData, [e.target.name]: e.target.value });
+  const handleSocialMediaChange = (socialLinks: SocialLink[]) => {
+    console.log('social change', socialLinks);
+    onSocialMediaChange(socialLinks);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-step">
-      <h2 className="step-header">Additional information</h2>
-      <GalFormInput
-        type="text"
-        value={initialData.website}
-        label="Your Website"
+    <div className="step-four">
+      <Controller
         name="website"
-        onChange={handleChange}
+        control={control}
+        render={({ field }) => (
+          <GalFormInput
+            className="form-input onboarding-form-input"
+            placeholder="Website"
+            type="text"
+            value={field.value}
+            onChange={field.onChange}
+            name={field.name}
+          />
+        )}
       />
-      <GalFormInput
-        type="text"
-        value={initialData.location}
-        label="Your Location"
-        name="location"
-        onChange={handleChange}
-      />
-      <GalFormInput
-        type="text"
-        value={initialData.socialLinks}
-        label="Your Social Media Links"
-        name="socialLinks"
-        onChange={handleChange}
-      />
-      {/* <div>
-        <label>Bio:</label>
-        <textarea
-          value={initialData.bio}
-          onChange={handleChange}
-          required
-        ></textarea>
-      </div> */}
-    </form>
+
+      <div className="user-location-search-container">
+        <OSMLocationSearch onSelect={handleSelect} />
+      </div>
+
+      <div className="social-media-circle-container">
+        <GalSocialMediaInput
+          initialSocialLinks={initialLinks}
+          onChange={handleSocialMediaChange}
+        />
+      </div>
+    </div>
   );
 };
 

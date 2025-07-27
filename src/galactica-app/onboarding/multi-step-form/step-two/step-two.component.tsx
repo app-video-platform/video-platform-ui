@@ -1,49 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { MultiStepFormData } from '../multi-step-form.component';
-
-import './step-two.styles.scss';
 import GalFormInput from '../../../../components/gal-form-input/gal-form-input.component';
 
-interface StepTwoProps {
-  initialData: MultiStepFormData;
-  setData: any;
-  submitForm: (data: Partial<FormData>) => void;
-}
+import './step-two.styles.scss';
 
-const StepTwo: React.FC<StepTwoProps> = ({
-  initialData,
-  setData,
-  submitForm,
-}) => {
-  const [bio, setBio] = useState(initialData.bio);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
-
-  const handleChange = (e: { target: { name: any; value: any } }) => {
-    setData({ ...initialData, [e.target.name]: e.target.value });
-  };
+const StepTwo: React.FC = () => {
+  const { control } = useFormContext<MultiStepFormData>();
 
   return (
-    <form onSubmit={handleSubmit} className="form-step">
-      <h2 className="step-header">Basic Profile</h2>
-      <GalFormInput
-        type="text"
-        value={initialData.profileImage}
-        label="Your Profile Picture (for now an input)"
-        name="profileImage"
-        onChange={handleChange}
-      />
-      <GalFormInput
-        type="text"
-        value={initialData.title}
-        label="Your Title"
+    <div className="step-two">
+      <Controller
         name="title"
-        onChange={handleChange}
+        control={control}
+        render={({ field }) => (
+          <>
+            <label className="onboarding-input-label">Title</label>
+            <GalFormInput
+              type="text"
+              value={field.value}
+              onChange={field.onChange}
+              name={field.name}
+              className="form-input onboarding-form-input"
+              placeholder="E.g. Teacher, Creator, etc."
+            />
+          </>
+        )}
       />
-    </form>
+    </div>
   );
 };
 

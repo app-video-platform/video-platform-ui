@@ -1,53 +1,53 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
-import './step-three.styles.scss';
 import { MultiStepFormData } from '../multi-step-form.component';
 import GalFormInput from '../../../../components/gal-form-input/gal-form-input.component';
 
-interface StepThreeProps {
-  initialData: MultiStepFormData;
-  setData: any;
-  submitForm: (data: Partial<FormData>) => void;
-}
+import './step-three.styles.scss';
 
-const StepThree: React.FC<StepThreeProps> = ({
-  initialData,
-  setData,
-  submitForm,
-}) => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // if (!bio) {
-    //   alert('Please enter your bio.');
-    //   return;
-    // }
-    // submitForm({ description });
-  };
-
-  const handleChange = (e: { target: { name: any; value: any } }) => {
-    setData({ ...initialData, [e.target.name]: e.target.value });
-  };
+const StepThree: React.FC = () => {
+  const { control } = useFormContext<MultiStepFormData>();
 
   return (
-    <form onSubmit={handleSubmit} className="form-step">
-      <h2 className="step-header">About You</h2>
-      <div>
-        <GalFormInput
-          type="text"
-          value={initialData.bio}
-          label="Your Bio"
-          name="bio"
-          onChange={handleChange}
-        />
-        <GalFormInput
-          type="text"
-          value={initialData.tagline}
-          label="Your Tagline / Mission"
-          name="tagline"
-          onChange={handleChange}
-        />
-      </div>
-    </form>
+    <div className="step-three">
+      <Controller
+        name="bio"
+        control={control}
+        render={({ field }) => (
+          <>
+            <label className="onboarding-input-label">Bio</label>
+            <GalFormInput
+              className="form-input onboarding-form-input onboarding-form-input__bio"
+              placeholder="Something about you"
+              type="text"
+              value={field.value}
+              onChange={field.onChange}
+              name={field.name}
+              inputType="textarea"
+            />
+          </>
+        )}
+      />
+
+      <Controller
+        name="tagline"
+        control={control}
+        render={({ field }) => (
+          <>
+            <label className="onboarding-input-label">Tagline / Mission</label>
+            <GalFormInput
+              className="form-input onboarding-form-input"
+              placeholder="Tell us what drives you"
+              type="text"
+              value={field.value}
+              onChange={field.onChange}
+              name={field.name}
+            />
+          </>
+        )}
+      />
+    </div>
   );
 };
 

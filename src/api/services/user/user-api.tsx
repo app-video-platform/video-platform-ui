@@ -15,13 +15,9 @@ export const getUserProfileAPI = async () => {
 
 export const updateUserDetailsAPI = async (payload: UserDetails) => {
   try {
-    const response = await httpClient.put<UserDetails>(
-      'api/user/userInfo',
-      payload,
-      {
-        withCredentials: true,
-      }
-    );
+    const response = await httpClient.put<User>('api/user/userInfo', payload, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error('Error updating user details:', error);

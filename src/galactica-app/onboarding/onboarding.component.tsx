@@ -16,7 +16,7 @@ const Onboarding: React.FC = () => {
       email: 'myemail@domain.test',
       firstName: 'Gica',
       lastName: 'Hagi',
-      role: [UserRole.USER],
+      roles: [UserRole.USER],
       id: '',
       onboardingCompleted: false,
     };

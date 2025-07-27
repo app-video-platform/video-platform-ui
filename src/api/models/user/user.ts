@@ -3,9 +3,34 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: UserRole[];
+  roles: UserRole[];
   onboardingCompleted?: boolean;
+  title?: string;
+  bio?: string;
+  taglineMission?: string;
+  website?: string;
+  city?: string;
+  country?: string;
+  socialLinks?: SocialLink[];
+  createdAt?: Date;
 }
+
+// export interface UserWithDetails {
+//   id: string;
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   title?: string;
+//   bio?: string;
+//   taglineMission?: string;
+//   website?: string;
+//   city?: string;
+//   country?: string;
+//   onboardingCompleted?: boolean;
+//   roles: string[];
+//   socialLinks?: SocialLink[];
+//   createdAt: Date;
+// }
 
 export interface UserRegisterData {
   firstName: string;
@@ -36,7 +61,7 @@ export interface UserDetails {
   taglineMission?: string;
   website?: string;
   city?: string;
-  country: string;
+  country?: string;
   socialLinks?: SocialLink[];
 }
 

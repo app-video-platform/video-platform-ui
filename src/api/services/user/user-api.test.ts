@@ -13,7 +13,7 @@ describe('User API functions', () => {
         firstName: 'Mock',
         lastName: 'User',
         email: 'mock@user.test',
-        role: [UserRole.USER],
+        roles: [UserRole.USER],
         onboardingCompleted: true,
       };
 

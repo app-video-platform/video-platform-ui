@@ -13,8 +13,8 @@ const AppLayout: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const location = useLocation();
   const isUserCreator =
-    user && user.role && Object.keys(user.role).length > 0
-      ? user.role.includes(UserRole.CREATOR)
+    user && user.roles && Object.keys(user.roles).length > 0
+      ? user.roles.includes(UserRole.CREATOR)
       : false;
   const showSidebar =
     location.pathname.startsWith('/app/dashboard') && isUserCreator;

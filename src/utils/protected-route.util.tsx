@@ -23,8 +23,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const authLoading = useSelector(selectAuthLoading);
   const user = useSelector(selectAuthUser);
 
-  if (user && user.role && Object.keys(user.role).length > 0) {
-    const isAllowed = allowedRoles.some((role) => user?.role.includes(role));
+  if (user && user.roles && Object.keys(user.roles).length > 0) {
+    const isAllowed = allowedRoles.some((role) => user?.roles.includes(role));
     if (!isAllowed) {
       return <Navigate to="/app" replace />;
     }

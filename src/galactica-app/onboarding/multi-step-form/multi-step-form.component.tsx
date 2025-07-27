@@ -1,124 +1,138 @@
 /* eslint-disable indent */
 import React, { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import MultiStepProgressBar from './multi-step-progress-bar/multi-step-progress-bar.component';
-
-import './multi-step-form.styles.scss';
 import StepOne from './step-one/step-one.component';
 import StepTwo from './step-two/step-two.component';
 import StepThree from './step-three/step-three.component';
 import StepFour from './step-four/step-four.component';
 import StepFive from './step-five/step-five.component';
-import { useNavigate } from 'react-router-dom';
 import GalButton from '../../../components/gal-button/gal-button.component';
+import { AppDispatch } from '../../../store/store';
+import { updateUserDetails } from '../../../store/auth-store/auth.slice';
+import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 
+import './multi-step-form.styles.scss';
+import { SocialLink, UserDetails } from '../../../api/models/user/user';
 export interface MultiStepFormData {
   profileImage: string;
   title: string;
   bio: string;
-  socialLinks: string;
   website: string;
-  location: string;
   tagline: string;
+  city: string;
+  country: string;
 }
 
 const MultiStepForm: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector(selectAuthUser);
   const [step, setStep] = useState(1);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
-  const [formData, setFormData] = useState({
-    profileImage: '',
-    title: '',
-    bio: '',
-    socialLinks: '',
-    website: '',
-    location: '',
-    tagline: '',
+  const methods = useForm<MultiStepFormData>({
+    defaultValues: {
+      title: '',
+      bio: '',
+      website: '',
+      city: '',
+      country: '',
+      tagline: '',
+    },
+    mode: 'onTouched',
   });
 
-  const handleNextStep = (type: 'next' | 'continue') => {
-    switch (type) {
-      case 'next':
-        if (step === 4) {
-          console.log('SHOULD SAVE HERE', formData);
-        }
-        console.log('continue on step', step);
-        console.log('save now form', formData);
+  const onStepValid = (data: MultiStepFormData) => {
+    console.log('data', data, 'step', step);
 
-        nextStep();
-        break;
-      case 'continue':
-        console.log('SHOULD CONTINUE ONBOARDING');
-        navigate('/app');
-        break;
-
-      default:
-        break;
+    if (step === 1) {
+      nextStep();
+      return;
     }
-  };
 
-  const handleUpdate = () => {
-    console.log('form data', formData);
-  };
+    const userDetails: UserDetails = {
+      userId: user!.id!,
+      title: data.title,
+      bio: data.bio,
+      website: data.website,
+      city: data.city,
+      country: data.country,
+      taglineMission: data.tagline,
+      socialLinks: socialLinks,
+    };
 
-  const handleSkip = () => {
-    console.log('SHOULD SET onboardingCompleted TO TRUE');
-    navigate('/app');
-  };
-
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return <StepOne key={step} />;
-      case 2:
-        return (
-          <StepTwo
-            key={step}
-            initialData={formData}
-            setData={setFormData}
-            submitForm={handleUpdate}
-          />
-        );
-      case 3:
-        return (
-          <StepThree
-            key={step}
-            initialData={formData}
-            setData={formData}
-            submitForm={handleUpdate}
-          />
-        );
-      case 4:
-        return (
-          <StepFour
-            key={step}
-            initialData={formData}
-            setData={formData}
-            submitForm={handleUpdate}
-          />
-        );
-      case 5:
-        return <StepFive key={step} />;
-      default:
-        return <div>Unknown step</div>;
-    }
+    console.log('[UPDATE USER DETAILS] userDetails', userDetails);
+    // Save partial data to Redux or back-end
+    dispatch(updateUserDetails(userDetails)).then(() => nextStep());
   };
 
   return (
     <div className="multi-step-container">
       <MultiStepProgressBar step={step} totalSteps={5} />
-      <div className="step-container">{renderStep()}</div>
+      <div className="step-container">
+        <FormProvider {...methods}>
+          {step === 1 && (
+            <>
+              <h1 className="step-header">
+                Welcome, {user?.firstName} {user?.lastName}...
+              </h1>
+              <div className="step-content">
+                <StepOne />
+              </div>
+            </>
+          )}
+          {step === 2 && (
+            <>
+              <h1 className="step-header">Basic Profile</h1>
+              <div className="step-content">
+                <StepTwo />
+              </div>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <h1 className="step-header">About You</h1>
+              <div className="step-content">
+                <StepThree />
+              </div>
+            </>
+          )}
+          {step === 4 && (
+            <>
+              <h1 className="step-header">Additional information</h1>
+              <div className="step-content">
+                <StepFour
+                  onSocialMediaChange={(links) => setSocialLinks(links)}
+                />
+              </div>
+            </>
+          )}
+          {step === 5 && (
+            <div className="step-content">
+              <StepFive />
+            </div>
+          )}
+        </FormProvider>
+      </div>
       <div className="step-action-buttons">
-        <GalButton onClick={() => handleSkip()} text="Skip" type="neutral" />
+        <GalButton
+          onClick={() => navigate('/app')}
+          text="Skip"
+          type="neutral"
+        />
         {step !== 1 && (
           <GalButton onClick={prevStep} text="Back" type="primary" />
         )}
         {step !== 5 && (
           <GalButton
-            onClick={() => handleNextStep('next')}
+            onClick={methods.handleSubmit(onStepValid)}
             type="primary"
             text="Next"
           />
@@ -126,7 +140,7 @@ const MultiStepForm: React.FC = () => {
 
         {step === 5 && (
           <GalButton
-            onClick={() => handleNextStep('continue')}
+            onClick={() => navigate('/app')}
             text="Continue"
             type="primary"
           />

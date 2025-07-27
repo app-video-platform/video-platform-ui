@@ -6,10 +6,18 @@ import {
   signInUser,
   verifyEmailApi,
 } from '../../api/services/auth/auth-api';
-import { getUserProfileAPI } from '../../api/services/user/user-api';
+import {
+  getUserProfileAPI,
+  updateUserDetailsAPI,
+} from '../../api/services/user/user-api';
 
 import { SignInFormData } from '../../static-pages/sign-in/sign-in.component';
-import { User, UserRegisterData, UserRole } from '../../api/models/user/user';
+import {
+  User,
+  UserDetails,
+  UserRegisterData,
+  UserRole,
+} from '../../api/models/user/user';
 import { AxiosError } from 'axios';
 
 interface AuthState {
@@ -124,6 +132,19 @@ export const logoutUser = createAsyncThunk<
   }
 });
 
+export const updateUserDetails = createAsyncThunk<
+  User, // Return type: user login response
+  UserDetails, // Argument type (user data)
+  { rejectValue: string } // Error type
+>('auth/updateUserDetails', async (userData, { rejectWithValue }) => {
+  try {
+    const response = await updateUserDetailsAPI(userData);
+    return response; // API returns user info with token
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -142,20 +163,16 @@ const authSlice = createSlice({
     resetOnboarding: (state) => {
       // Reset any onboarding state if needed
       // This can be expanded based on your onboarding logic
-      state.user = {
-        id: 'mocked-user-id',
-        firstName: 'Aleb',
-        lastName: 'Mocked',
-        email: 'aleb-mocked@example.com',
-        role: [UserRole.CREATOR],
-        onboardingCompleted: false,
-      };
+      if (state.user) {
+        state.user.onboardingCompleted = false;
+      }
+
       state.isUserLoggedIn = true;
     },
 
     changeUserRole: (state, action: PayloadAction<UserRole>) => {
       if (state.user) {
-        state.user.role = [action.payload];
+        state.user.roles = [action.payload];
       }
     },
   },
@@ -233,6 +250,21 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.rejected, (state, action) => {
         // Optionally handle logout errors here.
+        state.error = action.payload || 'Logout failed';
+      })
+
+      .addCase(updateUserDetails.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(
+        updateUserDetails.fulfilled,
+        (state, action: PayloadAction<User>) => {
+          state.loading = false;
+          state.user = action.payload;
+        }
+      )
+      .addCase(updateUserDetails.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload || 'Logout failed';
       });
   },

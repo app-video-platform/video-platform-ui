@@ -22,7 +22,7 @@ describe('auth slice reducers', () => {
       firstName: 'Alice',
       lastName: 'Smith',
       email: 'alice@example.com',
-      role: [UserRole.USER],
+      roles: [UserRole.USER],
       onboardingCompleted: true,
     } as User;
     const state = authReducer(initialState, setUserProfile(user));
@@ -36,7 +36,7 @@ describe('auth slice reducers', () => {
         firstName: 'Alice',
         lastName: 'Smith',
         email: 'alice@example.com',
-        role: [UserRole.USER],
+        roles: [UserRole.USER],
       },
       token: 'abc123',
       message: 'some message',

@@ -29,7 +29,7 @@ const UserPagePreview: React.FC = () => {
       email: 'myemail@domain.test',
       firstName: 'Gica',
       lastName: 'Hagi',
-      role: [UserRole.USER],
+      roles: [UserRole.USER],
       id: '',
     };
 
