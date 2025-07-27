@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Plus, Minus, BadgeX, CircleX } from 'lucide-react';
 import { IconType } from 'react-icons';
@@ -70,6 +70,24 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
     [SocialPlatforms.X]: '',
     [SocialPlatforms.YT]: '',
   });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      // If the click is *not* anywhere in our container, close
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setSelectedId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, []);
 
   const handleCircleClick = (id: string) => {
     setInputValue('');
@@ -102,12 +120,6 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
   }, [socialLinks, onChange]);
 
   const handleAdd = (id: SocialPlatforms) => {
-    // if (!inputValue.trim()) {
-    //   handleCircleClick(id);
-    //   return;
-    // }
-
-    // onchange(socialLinks);
     if (initialValuesById[id] !== inputValue.trim()) {
       const link: SocialLink = {
         id: undefined,
@@ -128,9 +140,6 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
             return [...prev, link];
           }
         });
-        // if (foundLink) {
-        // }
-        // setSocialLinks((prev) => [...prev, link]);
       } else {
         setSocialLinks([link]);
       }
@@ -153,7 +162,7 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
   };
 
   return (
-    <div className="animated-circle-input">
+    <div className="animated-circle-input" ref={containerRef}>
       <div className="circles">
         {options.map((opt, idx) => (
           <div key={idx} className="circle-wrapper">
@@ -164,7 +173,9 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
                 marginRight: opt.id === selectedId ? '275px' : '0',
               }}
               title={opt.title}
-              onClick={() => handleCircleClick(opt.id)}
+              onClick={() => {
+                handleCircleClick(opt.id);
+              }}
               whileHover={{
                 scale: completed[opt.id] || removed[opt.id] ? 1 : 1.1,
               }}

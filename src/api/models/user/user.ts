@@ -11,6 +11,8 @@ export interface User {
   website?: string;
   city?: string;
   country?: string;
+  lat?: string;
+  long?: string;
   socialLinks?: SocialLink[];
   createdAt?: Date;
 }

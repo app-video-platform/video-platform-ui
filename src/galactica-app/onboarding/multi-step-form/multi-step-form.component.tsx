@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,8 @@ export interface MultiStepFormData {
   tagline: string;
   city: string;
   country: string;
+  lat: string;
+  long: string;
 }
 
 const MultiStepForm: React.FC = () => {
@@ -44,10 +46,27 @@ const MultiStepForm: React.FC = () => {
       website: '',
       city: '',
       country: '',
+      lat: '',
+      long: '',
       tagline: '',
     },
     mode: 'onTouched',
   });
+
+  useEffect(() => {
+    if (user) {
+      methods.reset({
+        title: user.title,
+        bio: user.bio,
+        website: user.website,
+        city: user.city,
+        country: user.country,
+        lat: user.lat,
+        long: user.long,
+        tagline: user.taglineMission,
+      });
+    }
+  }, [user, methods]);
 
   const onStepValid = (data: MultiStepFormData) => {
     if (step === 1) {
@@ -133,6 +152,7 @@ const MultiStepForm: React.FC = () => {
             onClick={methods.handleSubmit(onStepValid)}
             type="primary"
             text="Next"
+            disabled={!methods.formState.isValid}
           />
         )}
 

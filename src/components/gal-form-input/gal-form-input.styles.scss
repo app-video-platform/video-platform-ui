@@ -33,6 +33,14 @@ $sub-color: grey;
     letter-spacing: 0.3em;
   }
 
+  .input-max-value {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 10px;
+    opacity: 0.6;
+  }
+
   .form-input-label {
     color: $sub-color;
     font-size: 16px;
