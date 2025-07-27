@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaUser } from 'react-icons/fa';
-import GalIcon from '../../components/gal-icon-component/gal-icon.component';
-
-import './user-dashboard.styles.scss';
-import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { useNavigate } from 'react-router-dom';
+
+import GalIcon from '../../components/gal-icon-component/gal-icon.component';
+import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { selectTopThreeProducts } from '../../store/product-store/product.selectors';
 import GalProductCard from '../../components/gal-product-box/gal-product-box.component';
 import GalButton from '../../components/gal-button/gal-button.component';
 import { AppDispatch } from '../../store/store';
 import { getAllProductsByUserId } from '../../store/product-store/product.slice';
 
-const UserDashboard: React.FC = () => {
+import './creator-dashboard.styles.scss';
+
+const CreatorDashboard: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
@@ -85,4 +86,4 @@ const UserDashboard: React.FC = () => {
   );
 };
 
-export default UserDashboard;
+export default CreatorDashboard;

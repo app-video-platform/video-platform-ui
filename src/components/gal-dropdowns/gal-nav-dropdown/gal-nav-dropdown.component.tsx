@@ -19,7 +19,7 @@ const NewGalNavDropdown: React.FC = () => (
           Products
         </Link>
         <Link to="/app" className="dropdown-item">
-          Dashboard
+          Go to app
         </Link>
       </>
     )}

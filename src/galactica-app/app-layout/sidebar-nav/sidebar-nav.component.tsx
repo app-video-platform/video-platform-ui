@@ -15,8 +15,8 @@ const SidebarNav: React.FC = () => {
       </div>
       <ul>
         <li>
-          <Link to="dashboard" className="sidebar-link">
-            Dashboard
+          <Link to="/" className="sidebar-link">
+            Overview
           </Link>
         </li>
         <li>

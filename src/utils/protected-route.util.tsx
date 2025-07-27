@@ -35,6 +35,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isUserLoggedIn) {
+    console.log('GET HERE', user, authLoading, isUserLoggedIn);
+
     return <Navigate to="/signin" replace />;
   }
 

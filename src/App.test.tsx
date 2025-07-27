@@ -60,7 +60,7 @@ const initialState = {
 };
 
 describe('App Component', () => {
-  test('navigates to /dashboard and renders UserDashboard after getUserProfile', async () => {
+  test('navigates to /app and renders CreatorDashboard after getUserProfile', async () => {
     const store = mockStore(initialState);
 
     render(

@@ -31,7 +31,7 @@ const GalBreadcrumbs: React.FC = () => {
   };
 
   const labelMap: Record<string, string> = {
-    dashboard: 'Dashboard',
+    dashboard: 'Overview',
     products: 'Products',
     new: 'New',
     myPagePreview: 'My Page Preview',

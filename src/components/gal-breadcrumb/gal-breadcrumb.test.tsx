@@ -16,11 +16,11 @@ describe('GalBreadcrumbs component', () => {
       </MemoryRouter>
     );
 
-  it('renders correct breadcrumbs for "/dashboard/products/new"', () => {
-    renderWithRouter('/dashboard/products/new');
+  it('renders correct breadcrumbs for "/app/products/new"', () => {
+    renderWithRouter('/app/products/new');
 
     // "Dashboard" and "Products" should be links while "New" is plain text (current page)
-    const dashboardLink = screen.getByRole('link', { name: /dashboard/i });
+    const dashboardLink = screen.getByRole('link', { name: /app/i });
     const productsLink = screen.getByRole('link', { name: /products/i });
     const newBreadcrumb = screen.getByText(/new/i);
 
@@ -29,8 +29,8 @@ describe('GalBreadcrumbs component', () => {
     expect(newBreadcrumb).toBeInTheDocument();
 
     // Verify that the links have the correct href values.
-    expect(dashboardLink.getAttribute('href')).toBe('/dashboard');
-    expect(productsLink.getAttribute('href')).toBe('/dashboard/products');
+    expect(dashboardLink.getAttribute('href')).toBe('/app');
+    expect(productsLink.getAttribute('href')).toBe('/app/products');
   });
 
   it('transforms dash-separated segments to camelCase and falls back when no labelMap match', () => {
@@ -46,11 +46,11 @@ describe('GalBreadcrumbs component', () => {
 
   it('uses labelMap when available', () => {
     // When the path segment is "myPagePreview", the labelMap should convert it to "My Page Preview"
-    renderWithRouter('/dashboard/products/create');
+    renderWithRouter('/app/products/create');
 
     // "My Page Preview" should be rendered as a link since it's not the last breadcrumb in this path.
     const mappedBreadcrumb = screen.getByRole('link', { name: 'Products' });
     expect(mappedBreadcrumb).toBeInTheDocument();
-    expect(mappedBreadcrumb.getAttribute('href')).toBe('/dashboard/products');
+    expect(mappedBreadcrumb.getAttribute('href')).toBe('/app/products');
   });
 });

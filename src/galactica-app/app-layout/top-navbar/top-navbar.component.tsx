@@ -21,8 +21,7 @@ const TopNavbar: React.FC = () => {
     user && user.roles && Object.keys(user.roles).length > 0
       ? user.roles.includes(UserRole.CREATOR)
       : false;
-  const isPathDashboard =
-    location.pathname.startsWith('/app/dashboard') && isUserCreator;
+  const isPathDashboard = location.pathname.startsWith('/app') && isUserCreator;
 
   const handleSearch = (query: string) => {
     console.log('Searching for:', query);
@@ -45,16 +44,12 @@ const TopNavbar: React.FC = () => {
         />
         <Link to="/app">Explore</Link>
         {isUserCreator ? (
-          isPathDashboard ? (
-            <GalButton
-              type="primary"
-              customClassName="create-product-btn"
-              text="Create Product"
-              onClick={() => navigate('/app/dashboard/products/create')}
-            />
-          ) : (
-            <Link to={'dashboard'}>Dashboard</Link>
-          )
+          <GalButton
+            type="primary"
+            customClassName="create-product-btn"
+            text="Create Product"
+            onClick={() => navigate('/app/products/create')}
+          />
         ) : (
           <Link to={'library'}>Library</Link>
         )}

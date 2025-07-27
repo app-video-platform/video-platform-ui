@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import SidebarNav from './sidebar-nav/sidebar-nav.component';
@@ -9,15 +9,25 @@ import { UserRole } from '../../api/models/user/user';
 
 import './app-layout.styles.scss';
 
+const CREATOR_ROUTES = [
+  '/app/*',
+  '/app/products/*',
+  '/app/sales',
+  '/app/marketing',
+];
+
 const AppLayout: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const location = useLocation();
   const isUserCreator =
     user && user.roles && Object.keys(user.roles).length > 0
-      ? user.roles.includes(UserRole.CREATOR)
+      ? user.roles.includes(UserRole.CREATOR || UserRole.ADMIN)
       : false;
-  const showSidebar =
-    location.pathname.startsWith('/app/dashboard') && isUserCreator;
+
+  const inCreatorArea = CREATOR_ROUTES.some((pattern) =>
+    Boolean(matchPath(pattern, location.pathname))
+  );
+  const showSidebar = inCreatorArea && isUserCreator;
 
   return (
     <div className="app-layout">
