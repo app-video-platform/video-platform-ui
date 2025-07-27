@@ -126,7 +126,7 @@ describe('GalGoogleSignInButton component', () => {
       await Promise.resolve();
     });
 
-    // Verify that navigate was called with 'dashboard'.
-    expect(mockNavigate).toHaveBeenCalledWith('dashboard');
+    // Verify that navigate was called with 'app'.
+    expect(mockNavigate).toHaveBeenCalledWith('/app');
   });
 });

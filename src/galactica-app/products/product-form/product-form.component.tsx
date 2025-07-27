@@ -74,7 +74,6 @@ const ProductForm: React.FC = () => {
       )
         .unwrap()
         .then((product) => {
-          console.log('Loaded product data:', product);
           setFormData({
             id: product.id,
             name: product.name ?? '',
@@ -99,8 +98,6 @@ const ProductForm: React.FC = () => {
   const handleImageChange = (image: File[]) => {
     // Callback to update the form's state with files from GalUppyFileUploader
     setProductImage(image[0]);
-
-    console.log('product image', image[0]);
   };
 
   const validateForm = () => {
@@ -144,16 +141,11 @@ const ProductForm: React.FC = () => {
       id: formData.id,
     };
 
-    console.log('SAVE PRODUCT', productData);
-    console.log('PRODUCT ID', formData.id);
-
     dispatch(updateCourseProductDetails(productData))
       .unwrap()
       .then((data) => {
-        console.log('response', data);
         if (data) {
           window.alert('Course product updated successfully!');
-          console.log('Updated product data:', data);
         }
       })
       .catch((error) => {
@@ -197,7 +189,6 @@ const ProductForm: React.FC = () => {
     dispatch(deleteProduct(deleteProductPayload))
       .unwrap()
       .then(() => {
-        console.log('Product removed successfully');
         window.alert('Product removed successfully');
         // Optionally redirect or reset form state here
       })

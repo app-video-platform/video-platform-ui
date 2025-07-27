@@ -67,11 +67,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   const [isLessonCreated, setIsLessonCreated] = useState(false);
 
   useEffect(() => {
-    console.log('LessonEditor useEffect triggered with lesson:', lesson);
-
     if (lesson) {
-      console.log('Lesson data received:', lesson);
-
       setFormData({
         title: lesson.title || '',
         description: lesson.description || '',
@@ -96,8 +92,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
 
   const handleCreateLesson = () => {
     // Logic to create a new lesson
-    console.log('Creating lesson with data:', formData);
-
     if (!user || !user.id) {
       console.error('User ID is not available');
       return;
@@ -131,7 +125,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           id: response.id, // Set the ID after creation
           type: response.type || ('VIDEO' as LessonType), // Default to VIDEO if not specified
         });
-        console.log('Lesson created successfully:', response);
         setIsLessonCreated(true);
       })
       .catch((error) => {
@@ -145,8 +138,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       return;
     }
     // Logic to update an existing lesson
-    console.log('Updating lesson with data:', formData);
-
     const lessonId = lesson.id ?? formData.id;
 
     if (!lessonId) {
@@ -165,7 +156,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     dispatch(updateLessonDetails(updateLessonPayload))
       .unwrap()
       .then((response) => {
-        console.log('Lesson updated successfully:', response);
+        console.info('Lesson updated successfully:', response);
       })
       .catch((error) => {
         console.error('Failed to update lesson:', error);
@@ -173,7 +164,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   };
 
   const onVideoUploadChange = (files: File[]) => {
-    console.log('Video files uploaded:', files);
     setUploadedVideo(files[0] || null);
   };
 
@@ -182,8 +172,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       console.error('User ID is not available for deletion');
       return;
     }
-    console.log('Deleting lesson:', formData.id);
-
     if (formData.id) {
       const removeLessonPayload: IRemoveItemPayload = {
         id: formData.id, // Use the ID from formData
@@ -193,7 +181,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       dispatch(deleteLesson(removeLessonPayload))
         .unwrap()
         .then(() => {
-          console.log('Lesson deleted successfully');
+          console.info('Lesson deleted successfully');
           removeLessonFromList(index);
         })
         .catch((error) => {
@@ -201,7 +189,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         });
     } else {
       removeLessonFromList(index);
-      console.log('No lesson ID found, removing from list only');
+      console.warn('No lesson ID found, removing from list only');
     }
   };
 

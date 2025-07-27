@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Fragment } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-
-import GalUserProfileDropdown from '../../components/gal-user-profile/gal-user-profile.component';
-import GalButton from '../../components/gal-button/gal-button.component';
-
-import './nav.styles.scss';
 import { useSelector } from 'react-redux';
+
+import GalButton from '../../components/gal-button/gal-button.component';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import GalFooter from '../../components/gal-footer/gal-footer.component';
-import GalNavDropdown from '../../components/gal-nav-dropdown/gal-nav-dropdown.component';
+import NewGalNavDropdown from '../../components/gal-dropdowns/gal-nav-dropdown/gal-nav-dropdown.component';
+import GalUserDropdown from '../../components/gal-dropdowns/gal-user-dropdown/gal-user-dropdown.component';
+
+import './nav.styles.scss';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const Navigation: React.FC = () => {
             <li>
               <Link to={'/pricing'}>Pricing</Link>
             </li>
-            <GalNavDropdown />
+            <NewGalNavDropdown />
 
             <li>
               <Link to={'/contact'}>Contact Us</Link>
@@ -43,7 +43,7 @@ const Navigation: React.FC = () => {
           <div className="user-buttons">
             <ul className="nav-link-list">
               {user ? (
-                <GalUserProfileDropdown />
+                <GalUserDropdown />
               ) : (
                 <ul className="nav-link-list">
                   <li>

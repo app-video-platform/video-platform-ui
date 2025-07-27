@@ -17,7 +17,6 @@ const Home: React.FC = () => {
     setError(null);
     try {
       // const usersData = await getNewAPI();
-      console.log('User state:', user);
       setApiResponse('usersData');
     } catch (err) {
       setError('Failed to fetch data - ' + err);

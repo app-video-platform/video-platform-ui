@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  act,
-  waitFor,
-} from '@testing-library/react';
-import SignIn, { SignInFormData } from './sign-in.component';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import SignIn from './sign-in.component';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { signinUser, getUserProfile } from '../../store/auth-store/auth.slice';
@@ -153,7 +147,7 @@ describe('SignIn component', () => {
     // Verify that dispatch was called (at least two times for signinUser and getUserProfile).
     expect(mockDispatch).toHaveBeenCalledTimes(2);
     // Verify navigation to dashboard.
-    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+    expect(mockNavigate).toHaveBeenCalledWith('/app');
   });
 
   it('submits the form with valid data and navigates to onboarding if onboardingCompleted is false', async () => {

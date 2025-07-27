@@ -19,12 +19,12 @@ jest.mock('react-router-dom', () => ({
 
 // Mock child components
 jest.mock(
-  '../../components/gal-user-profile/gal-user-profile.component',
+  '../../components/gal-dropdowns/gal-user-dropdown/gal-user-dropdown.component.tsx',
   () => {
     const MockUserProfile = () => (
-      <div data-testid="user-profile-dropdown">GalUserProfileDropdown</div>
+      <div data-testid="user-profile-dropdown">GalUserDropdown</div>
     );
-    MockUserProfile.displayName = 'GalUserProfileDropdown';
+    MockUserProfile.displayName = 'GalUserDropdown';
     return MockUserProfile;
   }
 );

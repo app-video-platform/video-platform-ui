@@ -15,7 +15,7 @@ const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
   useEffect(() => {
     dispatch(getUserProfile()).then((data) => {
       if (data.type === '"auth/getUserProfile/fulfilled"') {
-        console.log('User Profile in Init', data);
+        console.info('[APP INIT] User', data);
         navigate('dashboard');
       }
     });

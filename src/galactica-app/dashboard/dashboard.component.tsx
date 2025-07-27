@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
 
-import GalUserProfileDropdown from '../../components/gal-user-profile/gal-user-profile.component';
-
-import './dashboard.styles.scss';
-import UserDashboard from '../user-dashboard/user-dashboard.component';
 import GalBreadcrumbs from '../../components/gal-breadcrumb/gal-breadcrumb.component';
-import GalNotificationsDropdown from '../../components/gal-notifications-dropdown/gal-notifications-dropdown.component';
+import NewGalNotificationsDropdown from '../../components/gal-dropdowns/gal-notifications-dropdown/gal-notifications-dropdown.component';
+import GalUserDropdown from '../../components/gal-dropdowns/gal-user-dropdown/gal-user-dropdown.component';
+import './dashboard.styles.scss';
 
 //////////////////////////////////////////
 /////////// NO LONGER USED //////////////
@@ -28,8 +24,8 @@ const Dashboard: React.FC = () => {
           <Link to={'marketing'}>Marketing and Communication</Link>
         </div>
         <button onClick={() => navigate('/')}>Go to website</button>
-        <GalNotificationsDropdown />
-        <GalUserProfileDropdown />
+        <NewGalNotificationsDropdown />
+        <GalUserDropdown />
       </div>
       <GalBreadcrumbs />
       <div className="dashboard-outlet">

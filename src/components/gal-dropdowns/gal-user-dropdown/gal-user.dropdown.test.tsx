@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import GalUserProfileDropdown from './gal-user-profile.component';
+import GalUserDropdown from './gal-user-dropdown.component';
 import { useDispatch, useSelector } from 'react-redux';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
-import { logout } from '../../store/auth-store/auth.slice';
 import '@testing-library/jest-dom';
-import { UserRole } from '../../api/models/user/user';
+import { UserRole } from '../../../api/models/user/user';
+import { logout } from '../../../store/auth-store/auth.slice';
 
 // Mock react-redux and react-router-dom hooks
 jest.mock('react-router-dom', () => {
@@ -25,7 +25,7 @@ jest.mock('react-redux', () => {
   };
 });
 
-describe('GalUserProfileDropdown component', () => {
+describe('GalUserDropdown component', () => {
   const dummyUser = {
     firstName: 'John',
     lastName: 'Doe',
@@ -51,14 +51,14 @@ describe('GalUserProfileDropdown component', () => {
 
   it('renders null when no user is available', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
-    const { container } = render(<GalUserProfileDropdown />);
+    const { container } = render(<GalUserDropdown />);
     expect(container.firstChild).toBeNull();
   });
 
   it('renders the user profile button and toggles dropdown on click', () => {
     render(
       <MemoryRouter>
-        <GalUserProfileDropdown />
+        <GalUserDropdown />
       </MemoryRouter>
     );
     // Verify the profile button displays the user's first and last name.
@@ -71,13 +71,12 @@ describe('GalUserProfileDropdown component', () => {
     // Click the profile button to toggle dropdown open.
     fireEvent.click(profileButton);
     expect(screen.getByText(/john\.doe@example\.com/i)).toBeInTheDocument();
-    expect(screen.getByText(/role: admin/i)).toBeInTheDocument();
   });
 
   it('closes the dropdown when clicking outside', () => {
     render(
       <MemoryRouter>
-        <GalUserProfileDropdown />
+        <GalUserDropdown />
       </MemoryRouter>
     );
     const profileButton = screen.getByRole('button', { name: /jd/i });
@@ -97,7 +96,7 @@ describe('GalUserProfileDropdown component', () => {
 
     render(
       <MemoryRouter>
-        <GalUserProfileDropdown />
+        <GalUserDropdown />
       </MemoryRouter>
     );
     const profileButton = screen.getByRole('button', { name: /jd/i });

@@ -95,8 +95,6 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       return;
     }
 
-    console.log('Remove section:', localData.id);
-
     if (localData.id) {
       const removeSectionPayload: IRemoveItemPayload = {
         id: localData.id,
@@ -106,14 +104,12 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       dispatch(deleteSection(removeSectionPayload))
         .unwrap()
         .then(() => {
-          console.log('Section deleted from backend:', localData.id);
           onRemoveFromParent(index);
         })
         .catch((err) => {
           console.error('Failed to delete section (child):', err);
         });
     } else {
-      console.log('No section ID to remove, removing from local list only');
       onRemoveFromParent(index);
     }
   };
@@ -135,14 +131,11 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     dispatch(updateSectionDetails(updatedSection))
       .unwrap()
       .then((updated) => {
-        console.log('Section updated from child:', updated);
         // Optionally sync localData to match the “confirmed” updated data:
       })
       .catch((err) => {
         console.error('Failed to update section (child):', err);
       });
-
-    console.log('Update section:', localData);
   };
 
   const handleSectionCreation = () => {
@@ -177,7 +170,6 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     dispatch(createSection(newSection))
       .unwrap()
       .then((createdSection) => {
-        console.log('Section created from child:', createdSection);
         // Optionally sync localData to match the “confirmed” created data:
         setLocalData({
           ...createdSection,
@@ -189,14 +181,11 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       .catch((err) => {
         console.error('Failed to create section (child):', err);
       });
-    console.log('Create section:', localData);
   };
 
   const handleFilesChange = (files: File[]) => {
     // Callback to update the form's state with files from GalUppyFileUploader
     setFiles(files);
-
-    console.log('files', files);
   };
 
   const isUnchanged =

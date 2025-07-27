@@ -76,7 +76,6 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
     if (socialLinks) {
       const foundLink = socialLinks.find((link) => link.platform === id);
       if (foundLink) {
-        console.log('found social media link', foundLink);
         setInputValue(foundLink.url);
       }
     }
@@ -100,10 +99,6 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
 
   useEffect(() => {
     onChange(socialLinks);
-
-    console.log('initial links: ', initialSocialLinks);
-    console.log('current links: ', socialLinks);
-    console.log('completed links: ', completed);
   }, [socialLinks, onChange]);
 
   const handleAdd = (id: SocialPlatforms) => {
@@ -139,12 +134,6 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
       } else {
         setSocialLinks([link]);
       }
-      console.log(
-        'initial val',
-        initialValuesById[id],
-        '\ninput val',
-        inputValue
-      );
 
       if (inputValue.trim()) {
         setCompleted((prev) => ({ ...prev, [id]: true }));

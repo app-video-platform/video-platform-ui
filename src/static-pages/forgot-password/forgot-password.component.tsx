@@ -25,13 +25,11 @@ const ForgotPassword: React.FC = () => {
       return;
     }
     e.preventDefault();
-    console.log('change password email', emailInput);
-
     setStep(step + 1);
   };
 
   const sendEmail = () => {
-    console.log('SENDING CALL TO BE WITH EMAIL', emailInput);
+    console.info('SENDING CALL TO BE WITH EMAIL', emailInput);
   };
 
   const renderStep = () => {

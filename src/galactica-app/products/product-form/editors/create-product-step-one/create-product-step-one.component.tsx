@@ -45,8 +45,6 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
 
     const { name, description, type } = formData;
 
-    console.log('handleContinue', name, description, type);
-
     const newProductPayload: INewProductPayload = {
       name,
       description,
@@ -59,7 +57,6 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
       dispatch(createCourseProduct(newProductPayload))
         .unwrap()
         .then((data) => {
-          console.log('response', data);
           if (data) {
             // formData.id = data.id; // Set the product ID in formData
             setField('id', data.id); // Ensure the formData is updated with the new ID

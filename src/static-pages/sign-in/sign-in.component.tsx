@@ -43,8 +43,6 @@ const SignIn: React.FC = () => {
     if (!formData.password) {
       newErrors.password = 'Password is required';
     }
-    console.log('new errors', newErrors);
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -54,8 +52,6 @@ const SignIn: React.FC = () => {
   };
 
   const handleSubmit = (e: React.FormEvent) => {
-    console.log('get here');
-
     e.preventDefault();
     if (validateForm()) {
       dispatch(signinUser(formData))
@@ -68,10 +64,8 @@ const SignIn: React.FC = () => {
             .then((data) => {
               if (data) {
                 if (data.onboardingCompleted) {
-                  console.log('GO TO DASHBOARD FROM SIGN IN', data);
                   navigate('/app');
                 } else {
-                  console.log('GO TO ONBOARDING FROM SIGN IN', data);
                   navigate('/onboarding');
                 }
               }

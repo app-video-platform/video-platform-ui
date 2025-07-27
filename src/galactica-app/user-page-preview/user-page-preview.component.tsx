@@ -383,8 +383,6 @@ const UserPagePreview: React.FC = () => {
       });
       setOtherProducts(mappedProducts);
     } else {
-      console.log('get here', mockProducts);
-
       setOtherProducts(mockProducts);
     }
 

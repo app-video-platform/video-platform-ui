@@ -30,7 +30,6 @@ const ProductPage: React.FC = () => {
       )
         .unwrap()
         .then((product) => {
-          console.log('Product details fetched:', product);
           getProductInformation(product);
           setProduct(product);
         });

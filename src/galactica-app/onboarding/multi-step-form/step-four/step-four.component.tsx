@@ -43,7 +43,6 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
   }, [user]);
 
   const handleSelect = (location: GalLocation) => {
-    console.log('select', location);
     setValue('city', location.city, {
       shouldValidate: true,
       shouldDirty: true,
@@ -55,7 +54,6 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
   };
 
   const handleSocialMediaChange = (socialLinks: SocialLink[]) => {
-    console.log('social change', socialLinks);
     onSocialMediaChange(socialLinks);
   };
 

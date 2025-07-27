@@ -20,11 +20,9 @@ const EnterCode: React.FC<EnterCodeProps> = ({
 
   const handleChange = (code: string) => {
     setCode(code);
-    console.log('eeeeeee', code);
   };
 
   const handleClick = () => {
-    console.log('code', code);
     setStep(3);
   };
 

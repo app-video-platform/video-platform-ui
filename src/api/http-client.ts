@@ -22,7 +22,7 @@ attachRefreshTokenInterceptor(httpClient);
 // --------------------------------------------------------------------
 // Only load mocks if the “USE_MOCKS” env var is set to “true”
 // (you can also check `window.location.hostname === 'localhost'` if preferred)
-console.log('USE_MOCKS is:', process.env.REACT_APP_USE_MOCKS);
+console.info('[USE_MOCKS]', process.env.REACT_APP_USE_MOCKS);
 if (process.env.REACT_APP_USE_MOCKS === 'true') {
   // We use require() here so that when this file is bundled for production,
   // it won’t accidentally pull in the mock module.

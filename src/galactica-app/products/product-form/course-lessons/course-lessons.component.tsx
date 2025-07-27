@@ -18,12 +18,10 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
   const [localLessons, setLocalLessons] = useState(lessons);
 
   useEffect(() => {
-    console.log('CourseLessons useEffect triggered with lessons:', lessons);
     setLocalLessons(lessons);
   }, [lessons]);
 
   const handleAddLesson = () => {
-    console.log(`Add lesson to section ${sectionId}`);
     const newLesson = {
       title: '',
       description: '',
@@ -31,19 +29,14 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
 
     setLocalLessons((prevLessons) => {
       const updated = [...prevLessons, newLesson];
-      console.log('New localLessons:', updated);
       return updated;
     });
-
-    console.log('new lessons', lessons);
   };
 
   const handleRemoveLessonFromList = (index: number) => {
-    console.log(`Remove lesson at index ${index} from section ${sectionId}`);
     setLocalLessons((prevLessons) => {
       const updated = [...prevLessons];
       updated.splice(index, 1);
-      console.log('Updated localLessons after removal:', updated);
       return updated;
     });
   };

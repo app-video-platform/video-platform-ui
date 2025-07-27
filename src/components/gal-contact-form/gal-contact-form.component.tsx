@@ -26,7 +26,6 @@ const GalContactForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission logic here
-    console.log('Form submitted:', formData);
   };
 
   return (

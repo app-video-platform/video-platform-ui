@@ -26,9 +26,9 @@ module.exports = {
   // Allows importing CSS/SCSS files into Jest tests
   moduleNameMapper: {
     '\\.(css|scss)$': 'identity-obj-proxy',
-    '\\.(png|jpe?g|gif|svg)$': '<rootDir>/src/utils/file.mock.js',
+    '\\.(png|jpe?g|gif|svg)$': '<rootDir>/src/utils/mocks/file.mock.js',
     '^react-icons/(.*)': 'identity-obj-proxy',
-    '\\.mdx$': '<rootDir>/src/utils/mdx-mock.js',
+    '\\.mdx$': '<rootDir>/src/utils/mocks/mdx.mock.js',
   },
 
   // Treat `.ts` and `.tsx` explicitly as ES Modules

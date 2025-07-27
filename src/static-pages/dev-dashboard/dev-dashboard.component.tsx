@@ -2,10 +2,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import GalUserProfileDropdown from '../../components/gal-user-profile/gal-user-profile.component';
+import DashboardMDX from '../../utils/dashboard-details.mdx';
+import GalUserDropdown from '../../components/gal-dropdowns/gal-user-dropdown/gal-user-dropdown.component';
 
 import './dev-dashboard.styles.scss';
-import DashboardMDX from '../../utils/dashboard-details.mdx';
 
 const DevDashboard: React.FC = () => (
   <div className="dev-dashboard">
@@ -15,7 +15,7 @@ const DevDashboard: React.FC = () => (
         <Link to={'/app/dashboard'}>Normal Dashboard</Link>
         <Link to={'/'}>Landing page</Link>
       </div>
-      <GalUserProfileDropdown />
+      <GalUserDropdown />
     </nav>
     <main className="dev-dashboard-main">
       <DashboardMDX />

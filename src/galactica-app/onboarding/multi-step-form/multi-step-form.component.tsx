@@ -50,8 +50,6 @@ const MultiStepForm: React.FC = () => {
   });
 
   const onStepValid = (data: MultiStepFormData) => {
-    console.log('data', data, 'step', step);
-
     if (step === 1) {
       nextStep();
       return;
