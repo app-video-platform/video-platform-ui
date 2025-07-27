@@ -3,6 +3,7 @@ import httpClient from '../../http-client';
 import { getCookie } from '../../../utils/cookie.util';
 import { ILesson, ICreateLessonPayload } from '../../models/product/lesson';
 import {
+  IMinimalProduct,
   INewProductPayload,
   IProductResponse,
   IRemoveItemPayload,
@@ -155,7 +156,7 @@ export const getAllProductsByUserIdAPI = async (userId: string) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error getting all products:', error);
+    console.error('Error getting all products by user id:', error);
     throw error;
   }
 };
@@ -171,6 +172,30 @@ export const getProductByProductIdAPI = async (
     return response.data;
   } catch (error) {
     console.error(`Error retrieving product with id ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const getAllProductsMinimalAPI = async () => {
+  try {
+    const response = await httpClient.get<IMinimalProduct[]>(
+      'api/products/get-all-products-min'
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error getting all minimal products:', error);
+    throw error;
+  }
+};
+
+export const getAllProductsMinimalByUserAPI = async (userId: string) => {
+  try {
+    const response = await httpClient.get<IMinimalProduct[]>(
+      `api/products/get-all-products-min?userId=${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error getting all minimal products by user id:', error);
     throw error;
   }
 };

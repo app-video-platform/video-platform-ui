@@ -30,14 +30,21 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }
 
-  if (authLoading) {
+  if (authLoading || isUserLoggedIn === null) {
     return <p>Loading authentication...</p>; // Or a spinner component
   }
 
-  if (!isUserLoggedIn) {
+  // !isUserLoggedIn returns true if isUserLoggedIn is null as well
+  // isUserLoggedIn === false makes sure that the login attempt has been made already
+  if (isUserLoggedIn === false) {
     console.log('GET HERE', user, authLoading, isUserLoggedIn);
 
     return <Navigate to="/signin" replace />;
+  }
+
+  const hasRole = user?.roles?.some((role) => allowedRoles.includes(role));
+  if (!hasRole) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return children;

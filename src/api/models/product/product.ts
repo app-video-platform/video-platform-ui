@@ -45,6 +45,18 @@ export interface IProductResponse {
   sections?: Sectiunile[];
 }
 
+export interface IMinimalProduct {
+  id: string;
+  title: string;
+  type: ProductType;
+  price: 'free' | number;
+  createdById: string;
+  createdByName: string;
+  createdByTitle: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IUpdateCourseProduct {
   name?: string;
   description?: string; // Limit 420 characters

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { FaShoppingCart } from 'react-icons/fa';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 import GalSearch from '../../../components/gal-search/gal-search.component';
@@ -42,25 +42,43 @@ const TopNavbar: React.FC = () => {
             isPathDashboard ? 'creator' : 'user'
           }`}
         />
-        <Link to="/app">Explore</Link>
-        {isUserCreator ? (
+        <Link to="/app/explore">Explore</Link>
+        {user &&
+          (isUserCreator ? (
+            <GalButton
+              type="primary"
+              customClassName="create-product-btn"
+              text="Create Product"
+              onClick={() => navigate('/app/products/create')}
+            />
+          ) : (
+            <Link to={'library'}>Library</Link>
+          ))}
+      </div>
+      {user && (
+        <div className="nav-links">
+          {!isUserCreator && (
+            <GalIcon icon={FaShoppingCart} size={16} className="cart-icon" />
+          )}
+          <NewGalNotificationsDropdown />
+          <GalUserDropdown />
+        </div>
+      )}
+
+      {!user && (
+        <div className="nav-action-btns">
           <GalButton
-            type="primary"
-            customClassName="create-product-btn"
-            text="Create Product"
-            onClick={() => navigate('/app/products/create')}
+            text="Log In"
+            type="secondary"
+            onClick={() => navigate('/sign-in')}
           />
-        ) : (
-          <Link to={'library'}>Library</Link>
-        )}
-      </div>
-      <div className="nav-links">
-        {!isUserCreator && (
-          <GalIcon icon={FaShoppingCart} size={16} className="cart-icon" />
-        )}
-        <NewGalNotificationsDropdown />
-        <GalUserDropdown />
-      </div>
+          <GalButton
+            text="Register"
+            type="primary"
+            onClick={() => navigate('/sign-up')}
+          />
+        </div>
+      )}
     </nav>
   );
 };
