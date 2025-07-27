@@ -122,7 +122,7 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
   const handleAdd = (id: SocialPlatforms) => {
     if (initialValuesById[id] !== inputValue.trim()) {
       const link: SocialLink = {
-        id: undefined,
+        id: null,
         platform: id,
         url: inputValue,
       };

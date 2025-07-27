@@ -68,7 +68,7 @@ export interface UserDetails {
 }
 
 export interface SocialLink {
-  id?: string;
+  id?: string | null;
   platform: SocialPlatforms;
   url: string;
 }
