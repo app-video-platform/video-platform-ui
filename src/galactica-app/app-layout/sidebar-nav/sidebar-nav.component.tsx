@@ -15,27 +15,27 @@ const SidebarNav: React.FC = () => {
       </div>
       <ul>
         <li>
-          <Link to="/" className="sidebar-link">
+          <Link to="/app" className="sidebar-link">
             Overview
           </Link>
         </li>
         <li>
-          <Link to="dashboard/products" className="sidebar-link">
+          <Link to="/app/products" className="sidebar-link">
             Products
           </Link>
         </li>
         <li>
-          <Link to="dashboard/sales" className="sidebar-link">
+          <Link to="/app/sales" className="sidebar-link">
             Sales
           </Link>
         </li>
         <li>
-          <Link to="dashboard/marketing" className="sidebar-link">
+          <Link to="/app/marketing" className="sidebar-link">
             Marketing
           </Link>
         </li>
         <li>
-          <Link to="analytics" className="sidebar-link">
+          <Link to="/app/analytics" className="sidebar-link">
             Analytics
           </Link>
         </li>
