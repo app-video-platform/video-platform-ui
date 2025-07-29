@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useSelector } from 'react-redux';
-import { selectAuthUser } from '../../store/auth-store/auth.selectors';
+import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 
 import './library-page.styles.scss';
 

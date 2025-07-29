@@ -20,13 +20,13 @@ jest.mock('react-redux', () => ({
 }));
 import { useDispatch, useSelector } from 'react-redux';
 
-jest.mock('../../../../../store/auth-store/auth.selectors', () => ({
+jest.mock('../../../../../../store/auth-store/auth.selectors', () => ({
   selectAuthUser: jest.fn(),
 }));
-import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
+import { selectAuthUser } from '../../../../../../store/auth-store/auth.selectors';
 
 // ── 2) MOCK the async thunks from product.slice ───────────────────────────────────
-jest.mock('../../../../../store/product-store/product.slice', () => ({
+jest.mock('../../../../../../store/product-store/product.slice', () => ({
   createLesson: jest.fn(),
   updateLessonDetails: jest.fn(),
   deleteLesson: jest.fn(),
@@ -35,13 +35,13 @@ import {
   createLesson,
   updateLessonDetails,
   deleteLesson,
-} from '../../../../../store/product-store/product.slice';
+} from '../../../../../../store/product-store/product.slice';
 
 // ── 3) MOCK child components ──────────────────────────────────────────────────────
 
 // 3.1. GalFormInput: render <input data-testid="input-<name>" onChange calls onChange({target:{value}})>
 jest.mock(
-  '../../../../../components/gal-form-input/gal-form-input.component',
+  '../../../../../../components/gal-form-input/gal-form-input.component',
   () => ({
     __esModule: true,
     default: ({
@@ -75,7 +75,7 @@ jest.mock(
 
 // 3.2. GalBoxSelector: render a button per availableOption, data-testid="box-<opt>"
 jest.mock(
-  '../../../../../components/gal-box-selector/gal-box-selector.component',
+  '../../../../../../components/gal-box-selector/gal-box-selector.component',
   () => ({
     __esModule: true,
     default: ({
@@ -106,7 +106,7 @@ jest.mock(
 
 // 3.3. GalUppyFileUploader: render a button data-testid="file-uploader" that calls onFilesChange([mockFile])
 jest.mock(
-  '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
+  '../../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
   () => ({
     __esModule: true,
     default: ({
@@ -133,7 +133,7 @@ jest.mock(
 
 // 3.4. GalRichTextEditor: render a <div data-testid="rich-text-editor">, and call onChange({ somejson }) on click
 jest.mock(
-  '../../../../../components/rich-text-editor/gal-rich-text-editor.component',
+  '../../../../../../components/rich-text-editor/gal-rich-text-editor.component',
   () => ({
     __esModule: true,
     default: ({
@@ -154,36 +154,39 @@ jest.mock(
 );
 
 // 3.5. GalButton: render <button data-testid="btn-<text>">text</button>
-jest.mock('../../../../../components/gal-button/gal-button.component', () => ({
-  __esModule: true,
-  default: ({
-    text,
-    htmlType,
-    onClick,
-    disabled,
-  }: {
-    text: string;
-    htmlType: 'button' | 'submit';
-    onClick?: () => void;
-    disabled?: boolean;
-    customClassName?: string;
-    type?: string;
-  }) => (
-    <button
-      data-testid={`btn-${text.replace(/\s+/g, '-').toLowerCase()}`}
-      type={htmlType}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {text}
-    </button>
-  ),
-}));
+jest.mock(
+  '../../../../../../components/gal-button/gal-button.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      text,
+      htmlType,
+      onClick,
+      disabled,
+    }: {
+      text: string;
+      htmlType: 'button' | 'submit';
+      onClick?: () => void;
+      disabled?: boolean;
+      customClassName?: string;
+      type?: string;
+    }) => (
+      <button
+        data-testid={`btn-${text.replace(/\s+/g, '-').toLowerCase()}`}
+        type={htmlType}
+        onClick={onClick}
+        disabled={disabled}
+      >
+        {text}
+      </button>
+    ),
+  })
+);
 
 // ── 4) Import the component under test ───────────────────────────────────────────────
 import LessonEditor from './lesson-editor.component';
-import { ILesson } from '../../../../../api/models/product/lesson';
-import { LessonType } from '../../../../../api/models/product/product.types';
+import { ILesson } from '../../../../../../api/models/product/lesson';
+import { LessonType } from '../../../../../../api/models/product/product.types';
 
 // ── 5) Begin tests ───────────────────────────────────────────────────────────────────
 describe('<LessonEditor />', () => {

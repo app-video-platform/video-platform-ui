@@ -21,13 +21,13 @@ jest.mock('react-redux', () => ({
 }));
 import { useDispatch, useSelector } from 'react-redux';
 
-jest.mock('../../../../../store/auth-store/auth.selectors', () => ({
+jest.mock('../../../../../../store/auth-store/auth.selectors', () => ({
   selectAuthUser: jest.fn(),
 }));
-import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
+import { selectAuthUser } from '../../../../../../store/auth-store/auth.selectors';
 
 // ── 2) MOCK product-store thunks ─────────────────────────────────────────────────
-jest.mock('../../../../../store/product-store/product.slice', () => ({
+jest.mock('../../../../../../store/product-store/product.slice', () => ({
   createSection: jest.fn(),
   updateSectionDetails: jest.fn(),
   deleteSection: jest.fn(),
@@ -36,40 +36,43 @@ import {
   createSection,
   updateSectionDetails,
   deleteSection,
-} from '../../../../../store/product-store/product.slice';
+} from '../../../../../../store/product-store/product.slice';
 
 // ── 3) MOCK child components ──────────────────────────────────────────────────────
 
 // 3.1. GalButton → renders a simple <button data-testid="btn-<text>">text</button>
-jest.mock('../../../../../components/gal-button/gal-button.component', () => ({
-  __esModule: true,
-  default: ({
-    text,
-    htmlType,
-    onClick,
-    disabled,
-  }: {
-    text: string;
-    htmlType: 'button' | 'submit';
-    onClick?: () => void;
-    disabled?: boolean;
-    type?: string;
-    customClassName?: string;
-  }) => (
-    <button
-      data-testid={`btn-${text.toLowerCase().replace(/\s+/g, '-')}`}
-      type={htmlType}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {text}
-    </button>
-  ),
-}));
+jest.mock(
+  '../../../../../../components/gal-button/gal-button.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      text,
+      htmlType,
+      onClick,
+      disabled,
+    }: {
+      text: string;
+      htmlType: 'button' | 'submit';
+      onClick?: () => void;
+      disabled?: boolean;
+      type?: string;
+      customClassName?: string;
+    }) => (
+      <button
+        data-testid={`btn-${text.toLowerCase().replace(/\s+/g, '-')}`}
+        type={htmlType}
+        onClick={onClick}
+        disabled={disabled}
+      >
+        {text}
+      </button>
+    ),
+  })
+);
 
 // 3.2. GalFormInput → renders <input data-testid="input-<name>" …>
 jest.mock(
-  '../../../../../components/gal-form-input/gal-form-input.component',
+  '../../../../../../components/gal-form-input/gal-form-input.component',
   () => ({
     __esModule: true,
     default: ({
@@ -106,7 +109,7 @@ jest.mock(
 
 // 3.3. GalUppyFileUploader → renders <button data-testid="file-uploader">Upload File</button>
 jest.mock(
-  '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
+  '../../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
   () => ({
     __esModule: true,
     default: ({
@@ -132,7 +135,7 @@ jest.mock(
 );
 
 // 3.4. CourseLessons → stubbed out
-jest.mock('../../course-lessons/course-lessons.component', () => ({
+jest.mock('./../../course-lessons/course-lessons.component', () => ({
   __esModule: true,
   default: ({ sectionId, lessons }: { sectionId: string; lessons: any[] }) => (
     <div data-testid="course-lessons">

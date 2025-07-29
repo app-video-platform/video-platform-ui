@@ -2,17 +2,17 @@
 import React from 'react';
 
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../../../../store/store';
+import { AppDispatch } from '../../../../../../store/store';
 
 import { FormErrors, NewProductFormData } from '../../product-form.component';
-import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
-import GalButton from '../../../../../components/gal-button/gal-button.component';
-import { createCourseProduct } from '../../../../../store/product-store/product.slice';
+import GalFormInput from '../../../../../../components/gal-form-input/gal-form-input.component';
+import GalButton from '../../../../../../components/gal-button/gal-button.component';
+import { createCourseProduct } from '../../../../../../store/product-store/product.slice';
 
 import './create-product-step-one.styles.scss';
-import GalBoxSelector from '../../../../../components/gal-box-selector/gal-box-selector.component';
-import { ProductType } from '../../../../../api/models/product/product.types';
-import { INewProductPayload } from '../../../../../api/models/product/product';
+import GalBoxSelector from '../../../../../../components/gal-box-selector/gal-box-selector.component';
+import { ProductType } from '../../../../../../api/models/product/product.types';
+import { INewProductPayload } from '../../../../../../api/models/product/product';
 
 interface CreateProductStepOneProps {
   formData: NewProductFormData;

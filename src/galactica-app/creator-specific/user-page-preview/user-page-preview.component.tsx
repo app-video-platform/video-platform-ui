@@ -2,17 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { selectAuthUser } from '../../store/auth-store/auth.selectors';
-import { selectAllProducts } from '../../store/product-store/product.selectors';
-import GalProductCard from '../../components/gal-product-box/gal-product-box.component';
+import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
+import { selectAllProducts } from '../../../store/product-store/product.selectors';
+import GalProductCard from '../../../components/gal-product-box/gal-product-box.component';
 
 import './user-page-preview.styles.scss';
-import { BaseProduct } from '../../api/models/product/product';
+import { BaseProduct } from '../../../api/models/product/product';
 import {
   ProductType,
   ProductStatus,
-} from '../../api/models/product/product.types';
-import { User, UserRole } from '../../api/models/user/user';
+} from '../../../api/models/product/product.types';
+import { User, UserRole } from '../../../api/models/user/user';
 
 const UserPagePreview: React.FC = () => {
   const user = useSelector(selectAuthUser);

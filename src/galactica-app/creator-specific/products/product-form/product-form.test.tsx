@@ -26,15 +26,15 @@ jest.mock('react-redux', () => ({
 import { useSelector, useDispatch } from 'react-redux';
 
 // ── (2) Mock selectors & action creators ──
-jest.mock('../../../store/auth-store/auth.selectors', () => ({
+jest.mock('../../../../store/auth-store/auth.selectors', () => ({
   selectAuthUser: jest.fn(),
 }));
-import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
+import { selectAuthUser } from '../../../../store/auth-store/auth.selectors';
 
-jest.mock('../../../store/product-store/product.slice', () => ({
+jest.mock('../../../../store/product-store/product.slice', () => ({
   updateCourseProductDetails: jest.fn(),
 }));
-import { updateCourseProductDetails } from '../../../store/product-store/product.slice';
+import { updateCourseProductDetails } from '../../../../store/product-store/product.slice';
 
 // ── (3) Provide a “default” mock for CreateProductStepOne that *does* set fields ──
 // This will be used by most tests.
@@ -62,7 +62,7 @@ jest.mock(
 
 // ── (4) Mock the other child components and <GalButton> exactly as before ──
 jest.mock(
-  '../../../components/gal-price-selector/gal-price-selector.component',
+  '../../../../components/gal-price-selector/gal-price-selector.component',
   () => ({
     __esModule: true,
     default: ({ price }: any) => (
@@ -74,7 +74,7 @@ jest.mock(
 );
 
 jest.mock(
-  '../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
+  '../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
   () => ({
     __esModule: true,
     default: ({ onFilesChange }: any) => (
@@ -105,7 +105,7 @@ jest.mock(
   })
 );
 
-jest.mock('../../../components/gal-button/gal-button.component', () => ({
+jest.mock('../../../../components/gal-button/gal-button.component', () => ({
   __esModule: true,
   default: ({ text, htmlType }: any) => (
     <button

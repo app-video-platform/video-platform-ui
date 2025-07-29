@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-import GalIcon from '../../components/gal-icon-component/gal-icon.component';
-import { selectAuthUser } from '../../store/auth-store/auth.selectors';
-import { selectTopThreeProducts } from '../../store/product-store/product.selectors';
-import GalProductCard from '../../components/gal-product-box/gal-product-box.component';
-import GalButton from '../../components/gal-button/gal-button.component';
-import { AppDispatch } from '../../store/store';
-import { getAllProductsByUserId } from '../../store/product-store/product.slice';
+import GalIcon from '../../../components/gal-icon-component/gal-icon.component';
+import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
+import { selectTopThreeProducts } from '../../../store/product-store/product.selectors';
+import GalProductCard from '../../../components/gal-product-box/gal-product-box.component';
+import GalButton from '../../../components/gal-button/gal-button.component';
+import { AppDispatch } from '../../../store/store';
+import { getAllProductsByUserId } from '../../../store/product-store/product.slice';
 
 import './creator-dashboard.styles.scss';
 

@@ -1,13 +1,17 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { AppDispatch } from './../../../store/store';
-import { selectAuthUser } from './../../../store/auth-store/auth.selectors';
-import { getAllProductsByUserId } from './../../../store/product-store/product.slice';
+import { AppDispatch } from './../../../../store/store';
+import { selectAuthUser } from './../../../../store/auth-store/auth.selectors';
+import { getAllProductsByUserId } from './../../../../store/product-store/product.slice';
 
 import './products-list.styles.scss';
 import { useNavigate } from 'react-router-dom';
-import { selectAllProducts, selectProductsLoading, selectProductsError } from '../../../store/product-store/product.selectors';
+import {
+  selectAllProducts,
+  selectProductsLoading,
+  selectProductsError,
+} from '../../../../store/product-store/product.selectors';
 
 const ProductsList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

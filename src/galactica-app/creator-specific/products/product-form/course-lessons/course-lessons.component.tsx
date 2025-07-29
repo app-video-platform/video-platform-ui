@@ -4,7 +4,7 @@ import LessonEditor from '../editors/lesson-editor/lesson-editor.component';
 
 import { IoIosAddCircleOutline } from 'react-icons/io';
 import './course-lessons.styles.scss';
-import GalIcon from '../../../../components/gal-icon-component/gal-icon.component';
+import GalIcon from '../../../../../components/gal-icon-component/gal-icon.component';
 
 interface CourseLessonsProps {
   sectionId: string;

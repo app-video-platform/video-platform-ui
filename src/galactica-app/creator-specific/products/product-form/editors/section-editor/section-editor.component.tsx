@@ -6,24 +6,24 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ProductType } from '../../../../../api/models/product/product.types';
-import GalButton from '../../../../../components/gal-button/gal-button.component';
-import GalUppyFileUploader from '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
+import { ProductType } from '../../../../../../api/models/product/product.types';
+import GalButton from '../../../../../../components/gal-button/gal-button.component';
+import GalUppyFileUploader from '../../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
 import {
   updateSectionDetails,
   createSection,
   deleteSection,
-} from '../../../../../store/product-store/product.slice';
-import { AppDispatch } from '../../../../../store/store';
+} from '../../../../../../store/product-store/product.slice';
+import { AppDispatch } from '../../../../../../store/store';
 import CourseLessons from '../../course-lessons/course-lessons.component';
-import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
+import GalFormInput from '../../../../../../components/gal-form-input/gal-form-input.component';
 
 import './section-editor.styles.scss';
 import {
   IRemoveItemPayload,
   IUpdateSectionDetails,
-} from '../../../../../api/models/product/product';
-import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
+} from '../../../../../../api/models/product/product';
+import { selectAuthUser } from '../../../../../../store/auth-store/auth.selectors';
 
 export interface NewProductSectionFormData {
   id: string;

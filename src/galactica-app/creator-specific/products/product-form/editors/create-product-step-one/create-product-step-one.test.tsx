@@ -20,15 +20,15 @@ jest.mock('react-redux', () => ({
 import { useDispatch } from 'react-redux';
 
 // ── 2) MOCK createCourseProduct async thunk ───────────────────────────────────────
-jest.mock('../../../../../store/product-store/product.slice', () => ({
+jest.mock('../../../../../../store/product-store/product.slice', () => ({
   createCourseProduct: jest.fn(),
 }));
-import { createCourseProduct } from '../../../../../store/product-store/product.slice';
+import { createCourseProduct } from '../../../../../../store/product-store/product.slice';
 
 // ── 3) MOCK child components ──────────────────────────────────────────────────────
 // 3.1. GalFormInput: render a simple input/textarea that calls `onChange({ target: { value } })`
 jest.mock(
-  '../../../../../components/gal-form-input/gal-form-input.component',
+  '../../../../../../components/gal-form-input/gal-form-input.component',
   () => ({
     __esModule: true,
     default: ({
@@ -74,7 +74,7 @@ jest.mock(
 
 // 3.2. GalBoxSelector: render one button per availableOption that calls `onSelect(option)`
 jest.mock(
-  '../../../../../components/gal-box-selector/gal-box-selector.component',
+  '../../../../../../components/gal-box-selector/gal-box-selector.component',
   () => ({
     __esModule: true,
     default: ({
@@ -105,29 +105,32 @@ jest.mock(
 );
 
 // 3.3. GalButton: render a button with onClick, disabled, and text; give it data-testid="btn-<text>"
-jest.mock('../../../../../components/gal-button/gal-button.component', () => ({
-  __esModule: true,
-  default: ({
-    text,
-    htmlType,
-    onClick,
-    disabled,
-  }: {
-    text: string;
-    htmlType: 'button' | 'submit';
-    onClick?: () => void;
-    disabled?: boolean;
-  }) => (
-    <button
-      data-testid={`btn-${text.replace(/\s+/g, '-').toLowerCase()}`}
-      type={htmlType}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {text}
-    </button>
-  ),
-}));
+jest.mock(
+  '../../../../../../components/gal-button/gal-button.component',
+  () => ({
+    __esModule: true,
+    default: ({
+      text,
+      htmlType,
+      onClick,
+      disabled,
+    }: {
+      text: string;
+      htmlType: 'button' | 'submit';
+      onClick?: () => void;
+      disabled?: boolean;
+    }) => (
+      <button
+        data-testid={`btn-${text.replace(/\s+/g, '-').toLowerCase()}`}
+        type={htmlType}
+        onClick={onClick}
+        disabled={disabled}
+      >
+        {text}
+      </button>
+    ),
+  })
+);
 
 // ── 4) Import the component under test ──────────────────────────────────────────────
 import CreateProductStepOne from './create-product-step-one.component';

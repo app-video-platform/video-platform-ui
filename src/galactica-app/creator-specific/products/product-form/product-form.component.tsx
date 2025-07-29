@@ -5,25 +5,25 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { AppDispatch } from '../../../store/store';
-import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
+import { AppDispatch } from '../../../../store/store';
+import { selectAuthUser } from '../../../../store/auth-store/auth.selectors';
 
 import './product-form.styles.scss';
 import {
   deleteProduct,
   getProductByProductId,
   updateCourseProductDetails,
-} from '../../../store/product-store/product.slice';
-import GalButton from '../../../components/gal-button/gal-button.component';
-import GalPriceSelector from '../../../components/gal-price-selector/gal-price-selector.component';
-import GalUppyFileUploader from '../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
+} from '../../../../store/product-store/product.slice';
+import GalButton from '../../../../components/gal-button/gal-button.component';
+import GalPriceSelector from '../../../../components/gal-price-selector/gal-price-selector.component';
+import GalUppyFileUploader from '../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
 import CreateProductStepOne from './editors/create-product-step-one/create-product-step-one.component';
 import CreateProductSections from './create-product-sections/create-product-sections.component';
 import {
   IRemoveProductPayload,
   IUpdateCourseProduct,
-} from '../../../api/models/product/product';
-import { ProductType } from '../../../api/models/product/product.types';
+} from '../../../../api/models/product/product';
+import { ProductType } from '../../../../api/models/product/product.types';
 import { useParams } from 'react-router-dom';
 
 export interface NewProductFormData {

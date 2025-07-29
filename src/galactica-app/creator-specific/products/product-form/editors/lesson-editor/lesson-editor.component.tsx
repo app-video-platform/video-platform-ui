@@ -5,29 +5,29 @@
 /* eslint-disable indent */
 import React, { use, useEffect, useState } from 'react';
 
-import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
-import GalButton from '../../../../../components/gal-button/gal-button.component';
-import { AppDispatch } from '../../../../../store/store';
+import GalFormInput from '../../../../../../components/gal-form-input/gal-form-input.component';
+import GalButton from '../../../../../../components/gal-button/gal-button.component';
+import { AppDispatch } from '../../../../../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   createLesson,
   deleteLesson,
   updateLessonDetails,
-} from '../../../../../store/product-store/product.slice';
-import GalBoxSelector from '../../../../../components/gal-box-selector/gal-box-selector.component';
-import GalUppyFileUploader from '../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
-import GalRichTextEditor from '../../../../../components/rich-text-editor/gal-rich-text-editor.component';
+} from '../../../../../../store/product-store/product.slice';
+import GalBoxSelector from '../../../../../../components/gal-box-selector/gal-box-selector.component';
+import GalUppyFileUploader from '../../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
+import GalRichTextEditor from '../../../../../../components/rich-text-editor/gal-rich-text-editor.component';
 import {
   ICreateLessonPayload,
   ILesson,
-} from '../../../../../api/models/product/lesson';
-import { LessonType } from '../../../../../api/models/product/product.types';
+} from '../../../../../../api/models/product/lesson';
+import { LessonType } from '../../../../../../api/models/product/product.types';
 
 import { MdDeleteForever } from 'react-icons/md';
-import GalIcon from '../../../../../components/gal-icon-component/gal-icon.component';
+import GalIcon from '../../../../../../components/gal-icon-component/gal-icon.component';
 import './lesson-editor.styles.scss';
-import { selectAuthUser } from '../../../../../store/auth-store/auth.selectors';
-import { IRemoveItemPayload } from '../../../../../api/models/product/product';
+import { selectAuthUser } from '../../../../../../store/auth-store/auth.selectors';
+import { IRemoveItemPayload } from '../../../../../../api/models/product/product';
 
 interface LessonEditorProps {
   lesson: ILesson;

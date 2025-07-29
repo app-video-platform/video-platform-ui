@@ -64,6 +64,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
             <li>
               <button
                 class="vp-button vp-button--secondary undefined"
+                type="button"
               >
                 Sign In
               </button>
@@ -71,6 +72,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
             <li>
               <button
                 class="vp-button vp-button--primary undefined"
+                type="button"
               >
                 Register
               </button>
@@ -101,6 +103,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
         </p>
         <button
           class="vp-button vp-button--primary hero-cta"
+          type="button"
         >
           Launch Now
         </button>
@@ -268,11 +271,13 @@ exports[`App Component matches snapshot after navigation 1`] = `
       >
         <button
           class="vp-button vp-button--primary undefined"
+          type="button"
         >
           Launch Now
         </button>
         <button
           class="vp-button vp-button--secondary undefined"
+          type="button"
         >
           Learn More
         </button>
