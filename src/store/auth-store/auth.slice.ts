@@ -263,9 +263,9 @@ const authSlice = createSlice({
           state.user = action.payload;
         }
       )
-      .addCase(updateUserDetails.rejected, (state, action) => {
+      .addCase(updateUserDetails.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Logout failed';
+        state.error = 'Update user details failed';
       });
   },
 });

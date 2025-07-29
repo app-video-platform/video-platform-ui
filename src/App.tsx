@@ -74,6 +74,8 @@ const App = () => {
           }
         />
 
+        {/* <Route path="onboarding" element={<Onboarding />} /> */}
+
         {/* Protected app (everything under /app/* except “explore”) */}
         <Route
           path="app/"

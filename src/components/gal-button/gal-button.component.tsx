@@ -15,7 +15,7 @@ const GalButton: React.FC<GalButtonProps> = ({
   text,
   type = 'neutral',
   onClick,
-  htmlType,
+  htmlType = 'button',
   customClassName,
   disabled = false,
 }) => (

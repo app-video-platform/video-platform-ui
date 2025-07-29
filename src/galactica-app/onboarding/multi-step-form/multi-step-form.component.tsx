@@ -87,14 +87,15 @@ const MultiStepForm: React.FC = () => {
 
     console.log('[UPDATE USER DETAILS] userDetails', userDetails);
     // Save partial data to Redux or back-end
-    dispatch(updateUserDetails(userDetails)).then(() => nextStep());
+    dispatch(updateUserDetails(userDetails));
+    nextStep();
   };
 
   return (
     <div className="multi-step-container">
       <MultiStepProgressBar step={step} totalSteps={5} />
-      <div className="step-container">
-        <FormProvider {...methods}>
+      <FormProvider {...methods}>
+        <div className="step-container">
           {step === 1 && (
             <>
               <h1 className="step-header">
@@ -136,33 +137,41 @@ const MultiStepForm: React.FC = () => {
               <StepFive />
             </div>
           )}
-        </FormProvider>
-      </div>
-      <div className="step-action-buttons">
-        <GalButton
-          onClick={() => navigate('/app')}
-          text="Skip"
-          type="neutral"
-        />
-        {step !== 1 && (
-          <GalButton onClick={prevStep} text="Back" type="primary" />
-        )}
-        {step !== 5 && (
+        </div>
+        <div className="step-action-buttons">
           <GalButton
-            onClick={methods.handleSubmit(onStepValid)}
-            type="primary"
-            text="Next"
-          />
-        )}
-
-        {step === 5 && (
-          <GalButton
+            htmlType="button"
             onClick={() => navigate('/app')}
-            text="Continue"
-            type="primary"
+            text="Skip"
+            type="neutral"
           />
-        )}
-      </div>
+          {step !== 1 && (
+            <GalButton
+              htmlType="button"
+              onClick={prevStep}
+              text="Back"
+              type="primary"
+            />
+          )}
+          {step !== 5 && (
+            <GalButton
+              htmlType="button"
+              onClick={methods.handleSubmit(onStepValid)}
+              type="primary"
+              text="Next"
+            />
+          )}
+
+          {step === 5 && (
+            <GalButton
+              onClick={() => navigate('/app')}
+              htmlType="button"
+              text="Continue"
+              type="primary"
+            />
+          )}
+        </div>
+      </FormProvider>
     </div>
   );
 };
