@@ -96,9 +96,15 @@ const ExplorePage: React.FC = () => {
                       {product.price}
                     </span>
                   </div>
-                  <span className="creator">
-                    {product.createdByName}, {product.createdByTitle}
-                  </span>
+                  <button
+                    type="button"
+                    className="creator-route-btn"
+                    onClick={() => navigate(`/store/${product.createdById}`)}
+                  >
+                    <span className="creator">
+                      {product.createdByName}, {product.createdByTitle}
+                    </span>
+                  </button>
                 </div>
                 <GalButton
                   text="View Product"

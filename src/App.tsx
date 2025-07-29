@@ -33,6 +33,7 @@ import CreatorDashboard from './galactica-app/creator-dashboard/creator-dashboar
 import StorefrontPage from './galactica-app/storefront-page/storefront-page.component';
 import ExplorePage from './galactica-app/explore-page/explore-page.component';
 import ProductPage from './galactica-app/product-page/product-page.component';
+import SettingsPage from './galactica-app/settings-page/settings-page.component';
 
 const App = () => {
   const user = useSelector(selectAuthUser);
@@ -61,6 +62,17 @@ const App = () => {
         <Route path="store/:creatorId" element={<StorefrontPage />} />
         <Route path="app/explore" element={<ExplorePage />} />
         <Route path="product/:id/:type" element={<ProductPage />} />
+
+        <Route
+          path="onboarding"
+          element={
+            <ProtectedRoute
+              allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}
+            >
+              <Onboarding />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected app (everything under /app/* except “explore”) */}
         <Route
@@ -125,9 +137,8 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="my-page-preview" element={<UserPagePreview />} />
-          {/* Onboarding for freshly-registered users */}
-          <Route path="onboarding" element={<Onboarding />} />
           {/* Fallback inside /app */}
           <Route path="*" element={<Navigate to="/app" replace />} />
         </Route>

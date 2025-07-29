@@ -49,7 +49,9 @@ const SidebarNav: React.FC = () => {
           <a href="/settings">Messages</a>
         </li>
         <li>
-          <a href="/settings">Settings</a>
+          <Link to="/app/settings" className="sidebar-link">
+            Settings
+          </Link>
         </li>
       </ul>
     </nav>
