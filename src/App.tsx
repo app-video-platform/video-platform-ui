@@ -34,6 +34,7 @@ import StorefrontPage from './galactica-app/storefront-page/storefront-page.comp
 import ExplorePage from './galactica-app/explore-page/explore-page.component';
 import ProductPage from './galactica-app/product-page/product-page.component';
 import SettingsPage from './galactica-app/settings-page/settings-page.component';
+import SearchResultsPage from './galactica-app/explore-page/search-page/search-page.component';
 
 const App = () => {
   const user = useSelector(selectAuthUser);
@@ -59,9 +60,10 @@ const App = () => {
         {/* <Route path="onboarding" element={<Onboarding />} /> */}
 
         {/* Public storefront and explore */}
-        <Route path="store/:creatorId" element={<StorefrontPage />} />
+        {/* <Route path="store/:creatorId" element={<StorefrontPage />} />
         <Route path="app/explore" element={<ExplorePage />} />
-        <Route path="product/:id/:type" element={<ProductPage />} />
+        <Route path="app/explore/search" element={<SearchResultsPage />} />
+        <Route path="product/:id/:type" element={<ProductPage />} /> */}
 
         <Route
           path="onboarding"
@@ -76,73 +78,86 @@ const App = () => {
 
         {/* <Route path="onboarding" element={<Onboarding />} /> */}
 
-        {/* Protected app (everything under /app/* except “explore”) */}
-        <Route
-          path="app/"
-          element={
-            <ProtectedRoute
-              allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}
-            >
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
+        {/* /app englobes the whole app part of the project (restricted + visitors allowed) */}
+        <Route path="app/" element={<AppLayout />}>
+          {/* These are a series of routes under /app which are not protected (allowed for visitors as well) */}
+          <Route path="explore" element={<ExplorePage />} />
+          <Route path="explore/search" element={<SearchResultsPage />} />
+          <Route path="product/:id/:type" element={<ProductPage />} />
+          <Route path="store/:creatorId" element={<StorefrontPage />} />
+
           {/* Role-based home: creators see dashboard, users see library */}
           <Route
-            index
             element={
-              user?.roles.includes(UserRole.CREATOR) ? (
-                <CreatorDashboard />
-              ) : user?.roles.includes(UserRole.ADMIN) ? (
-                <AdminPage />
-              ) : (
-                <GalacticaHome />
-              )
-            }
-          />
-          {/* Creator-only product management */}
-          <Route
-            path="products/"
-            element={
-              <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
-                {/* <ProductsLayout /> */}
+              <ProtectedRoute
+                allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}
+              >
                 <Outlet />
               </ProtectedRoute>
             }
           >
-            <Route index element={<ProductsList />} />
-            <Route path="create" element={<ProductForm />} />
-            <Route path="edit/:type/:id" element={<ProductForm />} />
+            <Route
+              index
+              element={
+                user?.roles.includes(UserRole.CREATOR) ? (
+                  <CreatorDashboard />
+                ) : user?.roles.includes(UserRole.ADMIN) ? (
+                  <AdminPage />
+                ) : (
+                  <GalacticaHome />
+                )
+              }
+            />
+            {/* Creator-only product management */}
+            <Route
+              path="products/"
+              element={
+                <ProtectedRoute
+                  allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}
+                >
+                  {/* <ProductsLayout /> */}
+                  <Outlet />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<ProductsList />} />
+              <Route path="create" element={<ProductForm />} />
+              <Route path="edit/:type/:id" element={<ProductForm />} />
+            </Route>
+            <Route
+              path="sales"
+              element={
+                <ProtectedRoute
+                  allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}
+                >
+                  <SalesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="marketing"
+              element={
+                <ProtectedRoute
+                  allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}
+                >
+                  <MarketingPage />
+                </ProtectedRoute>
+              }
+            />
+            {/* User-only library */}
+            <Route
+              path="library"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+                  <LibraryPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="my-page-preview" element={<UserPagePreview />} />
+            {/* Fallback inside /app */}
+            <Route path="*" element={<Navigate to="/app" replace />} />
           </Route>
-          <Route
-            path="sales"
-            element={
-              <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
-                <SalesPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="marketing"
-            element={
-              <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
-                <MarketingPage />
-              </ProtectedRoute>
-            }
-          />
-          {/* User-only library */}
-          <Route
-            path="library"
-            element={
-              <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
-                <LibraryPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="my-page-preview" element={<UserPagePreview />} />
-          {/* Fallback inside /app */}
-          <Route path="*" element={<Navigate to="/app" replace />} />
         </Route>
       </Routes>
     </AppInitializer>

@@ -188,6 +188,69 @@ export const getAllProductsMinimalAPI = async () => {
   }
 };
 
+export interface SearchResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  last: boolean;
+  totalPages: number;
+  totalElements: number;
+  first: boolean;
+  size: number;
+  number: number;
+  sort: { empty: boolean; sorted: boolean; unsorted: boolean };
+  numberOfElements: number;
+  empty: boolean;
+}
+
+export type SortOrder = 'asc' | 'desc';
+export interface SortParam {
+  field: keyof IMinimalProduct;
+  order: SortOrder;
+}
+
+export const fetchProducts = async (params: {
+  term: string;
+  page: number;
+  size: number;
+  sort?: SortParam;
+}): Promise<SearchResponse<IMinimalProduct>> => {
+  try {
+    const { term, page, size, sort } = params;
+    const query = new URLSearchParams({
+      term,
+      page: String(page),
+      size: String(size),
+      sort: sort ? `${sort.field},${sort.order}` : 'createdAt,desc',
+    });
+    const response = await httpClient.get(
+      `/api/products/search?${query.toString()}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error getting all minimal products:', error);
+    throw error;
+  }
+};
+
+// export const getNewAllProductsMinimalAPI = async ({term: string}) => {
+//   try {
+//     const response = await httpClient.get<IMinimalProduct[]>(
+//       `/api/products/search?term=${term}&page=${page}&size=${size}&sort=${field},${dir}`
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error getting all minimal products:', error);
+//     throw error;
+//   }
+// };
+
 export const getAllProductsMinimalByUserAPI = async (userId: string) => {
   try {
     const response = await httpClient.get<IMinimalProduct[]>(

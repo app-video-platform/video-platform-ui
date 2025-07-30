@@ -3,17 +3,18 @@ import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import SidebarNav from './sidebar-nav/sidebar-nav.component';
-import TopNavbar from './top-navbar/top-navbar.component';
+import TopNavbar from '../top-navbar/top-navbar.component';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { UserRole } from '../../api/models/user/user';
 
 import './app-layout.styles.scss';
 
 const CREATOR_ROUTES = [
-  '/app/*',
+  '/app',
   '/app/products/*',
   '/app/sales',
   '/app/marketing',
+  '/app/settings',
 ];
 
 const AppLayout: React.FC = () => {

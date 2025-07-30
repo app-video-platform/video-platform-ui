@@ -3,15 +3,16 @@ import { useSelector } from 'react-redux';
 import { FaShoppingCart } from 'react-icons/fa';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
-import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
-import GalSearch from '../../../components/gal-search/gal-search.component';
-import GalIcon from '../../../components/gal-icon-component/gal-icon.component';
-import { UserRole } from '../../../api/models/user/user';
-import GalButton from '../../../components/gal-button/gal-button.component';
-import NewGalNotificationsDropdown from '../../../components/gal-dropdowns/gal-notifications-dropdown/gal-notifications-dropdown.component';
-import GalUserDropdown from '../../../components/gal-dropdowns/gal-user-dropdown/gal-user-dropdown.component';
+import { selectAuthUser } from '../../store/auth-store/auth.selectors';
+import GalSearch from '../../components/gal-search/gal-search.component';
+import GalIcon from '../../components/gal-icon-component/gal-icon.component';
+import { UserRole } from '../../api/models/user/user';
+import GalButton from '../../components/gal-button/gal-button.component';
+import NewGalNotificationsDropdown from '../../components/gal-dropdowns/gal-notifications-dropdown/gal-notifications-dropdown.component';
+import GalUserDropdown from '../../components/gal-dropdowns/gal-user-dropdown/gal-user-dropdown.component';
 
 import './top-navbar.styles.scss';
+import SmartSearch from './smart-search/smart-search.component';
 
 const TopNavbar: React.FC = () => {
   const navigate = useNavigate();
@@ -23,10 +24,6 @@ const TopNavbar: React.FC = () => {
       : false;
   const isPathDashboard = location.pathname.startsWith('/app') && isUserCreator;
 
-  const handleSearch = (query: string) => {
-    console.log('Searching for:', query);
-  };
-
   return (
     <nav className="galactica-home-nav">
       {!isPathDashboard && (
@@ -35,13 +32,7 @@ const TopNavbar: React.FC = () => {
         </div>
       )}
       <div className="home-search-container">
-        <GalSearch
-          placeholder="Search for what your heart desires"
-          onSearch={handleSearch}
-          customClassName={`galactica-home-search galactica-home-search__${
-            isPathDashboard ? 'creator' : 'user'
-          }`}
-        />
+        <SmartSearch />
         <Link to="/app/explore">Explore</Link>
         {user &&
           (isUserCreator ? (

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import TopNavbar from '../app-layout/top-navbar/top-navbar.component';
 import { IMinimalProduct } from '../../api/models/product/product';
 import { getAllProductsMinimalAPI } from '../../api/services/products/products-api';
 import GalButton from '../../components/gal-button/gal-button.component';
@@ -51,7 +50,6 @@ const ExplorePage: React.FC = () => {
   }
   return (
     <div className="explore-page">
-      <TopNavbar />
       <main className="explore-page-content">
         <section className="intro">
           <h1>Check this out</h1>

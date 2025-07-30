@@ -7,7 +7,6 @@ import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import './storefront-page.styles.scss';
 import { IMinimalProduct } from '../../api/models/product/product';
 import { getAllProductsMinimalByUserAPI } from '../../api/services/products/products-api';
-import TopNavbar from '../app-layout/top-navbar/top-navbar.component';
 
 const StorefrontPage: React.FC = () => {
   const { creatorId } = useParams();
@@ -54,7 +53,6 @@ const StorefrontPage: React.FC = () => {
 
   return (
     <div className="storefront-page">
-      <TopNavbar />
       <main className="storefront-page-content">
         <section className="hero">
           <div className="creator-profile-image" />

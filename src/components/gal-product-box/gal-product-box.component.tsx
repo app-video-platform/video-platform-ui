@@ -51,7 +51,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
       <GalButton
         text="View Product"
         type="secondary"
-        onClick={() => navigate(`/product/${product.id}/${product.type}`)}
+        onClick={() => navigate(`/app/product/${product.id}/${product.type}`)}
       />
     </div>
   );
