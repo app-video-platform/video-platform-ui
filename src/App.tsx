@@ -35,6 +35,7 @@ import ExplorePage from './galactica-app/explore-page/explore-page.component';
 import ProductPage from './galactica-app/product-page/product-page.component';
 import SettingsPage from './galactica-app/settings-page/settings-page.component';
 import SearchResultsPage from './galactica-app/explore-page/search-page/search-page.component';
+import Cart from './galactica-app/normal-user-specific/cart/cart.component';
 
 const App = () => {
   const user = useSelector(selectAuthUser);
@@ -154,7 +155,11 @@ const App = () => {
               }
             />
             <Route path="settings" element={<SettingsPage />} />
+
             <Route path="my-page-preview" element={<UserPagePreview />} />
+
+            <Route path="cart" element={<Cart />} />
+
             {/* Fallback inside /app */}
             <Route path="*" element={<Navigate to="/app" replace />} />
           </Route>

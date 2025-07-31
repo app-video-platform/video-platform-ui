@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppDispatch } from '../../store/store';
 
@@ -10,15 +10,19 @@ import { ProductType } from '../../api/models/product/product.types';
 import { IProductResponse } from '../../api/models/product/product';
 import GalButton from '../../components/gal-button/gal-button.component';
 import GalExpansionPanel from '../../components/gal-expansion-panel/gal-expansion-panel.component';
+import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../assets/image-placeholder.png');
 
 const ProductPage: React.FC = () => {
   const { type, id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const user = useSelector(selectAuthUser);
   const [product, setProduct] = useState<IProductResponse | null>(null);
   const [numberOfSections, setNumberOfSections] = useState<number>(0);
   const [numberOfLessons, setNumberOfLessons] = useState<number>(0);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
 
   useEffect(() => {
     if (id && type) {
@@ -35,6 +39,14 @@ const ProductPage: React.FC = () => {
         });
     }
   }, [dispatch, id, type]);
+
+  useEffect(() => {
+    if (user && user.id === product?.userId) {
+      setIsOwner(true);
+    } else {
+      setIsOwner(false);
+    }
+  }, [user]);
 
   const getProductInformation = (product: IProductResponse) => {
     let numOfSections = 0;
@@ -69,8 +81,22 @@ const ProductPage: React.FC = () => {
               <p>Created by: The One Handed Man</p>
               <p>{product?.price}</p>
               <div className="cta-buttons">
-                <GalButton type="primary" text="Add to Cart" />
-                <GalButton type="secondary" text="Buy Now" />
+                {isOwner ? (
+                  <GalButton
+                    type="primary"
+                    text="Edit"
+                    onClick={() =>
+                      navigate(
+                        `/app/products/edit/${product.type}/${product.id}`
+                      )
+                    }
+                  />
+                ) : (
+                  <>
+                    <GalButton type="primary" text="Add to Cart" />
+                    <GalButton type="secondary" text="Buy Now" />
+                  </>
+                )}
               </div>
               <p>Last updated: 2 days ago</p>
               <p>Language: Swahili</p>
