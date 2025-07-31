@@ -24,10 +24,6 @@ const ProductsList: React.FC = () => {
   useEffect(() => {
     if (user && user.id) {
       dispatch(getAllProductsByUserId(user.id));
-    } else {
-      dispatch(getAllProductsByUserId('user-id-alex-bej'))
-        .unwrap()
-        .then((data) => console.log('data from call in useeffect', data));
     }
   }, [dispatch, user]);
 
@@ -35,12 +31,6 @@ const ProductsList: React.FC = () => {
     <div>
       <div className="products-header">
         <h1>Products</h1>
-        <button
-          className="add-product-btn"
-          onClick={() => navigate('create-course')}
-        >
-          + (tmp) Add COURSE
-        </button>
         <button className="add-product-btn" onClick={() => navigate('create')}>
           + Add product
         </button>
