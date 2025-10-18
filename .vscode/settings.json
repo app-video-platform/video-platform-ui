@@ -19,5 +19,6 @@
   "editor.rulers": [
     150
   ],
-  "workbench.preferredDarkColorTheme": "Default High Contrast Light"
+  "workbench.preferredDarkColorTheme": "Default High Contrast Light",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
