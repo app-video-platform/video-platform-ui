@@ -20,11 +20,14 @@ import GalUppyFileUploader from '../../../../components/gal-uppy-file-uploader/g
 import CreateProductStepOne from './editors/create-product-step-one/create-product-step-one.component';
 import CreateProductSections from './create-product-sections/create-product-sections.component';
 import {
+  IConsultationDetails,
   IRemoveProductPayload,
   IUpdateCourseProduct,
+  MeetingMethods,
 } from '../../../../api/models/product/product';
 import { ProductType } from '../../../../api/models/product/product.types';
 import { useParams } from 'react-router-dom';
+import ConsultationDetails from './consultation-details/consultation-details.component';
 
 export interface NewProductFormData {
   id: string; // Initially empty, will be set after product creation
@@ -33,6 +36,7 @@ export interface NewProductFormData {
   type: ProductType; // e.g., 'course', 'ebook', etc.
   price: 'free' | number; // e.g., 'free', 'paid'
   sections?: any[]; // Optional: sections for courses, etc.
+  consultationDetails?: IConsultationDetails;
 }
 
 export interface FormErrors {
@@ -55,6 +59,10 @@ const ProductForm: React.FC = () => {
     type: '' as ProductType, // e.g., 'course', 'ebook', etc.
     price: 'free',
     sections: [], // Optional: sections for courses, etc.
+    consultationDetails: {
+      duration: 0,
+      meetingMethod: MeetingMethods.ZOOM,
+    },
   });
 
   const [productImage, setProductImage] = useState<File | null>(null);
@@ -70,7 +78,7 @@ const ProductForm: React.FC = () => {
         getProductByProductId({
           productId: id,
           productType: type as ProductType,
-        })
+        }),
       )
         .unwrap()
         .then((product) => {
@@ -141,6 +149,8 @@ const ProductForm: React.FC = () => {
       id: formData.id,
     };
 
+    console.log('form data', formData);
+
     dispatch(updateCourseProductDetails(productData))
       .unwrap()
       .then((data) => {
@@ -162,11 +172,11 @@ const ProductForm: React.FC = () => {
   const setField = useCallback(
     <K extends keyof NewProductFormData>(
       field: K,
-      value: NewProductFormData[K]
+      value: NewProductFormData[K],
     ) => {
       setFormData((f) => ({ ...f, [field]: value }));
     },
-    []
+    [],
   );
 
   const handleProductRemove = async () => {
@@ -262,12 +272,26 @@ const ProductForm: React.FC = () => {
             </div>
 
             <div className="sections-container">
-              <h3>Sections</h3>
-              <CreateProductSections
-                sections={formData.sections || []}
-                productType={formData.type}
-                productId={formData.id}
-              />
+              {formData.type === 'CONSULTATION' ? (
+                <>
+                  <h3>Consultation details</h3>
+                  <ConsultationDetails
+                    formData={formData}
+                    errors={errors}
+                    setFormData={setFormData}
+                    userId={user.id}
+                  />
+                </>
+              ) : (
+                <>
+                  <h3>Sections</h3>
+                  <CreateProductSections
+                    sections={formData.sections || []}
+                    productType={formData.type}
+                    productId={formData.id}
+                  />
+                </>
+              )}
             </div>
 
             {/* <div className="action-btns-wrapper">

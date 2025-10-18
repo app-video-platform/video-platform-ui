@@ -13,6 +13,7 @@ import SettingsSubscriptionsTab from './settings-tabs/settings-subscriptions-tab
 import SettingsAccountSecurityTab from './settings-tabs/settings-account-security-tab.component';
 import SettingsPhotoTab from './settings-tabs/settings-photo-tab.component';
 import SettingsProfileTab from './settings-tabs/settings-profile-tab.component';
+import ConnectedCalendarTab from './settings-tabs/connected-calendar.component';
 
 const SettingsPage: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -59,6 +60,14 @@ const SettingsPage: React.FC = () => {
             content: (
               <div className="settings-tab-content">
                 <SettingsPaymentMethodTab />
+              </div>
+            ),
+          },
+          {
+            label: 'Connected Calendar',
+            content: (
+              <div className="settings-tab-content">
+                <ConnectedCalendarTab />
               </div>
             ),
           },

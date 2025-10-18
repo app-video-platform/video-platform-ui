@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../../../../store/store';
 import GalButton from '../../../../../components/gal-button/gal-button.component';
 import SectionEditor from '../editors/section-editor/section-editor.component';
 import { ProductType } from '../../../../../api/models/product/product.types';
 
 import './create-product-sections.styles.scss';
+
 interface CreateProductSectionsProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sections: any[];
   productType: ProductType;
   productId: string;
@@ -25,7 +25,7 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
   productId,
 }) => {
   const [formDataList, setFormDataList] = useState<NewProductSectionFormData[]>(
-    []
+    [],
   );
 
   useEffect(() => {
