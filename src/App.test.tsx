@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /// <reference types="@testing-library/jest-dom" />
 
 import React from 'react';
@@ -34,18 +35,16 @@ jest.mock('./store/auth-store/auth.slice', () => ({
           email: 'test@example.com',
           role: [UserRole.USER],
         },
-      })
+      }),
   ),
   setUserProfile: jest.fn(),
 }));
 
 // Mock ProtectedRoute to simply render its children.
 // eslint-disable-next-line react/display-name
-jest.mock(
-  './utils/protected-route.util',
-  () =>
-    ({ children }: { children: React.ReactNode }) =>
-      <>{children}</>
+jest.mock('./utils/protected-route.util', () =>
+  // eslint-disable-next-line react/display-name
+  ({ children }: { children: React.ReactNode }) => <>{children}</>,
 );
 
 // Define an initial auth state with no user so that getUserProfile is dispatched.
@@ -68,7 +67,7 @@ describe('App Component', () => {
         <MemoryRouter initialEntries={['/']}>
           <App />
         </MemoryRouter>
-      </Provider>
+      </Provider>,
     );
 
     // Wait for getUserProfile to resolve and for the dashboard (UserDashboard) to render.
@@ -85,7 +84,7 @@ describe('App Component', () => {
         <MemoryRouter initialEntries={['/']}>
           <App />
         </MemoryRouter>
-      </Provider>
+      </Provider>,
     );
 
     // await waitFor(() => {

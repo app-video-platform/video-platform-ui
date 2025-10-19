@@ -1,16 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  Controller,
-  FormProvider,
-  useForm,
-  useFormContext,
-} from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 import GalFormInput from '../../../components/gal-form-input/gal-form-input.component';
-import { SocialLink } from '../../../api/models/user/user';
 import GalSocialMediaInput from '../../../components/gal-social-media-input/gal-social-media-input.component';
+import { SocialMediaLink } from '../../../api/models/socials/social-media-link';
 
 export interface ProfileFormData {
   firstName: string;
@@ -22,8 +17,8 @@ export interface ProfileFormData {
 }
 
 interface SettingsSocials {
-  initialLinks: SocialLink[];
-  newLinks: SocialLink[];
+  initialLinks: SocialMediaLink[];
+  newLinks: SocialMediaLink[];
 }
 
 const SettingsProfileTab: React.FC = () => {
@@ -64,7 +59,7 @@ const SettingsProfileTab: React.FC = () => {
     }
   }, [user, methods]);
 
-  const handleSocialLinksChange = useCallback((links: SocialLink[]) => {
+  const handleSocialLinksChange = useCallback((links: SocialMediaLink[]) => {
     setSocialLinks((prev) => ({ ...prev, newLinks: links }));
   }, []);
 

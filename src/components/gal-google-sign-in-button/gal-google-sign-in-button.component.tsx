@@ -45,11 +45,11 @@ const GalGoogleSignInButton: React.FC = () => {
 
   // Handle the ID token you get back from Google
   const handleCredentialResponse = (
-    response: google.accounts.id.CredentialResponse
+    response: google.accounts.id.CredentialResponse,
   ) => {
     const idToken = response.credential;
 
-    dispatch(googleSignInUser(idToken))
+    dispatch(googleSignInUser({ idToken: idToken }))
       .then((data) => {
         if (data) {
           dispatch(getUserProfile()).then((data) => {

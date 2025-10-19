@@ -9,10 +9,13 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { FaTiktok } from 'react-icons/fa6';
 import { FaYoutube } from 'react-icons/fa';
 
-import { SocialLink, SocialPlatforms } from '../../api/models/user/user';
 import GalIcon from '../gal-icon-component/gal-icon.component';
 
 import './gal-social-media-input.styles.scss';
+import {
+  SocialMediaLink,
+  SocialPlatforms,
+} from '../../api/models/socials/social-media-link';
 
 interface Option {
   id: SocialPlatforms;
@@ -47,9 +50,9 @@ const options: Option[] = [
 type ValuesById = Record<SocialPlatforms, string>;
 
 interface GalSocialMediaInputProps {
-  initialSocialLinks?: SocialLink[];
+  initialSocialLinks?: SocialMediaLink[];
   // eslint-disable-next-line no-unused-vars
-  onChange: (links: SocialLink[]) => void;
+  onChange: (links: SocialMediaLink[]) => void;
 }
 
 const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
@@ -60,8 +63,8 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [removed, setRemoved] = useState<Record<string, boolean>>({});
   const [inputValue, setInputValue] = useState('');
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
-    initialSocialLinks || []
+  const [socialLinks, setSocialLinks] = useState<SocialMediaLink[]>(
+    initialSocialLinks || [],
   );
   const [initialValuesById, setInitialValuesById] = useState<ValuesById>({
     [SocialPlatforms.FB]: '',
@@ -121,7 +124,7 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
 
   const handleAdd = (id: SocialPlatforms) => {
     if (initialValuesById[id] !== inputValue.trim()) {
-      const link: SocialLink = {
+      const link: SocialMediaLink = {
         id: null,
         platform: id,
         url: inputValue,
@@ -133,7 +136,7 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
           if (idx !== -1) {
             // We already have an entry for this platform → update its URL
             return prev.map((l) =>
-              l.platform === link.platform ? { ...l, url: link.url } : l
+              l.platform === link.platform ? { ...l, url: link.url } : l,
             );
           } else {
             // No existing entry → append it
@@ -149,6 +152,7 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
       } else {
         if (completed[id]) {
           setCompleted((prev) => {
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
             const { [id]: _, ...rest } = prev;
             return rest;
           });
@@ -238,8 +242,8 @@ const GalSocialMediaInput: React.FC<GalSocialMediaInputProps> = ({
                       backgroundColor: inputValue.trim()
                         ? '#28a745'
                         : initialValuesById[opt.id] === inputValue.trim()
-                        ? '#2865a7'
-                        : '#a72828ff',
+                          ? '#2865a7'
+                          : '#a72828ff',
                     }}
                   >
                     {inputValue.trim() && <Plus size={16} />}

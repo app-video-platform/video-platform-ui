@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { IProductResponse } from '../../api/models/product/product';
-
 // import PlaceholderImage from '../../assets/image-placeholder.png';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../assets/image-placeholder.png');
@@ -9,9 +7,10 @@ const placeholderImage = require('../../assets/image-placeholder.png');
 import './gal-product-box.styles.scss';
 import GalButton from '../gal-button/gal-button.component';
 import { useNavigate } from 'react-router-dom';
+import { ProductMinimised } from '../../api/models/product/product';
 
 interface GalProductCardProps {
-  product: IProductResponse;
+  product: ProductMinimised;
 }
 
 const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
@@ -26,7 +25,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
     <div className="product-card">
       <img
         src={placeholderImage}
-        alt={product.name}
+        alt={product.title}
         className="product-card-image"
       />
       <div className="product-card-details">
@@ -39,7 +38,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
             })} */}
           </span>
         </div>
-        <h3>{product.name}</h3>
+        <h3>{product.title}</h3>
         <div className="type-and-price-line">
           <span>{product.type?.toLowerCase()}</span>
           <span>

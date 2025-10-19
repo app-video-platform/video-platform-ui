@@ -18,12 +18,15 @@ import { AppDispatch } from '../../../../../../store/store';
 import CourseLessons from '../../course-lessons/course-lessons.component';
 import GalFormInput from '../../../../../../components/gal-form-input/gal-form-input.component';
 
-import './section-editor.styles.scss';
-import {
-  IRemoveItemPayload,
-  IUpdateSectionDetails,
-} from '../../../../../../api/models/product/product';
 import { selectAuthUser } from '../../../../../../store/auth-store/auth.selectors';
+import {
+  CourseProductSection,
+  CourseSectionCreateRequest,
+  CourseSectionUpdateRequest,
+} from '../../../../../../api/models/product/section';
+
+import './section-editor.styles.scss';
+import { IRemoveItemPayload } from '../../../../../../api/models/product/product';
 
 export interface NewProductSectionFormData {
   id: string;
@@ -120,7 +123,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       return;
     }
 
-    const updatedSection: IUpdateSectionDetails = {
+    const updatedSection: CourseSectionUpdateRequest = {
       ...localData,
       position: index,
       productId: productId,
@@ -142,7 +145,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     if (localData.id) {
       console.warn(
         'Section already exists, cannot create again:',
-        localData.id
+        localData.id,
       );
       return;
     }
@@ -158,7 +161,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       return;
     }
 
-    const newSection = {
+    const newSection: CourseSectionCreateRequest = {
       // ...localData,
       title: localData.title,
       description: localData.description,
@@ -169,7 +172,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
 
     dispatch(createSection(newSection))
       .unwrap()
-      .then((createdSection) => {
+      .then((createdSection: CourseProductSection) => {
         // Optionally sync localData to match the “confirmed” created data:
         setLocalData({
           ...createdSection,

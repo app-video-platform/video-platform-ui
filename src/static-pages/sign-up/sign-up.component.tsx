@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { signupUser } from '../../store/auth-store/auth.slice';
 import { useNavigate } from 'react-router-dom';
 import GalButton from '../../components/gal-button/gal-button.component';
-import { UserRegisterData } from '../../api/models/user/user';
+import { RegisterRequest } from '../../api/models/auth/register-request';
 
 import './sign-up.styles.scss';
 export interface SignupFormData {
@@ -87,7 +87,7 @@ const SignUp: React.FC = () => {
       newErrors.password = 'Password is required';
     } else {
       const failedRules = passwordValidationRules.filter(
-        (rule) => !rule.test(formData.password)
+        (rule) => !rule.test(formData.password),
       );
       if (failedRules.length > 0) {
         newErrors.password = 'Password does not meet all requirements';
@@ -113,7 +113,7 @@ const SignUp: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      const registerData: UserRegisterData = {
+      const registerData: RegisterRequest = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,

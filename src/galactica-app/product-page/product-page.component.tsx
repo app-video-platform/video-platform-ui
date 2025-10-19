@@ -7,10 +7,10 @@ import { AppDispatch } from '../../store/store';
 import './product-page.styles.scss';
 import { getProductByProductId } from '../../store/product-store/product.slice';
 import { ProductType } from '../../api/models/product/product.types';
-import { IProductResponse } from '../../api/models/product/product';
 import GalButton from '../../components/gal-button/gal-button.component';
 import GalExpansionPanel from '../../components/gal-expansion-panel/gal-expansion-panel.component';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
+import { AbstractProduct } from '../../api/types/products.types';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../assets/image-placeholder.png');
 
@@ -19,7 +19,7 @@ const ProductPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
-  const [product, setProduct] = useState<IProductResponse | null>(null);
+  const [product, setProduct] = useState<AbstractProduct | null>(null);
   const [numberOfSections, setNumberOfSections] = useState<number>(0);
   const [numberOfLessons, setNumberOfLessons] = useState<number>(0);
   const [isOwner, setIsOwner] = useState<boolean>(false);
@@ -30,7 +30,7 @@ const ProductPage: React.FC = () => {
         getProductByProductId({
           productId: id,
           productType: type as ProductType,
-        })
+        }),
       )
         .unwrap()
         .then((product) => {
@@ -48,16 +48,17 @@ const ProductPage: React.FC = () => {
     }
   }, [user]);
 
-  const getProductInformation = (product: IProductResponse) => {
+  const getProductInformation = (product: AbstractProduct) => {
     let numOfSections = 0;
     let numOfLessons = 0;
 
-    product.sections?.forEach((section) => {
-      numOfSections++;
-      section.lessons?.forEach(() => {
-        numOfLessons++;
+    product.type === 'COURSE' &&
+      product.sections?.forEach((section) => {
+        numOfSections++;
+        section.lessons?.forEach(() => {
+          numOfLessons++;
+        });
       });
-    });
     setNumberOfLessons(numOfLessons);
     setNumberOfSections(numOfSections);
   };
@@ -87,7 +88,7 @@ const ProductPage: React.FC = () => {
                     text="Edit"
                     onClick={() =>
                       navigate(
-                        `/app/products/edit/${product.type}/${product.id}`
+                        `/app/products/edit/${product.type}/${product.id}`,
                       )
                     }
                   />
@@ -127,19 +128,22 @@ const ProductPage: React.FC = () => {
               {numberOfSections} sections, {numberOfLessons} lessons, 4733 hours
               of total length
             </p>
-            {product.sections?.map((section) => (
-              <GalExpansionPanel key={section.id} header={section.title || ''}>
-                <p>Duration: 2 min</p>
-                <p>{section.description}</p>
-                {section.lessons?.map((lesson) => (
-                  <div key={lesson.id} className="lesson-line">
-                    <h3>{lesson.title}</h3>
-                    <p>Type: {lesson.type}</p>
-                    <p>Duration: {lesson.duration}</p>
-                  </div>
-                ))}
-              </GalExpansionPanel>
-            ))}
+            {product.type === 'COURSE' &&
+              product.sections?.map((section) => (
+                <GalExpansionPanel
+                  key={section.id}
+                  header={section.title || ''}
+                >
+                  <p>Duration: 2 min</p>
+                  <p>{section.description}</p>
+                  {section.lessons?.map((lesson) => (
+                    <div key={lesson.id} className="lesson-line">
+                      <h3>{lesson.title}</h3>
+                      <p>Type: {lesson.type}</p>
+                    </div>
+                  ))}
+                </GalExpansionPanel>
+              ))}
           </div>
         </>
       )}

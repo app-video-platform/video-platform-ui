@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { IMinimalProduct } from '../../api/models/product/product';
+import { ProductMinimised } from '../../api/models/product/product';
 import { getAllProductsMinimalAPI } from '../../api/services/products/products-api';
 import GalButton from '../../components/gal-button/gal-button.component';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -11,7 +11,7 @@ import './explore-page.styles.scss';
 
 const ExplorePage: React.FC = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState<IMinimalProduct[]>([]);
+  const [products, setProducts] = useState<ProductMinimised[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,11 +79,15 @@ const ExplorePage: React.FC = () => {
                 <div className="product-card-details">
                   <div className="last-updated-line">
                     <span>
-                      {new Date(product.updatedAt).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
+                      {product.updatedAt &&
+                        new Date(product.updatedAt).toLocaleDateString(
+                          'en-GB',
+                          {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          },
+                        )}
                     </span>
                   </div>
                   <h3>{product.title}</h3>

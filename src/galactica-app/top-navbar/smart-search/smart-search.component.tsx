@@ -10,9 +10,9 @@ import debounce from 'lodash.debounce';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import GalSearch from '../../../components/gal-search/gal-search.component';
-import { IMinimalProduct } from '../../../api/models/product/product';
 import { fetchProducts } from '../../../api/services/products/products-api';
 import './smart-search.styles.scss';
+import { ProductMinimised } from '../../../api/models/product/product';
 
 const SmartSearch: React.FC = () => {
   const [rawQuery, setRawQuery] = useState('');
@@ -23,7 +23,7 @@ const SmartSearch: React.FC = () => {
   // Debounce the raw query into debouncedQuery
   const debouncedSetQuery = useMemo(
     () => debounce((q: string) => setDebouncedQuery(q), 250),
-    []
+    [],
   );
   useEffect(() => () => debouncedSetQuery.cancel(), [debouncedSetQuery]);
   useEffect(() => {
@@ -38,7 +38,7 @@ const SmartSearch: React.FC = () => {
 
   // Fetch suggestions only; simple two-arg useQuery
   const { data: suggestions = [], isFetching } = useQuery<
-    IMinimalProduct[],
+    ProductMinimised[],
     Error
   >({
     queryKey: ['products-autocomplete', debouncedQuery],
@@ -47,7 +47,7 @@ const SmartSearch: React.FC = () => {
         return Promise.resolve([]);
       }
       return fetchProducts({ term: debouncedQuery, page: 0, size: 10 }).then(
-        (r) => r.content
+        (r) => r.content,
       );
     },
     enabled: debouncedQuery.length >= 2,
@@ -114,7 +114,8 @@ const SmartSearch: React.FC = () => {
             <li className="autocomplete-message">No suggestions</li>
           )}
           {suggestions.map((s, idx) => {
-            const titleLower = s.title.toLowerCase();
+            const titleValue = s.title ?? '';
+            const titleLower = titleValue.toLowerCase();
             const termLower = debouncedQuery.toLowerCase();
             const start = titleLower.indexOf(termLower);
             const end = start + termLower.length;
@@ -127,13 +128,13 @@ const SmartSearch: React.FC = () => {
                   'autocomplete-item' +
                   (idx === highlight ? ' highlighted' : '')
                 }
-                onMouseDown={() => handleSelect(s.title)}
+                onMouseDown={() => handleSelect(titleValue)}
               >
                 {start >= 0 ? (
                   <>
-                    {s.title.slice(0, start)}
-                    <strong>{s.title.slice(start, end)}</strong>
-                    {s.title.slice(end)}
+                    {titleValue.slice(0, start)}
+                    <strong>{titleValue.slice(start, end)}</strong>
+                    {titleValue.slice(end)}
                   </>
                 ) : (
                   s.title

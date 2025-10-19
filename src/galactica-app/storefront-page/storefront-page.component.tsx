@@ -3,15 +3,15 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
+import { getAllProductsMinimalByUserAPI } from '../../api/services/products/products-api';
+import { ProductMinimised } from '../../api/models/product/product';
 
 import './storefront-page.styles.scss';
-import { IMinimalProduct } from '../../api/models/product/product';
-import { getAllProductsMinimalByUserAPI } from '../../api/services/products/products-api';
 
 const StorefrontPage: React.FC = () => {
   const { creatorId } = useParams();
   const user = useSelector(selectAuthUser);
-  const [products, setProducts] = useState<IMinimalProduct[]>([]);
+  const [products, setProducts] = useState<ProductMinimised[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

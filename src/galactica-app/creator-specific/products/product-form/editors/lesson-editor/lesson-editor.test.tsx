@@ -70,7 +70,7 @@ jest.mock(
         }
       />
     ),
-  })
+  }),
 );
 
 // 3.2. GalBoxSelector: render a button per availableOption, data-testid="box-<opt>"
@@ -101,7 +101,7 @@ jest.mock(
         ))}
       </div>
     ),
-  })
+  }),
 );
 
 // 3.3. GalUppyFileUploader: render a button data-testid="file-uploader" that calls onFilesChange([mockFile])
@@ -128,7 +128,7 @@ jest.mock(
         Upload Video
       </button>
     ),
-  })
+  }),
 );
 
 // 3.4. GalRichTextEditor: render a <div data-testid="rich-text-editor">, and call onChange({ somejson }) on click
@@ -150,7 +150,7 @@ jest.mock(
         GalRichTextEditor
       </div>
     ),
-  })
+  }),
 );
 
 // 3.5. GalButton: render <button data-testid="btn-<text>">text</button>
@@ -180,12 +180,12 @@ jest.mock(
         {text}
       </button>
     ),
-  })
+  }),
 );
 
 // ── 4) Import the component under test ───────────────────────────────────────────────
 import LessonEditor from './lesson-editor.component';
-import { ILesson } from '../../../../../../api/models/product/lesson';
+import { CourseLesson } from '../../../../../../api/models/product/lesson';
 import { LessonType } from '../../../../../../api/models/product/product.types';
 
 // ── 5) Begin tests ───────────────────────────────────────────────────────────────────
@@ -214,7 +214,7 @@ describe('<LessonEditor />', () => {
   let fakeDispatch: jest.Mock<any, any>;
   let removeLessonMock: jest.Mock<any, any>;
 
-  const baseLesson: ILesson = {
+  const baseLesson: CourseLesson = {
     id: '',
     title: '',
     description: '',
@@ -250,7 +250,7 @@ describe('<LessonEditor />', () => {
   });
 
   it('renders “existing lesson” correctly (show Update mode)', () => {
-    const existingLesson: ILesson = {
+    const existingLesson: CourseLesson = {
       id: 'abc123',
       title: 'Existing Title',
       description: 'Existing Desc',
@@ -266,7 +266,7 @@ describe('<LessonEditor />', () => {
         index={1}
         sectionId="sec-1"
         removeLessonFromList={removeLessonMock}
-      />
+      />,
     );
 
     // Header should show “Lesson 2” (index + 1)
@@ -276,7 +276,7 @@ describe('<LessonEditor />', () => {
     const titleInput = screen.getByTestId('input-title') as HTMLInputElement;
     expect(titleInput.value).toBe('Existing Title');
     const descInput = screen.getByTestId(
-      'input-description'
+      'input-description',
     ) as HTMLInputElement;
     expect(descInput.value).toBe('Existing Desc');
 
@@ -296,7 +296,7 @@ describe('<LessonEditor />', () => {
 
   it('renders “new lesson” correctly and allows creation', async () => {
     // Pass a lesson with empty id → isLessonCreated starts false
-    const newLesson: ILesson = {
+    const newLesson: CourseLesson = {
       id: '',
       title: '',
       description: '',
@@ -313,7 +313,7 @@ describe('<LessonEditor />', () => {
         index={0}
         sectionId="sec-1"
         removeLessonFromList={removeLessonMock}
-      />
+      />,
     );
 
     // Header: “Lesson 1”
@@ -323,7 +323,7 @@ describe('<LessonEditor />', () => {
     const titleInput = screen.getByTestId('input-title') as HTMLInputElement;
     expect(titleInput.value).toBe('');
     const descInput = screen.getByTestId(
-      'input-description'
+      'input-description',
     ) as HTMLInputElement;
     expect(descInput.value).toBe('');
 
@@ -378,7 +378,7 @@ describe('<LessonEditor />', () => {
   });
 
   it('allows selecting a type and updating an existing lesson', async () => {
-    const existingLesson: ILesson = {
+    const existingLesson: CourseLesson = {
       id: 'l1',
       title: 'T1',
       description: 'D1',
@@ -395,7 +395,7 @@ describe('<LessonEditor />', () => {
         index={0}
         sectionId="sec-1"
         removeLessonFromList={removeLessonMock}
-      />
+      />,
     );
 
     // Initially formData.type === '', so no content field yet.
@@ -419,7 +419,7 @@ describe('<LessonEditor />', () => {
       fireEvent.click(screen.getByTestId('btn-update-lesson'));
     });
 
-    // updateLessonDetails should have been called with an ILesson object containing:
+    // updateLessonDetails should have been called with an CourseLesson object containing:
     // id = 'l1', title='T1', description='D1', content='C1', type='ARTICLE', sectionId='sec-1', position=1
     expect(mockedUpdateLesson).toHaveBeenCalledWith({
       id: 'l1',
@@ -429,7 +429,7 @@ describe('<LessonEditor />', () => {
       type: 'ARTICLE',
       sectionId: 'sec-1',
       position: 1,
-      userId: 'user-123', // from mocked useSelector
+      // userId: 'user-123', // from mocked useSelector
     });
 
     // Dispatch should have been called with fakeUpdateThunk
@@ -438,7 +438,7 @@ describe('<LessonEditor />', () => {
 
   it('deletes a new (unsaved) lesson by calling removeLessonFromList immediately', () => {
     // new lesson with no id
-    const newLesson: ILesson = {
+    const newLesson: CourseLesson = {
       id: '',
       title: 'T2',
       description: 'D2',
@@ -455,7 +455,7 @@ describe('<LessonEditor />', () => {
         index={2}
         sectionId="sec-1"
         removeLessonFromList={removeLessonMock}
-      />
+      />,
     );
 
     // Click delete icon
@@ -466,7 +466,7 @@ describe('<LessonEditor />', () => {
   });
 
   it('deletes an existing lesson by dispatching then calling removeLessonFromList', async () => {
-    const existingLesson: ILesson = {
+    const existingLesson: CourseLesson = {
       id: 'to-delete',
       title: 'T3',
       description: 'D3',
@@ -492,7 +492,7 @@ describe('<LessonEditor />', () => {
         index={3}
         sectionId="sec-1"
         removeLessonFromList={removeLessonMock}
-      />
+      />,
     );
 
     // Click the delete icon

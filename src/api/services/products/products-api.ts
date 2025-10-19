@@ -1,26 +1,42 @@
 /* eslint-disable no-console */
 import httpClient from '../../http-client';
 import { getCookie } from '../../../utils/cookie.util';
-import { ILesson, ICreateLessonPayload } from '../../models/product/lesson';
+// import { ILesson, ICreateLessonPayload } from '../../models/product/lesson';
+// import {
+//   IMinimalProduct,
+//   INewProductPayload,
+//   IProductResponse,
+//   IRemoveItemPayload,
+//   IRemoveProductPayload,
+//   IUpdateCourseProduct,
+//   IUpdateSectionDetails,
+// } from '../../models/product/product';
+import { ProductType } from '../../models/product/product.types';
 import {
-  IMinimalProduct,
-  INewProductPayload,
-  IProductResponse,
+  ConfirmUploadRequestDto,
+  FileS3UploadResponseDto,
+} from '../../models/files/confirm-upload';
+import { AbstractProduct } from '../../types/products.types';
+import {
   IRemoveItemPayload,
   IRemoveProductPayload,
-  IUpdateCourseProduct,
-  IUpdateSectionDetails,
+  ProductMinimised,
 } from '../../models/product/product';
-import { ProductType } from '../../models/product/product.types';
+import {
+  CourseProductSection,
+  CourseSectionCreateRequest,
+  CourseSectionUpdateRequest,
+} from '../../models/product/section';
+import { CourseLesson, LessonCreate } from '../../models/product/lesson';
 
-export const createProductAPI = async (payload: INewProductPayload) => {
+export const createProductAPI = async (payload: AbstractProduct) => {
   try {
-    const response = await httpClient.post<IProductResponse>(
+    const response = await httpClient.post<AbstractProduct>(
       'api/products',
       payload,
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -29,16 +45,14 @@ export const createProductAPI = async (payload: INewProductPayload) => {
   }
 };
 
-export const updateProductDetailsAPI = async (
-  payload: IUpdateCourseProduct
-) => {
+export const updateProductDetailsAPI = async (payload: AbstractProduct) => {
   try {
-    const response = await httpClient.put<IProductResponse>(
+    const response = await httpClient.put<AbstractProduct>(
       'api/products',
       payload,
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -50,7 +64,7 @@ export const updateProductDetailsAPI = async (
 export const deleteProductAPI = async (payload: IRemoveProductPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      `api/products?userId=${payload.userId}&productType=${payload.productType}&id=${payload.id}`
+      `api/products?userId=${payload.userId}&productType=${payload.productType}&id=${payload.id}`,
     );
     return response.data;
   } catch (error) {
@@ -59,14 +73,14 @@ export const deleteProductAPI = async (payload: IRemoveProductPayload) => {
   }
 };
 
-export const createSectionAPI = async (payload: IUpdateSectionDetails) => {
+export const createSectionAPI = async (payload: CourseSectionCreateRequest) => {
   try {
-    const response = await httpClient.post<IUpdateSectionDetails>(
+    const response = await httpClient.post<CourseProductSection>(
       'api/products/course/section',
       payload,
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -76,7 +90,7 @@ export const createSectionAPI = async (payload: IUpdateSectionDetails) => {
 };
 
 export const updateSectionDetailsAPI = async (
-  payload: IUpdateSectionDetails
+  payload: CourseSectionUpdateRequest,
 ) => {
   try {
     const response = await httpClient.put<string>(
@@ -84,7 +98,7 @@ export const updateSectionDetailsAPI = async (
       payload,
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -96,7 +110,7 @@ export const updateSectionDetailsAPI = async (
 export const deleteSectionAPI = async (payload: IRemoveItemPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      `api/products/course/section?userId=${payload.userId}&id=${payload.id}`
+      `api/products/course/section?userId=${payload.userId}&id=${payload.id}`,
     );
     return response.data;
   } catch (error) {
@@ -105,14 +119,14 @@ export const deleteSectionAPI = async (payload: IRemoveItemPayload) => {
   }
 };
 
-export const createLessonAPI = async (payload: ICreateLessonPayload) => {
+export const createLessonAPI = async (payload: LessonCreate) => {
   try {
-    const response = await httpClient.post<ILesson>(
+    const response = await httpClient.post<CourseLesson>(
       'api/products/course/section/lesson',
       payload,
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -121,14 +135,14 @@ export const createLessonAPI = async (payload: ICreateLessonPayload) => {
   }
 };
 
-export const updateLessonDetailsAPI = async (payload: ILesson) => {
+export const updateLessonDetailsAPI = async (payload: CourseLesson) => {
   try {
     const response = await httpClient.put<string>(
       'api/products/course/section/lesson',
       payload,
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -140,7 +154,7 @@ export const updateLessonDetailsAPI = async (payload: ILesson) => {
 export const deleteLessonAPI = async (payload: IRemoveItemPayload) => {
   try {
     const response = await httpClient.delete<string>(
-      `api/products/course/section/lesson?userId=${payload.userId}&id=${payload.id}`
+      `api/products/course/section/lesson?userId=${payload.userId}&id=${payload.id}`,
     );
     return response.data;
   } catch (error) {
@@ -151,8 +165,8 @@ export const deleteLessonAPI = async (payload: IRemoveItemPayload) => {
 
 export const getAllProductsByUserIdAPI = async (userId: string) => {
   try {
-    const response = await httpClient.get<IProductResponse[]>(
-      'api/products?userId=' + userId
+    const response = await httpClient.get<AbstractProduct[]>(
+      'api/products?userId=' + userId,
     );
     return response.data;
   } catch (error) {
@@ -163,11 +177,11 @@ export const getAllProductsByUserIdAPI = async (userId: string) => {
 
 export const getProductByProductIdAPI = async (
   productId: string,
-  productType: ProductType
+  productType: ProductType,
 ) => {
   try {
-    const response = await httpClient.get<IProductResponse>(
-      `api/products/getProduct?productId=${productId}&type=${productType}`
+    const response = await httpClient.get<AbstractProduct>(
+      `api/products/getProduct?productId=${productId}&type=${productType}`,
     );
     return response.data;
   } catch (error) {
@@ -178,8 +192,8 @@ export const getProductByProductIdAPI = async (
 
 export const getAllProductsMinimalAPI = async () => {
   try {
-    const response = await httpClient.get<IMinimalProduct[]>(
-      'api/products/get-all-products-min'
+    const response = await httpClient.get<ProductMinimised[]>(
+      'api/products/get-all-products-min',
     );
     return response.data;
   } catch (error) {
@@ -211,7 +225,7 @@ export interface SearchResponse<T> {
 
 export type SortOrder = 'asc' | 'desc';
 export interface SortParam {
-  field: keyof IMinimalProduct;
+  field: keyof ProductMinimised;
   order: SortOrder;
 }
 
@@ -220,17 +234,17 @@ export const fetchProducts = async (params: {
   page: number;
   size: number;
   sort?: SortParam;
-}): Promise<SearchResponse<IMinimalProduct>> => {
+}): Promise<SearchResponse<ProductMinimised>> => {
   try {
     const { term, page, size, sort } = params;
     const query = new URLSearchParams({
       term,
       page: String(page),
       size: String(size),
-      sort: sort ? `${sort.field},${sort.order}` : 'createdAt,desc',
+      sort: sort ? `${String(sort.field)},${sort.order}` : 'createdAt,desc',
     });
     const response = await httpClient.get(
-      `/api/products/search?${query.toString()}`
+      `/api/products/search?${query.toString()}`,
     );
     return response.data;
   } catch (error) {
@@ -253,8 +267,8 @@ export const fetchProducts = async (params: {
 
 export const getAllProductsMinimalByUserAPI = async (userId: string) => {
   try {
-    const response = await httpClient.get<IMinimalProduct[]>(
-      `api/products/get-all-products-min?userId=${userId}`
+    const response = await httpClient.get<ProductMinimised[]>(
+      `api/products/get-all-products-min?userId=${userId}`,
     );
     return response.data;
   } catch (error) {
@@ -267,7 +281,7 @@ export const addImageToProductAPI = async (image: File, productId: string) => {
   try {
     const response = await httpClient.post<string>(
       `api/products/image?productId=${productId}`,
-      image
+      image,
     );
     return response.data;
   } catch (error) {
@@ -278,7 +292,7 @@ export const addImageToProductAPI = async (image: File, productId: string) => {
 
 export const getPresignedUrlAPI = async (
   sectionId: string,
-  fileName: string
+  fileName: string,
 ) => {
   try {
     const response = await httpClient.get('/api/files/presigned-url', {
@@ -292,7 +306,7 @@ export const getPresignedUrlAPI = async (
   } catch (error) {
     console.error(
       `Error getting presigned URL for section ${sectionId}:`,
-      error
+      error,
     );
     throw error;
   }
@@ -301,7 +315,7 @@ export const getPresignedUrlAPI = async (
 // STEP 2: Upload file to presigned URL
 export const uploadToPresignedUrl = async (
   presignedUrl: string,
-  file: File
+  file: File,
 ) => {
   try {
     const response = await fetch(presignedUrl, {
@@ -324,17 +338,11 @@ export const uploadToPresignedUrl = async (
 };
 
 // STEP 3: Confirm file upload
-export const confirmFileUploadAPI = async (payload: {
-  sectionId: string;
-  fileId: string;
-  key: string;
-  fileUrl: string;
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-}) => {
+export const confirmFileUploadAPI = async (
+  payload: ConfirmUploadRequestDto,
+) => {
   try {
-    const response = await httpClient.post(
+    const response = await httpClient.post<FileS3UploadResponseDto>(
       '/api/files/confirm-upload',
       payload,
       {
@@ -342,7 +350,7 @@ export const confirmFileUploadAPI = async (payload: {
         headers: {
           'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') ?? '',
         },
-      }
+      },
     );
 
     return response.data;

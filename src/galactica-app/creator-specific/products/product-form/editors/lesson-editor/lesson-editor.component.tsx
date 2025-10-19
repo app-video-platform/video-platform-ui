@@ -18,8 +18,8 @@ import GalBoxSelector from '../../../../../../components/gal-box-selector/gal-bo
 import GalUppyFileUploader from '../../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
 import GalRichTextEditor from '../../../../../../components/rich-text-editor/gal-rich-text-editor.component';
 import {
-  ICreateLessonPayload,
-  ILesson,
+  CourseLesson,
+  LessonCreate,
 } from '../../../../../../api/models/product/lesson';
 import { LessonType } from '../../../../../../api/models/product/product.types';
 
@@ -31,7 +31,7 @@ import { IRemoveItemPayload } from '../../../../../../api/models/product/product
 import QuizWizard from '../../quiz-wizard/quiz-wizard.component';
 
 interface LessonEditorProps {
-  lesson: ILesson;
+  lesson: CourseLesson;
   index: number;
   sectionId: string;
   removeLessonFromList: (index: number) => void;
@@ -107,7 +107,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       return;
     }
 
-    const createLessonPayload: ICreateLessonPayload = {
+    const createLessonPayload: LessonCreate = {
       title: formData.title,
       type: formData.type, // Default to VIDEO if not specified
       description: formData.description,
@@ -120,7 +120,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       .unwrap()
       .then((response) => {
         setFormData({
-          title: response.title,
+          title: response.title ?? '',
           description: response.description ?? '',
           content: '',
           id: response.id, // Set the ID after creation
@@ -146,12 +146,12 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       return;
     }
 
-    const updateLessonPayload: ILesson = {
+    const updateLessonPayload: CourseLesson = {
       ...formData,
       id: lessonId,
       sectionId: sectionId, // Assuming lesson has a sectionId
       position: index + 1, // Assuming position is based on the index
-      userId: user.id, // User ID from the auth state
+      // userId: user.id, // User ID from the auth state
     };
 
     dispatch(updateLessonDetails(updateLessonPayload))

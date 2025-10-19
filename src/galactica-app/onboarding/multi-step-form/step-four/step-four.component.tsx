@@ -12,17 +12,20 @@ import './step-four.styles.scss';
 import GalSocialMediaInput from '../../../../components/gal-social-media-input/gal-social-media-input.component';
 import { useSelector } from 'react-redux';
 import { selectAuthUser } from '../../../../store/auth-store/auth.selectors';
-import { SocialLink, SocialPlatforms } from '../../../../api/models/user/user';
+import {
+  SocialMediaLink,
+  SocialPlatforms,
+} from '../../../../api/models/socials/social-media-link';
 
 interface StepFourProps {
   // eslint-disable-next-line no-unused-vars
-  onSocialMediaChange: (links: SocialLink[]) => void;
+  onSocialMediaChange: (links: SocialMediaLink[]) => void;
 }
 
 const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
   const user = useSelector(selectAuthUser);
   const { control, setValue } = useFormContext<MultiStepFormData>();
-  const [initialLinks, setInitialLinks] = useState<SocialLink[]>([]);
+  const [initialLinks, setInitialLinks] = useState<SocialMediaLink[]>([]);
 
   // URL regex:
   // ^(https?:\/\/)?      optional “http://” or “https://”
@@ -71,7 +74,7 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
     });
   };
 
-  const handleSocialMediaChange = (socialLinks: SocialLink[]) => {
+  const handleSocialMediaChange = (socialLinks: SocialMediaLink[]) => {
     onSocialMediaChange(socialLinks);
   };
 

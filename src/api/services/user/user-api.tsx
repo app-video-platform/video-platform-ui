@@ -1,5 +1,6 @@
 import httpClient from '../../http-client';
-import { User, UserDetails } from '../../models/user/user';
+import { UpdateUserRequest } from '../../models/user/update-user-request';
+import { User } from '../../models/user/user';
 
 export const getUserProfileAPI = async () => {
   try {
@@ -13,7 +14,7 @@ export const getUserProfileAPI = async () => {
   }
 };
 
-export const updateUserDetailsAPI = async (payload: UserDetails) => {
+export const updateUserDetailsAPI = async (payload: UpdateUserRequest) => {
   try {
     const response = await httpClient.put<User>('api/user/userInfo', payload, {
       withCredentials: true,

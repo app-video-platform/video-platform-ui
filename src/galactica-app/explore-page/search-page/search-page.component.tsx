@@ -1,14 +1,15 @@
-// src/pages/SearchResultsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import './search-page.styles.scss';
+
 import {
   fetchProducts,
   SearchResponse,
 } from '../../../api/services/products/products-api';
-import { IMinimalProduct } from '../../../api/models/product/product';
 import GalProductCard from '../../../components/gal-product-box/gal-product-box.component';
+import { ProductMinimised } from '../../../api/models/product/product';
+
+import './search-page.styles.scss';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -20,7 +21,7 @@ const SearchResultsPage: React.FC = () => {
 
   // Fetch page of results
   const { data, isLoading, isError } = useQuery<
-    SearchResponse<IMinimalProduct>,
+    SearchResponse<ProductMinimised>,
     Error
   >({
     queryKey: ['products-search', term, page],
@@ -65,7 +66,7 @@ const SearchResultsPage: React.FC = () => {
           <p className="results-empty">No products found for “{term}”.</p>
         ) : (
           <ul className="results-list">
-            {data?.content.map((p: IMinimalProduct) => (
+            {data?.content.map((p: ProductMinimised) => (
               <GalProductCard key={p.id} product={p} />
             ))}
           </ul>

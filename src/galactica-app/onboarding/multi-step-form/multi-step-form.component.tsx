@@ -16,7 +16,8 @@ import { updateUserDetails } from '../../../store/auth-store/auth.slice';
 import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
 
 import './multi-step-form.styles.scss';
-import { SocialLink, UserDetails } from '../../../api/models/user/user';
+import { SocialMediaLink } from '../../../api/models/socials/social-media-link';
+import { UpdateUserRequest } from '../../../api/models/user/update-user-request';
 export interface MultiStepFormData {
   profileImage: string;
   title: string;
@@ -34,7 +35,7 @@ const MultiStepForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
   const [step, setStep] = useState(1);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialMediaLink[]>([]);
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
@@ -74,7 +75,7 @@ const MultiStepForm: React.FC = () => {
       return;
     }
 
-    const userDetails: UserDetails = {
+    const userDetails: UpdateUserRequest = {
       userId: user!.id!,
       title: data.title,
       bio: data.bio,

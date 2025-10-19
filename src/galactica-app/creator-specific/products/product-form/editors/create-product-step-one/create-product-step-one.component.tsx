@@ -12,13 +12,13 @@ import { createCourseProduct } from '../../../../../../store/product-store/produ
 import './create-product-step-one.styles.scss';
 import GalBoxSelector from '../../../../../../components/gal-box-selector/gal-box-selector.component';
 import { ProductType } from '../../../../../../api/models/product/product.types';
-import { INewProductPayload } from '../../../../../../api/models/product/product';
+import { AbstractProduct } from '../../../../../../api/types/products.types';
 
 interface CreateProductStepOneProps {
   formData: NewProductFormData;
   setField: <K extends keyof NewProductFormData>(
     field: K,
-    value: NewProductFormData[K]
+    value: NewProductFormData[K],
   ) => void;
   errors: FormErrors;
   showRestOfForm: boolean;
@@ -45,7 +45,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
 
     const { name, description, type } = formData;
 
-    const newProductPayload: INewProductPayload = {
+    const newProductPayload: AbstractProduct = {
       name,
       description,
       type: type as ProductType,
@@ -59,9 +59,11 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
         .then((data) => {
           if (data) {
             // formData.id = data.id; // Set the product ID in formData
-            setField('id', data.id); // Ensure the formData is updated with the new ID
+            setField('id', data.id ?? ''); // Ensure the formData is updated with the new ID
             // formData.sections = data.sections || []; // Initialize sections if they exist
-            setField('sections', data.sections || []); // Update sections in formData
+            if (data.type !== 'CONSULTATION') {
+              setField('sections', data.sections || []); // Update sections in formData
+            }
             setShowRestOfForm(true);
           }
         })

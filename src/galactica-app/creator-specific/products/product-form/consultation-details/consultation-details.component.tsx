@@ -7,14 +7,25 @@ import GalSelect, {
   GalSelectOption,
 } from '../../../../../components/gal-select/gal-select.component';
 import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
-import {
-  CANCELATION_POLICIES,
-  CancelationPolicyId,
-  IConsultationDetails,
-  MeetingMethods,
-} from '../../../../../api/models/product/product';
 
 import './consultation-details.styles.scss';
+import {
+  CancelationPolicyId,
+  CANCELATION_POLICIES,
+} from '../../../../../api/enums/cancellation-policy.enum';
+import { MeetingMethods } from '../../../../../api/enums/meeting-methods.enum';
+import { CancelationPolicy } from '../../../../../api/models/cancellation/cancellation-policy';
+
+export interface IConsultationDetails {
+  duration: number;
+  meetingMethod: MeetingMethods;
+  customLocation?: string;
+  bufferBefore?: number;
+  bufferAfter?: number;
+  maxSessions?: number;
+  confirmationMessage?: string;
+  cancelationPolicy?: CancelationPolicy;
+}
 
 interface ConsultationDetailsProps {
   formData: NewProductFormData;
@@ -67,7 +78,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
   }));
 
   const handleFormChange = (field: string, value: string | number) => {
-    setConsultationForm((prev) => ({ ...prev, [field]: value }));
+    setConsultationForm((prev: any) => ({ ...prev, [field]: value }));
 
     const newData = { ...formData, consultationDetails: consultationForm };
     setFormData(newData);

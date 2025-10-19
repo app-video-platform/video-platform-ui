@@ -16,7 +16,7 @@ describe('Auth API functions', () => {
         lastName: 'Example',
       };
 
-      // Assuming UserRegisterData matches this shape
+      // Assuming RegisterRequest matches this shape
       mockedHttpClient.post.mockResolvedValueOnce({ data: fakeResponse });
 
       const result = await registerUser(userData);

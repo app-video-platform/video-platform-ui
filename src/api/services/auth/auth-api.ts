@@ -1,6 +1,8 @@
-import { SignInFormData } from '../../../static-pages/sign-in/sign-in.component';
 import httpClient from '../../http-client';
-import { UserRegisterData } from '../../models/user/user';
+
+import { GoogleLoginRequest } from '../../models/auth/google-login';
+import { LoginRequest } from '../../models/auth/login-request';
+import { RegisterRequest } from '../../models/auth/register-request';
 
 export const getNewAPI = async () => {
   try {
@@ -12,7 +14,7 @@ export const getNewAPI = async () => {
   }
 };
 
-export const registerUser = async (userData: UserRegisterData) => {
+export const registerUser = async (userData: RegisterRequest) => {
   try {
     const response = await httpClient.post<string>(
       'api/auth/register',
@@ -29,9 +31,8 @@ export const registerUser = async (userData: UserRegisterData) => {
 export const verifyEmailApi = (token: string) =>
   httpClient.get('api/auth/verify?token=' + token, { withCredentials: false });
 
-export const signInUser = async (userData: SignInFormData) => {
+export const signInUser = async (userData: LoginRequest) => {
   try {
-    // const response = await httpClient.post<UserLoginResponse>('api/auth/login', userData, { mock: true }); // COMM FOR INTERCEPT
     const response = await httpClient.post<string>('api/auth/login', userData);
     return response.data;
   } catch (error) {
@@ -50,11 +51,9 @@ export const logoutAPI = async () => {
   }
 };
 
-export const googleAPI = async (idToken: string) => {
+export const googleAPI = async (idToken: GoogleLoginRequest) => {
   try {
-    const response = await httpClient.post<string>('api/auth/googleSignIn', {
-      idToken: idToken,
-    });
+    const response = await httpClient.post<string>('api/auth/googleSignIn', idToken);
     return response.data;
   } catch (error) {
     console.error('Error signing in with Google:', error);

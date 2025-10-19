@@ -11,14 +11,15 @@ import {
   updateUserDetailsAPI,
 } from '../../api/services/user/user-api';
 
-import { SignInFormData } from '../../static-pages/sign-in/sign-in.component';
 import {
   User,
-  UserDetails,
-  UserRegisterData,
   UserRole,
 } from '../../api/models/user/user';
 import { AxiosError } from 'axios';
+import { RegisterRequest } from '../../api/models/auth/register-request';
+import { GoogleLoginRequest } from '../../api/models/auth/google-login';
+import { LoginRequest } from '../../api/models/auth/login-request';
+import { UpdateUserRequest } from '../../api/models/user/update-user-request';
 
 interface AuthState {
   user: null | User;
@@ -46,7 +47,7 @@ export const extractErrorMessage = (err: unknown): string => {
 // Registration thunk: returns a success message from the backend.
 export const signupUser = createAsyncThunk<
   { response: string }, // Return type: success message
-  UserRegisterData, // Argument type (user data)
+  RegisterRequest, // Argument type (user data)
   { rejectValue: string } // Error type
 >('auth/signupUser', async (userData, { rejectWithValue }) => {
   try {
@@ -74,7 +75,7 @@ export const verifyEmail = createAsyncThunk<
 // Sign in thunk: returns the user info along with a token.
 export const signinUser = createAsyncThunk<
   string, // Return type: user login response
-  SignInFormData, // Argument type (user data)
+  LoginRequest, // Argument type (user data)
   { rejectValue: string } // Error type
 >('auth/signinUser', async (userData, { dispatch, rejectWithValue }) => {
   try {
@@ -90,7 +91,7 @@ export const signinUser = createAsyncThunk<
 
 export const googleSignInUser = createAsyncThunk<
   string, // Return type: google login response
-  string, // Argument type (token)
+  GoogleLoginRequest, // Argument type (token)
   { rejectValue: string } // Error type
 >('auth/googleSignInUser', async (idToken, { dispatch, rejectWithValue }) => {
   try {
@@ -134,7 +135,7 @@ export const logoutUser = createAsyncThunk<
 
 export const updateUserDetails = createAsyncThunk<
   User, // Return type: user login response
-  UserDetails, // Argument type (user data)
+  UpdateUserRequest, // Argument type (user data)
   { rejectValue: string } // Error type
 >('auth/updateUserDetails', async (userData, { rejectWithValue }) => {
   try {

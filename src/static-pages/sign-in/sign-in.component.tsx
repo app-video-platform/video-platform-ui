@@ -7,19 +7,15 @@ import { AppDispatch } from '../../store/store';
 import GalFormInput from '../../components/gal-form-input/gal-form-input.component';
 import { getUserProfile, signinUser } from '../../store/auth-store/auth.slice';
 import GalButton from '../../components/gal-button/gal-button.component';
+import GalGoogleSignInButton from '../../components/gal-google-sign-in-button/gal-google-sign-in-button.component';
+import { LoginRequest } from '../../api/models/auth/login-request';
 
 import './sign-in.styles.scss';
-import GalGoogleSignInButton from '../../components/gal-google-sign-in-button/gal-google-sign-in-button.component';
-
-export interface SignInFormData {
-  email: string;
-  password: string;
-}
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<SignInFormData>({
+  const [formData, setFormData] = useState<LoginRequest>({
     email: '',
     password: '',
   });
@@ -29,7 +25,7 @@ const SignIn: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {

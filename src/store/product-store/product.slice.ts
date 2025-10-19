@@ -14,21 +14,24 @@ import {
   deleteProductAPI,
   getProductByProductIdAPI,
 } from '../../api/services/products/products-api';
-import { ICreateLessonPayload, ILesson } from '../../api/models/product/lesson';
-import {
-  INewProductPayload,
-  IUpdateCourseProduct,
-  IUpdateSectionDetails,
-  IProductResponse,
-  IRemoveProductPayload,
-  IRemoveItemPayload,
-} from '../../api/models/product/product';
+
 import { ProductType } from '../../api/models/product/product.types';
 import { AxiosError } from 'axios';
+import { AbstractProduct } from '../../api/types/products.types';
+import {
+  CourseProductSection,
+  CourseSectionCreateRequest,
+  CourseSectionUpdateRequest,
+} from '../../api/models/product/section';
+import {
+  IRemoveItemPayload,
+  IRemoveProductPayload,
+} from '../../api/models/product/product';
+import { CourseLesson, LessonCreate } from '../../api/models/product/lesson';
 
 interface ProductState {
-  products: null | IProductResponse[];
-  currentProduct: IProductResponse | null; // the product we’re currently creating/editing
+  products: null | AbstractProduct[];
+  currentProduct: AbstractProduct | null; // the product we’re currently creating/editing
   loading: boolean;
   error: string | null;
 }
@@ -50,8 +53,8 @@ export const extractErrorMessage = (err: unknown): string => {
 };
 
 export const createCourseProduct = createAsyncThunk<
-  IProductResponse, // what this thunk returns on success
-  INewProductPayload, // the argument you pass in
+  AbstractProduct, // what this thunk returns on success
+  AbstractProduct, // the argument you pass in
   { rejectValue: string }
 >('products/createCourseProduct', async (payload, thunkAPI) => {
   try {
@@ -63,8 +66,8 @@ export const createCourseProduct = createAsyncThunk<
 });
 
 export const updateCourseProductDetails = createAsyncThunk<
-  IProductResponse, // what this thunk returns on success
-  IUpdateCourseProduct, // the argument you pass in
+  AbstractProduct, // what this thunk returns on success
+  AbstractProduct, // the argument you pass in
   { rejectValue: string }
 >('products/updateCourseProductDetails', async (payload, thunkAPI) => {
   try {
@@ -89,8 +92,8 @@ export const deleteProduct = createAsyncThunk<
 });
 
 export const createSection = createAsyncThunk<
-  IUpdateSectionDetails, // what this thunk returns on success
-  IUpdateSectionDetails, // the argument you pass in
+  CourseProductSection, // what this thunk returns on success
+  CourseSectionCreateRequest, // the argument you pass in
   { rejectValue: string }
 >('products/createSection', async (payload, thunkAPI) => {
   try {
@@ -103,7 +106,7 @@ export const createSection = createAsyncThunk<
 
 export const updateSectionDetails = createAsyncThunk<
   string, // what this thunk returns on success
-  IUpdateSectionDetails, // the argument you pass in
+  CourseSectionUpdateRequest, // the argument you pass in
   { rejectValue: string }
 >('products/updateSectionDetails', async (payload, thunkAPI) => {
   try {
@@ -128,8 +131,8 @@ export const deleteSection = createAsyncThunk<
 });
 
 export const createLesson = createAsyncThunk<
-  ILesson, // what this thunk returns on success
-  ICreateLessonPayload, // the argument you pass in
+  CourseLesson, // what this thunk returns on success
+  LessonCreate, // the argument you pass in
   { rejectValue: string }
 >('products/createLesson', async (payload, thunkAPI) => {
   try {
@@ -142,7 +145,7 @@ export const createLesson = createAsyncThunk<
 
 export const updateLessonDetails = createAsyncThunk<
   string, // what this thunk returns on success
-  ILesson, // the argument you pass in
+  CourseLesson, // the argument you pass in
   { rejectValue: string }
 >('products/updateLessonDetails', async (payload, thunkAPI) => {
   try {
@@ -167,7 +170,7 @@ export const deleteLesson = createAsyncThunk<
 });
 
 export const getAllProductsByUserId = createAsyncThunk<
-  IProductResponse[], // Return type: Product[]
+  AbstractProduct[], // Return type: Product[]
   string, // Argument type (userId)
   { rejectValue: string } // Error type
 >('products/getAllProductsByUserId', async (idToken, { rejectWithValue }) => {
@@ -192,11 +195,11 @@ export const addImageToProduct = createAsyncThunk<
     } catch (error: unknown) {
       return rejectWithValue(extractErrorMessage(error));
     }
-  }
+  },
 );
 
 export const getProductByProductId = createAsyncThunk<
-  IProductResponse, // Return type: Product[]
+  AbstractProduct, // Return type: Product[]
   { productId: string; productType: ProductType }, // Argument type (productId, productType)
   { rejectValue: string } // Error type
 >(
@@ -208,7 +211,7 @@ export const getProductByProductId = createAsyncThunk<
     } catch (error: unknown) {
       return rejectWithValue(extractErrorMessage(error));
     }
-  }
+  },
 );
 
 const productsSlice = createSlice({
@@ -223,7 +226,7 @@ const productsSlice = createSlice({
     deleteProductFromStore(state, action: PayloadAction<string>) {
       if (state.products) {
         state.products = state.products.filter(
-          (product) => product.id !== action.payload
+          (product) => product.id !== action.payload,
         );
       }
       if (state.currentProduct && state.currentProduct.id === action.payload) {
@@ -232,24 +235,30 @@ const productsSlice = createSlice({
     },
 
     deleteSectionFromStore(state, action: PayloadAction<string>) {
-      if (state.currentProduct) {
+      if (
+        state.currentProduct &&
+        state.currentProduct.type !== 'CONSULTATION'
+      ) {
         state.currentProduct.sections = state.currentProduct.sections?.filter(
-          (section) => section.id !== action.payload
+          (section) => section.id !== action.payload,
         );
       }
     },
 
     deleteLessonFromStore(
       state,
-      action: PayloadAction<{ sectionId: string; lessonId: string }>
+      action: PayloadAction<{ sectionId: string; lessonId: string }>,
     ) {
+      if (state.currentProduct?.type !== 'COURSE') {
+        return;
+      }
       if (state.currentProduct) {
         const section = state.currentProduct.sections?.find(
-          (sec) => sec.id === action.payload.sectionId
+          (sec) => sec.id === action.payload.sectionId,
         );
         if (section && section.lessons) {
           section.lessons = section.lessons.filter(
-            (lesson) => lesson.id !== action.payload.lessonId
+            (lesson) => lesson.id !== action.payload.lessonId,
           );
         }
       }
@@ -265,10 +274,10 @@ const productsSlice = createSlice({
       })
       .addCase(
         getAllProductsByUserId.fulfilled,
-        (state, action: PayloadAction<IProductResponse[]>) => {
+        (state, action: PayloadAction<AbstractProduct[]>) => {
           state.loading = false;
           state.products = action.payload;
-        }
+        },
       )
       .addCase(getAllProductsByUserId.rejected, (state, action) => {
         state.loading = false;
@@ -290,12 +299,12 @@ const productsSlice = createSlice({
       })
       .addCase(
         createCourseProduct.fulfilled,
-        (state, action: PayloadAction<IProductResponse>) => {
+        (state, action: PayloadAction<AbstractProduct>) => {
           state.loading = false;
           state.error = null;
 
           state.currentProduct = action.payload;
-        }
+        },
       )
       .addCase(createCourseProduct.rejected, (state, action) => {
         state.loading = false;
@@ -308,12 +317,12 @@ const productsSlice = createSlice({
       })
       .addCase(
         updateCourseProductDetails.fulfilled,
-        (state, action: PayloadAction<IProductResponse>) => {
+        (state, action: PayloadAction<AbstractProduct>) => {
           state.loading = false;
           state.error = null;
 
           state.currentProduct = action.payload;
-        }
+        },
       )
       .addCase(updateCourseProductDetails.rejected, (state, action) => {
         state.loading = false;
@@ -326,21 +335,21 @@ const productsSlice = createSlice({
       })
       .addCase(
         createSection.fulfilled,
-        (state, action: PayloadAction<IUpdateSectionDetails>) => {
+        (state, action: PayloadAction<CourseProductSection>) => {
           state.loading = false;
           state.error = null;
 
           const updatedSection = action.payload;
           const prod = state.currentProduct;
 
-          if (prod) {
+          if (prod && prod.type !== 'CONSULTATION') {
             if (!prod.sections) {
               prod.sections = [updatedSection];
             } else {
               prod.sections.push(updatedSection);
             }
           }
-        }
+        },
       )
       .addCase(createSection.rejected, (state, action) => {
         state.loading = false;
@@ -366,13 +375,15 @@ const productsSlice = createSlice({
       })
       .addCase(
         createLesson.fulfilled,
-        (state, action: PayloadAction<ILesson>) => {
+        (state, action: PayloadAction<CourseLesson>) => {
           state.loading = false;
           state.error = null;
-
+          if (state.currentProduct?.type !== 'COURSE') {
+            return;
+          }
           const createdLesson = action.payload;
           const section = state.currentProduct?.sections?.find(
-            (sec) => sec.id === createdLesson.sectionId
+            (sec: { id?: string }) => sec.id === createdLesson.sectionId,
           );
           if (section) {
             // If sections is undefined, initialize it to an array with the new section
@@ -382,7 +393,7 @@ const productsSlice = createSlice({
               section.lessons.push(createdLesson);
             }
           }
-        }
+        },
       )
       .addCase(createLesson.rejected, (state, action) => {
         state.loading = false;
@@ -408,11 +419,11 @@ const productsSlice = createSlice({
       })
       .addCase(
         getProductByProductId.fulfilled,
-        (state, action: PayloadAction<IProductResponse>) => {
+        (state, action: PayloadAction<AbstractProduct>) => {
           state.loading = false;
           state.error = null;
           state.currentProduct = action.payload;
-        }
+        },
       )
       .addCase(getProductByProductId.rejected, (state, action) => {
         state.loading = false;

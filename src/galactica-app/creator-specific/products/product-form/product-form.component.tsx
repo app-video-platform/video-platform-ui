@@ -1,9 +1,11 @@
+/* eslint-disable indent */
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 import { AppDispatch } from '../../../../store/store';
 import { selectAuthUser } from '../../../../store/auth-store/auth.selectors';
@@ -19,15 +21,14 @@ import GalPriceSelector from '../../../../components/gal-price-selector/gal-pric
 import GalUppyFileUploader from '../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
 import CreateProductStepOne from './editors/create-product-step-one/create-product-step-one.component';
 import CreateProductSections from './create-product-sections/create-product-sections.component';
-import {
+import ConsultationDetails, {
   IConsultationDetails,
-  IRemoveProductPayload,
-  IUpdateCourseProduct,
-  MeetingMethods,
-} from '../../../../api/models/product/product';
+} from './consultation-details/consultation-details.component';
+
 import { ProductType } from '../../../../api/models/product/product.types';
-import { useParams } from 'react-router-dom';
-import ConsultationDetails from './consultation-details/consultation-details.component';
+import { AbstractProduct } from '../../../../api/types/products.types';
+import { MeetingMethods } from '../../../../api/enums/meeting-methods.enum';
+import { IRemoveProductPayload } from '../../../../api/models/product/product';
 
 export interface NewProductFormData {
   id: string; // Initially empty, will be set after product creation
@@ -82,14 +83,50 @@ const ProductForm: React.FC = () => {
       )
         .unwrap()
         .then((product) => {
-          setFormData({
-            id: product.id,
+          const baseData = {
+            id: product.id ?? '',
             name: product.name ?? '',
             description: product.description ?? '',
             type: product.type ?? ('COURSE' as ProductType),
             price: product.price ?? 'free',
-            sections: product.sections || [],
-          });
+          };
+          let newData: any = baseData;
+
+          switch (product.type) {
+            case 'COURSE':
+              newData = {
+                ...baseData,
+                sections: product.sections || [],
+              };
+              break;
+
+            case 'DOWNLOAD':
+              newData = {
+                ...baseData,
+                sections: product.sections || [],
+              };
+              break;
+
+            case 'CONSULTATION':
+              newData = {
+                ...baseData,
+                durationMinutes: product.durationMinutes ?? 60,
+                meetingMethod: product.meetingMethod ?? 'ZOOM',
+                customLocation: product.customLocation ?? '',
+                bufferBeforeMinutes: product.bufferBeforeMinutes ?? 0,
+                bufferAfterMinutes: product.bufferAfterMinutes ?? 0,
+                cancellationPolicy: product.cancellationPolicy ?? '',
+                maxSessionsPerDay: product.maxSessionsPerDay ?? 1,
+                confirmationMessage: product.confirmationMessage ?? '',
+              };
+              break;
+
+            default:
+              // fallback
+              newData = baseData;
+          }
+
+          setFormData(newData);
           setShowRestOfForm(true);
         })
         .catch((error) => {
@@ -139,7 +176,7 @@ const ProductForm: React.FC = () => {
       return;
     }
 
-    const productData: IUpdateCourseProduct = {
+    const productData: AbstractProduct = {
       name: formData.name,
       description: formData.description,
       type: 'COURSE' as ProductType,

@@ -1,21 +1,83 @@
-import { DownloadSection } from './download-section';
-import { ILesson } from './lesson';
+import { MeetingMethod } from '../../types/meeting-method.types';
+import { ConnectedCalendar } from '../calendars/connected-calendar';
 import { ProductType, ProductStatus } from './product.types';
+import {
+  CourseProductSection,
+  DownloadProductSectionRequest,
+  DownloadProductSectionResponse,
+} from './section';
 
-export interface BaseProduct {
-  id: string;
-  name: string;
-  description: string; // Limit 420 characters
-  image: string; // URL to image (jpeg, png, etc.)
-  type: ProductType;
-  status: ProductStatus;
-  userId: string;
-  price: 'free' | number;
-  customers: number;
-  createdAt: Date;
-  updatedAt: Date;
+// export interface BaseProduct {
+//   id: string;
+//   name: string;
+//   description: string; // Limit 420 characters
+//   image: string; // URL to image (jpeg, png, etc.)
+//   type: ProductType;
+//   status: ProductStatus;
+//   userId: string;
+//   price: 'free' | number;
+//   customers: number;
+//   createdAt: Date;
+//   updatedAt: Date;
+// }
+
+export interface AbstractProductBase {
+  id?: string;
+  type: ProductType | string;
+  name?: string;
+  description?: string;
+  status?: ProductStatus;
+  price?: 'free' | number;
+  userId?: string;
+  createdAt?: Date;
 }
 
+export interface DownloadProduct extends AbstractProductBase {
+  type: 'DOWNLOAD';
+  sections?: DownloadProductSectionRequest[] | DownloadProductSectionResponse[];
+}
+
+// ----- Course product (request)
+export interface CourseProduct extends AbstractProductBase {
+  type: 'COURSE';
+  sections?: CourseProductSection[];
+}
+
+export interface ConsultationProduct extends AbstractProductBase {
+  type: 'CONSULTATION';
+  durationMinutes?: number;
+  meetingMethod?: MeetingMethod;
+  customLocation?: string;
+  bufferBeforeMinutes?: number;
+  bufferAfterMinutes?: number;
+  maxSessionsPerDay?: number;
+  confirmationMessage?: string;
+  cancellationPolicy?: string;
+  connectedCalendars?: ConnectedCalendar[];
+}
+
+export interface ProductMinimised {
+  id?: string;
+  title?: string;
+  type?: ProductType;
+  price?: number | 'free';
+  createdById?: string;
+  createdByName?: string;
+  createdByTitle?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IRemoveItemPayload {
+  id: string;
+  userId: string;
+}
+
+export interface IRemoveProductPayload extends IRemoveItemPayload {
+  productType: ProductType;
+}
+
+/*
 export interface ICreateProduct {
   name: string;
   description: string; // Limit 420 characters
@@ -165,3 +227,5 @@ export const CANCELATION_POLICIES: CancelationPolicy[] = [
     notes: 'Enables custom entry in "Confirmation Message" field',
   },
 ];
+
+*/
