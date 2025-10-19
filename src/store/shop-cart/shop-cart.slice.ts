@@ -1,9 +1,9 @@
 import { AxiosError } from 'axios';
-import { IMinimalProduct } from '../../api/models/product/product';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ProductMinimised } from '../../api/models/product/product';
 
 interface ShopCartState {
-  products: null | IMinimalProduct[];
+  products: null | ProductMinimised[];
   loading: boolean;
   total: number;
 }
@@ -27,14 +27,14 @@ const shopCartSlice = createSlice({
   name: 'shopCart',
   initialState,
   reducers: {
-    addProductToCart(state, action: PayloadAction<IMinimalProduct>) {
+    addProductToCart(state, action: PayloadAction<ProductMinimised>) {
       state.loading = true;
       if (state.products && state.products.length > 0) {
         state.products.push(action.payload);
       } else {
         state.products = [action.payload];
       }
-      if (action.payload.price !== 'free') {
+      if (action.payload.price && action.payload.price !== 'free') {
         state.total += action.payload.price;
       }
       state.loading = false;

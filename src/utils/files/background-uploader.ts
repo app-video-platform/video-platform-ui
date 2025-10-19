@@ -1,7 +1,6 @@
-import { DownloadSection } from '../../api/models/product/download-section';
-import { Sectiunile } from '../../api/models/product/product';
 // import { Sectiunile } from '../../api/services/products/products-api';
 // import { IFilesWithSection } from '../../galactica-app/products/create-product/create-product.component';
+import { CourseProductSection } from '../../api/models/product/section';
 import { uploadFileToSection } from './upload-file';
 
 interface IFilesWithSection {
@@ -13,17 +12,17 @@ interface IFilesWithSection {
 
 export const uploadFilesInBackground = async (
   uploadedFiles: IFilesWithSection[],
-  localSections: DownloadSection[],
-  savedSections: Sectiunile[]
+  localSections: CourseProductSection[],
+  savedSections: CourseProductSection[],
 ) => {
   const localIdToBackendId = new Map<string, string>();
 
-  for (const saved of savedSections) {
-    const match = localSections.find((s) => s.position === saved.position);
-    if (match?.localId && saved.id) {
-      localIdToBackendId.set(match.localId, saved.id);
-    }
-  }
+  // for (const saved of savedSections) {
+  //   const match = localSections.find((s) => s.position === saved.position);
+  //   if (match?.localId && saved.id) {
+  //     localIdToBackendId.set(match.localId, saved.id);
+  //   }
+  // }
 
   const uploadPromises = uploadedFiles.flatMap(({ sectionLocalId, files }) => {
     const backendId = localIdToBackendId.get(sectionLocalId);
@@ -34,8 +33,8 @@ export const uploadFilesInBackground = async (
     return files.map((file) =>
       uploadFileToSection(backendId, file).then(
         () => ({ status: 'fulfilled', file }),
-        (error) => ({ status: 'rejected', file, error })
-      )
+        (error) => ({ status: 'rejected', file, error }),
+      ),
     );
   });
 
