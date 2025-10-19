@@ -98,12 +98,18 @@ const MCQEditor: React.FC<MCQEditorProps> = ({
               updateText(o.id, e.target.value)
             }
           />
-          <button onClick={() => removeOption(o.id)} aria-label="Remove option">
+          <button
+            type="button"
+            onClick={() => removeOption(o.id)}
+            aria-label="Remove option"
+          >
             Remove
           </button>
         </div>
       ))}
-      <button onClick={addOption}>+ Add option</button>
+      <button type="button" onClick={addOption}>
+        + Add option
+      </button>
     </div>
   );
 };

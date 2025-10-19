@@ -132,7 +132,7 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
         <section className="space-y-4">
           {quiz.questions.map((q, idx) => (
             <QuestionCard
-              key={q.id}
+              key={idx}
               question={q}
               index={idx}
               // onTypeChange={(type) => onTypeChange(q, type)}
