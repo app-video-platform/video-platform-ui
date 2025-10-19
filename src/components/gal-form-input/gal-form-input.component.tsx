@@ -13,7 +13,7 @@ interface GalFormInputProps {
   label?: string;
   value: string | number;
   required?: boolean;
-  inputType?: 'text' | 'textarea';
+  inputType?: 'text' | 'textarea' | 'number';
   isMaxLengthShown?: boolean;
   passwordField?: PasswordFieldVisibility;
   maxLength?: number;

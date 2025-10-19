@@ -63,7 +63,7 @@ const TopNavbar: React.FC = () => {
           <GalButton
             text="Log In"
             type="secondary"
-            onClick={() => navigate('/sign-in')}
+            onClick={() => navigate('/login')}
           />
           <GalButton
             text="Register"

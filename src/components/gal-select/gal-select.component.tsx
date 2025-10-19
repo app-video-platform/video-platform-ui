@@ -41,8 +41,8 @@ const GalSelect: React.FC<GalSelectProps> = ({
       <option value="" disabled hidden>
         {label ? `Select ${label}` : 'Select...'}
       </option>
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
+      {options.map((opt, index) => (
+        <option key={index} value={opt.value}>
           {opt.label}
         </option>
       ))}

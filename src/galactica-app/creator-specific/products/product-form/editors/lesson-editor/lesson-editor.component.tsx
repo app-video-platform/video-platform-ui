@@ -28,6 +28,7 @@ import GalIcon from '../../../../../../components/gal-icon-component/gal-icon.co
 import './lesson-editor.styles.scss';
 import { selectAuthUser } from '../../../../../../store/auth-store/auth.selectors';
 import { IRemoveItemPayload } from '../../../../../../api/models/product/product';
+import QuizWizard from '../../quiz-wizard/quiz-wizard.component';
 
 interface LessonEditorProps {
   lesson: ILesson;
@@ -214,11 +215,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         );
 
       case 'QUIZ':
-        return (
-          <div className="quiz-editor-placeholder">
-            <p>Quiz editor will go here.</p>
-          </div>
-        );
+        return <QuizWizard />;
 
       case 'ASSIGNMENT':
         return (
