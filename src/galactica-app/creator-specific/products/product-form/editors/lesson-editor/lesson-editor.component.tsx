@@ -21,7 +21,6 @@ import {
   CourseLesson,
   LessonCreate,
 } from '../../../../../../api/models/product/lesson';
-import { LessonType } from '../../../../../../api/models/product/product.types';
 
 import { MdDeleteForever } from 'react-icons/md';
 import GalIcon from '../../../../../../components/gal-icon-component/gal-icon.component';
@@ -29,6 +28,7 @@ import './lesson-editor.styles.scss';
 import { selectAuthUser } from '../../../../../../store/auth-store/auth.selectors';
 import { IRemoveItemPayload } from '../../../../../../api/models/product/product';
 import QuizWizard from '../../quiz-wizard/quiz-wizard.component';
+import { LessonType } from '../../../../../../api/types/products.types';
 
 interface LessonEditorProps {
   lesson: CourseLesson;

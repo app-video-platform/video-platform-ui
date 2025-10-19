@@ -11,12 +11,11 @@ import { getCookie } from '../../../utils/cookie.util';
 //   IUpdateCourseProduct,
 //   IUpdateSectionDetails,
 // } from '../../models/product/product';
-import { ProductType } from '../../models/product/product.types';
 import {
   ConfirmUploadRequestDto,
   FileS3UploadResponseDto,
 } from '../../models/files/confirm-upload';
-import { AbstractProduct } from '../../types/products.types';
+import { AbstractProduct, ProductType } from '../../types/products.types';
 import {
   IRemoveItemPayload,
   IRemoveProductPayload,

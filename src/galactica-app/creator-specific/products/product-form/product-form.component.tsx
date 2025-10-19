@@ -25,8 +25,10 @@ import ConsultationDetails, {
   IConsultationDetails,
 } from './consultation-details/consultation-details.component';
 
-import { ProductType } from '../../../../api/models/product/product.types';
-import { AbstractProduct } from '../../../../api/types/products.types';
+import {
+  AbstractProduct,
+  ProductType,
+} from '../../../../api/types/products.types';
 import { MeetingMethods } from '../../../../api/enums/meeting-methods.enum';
 import { IRemoveProductPayload } from '../../../../api/models/product/product';
 

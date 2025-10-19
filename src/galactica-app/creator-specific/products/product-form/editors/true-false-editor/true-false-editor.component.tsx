@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrueFalseQuestion } from '../../quiz-wizard/quiz-wizard.component';
+import { TrueFalseQuestion } from '../../../../../../api/models/product/quiz';
 
 import './true-false-editor.styles.scss';
 

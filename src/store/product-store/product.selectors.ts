@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
+import { ProductType } from '../../api/types/products.types';
 import { RootState } from '../store'; // Ensure your store exports RootState
-import { ProductType } from '../../api/models/product/product.types';
 
 export const selectAllProducts = (state: RootState) => state.products.products;
 
@@ -13,7 +13,7 @@ export const selectCurrentProduct = (state: RootState) =>
 
 export const selectProductsByType = (productType: ProductType) =>
   createSelector(selectAllProducts, (products) =>
-    products?.filter((product) => product.type === productType)
+    products?.filter((product) => product.type === productType),
   );
 
 export const selectTopThreeProducts = createSelector(
@@ -30,5 +30,5 @@ export const selectTopThreeProducts = createSelector(
         return priceB - priceA;
       })
       .slice(0, 3);
-  }
+  },
 );

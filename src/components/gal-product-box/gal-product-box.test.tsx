@@ -3,11 +3,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import GalProductCard from './gal-product-box.component';
 import '@testing-library/jest-dom';
-import {
-  ProductType,
-  ProductStatus,
-} from '../../api/models/product/product.types';
 import { MemoryRouter } from 'react-router-dom';
+import { ProductStatus, ProductType } from '../../api/types/products.types';
 
 // Create a dummy placeholder value as used in your component.
 // In your component, placeholderImage is imported via require.

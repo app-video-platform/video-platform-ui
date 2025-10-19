@@ -1,9 +1,9 @@
-import { NotificationType } from './notifications.types';
+import { NotificationType } from '../../types/notifications.types';
 
 export interface INotification {
+  id: string;
   title: string;
   message: string;
-  isRead: boolean;
   type: NotificationType;
-  id: number;
+  isRead: boolean;
 }

@@ -6,7 +6,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ProductType } from '../../../../../../api/models/product/product.types';
 import GalButton from '../../../../../../components/gal-button/gal-button.component';
 import GalUppyFileUploader from '../../../../../../components/gal-uppy-file-uploader/gal-uppy-file-uploader.component';
 import {
@@ -27,6 +26,7 @@ import {
 
 import './section-editor.styles.scss';
 import { IRemoveItemPayload } from '../../../../../../api/models/product/product';
+import { ProductType } from '../../../../../../api/types/products.types';
 
 export interface NewProductSectionFormData {
   id: string;

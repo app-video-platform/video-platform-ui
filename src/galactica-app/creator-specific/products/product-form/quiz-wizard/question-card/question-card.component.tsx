@@ -1,16 +1,16 @@
 /* eslint-disable indent */
 import React from 'react';
+import { MCQQuestion } from '../../../../../../api/models/product/quiz';
+import {
+  QuestionType,
+  QuizQuestion,
+} from '../../../../../../api/types/quiz.types';
 import GalFormInput from '../../../../../../components/gal-form-input/gal-form-input.component';
 import GalSelect, {
   GalSelectOption,
 } from '../../../../../../components/gal-select/gal-select.component';
 import MCQEditor from '../../editors/mcq-editor/mcq-editor.component';
 import TrueFalseEditor from '../../editors/true-false-editor/true-false-editor.component';
-import {
-  MCQQuestion,
-  QuestionType,
-  QuizQuestion,
-} from '../quiz-wizard.component';
 
 import './question-card.styles.scss';
 

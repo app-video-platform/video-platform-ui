@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import GalFormInput from '../../../../../../components/gal-form-input/gal-form-input.component';
 import {
   MCQQuestion,
   QuizOption,
   TrueFalseQuestion,
-} from '../../quiz-wizard/quiz-wizard.component';
+} from '../../../../../../api/models/product/quiz';
+import GalFormInput from '../../../../../../components/gal-form-input/gal-form-input.component';
 
 import './mcq-editor.styles.scss';
 

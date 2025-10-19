@@ -4,7 +4,7 @@ import './enter-email.styles.scss';
 import GalFormInput from '../../../components/gal-form-input/gal-form-input.component';
 import GalButton from '../../../components/gal-button/gal-button.component';
 
-export interface EnterEmailProps {
+interface EnterEmailProps {
   emailInput: string;
   error: string;
   // eslint-disable-next-line no-unused-vars

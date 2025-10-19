@@ -1,51 +1,16 @@
 import React, { useMemo, useState } from 'react';
+
+import { MCQQuestion, QuizDraft } from '../../../../../api/models/product/quiz';
+import { QuizQuestion } from '../../../../../api/types/quiz.types';
 import GalButton from '../../../../../components/gal-button/gal-button.component';
 import GalFormInput from '../../../../../components/gal-form-input/gal-form-input.component';
 import QuestionCard from './question-card/question-card.component';
 
 import './quiz-wizard.styles.scss';
 
-export type QuestionType =
-  | 'multiple_choice_single'
-  | 'multiple_choice_multi'
-  | 'true_false';
-
-export interface QuizOption {
-  id: string;
-  text: string;
-  isCorrect?: boolean; // for MCQ types
-}
-
-export interface QuizQuestionBase {
-  id: string;
-  title: string;
-  type: QuestionType;
-  points: number; // award on full correctness
-  explanation?: string; // shown after submit
-}
-
-export interface MCQQuestion extends QuizQuestionBase {
-  type: 'multiple_choice_single' | 'multiple_choice_multi';
-  options: QuizOption[];
-}
-
-export interface TrueFalseQuestion extends QuizQuestionBase {
-  type: 'true_false';
-  options: QuizOption[];
-}
-
-export type QuizQuestion = MCQQuestion | TrueFalseQuestion;
-
-export interface QuizDraft {
-  id: string;
-  title: string;
-  description?: string;
-  questions: QuizQuestion[];
-  passingScore?: number; // optional passing threshold in %
-}
-
 interface QuizWizardProps {
   initial?: Partial<QuizDraft>;
+  // eslint-disable-next-line no-unused-vars
   onSave?: (quiz: QuizDraft) => Promise<void> | void; // hook for API integration
 }
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { ProductType } from '../../../../../api/types/products.types';
 
 import GalButton from '../../../../../components/gal-button/gal-button.component';
 import SectionEditor from '../editors/section-editor/section-editor.component';
-import { ProductType } from '../../../../../api/models/product/product.types';
 
 import './create-product-sections.styles.scss';
 

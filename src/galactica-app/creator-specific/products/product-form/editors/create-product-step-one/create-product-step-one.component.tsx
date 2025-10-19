@@ -11,8 +11,10 @@ import { createCourseProduct } from '../../../../../../store/product-store/produ
 
 import './create-product-step-one.styles.scss';
 import GalBoxSelector from '../../../../../../components/gal-box-selector/gal-box-selector.component';
-import { ProductType } from '../../../../../../api/models/product/product.types';
-import { AbstractProduct } from '../../../../../../api/types/products.types';
+import {
+  AbstractProduct,
+  ProductType,
+} from '../../../../../../api/types/products.types';
 
 interface CreateProductStepOneProps {
   formData: NewProductFormData;

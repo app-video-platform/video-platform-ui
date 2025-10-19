@@ -8,7 +8,7 @@ export interface TabItem {
   content: ReactNode;
 }
 
-export interface TabsProps {
+interface TabsProps {
   items: TabItem[];
   defaultIndex?: number;
 }

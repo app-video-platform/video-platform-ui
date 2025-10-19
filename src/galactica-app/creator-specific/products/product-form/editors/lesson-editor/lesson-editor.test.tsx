@@ -186,7 +186,7 @@ jest.mock(
 // ── 4) Import the component under test ───────────────────────────────────────────────
 import LessonEditor from './lesson-editor.component';
 import { CourseLesson } from '../../../../../../api/models/product/lesson';
-import { LessonType } from '../../../../../../api/models/product/product.types';
+import { LessonType } from '../../../../../../api/types/products.types';
 
 // ── 5) Begin tests ───────────────────────────────────────────────────────────────────
 describe('<LessonEditor />', () => {

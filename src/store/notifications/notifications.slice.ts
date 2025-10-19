@@ -1,13 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
-
-export interface INotification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'SUCCESS' | 'ERROR' | 'INFO';
-  isRead: boolean;
-}
+import { INotification } from '../../api/models/user/notification';
 
 interface NotificationsState {
   notifications: INotification[];
@@ -23,7 +16,7 @@ const notificationsSlice = createSlice({
   reducers: {
     addNotification: (
       state,
-      action: PayloadAction<Omit<INotification, 'id' | 'isRead'>>
+      action: PayloadAction<Omit<INotification, 'id' | 'isRead'>>,
     ) => {
       state.notifications.push({
         ...action.payload,
@@ -33,12 +26,12 @@ const notificationsSlice = createSlice({
     },
     removeNotification: (state, action: PayloadAction<string>) => {
       state.notifications = state.notifications.filter(
-        (n) => n.id !== action.payload
+        (n) => n.id !== action.payload,
       );
     },
     markAsRead: (state, action: PayloadAction<string>) => {
       const notification = state.notifications.find(
-        (n) => n.id === action.payload
+        (n) => n.id === action.payload,
       );
       if (notification) {
         notification.isRead = true;

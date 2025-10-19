@@ -7,12 +7,12 @@ import { selectAllProducts } from '../../../store/product-store/product.selector
 import GalProductCard from '../../../components/gal-product-box/gal-product-box.component';
 
 import './user-page-preview.styles.scss';
-import {
-  ProductType,
-  ProductStatus,
-} from '../../../api/models/product/product.types';
 import { User, UserRole } from '../../../api/models/user/user';
-import { AbstractProduct } from '../../../api/types/products.types';
+import {
+  AbstractProduct,
+  ProductStatus,
+  ProductType,
+} from '../../../api/types/products.types';
 
 const UserPagePreview: React.FC = () => {
   const user = useSelector(selectAuthUser);

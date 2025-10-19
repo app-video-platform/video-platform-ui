@@ -1,13 +1,6 @@
 import { FileDownloadProductResponse } from '../files/file-download-product';
 import { CourseLesson } from './lesson';
 
-// export interface DownloadProductSection {
-//   id?: string;
-//   title?: string;
-//   description?: string;
-//   position?: number;
-// }
-
 export interface CourseProductSection {
   id?: string;
   title?: string;

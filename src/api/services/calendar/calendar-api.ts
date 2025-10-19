@@ -4,11 +4,6 @@ import {
   ConnectInitResponse,
 } from '../../models/calendars/connect-init';
 
-// export interface IConnectCalendarPayload {
-//   provider: string;
-//   loginHint: string;
-// }
-
 export const getAllCalendarProvidersAPI = async () => {
   try {
     const response = await httpClient.get<string[]>('api/calendars/providers');

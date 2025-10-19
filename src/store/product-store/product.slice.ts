@@ -15,9 +15,8 @@ import {
   getProductByProductIdAPI,
 } from '../../api/services/products/products-api';
 
-import { ProductType } from '../../api/models/product/product.types';
 import { AxiosError } from 'axios';
-import { AbstractProduct } from '../../api/types/products.types';
+import { AbstractProduct, ProductType } from '../../api/types/products.types';
 import {
   CourseProductSection,
   CourseSectionCreateRequest,
