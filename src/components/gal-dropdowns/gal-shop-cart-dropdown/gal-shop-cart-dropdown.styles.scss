@@ -12,4 +12,24 @@
       font-size: 11px;
     }
   }
+
+  .cart-icon-button {
+    position: relative;
+
+    .badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: 999px;
+      font-size: 12px;
+      line-height: 18px;
+      text-align: center;
+      font-weight: 700;
+      color: #fff;
+      background: #e11d48;
+    }
+  }
 }

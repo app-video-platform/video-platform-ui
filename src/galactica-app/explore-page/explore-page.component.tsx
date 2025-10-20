@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { ProductMinimised } from '../../api/models/product/product';
 import { getAllProductsMinimalAPI } from '../../api/services/products/products-api';
 import GalButton from '../../components/gal-button/gal-button.component';
+import { selectAllShopCartProducts } from '../../store/shop-cart/shop-cart.selectors';
+import { addProductToCart } from '../../store/shop-cart/shop-cart.slice';
+import { AppDispatch } from '../../store/store';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../assets/image-placeholder.png');
 
@@ -11,6 +15,8 @@ import './explore-page.styles.scss';
 
 const ExplorePage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const cartProducts = useSelector(selectAllShopCartProducts);
   const [products, setProducts] = useState<ProductMinimised[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +47,13 @@ const ExplorePage: React.FC = () => {
       isMounted = false;
     };
   }, []); // empty deps → runs once on mount
+
+  const handleAddToCart = (prod: ProductMinimised) => {
+    dispatch(addProductToCart(prod));
+  };
+
+  const isInCart = (productId: string | undefined) =>
+    cartProducts?.some((p) => p.id === productId);
 
   if (loading) {
     return <p>Loading products…</p>;
@@ -108,13 +121,27 @@ const ExplorePage: React.FC = () => {
                     </span>
                   </button>
                 </div>
-                <GalButton
-                  text="View Product"
-                  type="secondary"
-                  onClick={() =>
-                    navigate(`/product/${product.id}/${product.type}`)
-                  }
-                />
+                <div className="explore-card-actions">
+                  <GalButton
+                    text="View Product"
+                    type="secondary"
+                    onClick={() =>
+                      navigate(`/product/${product.id}/${product.type}`)
+                    }
+                  />
+                  <GalButton
+                    text={
+                      isInCart(product.id) ? 'Already in cart' : 'Add to cart'
+                    }
+                    type="primary"
+                    disabled={isInCart(product.id)}
+                    onClick={() => {
+                      if (!isInCart(product.id)) {
+                        handleAddToCart(product);
+                      }
+                    }}
+                  />
+                </div>
               </div>
             ))}
           </div>
