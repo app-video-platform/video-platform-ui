@@ -100,7 +100,12 @@ const GalUserDropdown: React.FC = () => {
             </div>
             <div className="dropdown-item">
               <Link to="/dev-dashboard">Dev Dashboard</Link>
-              <Link to="https://luxury-klepon-a62307.netlify.app/">DOCS</Link>
+              <Link
+                target="_blank"
+                to="https://luxury-klepon-a62307.netlify.app/"
+              >
+                DOCS
+              </Link>
             </div>
             <hr />
             <div className="dropdown-item logout-btn" onClick={handleLogout}>
