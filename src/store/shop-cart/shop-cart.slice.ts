@@ -1,18 +1,62 @@
+/* eslint-disable indent */
 import { AxiosError } from 'axios';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  AnyAction,
+  createSlice,
+  PayloadAction,
+  ThunkAction,
+} from '@reduxjs/toolkit';
 import { ProductMinimised } from '../../api/models/product/product';
+import { RootState } from '../store';
+import { addToWishlist } from '../wishlist/wishlist.slice';
 
-interface ShopCartState {
-  products: null | ProductMinimised[];
+const STORAGE_KEY = 'cart:v1';
+
+export interface ShopCartState {
+  products: ProductMinimised[];
   loading: boolean;
   total: number;
 }
 
 const initialState: ShopCartState = {
-  products: null,
+  products: [],
   loading: false,
   total: 0,
 };
+
+export const loadCartFromStorage = (): ShopCartState | undefined => {
+  try {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as ShopCartState) : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+export const saveCartToStorage = (state: ShopCartState) => {
+  try {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore quota / privacy errors */
+  }
+};
+
+const getNumericPrice = (p: ProductMinimised): number => {
+  const price = (p as any).price;
+  if (price === 'free' || price === null) {
+    return 0;
+  }
+  return typeof price === 'number' ? price : Number(price) || 0;
+};
+
+const recomputeTotal = (items: ProductMinimised[]) =>
+  items.reduce((sum, p) => sum + getNumericPrice(p), 0);
 
 export const extractErrorMessage = (err: unknown): string => {
   if (err instanceof AxiosError && err.response?.data?.message) {
@@ -23,19 +67,54 @@ export const extractErrorMessage = (err: unknown): string => {
   return 'An unknown error occurred';
 };
 
+export const moveCartItemToWishlist =
+  (productId: string): ThunkAction<void, RootState, unknown, AnyAction> =>
+  (dispatch, getState) => {
+    const state = getState();
+
+    // find the product in wishlist
+    const product = state.shopCart.products.find((p) => p.id === productId);
+    if (!product) {
+      return;
+    } // nothing to do
+
+    // if already in cart, just remove from wishlist (optional behavior)
+    const isAlreadyInWishlist = state.wishlist.products.some(
+      (p) => p.id === productId,
+    );
+
+    if (!isAlreadyInWishlist) {
+      dispatch(addToWishlist(product));
+    }
+    dispatch(removeProductFromCart(productId));
+  };
+
 const shopCartSlice = createSlice({
   name: 'shopCart',
   initialState,
   reducers: {
     addProductToCart(state, action: PayloadAction<ProductMinimised>) {
       state.loading = true;
-      if (state.products && state.products.length > 0) {
-        state.products.push(action.payload);
-      } else {
-        state.products = [action.payload];
+
+      // optional: prevent duplicates (by product id)
+      const exists = state.products?.some((p) => p.id === action.payload.id);
+      if (!exists) {
+        state.products?.push(action.payload);
       }
-      if (action.payload.price && action.payload.price !== 'free') {
-        state.total += action.payload.price;
+
+      state.total = recomputeTotal(state.products);
+      state.loading = false;
+    },
+
+    removeProductFromCart(
+      state,
+      action: PayloadAction<string /* productId */>,
+    ) {
+      const idToRemove = action.payload;
+      const idx = state.products?.findIndex((p) => p.id === idToRemove);
+      if (idx && idx >= 0) {
+        state.products?.splice(idx, 1);
+        state.total = recomputeTotal(state.products);
       }
       state.loading = false;
     },
@@ -44,14 +123,6 @@ const shopCartSlice = createSlice({
       state.products = [];
       state.total = 0;
       state.loading = false;
-    },
-
-    removeProductFromCart(state, action: PayloadAction<string>) {
-      const idToRemove = action.payload;
-      const idx = state.products?.findIndex((p) => p.id === idToRemove);
-      if (idx && idx !== -1) {
-        state.products?.splice(idx, 1);
-      }
     },
   },
 });

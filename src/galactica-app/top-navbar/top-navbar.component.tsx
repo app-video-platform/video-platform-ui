@@ -1,19 +1,17 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-// import { FaShoppingCart } from 'react-icons/fa';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
-import GalSearch from '../../components/gal-search/gal-search.component';
-import GalIcon from '../../components/gal-icon-component/gal-icon.component';
 import { UserRole } from '../../api/models/user/user';
 import GalButton from '../../components/gal-button/gal-button.component';
 import NewGalNotificationsDropdown from '../../components/gal-dropdowns/gal-notifications-dropdown/gal-notifications-dropdown.component';
 import GalUserDropdown from '../../components/gal-dropdowns/gal-user-dropdown/gal-user-dropdown.component';
-
-import './top-navbar.styles.scss';
 import SmartSearch from './smart-search/smart-search.component';
 import ShopCartDropdown from '../../components/gal-dropdowns/gal-shop-cart-dropdown/gal-shop-cart-dropdown.component';
+
+import './top-navbar.styles.scss';
+import GalWishlistDropdown from '../../components/gal-dropdowns/gal-wishlist-dropdown/gal-wishlist-dropdown.component';
 
 const TopNavbar: React.FC = () => {
   const navigate = useNavigate();
@@ -44,14 +42,16 @@ const TopNavbar: React.FC = () => {
               onClick={() => navigate('/app/products/create')}
             />
           ) : (
-            <Link to={'library'}>Library</Link>
+            <Link to={'library/all-products'}>Library</Link>
           ))}
       </div>
       {user && (
         <div className="nav-links">
           {!isUserCreator && (
-            // <GalIcon icon={FaShoppingCart} size={16} className="cart-icon" />
-            <ShopCartDropdown />
+            <>
+              <GalWishlistDropdown />
+              <ShopCartDropdown />
+            </>
           )}
           <NewGalNotificationsDropdown />
           <GalUserDropdown />

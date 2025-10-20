@@ -1,21 +1,41 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   selectAllShopCartProducts,
   selectShopCartTotal,
 } from '../../../store/shop-cart/shop-cart.selectors';
-import { selectAuthUser } from '../../../store/auth-store/auth.selectors';
+import GalButton from '../../../components/gal-button/gal-button.component';
+
+import './cart.styles.scss';
+import { ProductMinimised } from '../../../api/models/product/product';
+import { AppDispatch } from '../../../store/store';
+import {
+  moveCartItemToWishlist,
+  removeProductFromCart,
+} from '../../../store/shop-cart/shop-cart.slice';
+import { selectWishlistIds } from '../../../store/wishlist/wishlist.selectors';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../assets/image-placeholder.png');
 
-import './cart.styles.scss';
-import GalButton from '../../../components/gal-button/gal-button.component';
-
 const Cart: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const cartProducts = useSelector(selectAllShopCartProducts);
   const cartTotal = useSelector(selectShopCartTotal);
-  const user = useSelector(selectAuthUser);
+  const wishlistIds = useSelector(selectWishlistIds);
+
+  const handleRemoveFromCart = (prod: ProductMinimised) => {
+    if (prod && prod.id) {
+      dispatch(removeProductFromCart(prod.id));
+    }
+  };
+
+  const handleMoveToWishlist = (prod: ProductMinimised) => {
+    if (prod && prod.id) {
+      dispatch(moveCartItemToWishlist(prod.id));
+    }
+  };
 
   return (
     <div className="cart-page">
@@ -29,25 +49,42 @@ const Cart: React.FC = () => {
             </div>
             <article className="cart-products-container">
               <div className="cart-products-list">
-                {cartProducts.map((prod) => (
-                  <div key={prod.id} className="cart-product">
-                    <img
-                      src={placeholderImage}
-                      alt={prod.title}
-                      className="product-card-image"
-                    />
-                    <div className="cart-product-details">
-                      <h3>{prod.title}</h3>
-                      <p>By {prod.createdByName}</p>
-                      <p>4.7 ⭐⭐⭐⭐⭐ (32,025 ratings)</p>
+                {cartProducts.map((prod) => {
+                  const isInWishlist = wishlistIds.has(prod.id);
+
+                  return (
+                    <div key={prod.id} className="cart-product">
+                      <img
+                        src={placeholderImage}
+                        alt={prod.title}
+                        className="product-card-image"
+                      />
+                      <div className="cart-product-details">
+                        <h3>{prod.title}</h3>
+                        <p>By {prod.createdByName}</p>
+                        <p>4.7 ⭐⭐⭐⭐⭐ (32,025 ratings)</p>
+                      </div>
+                      <div className="cart-product-actions">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFromCart(prod)}
+                        >
+                          Remove
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isInWishlist}
+                          onClick={() => handleMoveToWishlist(prod)}
+                        >
+                          Move to wishlist
+                        </button>
+                      </div>
+                      <div className="cart-product-price-tag">
+                        €{prod.price}
+                      </div>
                     </div>
-                    <div className="cart-product-actions">
-                      <button type="button">Remove</button>
-                      <button type="button">Move to wishlist</button>
-                    </div>
-                    <div className="cart-product-price-tag">€{prod.price}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </article>
             <aside className="cart-products-aside">

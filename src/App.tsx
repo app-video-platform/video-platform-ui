@@ -36,6 +36,11 @@ import ProductPage from './galactica-app/product-page/product-page.component';
 import SettingsPage from './galactica-app/settings-page/settings-page.component';
 import SearchResultsPage from './galactica-app/explore-page/search-page/search-page.component';
 import Cart from './galactica-app/normal-user-specific/cart/cart.component';
+import AllProductsTab from './galactica-app/normal-user-specific/library-page/all-products-tab/all-products-tab.component';
+import CoursesTab from './galactica-app/normal-user-specific/library-page/courses-tab/courses-tab.component';
+import DownloadPackagesTab from './galactica-app/normal-user-specific/library-page/download-packages-tab/download-packages-tab.component';
+import ConsultationTab from './galactica-app/normal-user-specific/library-page/consultation-tab/consultation-tab.component';
+import WishlistTab from './galactica-app/normal-user-specific/library-page/wishlist-tab/wishlist-tab.component';
 
 const App = () => {
   const user = useSelector(selectAuthUser);
@@ -153,7 +158,16 @@ const App = () => {
                   <LibraryPage />
                 </ProtectedRoute>
               }
-            />
+            >
+              <Route path="all-products" element={<AllProductsTab />} />
+              <Route path="my-courses" element={<CoursesTab />} />
+              <Route
+                path="my-download-packages"
+                element={<DownloadPackagesTab />}
+              />
+              <Route path="my-consultation" element={<ConsultationTab />} />
+              <Route path="my-wishlist" element={<WishlistTab />} />
+            </Route>
             <Route path="settings" element={<SettingsPage />} />
 
             <Route path="my-page-preview" element={<UserPagePreview />} />

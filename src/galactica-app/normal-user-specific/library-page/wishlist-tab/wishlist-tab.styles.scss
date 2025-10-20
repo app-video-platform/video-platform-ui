@@ -1,0 +1,33 @@
+.wishlist-product-card {
+  display: inline-flex;
+  width: 100%;
+  justify-content: flex-start;
+  gap: 30px;
+  margin-bottom: 40px;
+
+  .product-card-image {
+    border-radius: 5px;
+  }
+
+  .wishlist-product-details {
+    display: flex;
+    flex-direction: column;
+    height: 150px;
+
+    .wishlist-product-rating {
+      margin-top: auto;
+    }
+
+    .wishlist-product-price {
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+
+  .wishlist-product-actions {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+}

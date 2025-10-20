@@ -4,6 +4,21 @@
     max-width: 1200px;
     margin: auto;
 
+    .product-card {
+      position: relative;
+
+      .wish-btn {
+        position: absolute;
+
+        right: 10px;
+        top: 10px;
+      }
+
+      .is-active {
+        color: red;
+      }
+    }
+
     .explore-card-actions {
       width: 100%;
       display: inline-flex;

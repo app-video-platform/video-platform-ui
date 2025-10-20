@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { FaRegHeart } from 'react-icons/fa';
+import { FaHeart } from 'react-icons/fa';
 
 import { ProductMinimised } from '../../api/models/product/product';
 import { getAllProductsMinimalAPI } from '../../api/services/products/products-api';
 import GalButton from '../../components/gal-button/gal-button.component';
+import GalIcon from '../../components/gal-icon-component/gal-icon.component';
 import { selectAllShopCartProducts } from '../../store/shop-cart/shop-cart.selectors';
 import { addProductToCart } from '../../store/shop-cart/shop-cart.slice';
 import { AppDispatch } from '../../store/store';
+import { selectWishlistIds } from '../../store/wishlist/wishlist.selectors';
+import { toggleWishlist } from '../../store/wishlist/wishlist.slice';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../assets/image-placeholder.png');
 
@@ -17,6 +22,7 @@ const ExplorePage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const cartProducts = useSelector(selectAllShopCartProducts);
+  const wishlistIds = useSelector(selectWishlistIds);
   const [products, setProducts] = useState<ProductMinimised[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +58,10 @@ const ExplorePage: React.FC = () => {
     dispatch(addProductToCart(prod));
   };
 
+  const handleToggleWishlist = (prod: ProductMinimised) => {
+    dispatch(toggleWishlist(prod));
+  };
+
   const isInCart = (productId: string | undefined) =>
     cartProducts?.some((p) => p.id === productId);
 
@@ -82,68 +92,89 @@ const ExplorePage: React.FC = () => {
         <section className="explore-products">
           <h1>These are our best products</h1>
           <div className="products-list">
-            {products?.map((product, idx) => (
-              <div key={idx} className="product-card">
-                <img
-                  src={placeholderImage}
-                  alt={product.title}
-                  className="product-card-image"
-                />
-                <div className="product-card-details">
-                  <div className="last-updated-line">
-                    <span>
-                      {product.updatedAt &&
-                        new Date(product.updatedAt).toLocaleDateString(
-                          'en-GB',
-                          {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                          },
-                        )}
-                    </span>
-                  </div>
-                  <h3>{product.title}</h3>
-                  <div className="type-and-price-line">
-                    <span>{product.type?.toLowerCase()}</span>
-                    <span>
-                      {product.price !== 'free' && <span>&euro;</span>}
-                      {product.price}
-                    </span>
-                  </div>
+            {products?.map((product, idx) => {
+              const wished = wishlistIds.has(product.id);
+
+              return (
+                <div key={idx} className="product-card">
+                  <img
+                    src={placeholderImage}
+                    alt={product.title}
+                    className="product-card-image"
+                  />
+
                   <button
                     type="button"
-                    className="creator-route-btn"
-                    onClick={() => navigate(`/store/${product.createdById}`)}
+                    className={`wish-btn ${wished ? 'is-active' : ''}`}
+                    aria-pressed={wished}
+                    aria-label={
+                      wished ? 'Remove from wishlist' : 'Add to wishlist'
+                    }
+                    onClick={() => handleToggleWishlist(product)}
+                    title={wished ? 'Remove from wishlist' : 'Add to wishlist'}
                   >
-                    <span className="creator">
-                      {product.createdByName}, {product.createdByTitle}
-                    </span>
+                    {wished ? (
+                      <GalIcon icon={FaHeart} size={22} color="red" />
+                    ) : (
+                      <GalIcon icon={FaRegHeart} size={22} />
+                    )}
                   </button>
-                </div>
-                <div className="explore-card-actions">
-                  <GalButton
-                    text="View Product"
-                    type="secondary"
-                    onClick={() =>
-                      navigate(`/product/${product.id}/${product.type}`)
-                    }
-                  />
-                  <GalButton
-                    text={
-                      isInCart(product.id) ? 'Already in cart' : 'Add to cart'
-                    }
-                    type="primary"
-                    disabled={isInCart(product.id)}
-                    onClick={() => {
-                      if (!isInCart(product.id)) {
-                        handleAddToCart(product);
+                  <div className="product-card-details">
+                    <div className="last-updated-line">
+                      <span>
+                        {product.updatedAt &&
+                          new Date(product.updatedAt).toLocaleDateString(
+                            'en-GB',
+                            {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                            },
+                          )}
+                      </span>
+                    </div>
+                    <h3>{product.title}</h3>
+                    <div className="type-and-price-line">
+                      <span>{product.type?.toLowerCase()}</span>
+                      <span>
+                        {product.price !== 'free' && <span>&euro;</span>}
+                        {product.price}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="creator-route-btn"
+                      onClick={() => navigate(`/store/${product.createdById}`)}
+                    >
+                      <span className="creator">
+                        {product.createdByName}, {product.createdByTitle}
+                      </span>
+                    </button>
+                  </div>
+                  <div className="explore-card-actions">
+                    <GalButton
+                      text="View Product"
+                      type="secondary"
+                      onClick={() =>
+                        navigate(`/product/${product.id}/${product.type}`)
                       }
-                    }}
-                  />
+                    />
+                    <GalButton
+                      text={
+                        isInCart(product.id) ? 'Already in cart' : 'Add to cart'
+                      }
+                      type="primary"
+                      disabled={isInCart(product.id)}
+                      onClick={() => {
+                        if (!isInCart(product.id)) {
+                          handleAddToCart(product);
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </main>
