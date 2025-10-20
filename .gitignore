@@ -132,3 +132,5 @@ dist
 
 # mocks
 src/api/_mocks.ts
+*storybook.log
+storybook-static

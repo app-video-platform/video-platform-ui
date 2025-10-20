@@ -12,5 +12,6 @@ graph TD
   App --> Store[(Redux Toolkit)]
   App --> API
   API --> DB[(Database)]
+```
 
 > Owner: @aleb, el Hijo del Diablo · Last reviewed: 2025-10-20

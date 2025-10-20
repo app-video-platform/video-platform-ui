@@ -41,6 +41,7 @@ import CoursesTab from './galactica-app/normal-user-specific/library-page/course
 import DownloadPackagesTab from './galactica-app/normal-user-specific/library-page/download-packages-tab/download-packages-tab.component';
 import ConsultationTab from './galactica-app/normal-user-specific/library-page/consultation-tab/consultation-tab.component';
 import WishlistTab from './galactica-app/normal-user-specific/library-page/wishlist-tab/wishlist-tab.component';
+import RoutesDev from './static-pages/__routes-dev';
 
 const App = () => {
   const user = useSelector(selectAuthUser);
@@ -63,6 +64,9 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dev-dashboard" element={<DevDashboard />} />
 
+        {process.env.NODE_ENV === 'development' && (
+          <Route path="__routes-dev" element={<RoutesDev />} />
+        )}
         {/* <Route path="onboarding" element={<Onboarding />} /> */}
 
         {/* Public storefront and explore */}

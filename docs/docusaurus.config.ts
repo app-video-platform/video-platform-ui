@@ -90,8 +90,8 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        { href: 'https://your-app-dev-url', label: 'App (dev)', position: 'left' },
-        { href: 'https://your-api-swagger-url', label: 'API (Swagger)', position: 'right' },
+        { href: 'https://app.serious-debauchery.click/', label: 'App (dev)', position: 'left' },
+        { href: 'https://serious-debauchery.click/swagger-ui', label: 'API (Swagger)', position: 'left' },
         {
           href: 'https://github.com/app-video-platform/video-platform-ui',
           label: 'GitHub',
