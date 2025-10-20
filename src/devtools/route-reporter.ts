@@ -1,4 +1,4 @@
-import type { DocRoute } from './routes.map';
+import type { DocNonIndexRouteObject, DocRoute } from './routes.map';
 import { UserRole } from '../api/models/user/user';
 
 function join(base: string, seg?: string) {
@@ -19,25 +19,29 @@ export type FlatRow = {
   id?: string;
 };
 
+function isNonIndex(r: DocRoute): r is DocNonIndexRouteObject {
+  // Index routes are the only ones with r.index === true
+  return !('index' in r) || (r as any).index !== true;
+}
+
 export function flattenRoutes(routes: DocRoute[], base = ''): FlatRow[] {
   const out: FlatRow[] = [];
   for (const r of routes) {
-    const full = r.index ? r.path || base || '/' : join(base, r.path ?? '');
-    if (r.path || r.index || r.meta) {
-      out.push({
-        path: r.index ? full : full || '/',
-        access: r.meta?.access ?? 'public',
-        roles: r.meta?.roles,
-        index: Boolean(r.index),
-        notes: r.meta?.notes,
-        id: (r as any).id,
-      });
-    }
-    if (r.children?.length) {
-      out.push(...flattenRoutes(r.children as DocRoute[], full));
+    // For index routes, use the parent path as the full path
+    const full = r.index ? base || '/' : join(base, r.path);
+    out.push({
+      path: full,
+      access: r.meta?.access ?? 'public',
+      roles: r.meta?.roles,
+      index: Boolean(r.index),
+      notes: r.meta?.notes,
+      id: (r as any).id,
+    });
+    if (isNonIndex(r) && r.children?.length) {
+      out.push(...flattenRoutes(r.children, full));
     }
   }
-  // de-dupe (in case of helper paths used for index)
+  // optional de-dupe
   const seen = new Set<string>();
   return out.filter((row) => {
     const key = `${row.path}|${row.access}|${row.roles?.join(',') ?? ''}|${row.index}`;
