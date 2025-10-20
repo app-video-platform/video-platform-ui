@@ -1,2 +1,3 @@
 https://serious-debauchery.netlify.app/*  https://app.serious-debauchery.click/:splat 301!
 /*    /index.html   200
+/docs/*  https://YOUR-DOCS-SITE.netlify.app/:splat  200
