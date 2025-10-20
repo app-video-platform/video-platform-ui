@@ -1,4 +1,4 @@
-import type { RouteObject } from 'react-router-dom';
+import type { IndexRouteObject, NonIndexRouteObject } from 'react-router-dom';
 import { UserRole } from '../api/models/user/user';
 
 // Optionally add a small meta type for docs:
@@ -8,8 +8,16 @@ type Meta = {
   notes?: string;
 };
 
-export type DocRoute = RouteObject & { meta?: Meta; children?: DocRoute[] };
+export type DocIndexRouteObject = Omit<IndexRouteObject, 'children'> & {
+  meta?: Meta;
+};
 
+export type DocNonIndexRouteObject = Omit<NonIndexRouteObject, 'children'> & {
+  meta?: Meta;
+  children?: DocRoute[];
+};
+
+export type DocRoute = DocIndexRouteObject | DocNonIndexRouteObject;
 // This is a DOCS-ONLY mirror of your App.tsx structure.
 // Keep it roughly in sync when you add/change routes.
 export const docRoutes: DocRoute[] = [
@@ -17,7 +25,7 @@ export const docRoutes: DocRoute[] = [
     path: '/',
     // Navigation layout (not rendered here; for docs only)
     children: [
-      { index: true, path: '/', meta: { access: 'public' }, id: 'home' },
+      { index: true, meta: { access: 'public' }, id: 'home' },
       { path: 'about', meta: { access: 'public' }, id: 'about' },
       { path: 'contact', meta: { access: 'public' }, id: 'contact' },
       { path: 'pricing', meta: { access: 'public' }, id: 'pricing' },
@@ -67,7 +75,6 @@ export const docRoutes: DocRoute[] = [
       // Protected wrapper (Admin/Creator/User) — index is role-based
       {
         index: true,
-        path: '/app', // convenient for flattening
         meta: {
           access: 'protected',
           roles: [UserRole.ADMIN, UserRole.CREATOR, UserRole.USER],
@@ -88,7 +95,6 @@ export const docRoutes: DocRoute[] = [
         children: [
           {
             index: true,
-            path: '/app/products',
             meta: {
               access: 'protected',
               roles: [UserRole.CREATOR, UserRole.ADMIN],
