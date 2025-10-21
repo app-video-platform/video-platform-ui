@@ -98,13 +98,13 @@ const GalUserDropdown: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="dropdown-item">
+            <div className="dropdown-item dev-items">
               <Link to="/dev-dashboard">Dev Dashboard</Link>
               <Link
                 target="_blank"
                 to="https://luxury-klepon-a62307.netlify.app/"
               >
-                DOCS
+                Docusaurus
               </Link>
             </div>
             <hr />
