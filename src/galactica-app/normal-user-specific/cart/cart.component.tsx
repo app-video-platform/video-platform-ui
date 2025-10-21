@@ -25,6 +25,8 @@ const Cart: React.FC = () => {
   const cartTotal = useSelector(selectShopCartTotal);
   const wishlistIds = useSelector(selectWishlistIds);
 
+  console.log('produs', cartProducts);
+
   const handleRemoveFromCart = (prod: ProductMinimised) => {
     if (prod && prod.id) {
       dispatch(removeProductFromCart(prod.id));

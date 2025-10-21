@@ -47,7 +47,7 @@ const ShopCartDropdown: React.FC = () => {
                 cartItems &&
                 cartItems.map((item) => (
                   <div key={item.id} className="cart-item-box">
-                    <span className="item-title">{item.title}</span>
+                    <span className="item-title">{item.name}</span>{' '}
                     <span className="item-price">{item.price}</span>
                   </div>
                 ))
