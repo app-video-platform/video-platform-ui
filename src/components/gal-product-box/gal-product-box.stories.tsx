@@ -34,7 +34,7 @@ type Story = StoryObj<typeof GalProductCard>;
 
 const mockProduct: ProductMinimised = {
   id: 'p123',
-  title: 'Cinematic Video Course',
+  name: 'Cinematic Video Course',
   type: 'COURSE',
   price: 89,
 };
@@ -47,7 +47,7 @@ export const FreeProduct: Story = {
   args: {
     product: {
       id: 'p124',
-      title: 'Beginner Photography Tips',
+      name: 'Beginner Photography Tips',
       type: 'DOWNLOAD',
       price: 'free',
     } as ProductMinimised,
@@ -58,7 +58,7 @@ export const ConsultationType: Story = {
   args: {
     product: {
       id: 'p125',
-      title: '1:1 Video Consultation',
+      name: '1:1 Video Consultation',
       type: 'CONSULTATION',
       price: 150,
     } as ProductMinimised,

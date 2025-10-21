@@ -44,7 +44,7 @@ export interface ConsultationProduct extends AbstractProductBase {
 
 export interface ProductMinimised {
   id?: string;
-  title?: string;
+  name?: string;
   type?: ProductType;
   price?: number | 'free';
   createdById?: string;

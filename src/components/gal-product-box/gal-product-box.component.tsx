@@ -25,7 +25,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
     <div className="product-card">
       <img
         src={placeholderImage}
-        alt={product.title}
+        alt={product.name}
         className="product-card-image"
       />
       <div className="product-card-details">
@@ -38,7 +38,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
             })} */}
           </span>
         </div>
-        <h3>{product.title}</h3>
+        <h3>{product.name}</h3>
         <div className="type-and-price-line">
           <span>{product.type?.toLowerCase()}</span>
           <span>

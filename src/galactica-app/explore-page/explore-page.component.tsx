@@ -99,7 +99,7 @@ const ExplorePage: React.FC = () => {
                 <div key={idx} className="product-card">
                   <img
                     src={placeholderImage}
-                    alt={product.title}
+                    alt={product.name}
                     className="product-card-image"
                   />
 
@@ -133,7 +133,7 @@ const ExplorePage: React.FC = () => {
                           )}
                       </span>
                     </div>
-                    <h3>{product.title}</h3>
+                    <h3>{product.name}</h3>
                     <div className="type-and-price-line">
                       <span>{product.type?.toLowerCase()}</span>
                       <span>

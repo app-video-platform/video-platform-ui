@@ -42,12 +42,12 @@ const WishlistTab: React.FC = () => {
             <div key={prod.id} className="wishlist-product-card">
               <img
                 src={placeholderImage}
-                alt={prod.title}
+                alt={prod.name}
                 className="product-card-image"
                 height={'150'}
               />
               <div className="wishlist-product-details">
-                <h3>{prod.title}</h3>
+                <h3>{prod.name}</h3>
                 <p>
                   By {prod.createdByName} <span>{prod.createdByTitle}</span>
                 </p>
