@@ -38,7 +38,7 @@ describe('GalProductCard component', () => {
   // };
 
   const baseProductWithoutImage = {
-    title: 'Free Product',
+    name: 'Free Product',
     // image: '',
     // updatedAt: new Date('2022-01-01T00:00:00Z'),
     type: typeForTesting,
@@ -67,7 +67,7 @@ describe('GalProductCard component', () => {
 
     // Verify product name.
     const productName = screen.getByRole('heading', { level: 3 });
-    expect(productName).toHaveTextContent(baseProductWithoutImage.title);
+    expect(productName).toHaveTextContent(baseProductWithoutImage.name);
 
     // Verify updated date is rendered in the correct format.
     // expect(screen.getByText(formattedDate)).toBeInTheDocument();
