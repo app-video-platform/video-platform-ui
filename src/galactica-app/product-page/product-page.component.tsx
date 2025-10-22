@@ -7,7 +7,7 @@ import { AppDispatch } from '../../store/store';
 import './product-page.styles.scss';
 import { getProductByProductId } from '../../store/product-store/product.slice';
 import GalButton from '../../components/gal-button/gal-button.component';
-import GalExpansionPanel from '../../components/gal-expansion-panel/gal-expansion-panel.component';
+import GalExpansionPanel from '../../components/gal-expansion-group/gal-expansion-panel/gal-expansion-panel.component';
 import { selectAuthUser } from '../../store/auth-store/auth.selectors';
 import { AbstractProduct, ProductType } from '../../api/types/products.types';
 // eslint-disable-next-line @typescript-eslint/no-var-requires

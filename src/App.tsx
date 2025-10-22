@@ -42,6 +42,7 @@ import DownloadPackagesTab from './galactica-app/normal-user-specific/library-pa
 import ConsultationTab from './galactica-app/normal-user-specific/library-page/consultation-tab/consultation-tab.component';
 import WishlistTab from './galactica-app/normal-user-specific/library-page/wishlist-tab/wishlist-tab.component';
 import RoutesDev from './static-pages/__routes-dev';
+import Checkout from './galactica-app/normal-user-specific/checkout/checkout.component';
 
 const App = () => {
   const user = useSelector(selectAuthUser);
@@ -177,6 +178,7 @@ const App = () => {
             <Route path="my-page-preview" element={<UserPagePreview />} />
 
             <Route path="cart" element={<Cart />} />
+            <Route path="checkout" element={<Checkout />} />
 
             {/* Fallback inside /app */}
             <Route path="*" element={<Navigate to="/app" replace />} />
