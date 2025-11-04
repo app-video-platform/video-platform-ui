@@ -15,12 +15,14 @@ import {
   removeProductFromCart,
 } from '../../../store/shop-cart/shop-cart.slice';
 import { selectWishlistIds } from '../../../store/wishlist/wishlist.selectors';
+import { useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../assets/image-placeholder.png');
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const cartProducts = useSelector(selectAllShopCartProducts);
   const cartTotal = useSelector(selectShopCartTotal);
   const wishlistIds = useSelector(selectWishlistIds);
@@ -98,7 +100,11 @@ const Cart: React.FC = () => {
                   <span>free</span>
                 )}
               </h2>
-              <GalButton text="Procees to checkout ->" type="primary" />
+              <GalButton
+                text="Procees to checkout ->"
+                type="primary"
+                onClick={() => navigate('/app/checkout')}
+              />
             </aside>
           </section>
         </>

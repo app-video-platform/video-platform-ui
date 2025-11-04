@@ -3,7 +3,7 @@ import ContactForm from '../../components/gal-contact-form/gal-contact-form.comp
 
 import './contact.styles.scss';
 import GalCtaSection from '../../components/gal-cta-section/gal-cta-section.component';
-import GalExpansionPanel from '../../components/gal-expansion-panel/gal-expansion-panel.component';
+import GalExpansionPanel from '../../components/gal-expansion-group/gal-expansion-panel/gal-expansion-panel.component';
 
 const Contact: React.FC = () => (
   <main className="contact-page">
