@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpClient from '../../http-client';
-import { getCookie } from '../../../utils/cookie.util';
+import { getCookie } from '@shared/utils';
 
 import {
   createProductAPI,
@@ -24,7 +24,7 @@ import {
 } from './products-api';
 
 jest.mock('../../http-client');
-jest.mock('../../../utils/cookie.util', () => ({
+jest.mock('@shared/utils/cookie.util', () => ({
   getCookie: jest.fn(),
 }));
 

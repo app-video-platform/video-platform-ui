@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import httpClient from '../../http-client';
-import { getCookie } from '../../../utils/cookie.util';
+import { getCookie } from '@shared/utils';
 // import { ILesson, ICreateLessonPayload } from '../../models/product/lesson';
 // import {
 //   IMinimalProduct,

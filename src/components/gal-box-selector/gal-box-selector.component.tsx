@@ -1,6 +1,7 @@
 /* eslint-disable indent */
 import React from 'react';
-import { LessonType, ProductType } from '../../api/types/products.types';
+
+import { LessonType, ProductType } from '@api/types';
 
 import './gal-box-selector.styles.scss';
 

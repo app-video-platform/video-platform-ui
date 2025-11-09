@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 // or '@storybook/react-vite' if using Vite
 import GalProductCard from './gal-product-box.component';
 import { MemoryRouter } from 'react-router-dom';
-import { ProductMinimised } from '../../api/models/product/product';
+import { ProductMinimised } from '@api/models';
 
 const meta: Meta<typeof GalProductCard> = {
   title: 'Components/GalProductCard',

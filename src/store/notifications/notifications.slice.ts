@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuidv4 } from 'uuid';
-import { INotification } from '../../api/models/user/notification';
+
+import { INotification } from '@api/models';
 
 interface NotificationsState {
   notifications: INotification[];

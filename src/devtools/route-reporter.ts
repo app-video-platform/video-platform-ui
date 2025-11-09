@@ -1,5 +1,5 @@
 import type { DocNonIndexRouteObject, DocRoute } from './routes.map';
-import { UserRole } from '../api/models/user/user';
+import { UserRole } from '@api/models';
 
 function join(base: string, seg?: string) {
   if (!seg) {

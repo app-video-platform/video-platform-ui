@@ -1,8 +1,6 @@
 import React from 'react';
 
-import GalFormInput from '../gal-form-input/gal-form-input.component';
-import GalCheckboxInput from '../gal-checkbox-input/gal-checkbox-input.component';
-import GalButton from '../gal-button/gal-button.component';
+import { GalFormInput, GalCheckboxInput, GalButton } from '@shared/ui';
 
 import './gal-contact-form.styles.scss';
 
@@ -17,7 +15,7 @@ const GalContactForm: React.FC = () => {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));

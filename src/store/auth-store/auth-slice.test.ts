@@ -1,5 +1,5 @@
 // auth.slice.test.ts
-import { User, UserRole } from '../../api/models/user/user';
+import { User, UserRole } from '@api/models';
 import authReducer, {
   logout,
   setUserProfile,

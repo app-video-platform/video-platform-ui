@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { pathsToModuleNameMapper } = require('ts-jest');
+const { compilerOptions } = require('./tsconfig');
+
 /* eslint-env node */
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
@@ -26,9 +30,10 @@ module.exports = {
   // Allows importing CSS/SCSS files into Jest tests
   moduleNameMapper: {
     '\\.(css|scss)$': 'identity-obj-proxy',
-    '\\.(png|jpe?g|gif|svg)$': '<rootDir>/src/utils/mocks/file.mock.js',
+    '\\.(png|jpe?g|gif|svg)$': '<rootDir>/src/shared/utils/mocks/file.mock.js',
     '^react-icons/(.*)': 'identity-obj-proxy',
-    '\\.mdx$': '<rootDir>/src/utils/mocks/mdx.mock.js',
+    '\\.mdx$': '<rootDir>/src/shared/utils/mocks/mdx.mock.js',
+    ...pathsToModuleNameMapper(compilerOptions.paths || {}, { prefix: '<rootDir>/src/' }),
   },
 
   // Treat `.ts` and `.tsx` explicitly as ES Modules

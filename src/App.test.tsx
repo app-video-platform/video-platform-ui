@@ -1,13 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable indent */
 /// <reference types="@testing-library/jest-dom" />
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+
 import App from './App';
-import { UserRole } from './api/models/user/user';
+import { UserRole } from '@api/models';
 
 // Define a dummy thunk middleware with minimal typing (using any to bypass type conflicts)
 const dummyThunk =
@@ -25,7 +27,7 @@ const middlewares = [dummyThunk] as any;
 const mockStore = configureStore(middlewares);
 
 // Mock getUserProfile and setUserProfile from your auth slice so that the async thunk resolves immediately.
-jest.mock('./store/auth-store/auth.slice', () => ({
+jest.mock('@store/auth-store/auth.slice', () => ({
   getUserProfile: jest.fn(
     () => () =>
       Promise.resolve({
@@ -42,7 +44,7 @@ jest.mock('./store/auth-store/auth.slice', () => ({
 
 // Mock ProtectedRoute to simply render its children.
 // eslint-disable-next-line react/display-name
-jest.mock('./utils/protected-route.util', () =>
+jest.mock('@api/providers/protected-route.util', () =>
   // eslint-disable-next-line react/display-name
   ({ children }: { children: React.ReactNode }) => <>{children}</>,
 );

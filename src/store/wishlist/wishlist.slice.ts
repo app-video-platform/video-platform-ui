@@ -5,7 +5,8 @@ import {
   PayloadAction,
   ThunkAction,
 } from '@reduxjs/toolkit';
-import type { ProductMinimised } from '../../api/models/product/product';
+
+import type { ProductMinimised } from '@api/models';
 import { addProductToCart } from '../shop-cart/shop-cart.slice';
 import { RootState } from '../store';
 

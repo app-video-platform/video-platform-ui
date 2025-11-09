@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { SocialMediaLink } from '../socials/social-media-link';
 
 export interface User {

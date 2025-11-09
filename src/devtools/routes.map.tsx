@@ -1,5 +1,5 @@
 import type { IndexRouteObject, NonIndexRouteObject } from 'react-router-dom';
-import { UserRole } from '../api/models/user/user';
+import { UserRole } from '@api/models';
 
 // Optionally add a small meta type for docs:
 type Meta = {

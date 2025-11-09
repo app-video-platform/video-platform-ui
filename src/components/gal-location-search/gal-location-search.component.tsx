@@ -12,12 +12,13 @@ export interface GalLocation {
 }
 
 interface Props {
+  // eslint-disable-next-line no-unused-vars
   onSelect: (place: GalLocation) => void;
 }
 
 async function fetchStructuredAddress(lat: number, lon: number) {
   const res = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`
+    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`,
   );
   const data = await res.json();
   // data.address might look like:
@@ -29,7 +30,7 @@ async function fetchStructuredAddress(lat: number, lon: number) {
   return { city, country };
 }
 
-export const OSMLocationSearch: React.FC<Props> = ({ onSelect }) => {
+const OSMLocationSearch: React.FC<Props> = ({ onSelect }) => {
   const [value, setValue] = useState<OpeenStreetMap | null>(null);
 
   return (
@@ -52,3 +53,5 @@ export const OSMLocationSearch: React.FC<Props> = ({ onSelect }) => {
     />
   );
 };
+
+export default OSMLocationSearch;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import GalFormInput from '../gal-form-input/gal-form-input.component';
+import { GalFormInput } from '@shared/ui';
 
 interface GalPriceSelectorProps {
   price: 'free' | number;
@@ -13,7 +13,7 @@ const GalPriceSelector: React.FC<GalPriceSelectorProps> = ({
   setPrice,
 }) => {
   const [selectedPriceMode, setSelectedPriceMode] = useState<'free' | 'paid'>(
-    'free'
+    'free',
   );
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const GalPriceSelector: React.FC<GalPriceSelectorProps> = ({
   }, [price]);
 
   const handlePriceModeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { value } = event.target;
     setSelectedPriceMode(value as 'free' | 'paid');

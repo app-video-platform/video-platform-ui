@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import httpClient from '../../http-client';
 import { UpdateUserRequest } from '../../models/user/update-user-request';
 import { User } from '../../models/user/user';

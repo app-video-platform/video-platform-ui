@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react';
 import { CiSearch } from 'react-icons/ci';
 
-import GalIcon from '../gal-icon-component/gal-icon.component';
+import { GalIcon } from '@shared/ui';
 
 import './gal-search.styles.scss';
 

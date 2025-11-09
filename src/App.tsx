@@ -2,46 +2,44 @@ import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import Home from './static-pages/home/home.component';
-import About from './static-pages/about/about.component';
-import EmailSent from './static-pages/email-sent/email-sent.component';
-import SignIn from './static-pages/sign-in/sign-in.component';
-import SignUp from './static-pages/sign-up/sign-up.component';
-import VerifyEmail from './static-pages/verify-email/verify-email.component';
-import AppInitializer from './utils/app-initializer.util';
-import Navigation from './static-pages/nav/nav.component';
-import Contact from './static-pages/contact/contact.component';
-import NotFoundPage from './static-pages/errors/not-found/not-found.component';
-import UnauthorizedPage from './static-pages/errors/unauthorized/unauthorized.component';
-import ProtectedRoute from './utils/protected-route.util';
-import ProductsList from './galactica-app/creator-specific/products/products-list/products-list.component';
-import UserPagePreview from './galactica-app/creator-specific//user-page-preview/user-page-preview.component';
-import Onboarding from './galactica-app/onboarding/onboarding.component';
-import ForgotPassword from './static-pages/forgot-password/forgot-password.component';
-import ProductForm from './galactica-app/creator-specific/products/product-form/product-form.component';
-import Pricing from './static-pages/pricing/pricing.component';
-import SalesPage from './galactica-app/creator-specific/sales-page/sales-page.component';
-import MarketingPage from './galactica-app/creator-specific/marketing-page/marketing-page.component';
-import GalacticaHome from './galactica-app/normal-user-specific/galactica-home/galactica-home.component';
-import DevDashboard from './static-pages/dev-dashboard/dev-dashboard.component';
-import AppLayout from './galactica-app/app-layout/app-layout.component';
-import { UserRole } from './api/models/user/user';
-import LibraryPage from './galactica-app/normal-user-specific//library-page/library-page.component';
-import { selectAuthUser } from './store/auth-store/auth.selectors';
-import AdminPage from './galactica-app/admin-page/admin-page.component';
-import CreatorDashboard from './galactica-app/creator-specific/creator-dashboard/creator-dashboard.component';
-import StorefrontPage from './galactica-app/storefront-page/storefront-page.component';
-import ExplorePage from './galactica-app/explore-page/explore-page.component';
-import ProductPage from './galactica-app/product-page/product-page.component';
-import SettingsPage from './galactica-app/settings-page/settings-page.component';
-import SearchResultsPage from './galactica-app/explore-page/search-page/search-page.component';
-import Cart from './galactica-app/normal-user-specific/cart/cart.component';
-import AllProductsTab from './galactica-app/normal-user-specific/library-page/all-products-tab/all-products-tab.component';
-import CoursesTab from './galactica-app/normal-user-specific/library-page/courses-tab/courses-tab.component';
-import DownloadPackagesTab from './galactica-app/normal-user-specific/library-page/download-packages-tab/download-packages-tab.component';
-import ConsultationTab from './galactica-app/normal-user-specific/library-page/consultation-tab/consultation-tab.component';
-import WishlistTab from './galactica-app/normal-user-specific/library-page/wishlist-tab/wishlist-tab.component';
-import RoutesDev from './static-pages/__routes-dev';
+import RoutesDev from './devtools/__routes-dev';
+import { About, Contact, Home, Pricing } from '@pages/marketing-site';
+import {
+  EmailSent,
+  ForgotPassword,
+  SignIn,
+  SignUp,
+  VerifyEmail,
+} from '@pages/auth';
+import {
+  AdminPage,
+  AllProductsTab,
+  AppLayout,
+  Cart,
+  ConsultationTab,
+  CoursesTab,
+  CreatorDashboard,
+  DownloadPackagesTab,
+  ExplorePage,
+  GalacticaHome,
+  LibraryPage,
+  MarketingPage,
+  Onboarding,
+  ProductForm,
+  ProductPage,
+  ProductsList,
+  SalesPage,
+  SearchResultsPage,
+  SettingsPage,
+  StorefrontPage,
+  UserPagePreview,
+  WishlistTab,
+} from '@pages/app';
+import { DevDashboard, NotFoundPage, UnauthorizedPage } from '@pages/shared';
+import { AppInitializer, ProtectedRoute } from '@api/providers';
+import { UserRole } from '@api/models';
+import { selectAuthUser } from '@store/auth-store';
+import { Navigation } from '@widgets/nav';
 
 const App = () => {
   const user = useSelector(selectAuthUser);

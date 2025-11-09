@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export interface SocialMediaLink {
   id?: string | null;
   platform: SocialPlatforms;

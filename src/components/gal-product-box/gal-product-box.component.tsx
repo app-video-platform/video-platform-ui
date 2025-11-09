@@ -1,13 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// import PlaceholderImage from '../../assets/image-placeholder.png';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../assets/image-placeholder.png');
 
+import { GalButton } from '@shared/ui';
+import { ProductMinimised } from '@api/models';
+
 import './gal-product-box.styles.scss';
-import GalButton from '../gal-button/gal-button.component';
-import { useNavigate } from 'react-router-dom';
-import { ProductMinimised } from '../../api/models/product/product';
 
 interface GalProductCardProps {
   product: ProductMinimised;

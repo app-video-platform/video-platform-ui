@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import httpClient from '../../http-client';
 import {
   ConnectInitRequest,

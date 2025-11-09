@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import GalButton from '../gal-button/gal-button.component';
+import { GalButton } from '@shared/ui';
 
 import './gal-cta-section.styles.scss';
 

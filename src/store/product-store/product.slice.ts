@@ -1,32 +1,31 @@
 /* eslint-disable indent */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  addImageToProductAPI,
-  createProductAPI,
-  getAllProductsByUserIdAPI,
-  updateProductDetailsAPI,
-  updateSectionDetailsAPI,
-  createSectionAPI,
-  createLessonAPI,
-  updateLessonDetailsAPI,
-  deleteLessonAPI,
-  deleteSectionAPI,
-  deleteProductAPI,
-  getProductByProductIdAPI,
-} from '../../api/services/products/products-api';
 
-import { AxiosError } from 'axios';
-import { AbstractProduct, ProductType } from '../../api/types/products.types';
 import {
+  IRemoveProductPayload,
   CourseProductSection,
   CourseSectionCreateRequest,
   CourseSectionUpdateRequest,
-} from '../../api/models/product/section';
-import {
   IRemoveItemPayload,
-  IRemoveProductPayload,
-} from '../../api/models/product/product';
-import { CourseLesson, LessonCreate } from '../../api/models/product/lesson';
+  CourseLesson,
+  LessonCreate,
+} from '@api/models';
+import {
+  createProductAPI,
+  updateProductDetailsAPI,
+  deleteProductAPI,
+  createSectionAPI,
+  updateSectionDetailsAPI,
+  deleteSectionAPI,
+  createLessonAPI,
+  updateLessonDetailsAPI,
+  deleteLessonAPI,
+  getAllProductsByUserIdAPI,
+  addImageToProductAPI,
+  getProductByProductIdAPI,
+} from '@api/services';
+import { AbstractProduct, ProductType } from '@api/types';
+import { extractErrorMessage } from '@shared/utils';
 
 interface ProductState {
   products: null | AbstractProduct[];
@@ -40,15 +39,6 @@ const initialState: ProductState = {
   currentProduct: null, // the product we’re currently creating/editing
   loading: false,
   error: null,
-};
-
-export const extractErrorMessage = (err: unknown): string => {
-  if (err instanceof AxiosError && err.response?.data?.message) {
-    return err.response.data.message;
-  } else if (err instanceof Error) {
-    return err.message;
-  }
-  return 'An unknown error occurred';
 };
 
 export const createCourseProduct = createAsyncThunk<

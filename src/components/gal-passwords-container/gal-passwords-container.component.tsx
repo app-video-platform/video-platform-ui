@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
-import GalFormInput from '../gal-form-input/gal-form-input.component';
+import { GalFormInput } from '@shared/ui';
 
 import './gal-passwords-container.styles.scss';
 
