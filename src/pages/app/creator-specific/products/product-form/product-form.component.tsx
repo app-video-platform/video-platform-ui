@@ -177,7 +177,7 @@ const ProductForm: React.FC = () => {
     const productData: AbstractProduct = {
       name: formData.name,
       description: formData.description,
-      type: 'COURSE' as ProductType,
+      type: formData.type as ProductType,
       price: formData.price,
       status: 'draft',
       userId: user?.id ?? '',
