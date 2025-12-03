@@ -11,6 +11,7 @@ import {
   logoutUser,
 } from '@store/auth-store';
 import { AppDispatch } from '@store/store';
+import { getProfileNameInitials } from '@shared/utils';
 
 import './gal-user-dropdown.styles.scss';
 
@@ -51,12 +52,6 @@ const GalUserDropdown: React.FC = () => {
       .catch((error) => {
         console.error('Logout error:', error);
       });
-  };
-
-  const getProfileNameInitials = (firstName: string, lastName: string) => {
-    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
-    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
-    return `${firstInitial}${lastInitial}`;
   };
 
   if (!user) {

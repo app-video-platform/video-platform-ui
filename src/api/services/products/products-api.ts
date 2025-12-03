@@ -1,22 +1,17 @@
 /* eslint-disable no-console */
 import httpClient from '../../http-client';
 import { getCookie } from '@shared/utils';
-// import { ILesson, ICreateLessonPayload } from '../../models/product/lesson';
-// import {
-//   IMinimalProduct,
-//   INewProductPayload,
-//   IProductResponse,
-//   IRemoveItemPayload,
-//   IRemoveProductPayload,
-//   IUpdateCourseProduct,
-//   IUpdateSectionDetails,
-// } from '../../models/product/product';
 import {
   ConfirmUploadRequestDto,
   FileS3UploadResponseDto,
 } from '../../models/files/confirm-upload';
-import { AbstractProduct, ProductType } from '../../types/products.types';
 import {
+  AbstractProduct,
+  CreateProductPayload,
+  ProductType,
+} from '../../types/products.types';
+import {
+  AbstractProductBase,
   IRemoveItemPayload,
   IRemoveProductPayload,
   ProductMinimised,
@@ -28,7 +23,7 @@ import {
 } from '../../models/product/section';
 import { CourseLesson, LessonCreate } from '../../models/product/lesson';
 
-export const createProductAPI = async (payload: AbstractProduct) => {
+export const createProductAPI = async (payload: CreateProductPayload) => {
   try {
     const response = await httpClient.post<AbstractProduct>(
       'api/products',
@@ -44,7 +39,7 @@ export const createProductAPI = async (payload: AbstractProduct) => {
   }
 };
 
-export const updateProductDetailsAPI = async (payload: AbstractProduct) => {
+export const updateProductDetailsAPI = async (payload: AbstractProductBase) => {
   try {
     const response = await httpClient.put<AbstractProduct>(
       'api/products',

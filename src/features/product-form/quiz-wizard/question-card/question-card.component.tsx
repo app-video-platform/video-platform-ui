@@ -1,19 +1,30 @@
 /* eslint-disable indent */
-import React from 'react';
+import React, { useState } from 'react';
+import clsx from 'clsx';
+import { IoChevronDown } from 'react-icons/io5';
 
-import { GalSelectOption, GalFormInput, GalSelect } from '@shared/ui';
+import {
+  Input,
+  GalIcon,
+  Textarea,
+  Toggle,
+  InfoPopover,
+  ExpansionPanel,
+} from '@shared/ui';
 import { MCQQuestion } from '@api/models';
 import { QuestionType, QuizQuestion } from '@api/types';
 import MCQEditor from '../../editors/mcq-editor/mcq-editor.component';
-import TrueFalseEditor from '../../editors/true-false-editor/true-false-editor.component';
+import { getCssVar } from '@shared/utils';
+import { EditableTitle } from '@features/product-form/editors';
+import { GalBoxSelector } from '@components';
+import { normalizeQuestionForType } from './answer-normalizer.util';
 
 import './question-card.styles.scss';
 
 interface QuestionCardProps {
   question: QuizQuestion;
   index: number;
-  // eslint-disable-next-line no-unused-vars
-  // onTypeChange: (type: QuestionType) => void;
+  readOnly?: boolean;
   // eslint-disable-next-line no-unused-vars
   onChange: (q: QuizQuestion) => void;
   onRemove: () => void;
@@ -24,30 +35,17 @@ interface QuestionCardProps {
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   index,
-  // onTypeChange,
+  readOnly = true,
   onChange,
   onRemove,
   onMove,
 }) => {
-  const typeOptions: GalSelectOption[] = [
-    {
-      label: 'Multiple choice - single answer',
-      value: 'multiple_choice_single',
-    },
-    {
-      label: 'Multiple choice - multiple answers',
-      value: 'multiple_choice_multi',
-    },
-    {
-      label: 'True - false',
-      value: 'true_false',
-    },
-  ];
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const handleTypeChange = (type: string) => {
-    console.log('type change', type);
     const newType = type as QuestionType;
-    const updatedQuestion = { ...question, type: newType } as QuizQuestion;
+    const updatedQuestion = normalizeQuestionForType(question, newType);
+    // const updatedQuestion = { ...question, type: newType } as QuizQuestion;
     onChange(updatedQuestion);
   };
 
@@ -56,76 +54,52 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     ques.type === 'multiple_choice_multi';
 
   return (
-    <div className="question-card">
-      <section className="question-card-top">
-        <div className="qc-meta">
-          <span className="qc-badge">{index + 1}</span>
-        </div>
-        <div className="qc-actions">
-          <button onClick={() => onMove(-1)} disabled={index === 0}>
-            ↑
-          </button>
-          <button onClick={() => onMove(1)}>↓</button>
-          <button className="is-danger" onClick={onRemove}>
-            Delete
-          </button>
-        </div>
-      </section>
+    <ExpansionPanel
+      className="question-card"
+      defaultExpanded={true}
+      header={
+        <>
+          <h4 className="question-index">Question {index + 1}</h4>
+          <EditableTitle
+            value={question.title ?? ''}
+            placeholder="How many cats does Taylor Swift have? (click here to edit)"
+            onChange={(title: string) =>
+              onChange({ ...question, title } as QuizQuestion)
+            }
+            smaller
+          />
+        </>
+      }
+    >
+      <div className="question-row">
+        <GalBoxSelector<QuestionType>
+          selectedOption={question.type}
+          selectFor="question"
+          onSelect={(type) => handleTypeChange(type)}
+          availableOptions={[
+            'multiple_choice_single',
+            'multiple_choice_multi',
+            'true_false',
+          ]}
+        />
 
-      <div className="question-card-body">
-        <div className="qc-title-row">
-          <div className="qc-question">
-            <GalFormInput
-              value={question.title}
-              name="question"
-              label="Question"
-              inputType="text"
-              onChange={(e: { target: { value: string } }) =>
-                onChange({ ...question, title: e.target.value } as QuizQuestion)
-              }
-            />
-          </div>
-
-          <div className="qc-points">
-            <GalFormInput
-              value={question.points}
-              name="points"
-              label="Points"
-              inputType="number"
-              onChange={(e: { target: { value: string } }) =>
-                onChange({
-                  ...question,
-                  points: Number(e.target.value || 0),
-                } as QuizQuestion)
-              }
-            />
-          </div>
-        </div>
-
-        <GalFormInput
-          value={question.explanation ?? ''}
-          name="explanation"
-          label="Explanation (shown after submit)"
-          inputType="text"
+        <Input
+          value={question.points}
+          name="points"
+          label="Points"
+          type="number"
+          readOnly={readOnly}
+          className="points-input"
           onChange={(e: { target: { value: string } }) =>
             onChange({
               ...question,
-              explanation: e.target.value,
+              points: Number(e.target.value || 0),
             } as QuizQuestion)
-          }
-        />
-
-        <GalSelect
-          value={question.type}
-          name="type"
-          label="Question type"
-          options={typeOptions}
-          onChange={(e: { target: { value: string } }) =>
-            handleTypeChange(e.target.value)
           }
         />
       </div>
 
+      <span className="answers-label">Answers</span>
       <div>
         {isQuestionMCType(question) ? (
           <MCQEditor
@@ -141,7 +115,43 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           />
         )}
       </div>
-    </div>
+
+      <div className="shuffle-row">
+        <Toggle
+          label="Suffle answers"
+          checked={question.shuffle}
+          name="shuffle"
+          onChange={(e: { target: { checked: boolean } }) =>
+            onChange({
+              ...question,
+              shuffle: e.target.checked,
+            } as QuizQuestion)
+          }
+        />
+
+        <InfoPopover>
+          <span>
+            If you check this, the question order displayed to your students
+            will be randomized
+          </span>
+        </InfoPopover>
+      </div>
+
+      <Textarea
+        value={question.explanation ?? ''}
+        label="Explanation (shown after submit)"
+        name="explanation"
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+          onChange({
+            ...question,
+            explanation: e.target.value,
+          } as QuizQuestion)
+        }
+        placeholder="What's the reasoning behind your answer?"
+        isMaxLengthShown={true}
+        maxLength={250}
+      />
+    </ExpansionPanel>
   );
 };
 

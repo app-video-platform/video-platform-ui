@@ -2,7 +2,7 @@ import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { MultiStepFormData } from '../multi-step-form.component';
-import { GalFormInput } from '@shared/ui';
+import { Input } from '@shared/ui';
 
 import './step-two.styles.scss';
 
@@ -29,7 +29,7 @@ const StepTwo: React.FC = () => {
           return (
             <>
               <label className="onboarding-input-label">Title</label>
-              <GalFormInput
+              <Input
                 type="text"
                 value={field.value}
                 onChange={field.onChange}

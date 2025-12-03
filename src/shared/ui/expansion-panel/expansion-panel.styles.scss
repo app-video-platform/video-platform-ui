@@ -1,0 +1,69 @@
+@use '../../../styles/index.scss' as *;
+
+.expansion-panel {
+  padding: $spacing-5;
+  width: 100%;
+  border: 1px solid transparent;
+
+  &.disabled {
+    border-color: $neutral-medium;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .expansion-panel-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .panel-header-content {
+      flex: 1;
+      margin-right: $spacing-3;
+    }
+
+    .panel-toggle-btn {
+      border: none;
+      background: transparent;
+      padding: $spacing-1;
+      border-radius: 50%;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: $accent-secondary-dark;
+      }
+    }
+
+    .panel-chevron {
+      transition: transform 0.2s ease;
+
+      &.expanded {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .expansion-panel-content {
+    transition:
+      max-height 0.25s ease,
+      opacity 0.2s ease,
+      display 2s ease;
+
+    &.collapsed {
+      max-height: 0;
+      opacity: 0;
+      display: none;
+    }
+
+    &.expanded {
+      opacity: 1;
+      max-height: max-content;
+      display: block;
+    }
+  }
+}

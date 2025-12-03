@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { GalFormInput, GalButton } from '@shared/ui';
+import { Button, Input, Radio, RadioGroup } from '@shared/ui';
 import { MCQQuestion, QuizDraft } from '@api/models';
 import { QuizQuestion } from '@api/types';
 import QuestionCard from './question-card/question-card.component';
@@ -21,25 +21,87 @@ const emptyMCQ: MCQQuestion = {
   type: 'multiple_choice_single',
   points: 1,
   explanation: '',
+  shuffle: true,
   options: [
-    { id: uid(), text: '0', isCorrect: false },
-    { id: uid(), text: 'more than 0', isCorrect: true },
+    { id: uid(), text: '0', isCorrect: false, position: 1 },
+    { id: uid(), text: 'more than 0', isCorrect: true, position: 2 },
   ],
+};
+
+const splitPointsEvenly = (total: number, count: number): number[] => {
+  if (count <= 0) {
+    return [];
+  }
+  const base = Math.floor(total / count);
+  let remainder = total - base * count;
+
+  return Array.from({ length: count }, () => {
+    const extra = remainder > 0 ? 1 : 0;
+    if (remainder > 0) {
+      remainder -= 1;
+    }
+    return base + extra;
+  });
 };
 
 const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
   const [quiz, setQuiz] = useState<QuizDraft>(() => ({
     id: initial?.id ?? uid(),
-    title: initial?.title ?? 'Untitled Quiz',
-    description: initial?.description ?? '',
     questions: initial?.questions ?? [emptyMCQ],
     passingScore: initial?.passingScore ?? 70,
   }));
+
+  const [scoreType, setScoreType] = useState<'auto' | 'manual'>('auto');
 
   const totalPoints = useMemo(
     () => quiz.questions.reduce((sum, q) => sum + q.points, 0),
     [quiz.questions],
   );
+
+  useEffect(() => {
+    if (scoreType !== 'auto') {
+      return;
+    }
+
+    setQuiz((qz) => {
+      const count = qz.questions.length;
+      if (!count) {
+        return qz;
+      }
+
+      const total = qz.totalScore ?? totalPoints;
+      const perQuestion = splitPointsEvenly(total, count);
+
+      let changed = false;
+      const nextQuestions = qz.questions.map((q, idx) => {
+        const nextPoints = perQuestion[idx];
+        if (q.points !== nextPoints) {
+          changed = true;
+          return { ...q, points: nextPoints };
+        }
+        return q;
+      });
+
+      if (!changed) {
+        return qz;
+      }
+      return { ...qz, questions: nextQuestions };
+    });
+  }, [scoreType, quiz.totalScore, quiz.questions.length, totalPoints]);
+
+  // Manual mode: keep totalScore in sync with sum of question points
+  useEffect(() => {
+    if (scoreType !== 'manual') {
+      return;
+    }
+
+    setQuiz((qz) => {
+      if (qz.totalScore === totalPoints) {
+        return qz;
+      }
+      return { ...qz, totalScore: totalPoints };
+    });
+  }, [scoreType, totalPoints]);
 
   const updateQuestion = (qid: string, next: QuizQuestion) => {
     setQuiz((qz) => ({
@@ -76,50 +138,34 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
     }));
   };
 
-  // const onTypeChange = (quest: QuizQuestion, type: QuestionType) => {
-  //   const foundQuestion = quiz.questions.find((q) => quest.id === q.id);
-  //   if (foundQuestion) {
-  //     const updatedQuestion: QuizQuestion = { ...foundQuestion, type: type };
-  //     setQuiz((qz) => ({
-  //       ...qz,
-  //       questions: qz.questions.map((q) =>
-  //         q.id === quest.id ? updatedQuestion : q,
-  //       ),
-  //     }));
-  //   }
-  // };
-
   return (
     <div className="quiz-wizard">
-      <GalFormInput
-        value={quiz.title}
-        label="Title"
-        name="title"
-        inputType="text"
-        onChange={(e: { target: { value: any } }) =>
-          setQuiz((q) => ({ ...q, title: e.target.value }))
-        }
-      />
+      <RadioGroup
+        name="scoreType"
+        value={scoreType}
+        onChange={(v) => setScoreType(v as 'auto' | 'manual')}
+        label="Points distribution"
+        className="score-radios"
+      >
+        <Radio
+          value="auto"
+          label="Auto-Split"
+          description="Distribute the total points evenly across all questions."
+        />
+        <Radio
+          value="manual"
+          label="Manual Split"
+          description="Set points on each question individually."
+        />
+      </RadioGroup>
 
-      <GalFormInput
-        value={quiz.description ?? ''}
-        label="Description"
-        name="description"
-        inputType="textarea"
-        onChange={(e: { target: { value: any } }) =>
-          setQuiz((q) => ({ ...q, description: e.target.value }))
-        }
-      />
-
-      <div className="quiz-wiz-content">
-        <div>
-          Total points: <strong>{totalPoints}</strong>
-        </div>
-        <GalFormInput
+      <div className="scores-row">
+        <Input
           value={quiz.passingScore ?? 80}
           label="Passing Score"
-          name="passing_score"
-          inputType="text"
+          name="passingScore"
+          type="number"
+          className="score-input"
           onChange={(e: { target: { value: any } }) =>
             setQuiz((q) => ({
               ...q,
@@ -127,29 +173,46 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
             }))
           }
         />
-
-        <section className="space-y-4">
-          {quiz.questions.map((q, idx) => (
-            <QuestionCard
-              key={idx}
-              question={q}
-              index={idx}
-              // onTypeChange={(type) => onTypeChange(q, type)}
-              onChange={(next) => updateQuestion(q.id, next)}
-              onRemove={() => removeQuestion(q.id)}
-              onMove={(dir) => moveQuestion(q.id, dir)}
-            />
-          ))}
-        </section>
-
-        <section>
-          <GalButton
-            text="Add question"
-            type="primary"
-            onClick={() => addQuestion()}
-          />
-        </section>
+        <Input
+          value={scoreType === 'auto' ? (quiz.totalScore ?? 0) : totalPoints}
+          label="Total points"
+          name="totalPoints"
+          className="score-input"
+          type="number"
+          readOnly={scoreType === 'manual'}
+          onChange={(e) => {
+            if (scoreType === 'manual') {
+              return;
+            }
+            const value = Number(e.target.value || 0);
+            setQuiz((q) => ({
+              ...q,
+              totalScore: value,
+            }));
+          }}
+        />
       </div>
+
+      <section className="questions">
+        {quiz.questions.map((q, idx) => (
+          <QuestionCard
+            key={idx}
+            question={q}
+            index={idx}
+            readOnly={scoreType === 'auto'}
+            // onTypeChange={(type) => onTypeChange(q, type)}
+            onChange={(next) => updateQuestion(q.id, next)}
+            onRemove={() => removeQuestion(q.id)}
+            onMove={(dir) => moveQuestion(q.id, dir)}
+          />
+        ))}
+      </section>
+
+      <section>
+        <Button type="button" variant="primary" onClick={() => addQuestion()}>
+          Add question
+        </Button>
+      </section>
     </div>
   );
 };

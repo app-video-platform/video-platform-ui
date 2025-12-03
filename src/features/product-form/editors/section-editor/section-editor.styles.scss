@@ -1,12 +1,44 @@
-.section-container {
-  margin-bottom: 1rem;
-  background-color: white;
-  padding: 30px;
-  border-radius: 20px;
+@use '../../../../styles/index.scss' as *;
+
+.section-editor {
+  margin-bottom: $spacing-8;
+  // background-color: $bg-elevated;
+  padding: 0 $spacing-5 $spacing-5;
+  border-radius: $radius-md;
+  position: relative;
+
+  .section-divider {
+    display: inline-flex;
+    width: calc(100% - 52px);
+    align-items: center;
+    position: absolute;
+    top: -15px;
+
+    .divider-title {
+      font-size: 14px;
+      font-family: $font-heading;
+      color: $text-primary;
+    }
+
+    .divider-line {
+      height: 1px;
+      flex: 1;
+      background-color: $text-secondary;
+    }
+  }
 
   .section-header-line {
     display: flex;
     width: 100%;
     justify-content: space-between;
+
+    .section-title-block {
+      display: inline-flex;
+      gap: $spacing-4;
+    }
+  }
+
+  .section-description {
+    max-width: 800px;
   }
 }

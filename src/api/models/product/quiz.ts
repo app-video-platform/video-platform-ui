@@ -3,6 +3,7 @@ import { QuestionType, QuizQuestion } from '../../types/quiz.types';
 export interface QuizOption {
   id: string;
   text: string;
+  position: number;
   isCorrect?: boolean; // for MCQ types
 }
 
@@ -12,6 +13,7 @@ export interface QuizQuestionBase {
   type: QuestionType;
   points: number; // award on full correctness
   explanation?: string; // shown after submit
+  shuffle?: boolean;
 }
 
 export interface MCQQuestion extends QuizQuestionBase {
@@ -26,8 +28,7 @@ export interface TrueFalseQuestion extends QuizQuestionBase {
 
 export interface QuizDraft {
   id: string;
-  title: string;
-  description?: string;
   questions: QuizQuestion[];
   passingScore?: number; // optional passing threshold in %
+  totalScore?: number;
 }

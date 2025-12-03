@@ -1,0 +1,74 @@
+@use '../../../styles/index.scss' as *;
+
+.select-wrapper {
+  position: relative;
+  min-width: 100px;
+
+  .select-row {
+    position: relative;
+    display: inline-flex;
+    width: 100%;
+
+    .select-prefix {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+    }
+
+    .select-field {
+      appearance: none;
+      background-color: $bg-base;
+      color: $text-primary;
+      // font-size: 16px;
+      padding: $spacing-4 $spacing-5;
+      padding-right: 40px;
+      display: block;
+      width: 100%;
+      border: none;
+      border-radius: $radius-lg;
+      border: 1px solid $bg-elevated;
+
+      &:focus {
+        outline: none;
+        border-color: $accent-primary;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+      }
+    }
+
+    .select-with-prefix {
+      padding-left: 40px;
+      // padding-right: 50px;
+    }
+
+    .select-chevron {
+      position: absolute;
+      right: 14px;
+      bottom: 15px;
+      pointer-events: none;
+    }
+
+    &__small {
+      .form-select {
+        padding: $spacing-2 $spacing-4;
+      }
+
+      .select-chevron {
+        bottom: 6px;
+      }
+    }
+  }
+
+  .form-select-label {
+    display: block;
+    font-size: 12px;
+    pointer-events: none;
+    color: $text-secondary;
+    margin-bottom: $spacing-1;
+    margin-left: $spacing-3;
+  }
+
+  .field-error {
+    font-size: 9px;
+    color: $error;
+  }
+}

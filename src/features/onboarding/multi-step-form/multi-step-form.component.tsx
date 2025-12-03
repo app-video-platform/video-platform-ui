@@ -10,7 +10,7 @@ import StepTwo from './step-two/step-two.component';
 import StepThree from './step-three/step-three.component';
 import StepFour from './step-four/step-four.component';
 import StepFive from './step-five/step-five.component';
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import { SocialMediaLink, UpdateUserRequest } from '@api/models';
 import { selectAuthUser, updateUserDetails } from '@store/auth-store';
 import { AppDispatch } from '@store/store';
@@ -139,36 +139,36 @@ const MultiStepForm: React.FC = () => {
           )}
         </div>
         <div className="step-action-buttons">
-          <GalButton
-            htmlType="button"
+          <Button
+            type="button"
+            variant="neutral"
             onClick={() => navigate('/app')}
-            text="Skip"
-            type="neutral"
-          />
+          >
+            Skip
+          </Button>
           {step !== 1 && (
-            <GalButton
-              htmlType="button"
-              onClick={prevStep}
-              text="Back"
-              type="primary"
-            />
+            <Button type="button" variant="primary" onClick={prevStep}>
+              Back
+            </Button>
           )}
           {step !== 5 && (
-            <GalButton
-              htmlType="button"
+            <Button
+              type="button"
+              variant="primary"
               onClick={methods.handleSubmit(onStepValid)}
-              type="primary"
-              text="Next"
-            />
+            >
+              Next
+            </Button>
           )}
 
           {step === 5 && (
-            <GalButton
+            <Button
+              type="button"
+              variant="primary"
               onClick={() => navigate('/app')}
-              htmlType="button"
-              text="Continue"
-              type="primary"
-            />
+            >
+              Continue
+            </Button>
           )}
         </div>
       </FormProvider>

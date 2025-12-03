@@ -2,6 +2,7 @@ import {
   DownloadProduct,
   CourseProduct,
   ConsultationProduct,
+  AbstractProductBase,
 } from '../models/product/product';
 
 export type AbstractProduct =
@@ -11,6 +12,18 @@ export type AbstractProduct =
 
 export type ProductType = 'COURSE' | 'DOWNLOAD' | 'CONSULTATION';
 
-export type ProductStatus = 'draft' | 'published' | 'hidden';
+export type ProductStatus = 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
 
 export type LessonType = 'VIDEO' | 'ARTICLE' | 'QUIZ' | 'ASSIGNMENT';
+
+export type ProductWithSections = Extract<
+  AbstractProduct,
+  { type: 'COURSE' | 'DOWNLOAD' }
+>;
+
+export type Section = NonNullable<ProductWithSections['sections']>[number];
+
+export type CreateProductPayload = Pick<
+  AbstractProductBase,
+  'name' | 'status' | 'type' | 'userId'
+>;

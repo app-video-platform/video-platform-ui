@@ -1,20 +1,15 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  Controller,
-  FormProvider,
-  useForm,
-  useFormContext,
-} from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '@store/auth-store';
-import { GalFormInput } from '@shared/ui';
+import { Button, Input } from '@shared/ui';
+import { SettingsSection } from '../settings-section';
 
 export interface PaymentMethodFormData {
-  profileImage: string;
-  title: string;
-  bio: string;
-  website: string;
+  businessName: string;
+  businessType: 'company' | 'individual';
+  vat: string;
 }
 
 const SettingsPaymentMethodTab: React.FC = () => {
@@ -22,10 +17,9 @@ const SettingsPaymentMethodTab: React.FC = () => {
 
   const methods = useForm<PaymentMethodFormData>({
     defaultValues: {
-      title: '',
-      bio: '',
-      website: '',
-      profileImage: '',
+      businessName: '',
+      businessType: 'individual',
+      vat: '',
     },
     mode: 'onTouched',
   });
@@ -33,51 +27,56 @@ const SettingsPaymentMethodTab: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <Controller
-        name="title"
-        control={control}
-        rules={{
-          maxLength: {
-            value: 50,
-            message: 'Titles must be 50 characters or fewer',
-          },
-          minLength: {
-            value: 2,
-            message: 'Title must be at least 2 characters',
-          },
-        }}
-        render={({ field, fieldState }) => {
-          const hasError = !!fieldState.error;
-          return (
-            <>
-              <label className="onboarding-input-label">Notifications</label>
-              <GalFormInput
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                className={`form-input onboarding-form-input${
-                  hasError ? ' onboarding-form-input__error' : ''
-                }`}
-                placeholder="Notifications"
-                aria-describedby={
-                  fieldState.error ? `${field.name}-error` : undefined
-                }
-                onBlur={(e: { target: { value: string } }) =>
-                  field.onChange(e.target.value.trim())
-                }
-                isMaxLengthShown={true}
-                maxLength={50}
-              />
-              {fieldState.error && (
-                <p className="form-field-error error-text-red">
-                  {fieldState.error.message}
-                </p>
-              )}
-            </>
-          );
-        }}
-      />
+      <div className="settings-header">
+        <div className="title-wrapper">
+          <h2>Payment Method</h2>
+          <p style={{ fontSize: 14 }}>Add Payment Method</p>
+        </div>
+      </div>
+
+      <hr className="category-line" />
+
+      <SettingsSection
+        title="Business"
+        subTitle="Add your business information"
+      >
+        <Controller
+          name="businessName"
+          control={control}
+          render={({ field }) => (
+            <Input
+              type="text"
+              label="Business Name"
+              value={field.value}
+              onChange={field.onChange}
+              name={field.name}
+            />
+          )}
+        />
+
+        <Controller
+          name="vat"
+          control={control}
+          render={({ field }) => (
+            <Input
+              type="text"
+              label="VAT / Tax ID"
+              value={field.value}
+              onChange={field.onChange}
+              name={field.name}
+            />
+          )}
+        />
+      </SettingsSection>
+
+      <hr className="category-line" />
+
+      <SettingsSection
+        title="Payment Provider"
+        subTitle="Connect your payment provider"
+      >
+        <Button variant="tertiary">Connect</Button>
+      </SettingsSection>
     </FormProvider>
   );
 };

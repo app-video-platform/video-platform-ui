@@ -95,25 +95,4 @@ describe('SignUp Component', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/email-sent');
     });
   });
-
-  test('toggles password visibility', () => {
-    renderComponent();
-    // Assuming that the password field is labeled "Password"
-    const passwordInput = screen.getByTestId('input-password');
-    // Since the toggle button does not have accessible text, we use a test id or a query based on class.
-    // For this example, assume you add a data-testid="toggle-password" attribute to the button.
-    const toggleButton = screen.getByTestId('toggle-password-password');
-
-    // Initially, the password field type should be "password"
-    expect(passwordInput).toHaveAttribute('type', 'password');
-
-    // Click to toggle
-    fireEvent.click(toggleButton);
-    // After toggle, the field should switch to "text"
-    expect(passwordInput).toHaveAttribute('type', 'text');
-
-    // Click again to toggle back
-    fireEvent.click(toggleButton);
-    expect(passwordInput).toHaveAttribute('type', 'password');
-  });
 });

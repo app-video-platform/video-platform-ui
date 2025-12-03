@@ -1,8 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
 /**
  * product-form.test.tsx
  */
@@ -17,143 +13,154 @@ import {
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// ── (1) ALWAYS mock react-redux at the top, so useSelector/useDispatch become Jest mocks ──
-jest.mock('react-redux', () => ({
+// ── 1) Mock @components (GalPriceSelector) ──────────────────────────────
+jest.mock('@components', () => ({
   __esModule: true,
-  useSelector: jest.fn(),
-  useDispatch: jest.fn(),
+  GalPriceSelector: ({ price }: { price: number }) => (
+    <div data-testid="price-selector">
+      GalPriceSelector (price: {String(price)})
+    </div>
+  ),
 }));
-import { useSelector, useDispatch } from 'react-redux';
 
-// ── (2) Mock selectors & action creators ──
-jest.mock('@store/auth-store/auth.selectors', () => ({
-  selectAuthUser: jest.fn(),
-}));
-import { selectAuthUser } from '@store/auth-store';
-
-jest.mock('@store/product-store/product.slice', () => ({
-  updateCourseProductDetails: jest.fn(),
-}));
-import { updateCourseProductDetails } from '@store/product-store';
-
-// ── (3) Provide a “default” mock for CreateProductStepOne that *does* set fields ──
-// This will be used by most tests.
-jest.mock(
-  '@features/product-form/editors/create-product-step-one/create-product-step-one.component',
-  () => ({
-    __esModule: true,
-    default: ({ setField, setShowRestOfForm }: any) => (
-      <button
-        data-testid="step-one-continue"
-        onClick={() => {
-          // This mock *does* populate all required fields + showRestOfForm
-          setField('id', 'test-id-123');
-          setField('name', 'My Test Course');
-          setField('type', 'COURSE');
-          setField('description', 'Some description');
-          setShowRestOfForm(true);
-        }}
-      >
-        Continue
-      </button>
-    ),
-  }),
-);
-
-// ── (4) Mock the other child components and <GalButton> exactly as before ──
-jest.mock(
-  '@components/gal-price-selector/gal-price-selector.component',
-  () => ({
-    __esModule: true,
-    default: ({ price }: any) => (
-      <div data-testid="price-selector">
-        GalPriceSelector (current: {String(price)})
-      </div>
-    ),
-  }),
-);
-
-jest.mock(
-  '@shared/ui/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
-  () => ({
-    __esModule: true,
-    default: ({ onFilesChange }: any) => (
-      <button
-        data-testid="file-uploader"
-        onClick={() => {
-          const fakeFile = new File([''], 'image.png', {
-            type: 'image/png',
-          });
-          onFilesChange([fakeFile]);
-        }}
-      >
-        Upload Image
-      </button>
-    ),
-  }),
-);
-
-jest.mock(
-  '@features/product-form/create-product-sections/create-product-sections.component',
-  () => ({
-    __esModule: true,
-    default: ({ productType, productId }: any) => (
-      <div data-testid="create-sections">
-        CreateProductSections (type: {productType}, id: {productId})
-      </div>
-    ),
-  }),
-);
-
-jest.mock('@shared/ui/gal-button/gal-button.component', () => ({
+// ── 2) Mock @shared/ui (GalUppyFileUploader) ────────────────────────────
+jest.mock('@shared/ui', () => ({
   __esModule: true,
-  default: ({ text, htmlType }: any) => (
-    <button
-      data-testid={`btn-${text.replace(/\s+/g, '-').toLowerCase()}`}
-      type={htmlType}
-    >
-      {text}
+  GalUppyFileUploader: ({
+    onFilesChange,
+  }: {
+    onFilesChange: (files: File[]) => void;
+    allowedFileTypes?: string[];
+    disableImporters?: boolean;
+  }) => (
+    <button data-testid="file-uploader" onClick={() => onFilesChange([])}>
+      Upload Image
     </button>
   ),
 }));
 
-// ── (5) Set up a fakeDispatch (returns an object with unwrap()) ──
-const mockDispatch = jest.fn((action: any) => ({
-  unwrap: () => Promise.resolve({ updated: true, id: 'test-id-123' }),
+// ── 3) Mock @features/product-form (facade + children) ──────────────────
+const mockUseProductFormFacade = jest.fn();
+const mockUseProductFormAnimation = jest.fn();
+
+jest.mock('@features/product-form', () => ({
+  __esModule: true,
+  // hooks
+  useProductFormFacade: (...args: any[]) => mockUseProductFormFacade(...args),
+  useProductFormAnimation: (...args: any[]) =>
+    mockUseProductFormAnimation(...args),
+
+  // step one: just a button that can toggle showRestOfForm
+  CreateProductStepOne: ({
+    setShowRestOfForm,
+  }: {
+    setShowRestOfForm: (show: boolean) => void;
+  }) => (
+    <button
+      data-testid="step-one-continue"
+      onClick={() => setShowRestOfForm(true)}
+    >
+      Continue
+    </button>
+  ),
+
+  // basic info tab stub
+  BasicInfo: () => <div data-testid="basic-info">BasicInfo</div>,
+
+  // consultation details tab stub
+  ConsultationDetails: () => (
+    <div data-testid="consultation-details">ConsultationDetails</div>
+  ),
+
+  // sections editor stub
+  CreateProductSections: ({
+    productType,
+    productId,
+  }: {
+    productType: string;
+    productId: string;
+  }) => (
+    <div data-testid="create-sections">
+      CreateProductSections (type: {productType}, id: {productId})
+    </div>
+  ),
+
+  // sidebar stub with tab buttons
+  BuilderSidebar: ({
+    activeTab,
+    onChange,
+  }: {
+    activeTab: string | null;
+    onChange: (tab: any) => void;
+  }) => (
+    <div data-testid="builder-sidebar">
+      <span data-testid="active-tab">{activeTab ?? 'none'}</span>
+      <button data-testid="tab-basics" onClick={() => onChange('basics')}>
+        Basics
+      </button>
+      <button data-testid="tab-pricing" onClick={() => onChange('pricing')}>
+        Pricing
+      </button>
+      <button data-testid="tab-sections" onClick={() => onChange('sections')}>
+        Sections
+      </button>
+      <button
+        data-testid="tab-consultation-details"
+        onClick={() => onChange('consultation-details')}
+      >
+        Consultation
+      </button>
+      <button data-testid="tab-media" onClick={() => onChange('media')}>
+        Media
+      </button>
+    </div>
+  ),
+
+  // runtime placeholders for types (not actually used at runtime)
+  BuilderTab: {} as any,
+  SectionDraft: {} as any,
 }));
 
-// ── (6) Prepare typed aliases for the mocks (so TS doesn’t complain) ──
-const mockedUseSelector = useSelector as jest.MockedFunction<
-  typeof useSelector
->;
-const mockedUseDispatch = useDispatch as jest.MockedFunction<
-  typeof useDispatch
->;
-const mockedUpdateCourse = updateCourseProductDetails as jest.MockedFunction<
-  typeof updateCourseProductDetails
->;
+// ── 4) Import component under test (after mocks) ────────────────────────
+import ProductForm from './product-form.component';
 
-// ── (7) Common setup: always clear mocks & have useDispatch return mockDispatch ──
-beforeEach(() => {
-  jest.clearAllMocks();
-  mockedUseDispatch.mockReturnValue(mockDispatch as any); // “as any” silences TS here
-});
-
+// ── 5) Helpers ───────────────────────────────────────────────────────────
 afterEach(() => {
   cleanup();
+  jest.clearAllMocks();
 });
 
-describe('<ProductForm />', () => {
-  test('renders “must be logged in” if no user', () => {
-    mockedUseSelector.mockImplementation((selector) => {
-      if (selector === selectAuthUser) {
-        return null;
-      }
-      return undefined;
-    });
+const makeFacadeState = (overrides: Partial<any> = {}) => ({
+  user: { id: 'user-123' },
+  formData: {
+    id: 'prod-1',
+    name: 'My Product',
+    description: '',
+    type: 'COURSE',
+    price: 0,
+    sections: [],
+  },
+  setFormData: jest.fn(),
+  setField: jest.fn(),
+  handleSetPrice: jest.fn(),
+  handleImageChange: jest.fn(),
+  showRestOfForm: true,
+  setShowRestOfForm: jest.fn(),
+  showLoadingRestOfForm: false,
+  setShowLoadingRestOfForm: jest.fn(),
+  errors: {},
+  handleSubmit: jest.fn((e?: React.FormEvent) => e && e.preventDefault()),
+  handleSidebarSectionClick: jest.fn(),
+  handleSidebarLessonClick: jest.fn(),
+  sidebarSections: [],
+  ...overrides,
+});
 
-    // Import the component normally (uses the default mock CreateProductStepOne)
-    const { default: ProductForm } = require('./product-form.component');
+// ── 6) Tests ─────────────────────────────────────────────────────────────
+describe('<ProductForm />', () => {
+  it('renders “must be logged in” if no user', () => {
+    mockUseProductFormFacade.mockReturnValue(makeFacadeState({ user: null }));
+
     render(<ProductForm />);
 
     expect(
@@ -161,94 +168,136 @@ describe('<ProductForm />', () => {
     ).toBeInTheDocument();
   });
 
-  test('shows step-one button & hides rest of form when user is present', () => {
-    mockedUseSelector.mockImplementation((selector) => {
-      if (selector === selectAuthUser) {
-        return { id: 'user-123' };
-      }
-      return undefined;
+  it('shows step-one hero when user is present but showRestOfForm is false', () => {
+    const state = makeFacadeState({
+      showRestOfForm: false,
+      formData: {
+        id: '',
+        name: '',
+        description: '',
+        type: undefined,
+        price: 0,
+        sections: [],
+      },
     });
 
-    const { default: ProductForm } = require('./product-form.component');
+    mockUseProductFormFacade.mockReturnValue(state);
+
     render(<ProductForm />);
 
+    // Step one button visible
     expect(screen.getByTestId('step-one-continue')).toBeInTheDocument();
-    expect(screen.queryByTestId('price-selector')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('file-uploader')).not.toBeInTheDocument();
+
+    // Builder not visible yet
+    expect(screen.queryByTestId('builder-sidebar')).not.toBeInTheDocument();
     expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId('btn-update-product-details'),
-    ).not.toBeInTheDocument();
   });
 
-  test('clicking “Continue” (default step-one) shows price selector, uploader, sections & update button', () => {
-    mockedUseSelector.mockImplementation((selector) => {
-      if (selector === selectAuthUser) {
-        return { id: 'user-123' };
-      }
-      return undefined;
+  it('when showRestOfForm is true for a COURSE, shows sections builder after effect', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'prod-1',
+        name: 'Course Name',
+        description: '',
+        type: 'COURSE',
+        price: 42,
+        sections: [],
+      },
     });
 
-    const { default: ProductForm } = require('./product-form.component');
+    mockUseProductFormFacade.mockReturnValue(state);
+
     render(<ProductForm />);
 
-    fireEvent.click(screen.getByTestId('step-one-continue'));
+    // Wait until builder/sections show up (activeTab is set via effect)
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+      expect(screen.getByTestId('create-sections')).toBeInTheDocument();
+    });
 
+    // Hero step-one should not be rendered when showRestOfForm is true
+    expect(screen.queryByTestId('step-one-continue')).not.toBeInTheDocument();
+  });
+
+  it('clicking Pricing tab shows the GalPriceSelector panel', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'prod-1',
+        name: 'Course Name',
+        description: '',
+        type: 'COURSE',
+        price: 99,
+        sections: [],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    // Wait for builder to appear (activeTab initially "sections")
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+    });
+
+    // Click the "Pricing" tab in our mocked sidebar
+    fireEvent.click(screen.getByTestId('tab-pricing'));
+
+    // Now the pricing panel should show our GalPriceSelector stub
     expect(screen.getByTestId('price-selector')).toBeInTheDocument();
-    expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
-    expect(screen.getByTestId('create-sections')).toBeInTheDocument();
-    expect(
-      screen.getByTestId('btn-update-product-details'),
-    ).toBeInTheDocument();
+    // And sections panel should be gone
+    expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
   });
 
-  test('submitting with all required fields dispatches + unwraps + alerts', async () => {
-    mockedUseSelector.mockImplementation((selector) => {
-      if (selector === selectAuthUser) {
-        return { id: 'user-123' };
-      }
-      return undefined;
+  it('clicking Media tab shows the image uploader (GalUppyFileUploader)', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'prod-1',
+        name: 'Course Name',
+        description: '',
+        type: 'COURSE',
+        price: 0,
+        sections: [],
+      },
     });
 
-    // Use the original CreateProductStepOne (the one that *does* fill id/name/type)
-    // Since we mocked it at top, we can just re‐require the component:
-    const { default: ProductForm } = require('./product-form.component');
-
-    // When updateCourseProductDetails is called, return a fake thunk
-    const fakeThunk = Symbol('fakeThunk');
-    mockedUpdateCourse.mockReturnValue(fakeThunk as any);
-
-    // Make dispatch(fakeThunk).unwrap() resolve successfully
-    mockDispatch.mockImplementation((action) => {
-      expect(action).toBe(fakeThunk);
-      return {
-        unwrap: () => Promise.resolve({ updated: true, id: 'test-id-123' }),
-      };
-    });
-
-    // Spy on alert
-    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+    mockUseProductFormFacade.mockReturnValue(state);
 
     render(<ProductForm />);
 
-    // 1) Click the “Continue” button (populates formData and sets showRestOfForm=true)
-    fireEvent.click(screen.getByTestId('step-one-continue'));
-
-    // 2) Click the “Update product details” button
-    fireEvent.click(screen.getByTestId('btn-update-product-details'));
-
-    // Wait for dispatch(fakeThunk) to have been called
     await waitFor(() => {
-      expect(mockDispatch).toHaveBeenCalledWith(fakeThunk);
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
     });
 
-    // Wait for unwrap() → then window.alert(...)
-    await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith(
-        'Course product updated successfully!',
-      );
+    fireEvent.click(screen.getByTestId('tab-media'));
+
+    expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
+  });
+
+  it('submitting the form calls handleSubmit from the facade', async () => {
+    const handleSubmitMock = jest.fn((e?: React.FormEvent) => {
+      if (e) {
+        e.preventDefault();
+      }
     });
 
-    alertSpy.mockRestore();
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      handleSubmit: handleSubmitMock,
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    const { container } = render(<ProductForm />);
+
+    const form = container.querySelector('form');
+    expect(form).not.toBeNull();
+
+    fireEvent.submit(form!);
+
+    expect(handleSubmitMock).toHaveBeenCalled();
   });
 });

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import { GalPasswordsContainer } from '@components';
 
 import './change-password.styles.scss';
@@ -38,13 +38,13 @@ const ChangePassword: React.FC = () => {
         confirmPasswordErrors={errors.confirmPassword}
         handleChange={handleChange}
       />
-
-      <GalButton
-        text="Change password"
-        type="primary"
-        htmlType="button"
+      <Button
+        type="button"
+        variant="primary"
         onClick={() => handlePasswordChange()}
-      />
+      >
+        Change password
+      </Button>
     </>
   );
 };

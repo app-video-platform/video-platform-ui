@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { GalOTPInput, GalButton } from '@shared/ui';
+import { GalOTPInput, Button } from '@shared/ui';
 
 import './enter-code.styles.scss';
 
@@ -37,24 +37,26 @@ const EnterCode: React.FC<EnterCodeProps> = ({
         <GalOTPInput value={code} onChange={handleChange} numInputs={4} />
       </div>
       <div className="button-container">
-        <GalButton
-          text="Continue"
-          htmlType="button"
-          type="primary"
-          customClassName="continue-btn"
+        <Button
+          type="button"
+          variant="primary"
           onClick={() => handleClick()}
-        />
+          className="continue-btn"
+        >
+          Continue
+        </Button>
       </div>
 
       <p className="resend-email">
         Did not receive an email?
-        <GalButton
-          text="Send it again!"
-          htmlType="button"
-          type="neutral"
-          onClick={() => sendEmail}
-          customClassName="send-again-email"
-        />
+        <Button
+          type="button"
+          variant="neutral"
+          onClick={() => sendEmail()}
+          className="send-again-email"
+        >
+          Send it again!
+        </Button>
       </p>
     </div>
   );

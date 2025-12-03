@@ -1,0 +1,56 @@
+@use '../../../styles/index.scss' as *;
+
+.toggle {
+  display: flex;
+  gap: $spacing-3;
+
+  // input[type='checkbox'] {
+  //   display: none;
+  // }
+
+  .toggle-input {
+    position: relative;
+    appearance: none;
+    border-radius: 999px;
+    height: 30px;
+    width: 65px;
+    background-color: $bg-base;
+    // background-color: $bg-base;
+    outline: none;
+    transition: background-color 150ms ease;
+    cursor: pointer;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: $accent-secondary;
+      transition: transform 150ms ease;
+    }
+
+    &:checked {
+      background-color: $accent-primary;
+      border-color: $accent-primary;
+    }
+    &:checked::after {
+      transform: translateX(30px);
+      top: 3px;
+      width: 24px;
+      height: 24px;
+      border-color: $accent-secondary;
+    }
+    &:focus-visible {
+      box-shadow: 0 0 0 3px var(--switch-ring, rgba(59, 130, 246, 0.5));
+    }
+  }
+
+  .toggle-label {
+    font-size: 14px;
+    color: $text-primary;
+    font-weight: 500;
+  }
+}

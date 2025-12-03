@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 
 import './pricing.styles.scss';
 
@@ -33,11 +33,9 @@ const Pricing: React.FC = () => {
               <h3>Monthly</h3>
               <p>Pay monthly, no commitment</p>
             </div>
-            <GalButton
-              type="primary"
-              text="Get Started"
-              onClick={() => console.log('Monthly plan selected')}
-            />
+            <Button type="button" variant="primary">
+              Get Started
+            </Button>
           </div>
         </div>
 
@@ -52,11 +50,10 @@ const Pricing: React.FC = () => {
               <h3>Bi-yearly</h3>
               <p>Save 10% on a 6 month commitment</p>
             </div>
-            <GalButton
-              type="primary"
-              text="Get Started"
-              onClick={() => console.log('Bi-yearly plan selected')}
-            />
+
+            <Button type="button" variant="primary">
+              Get Started
+            </Button>
           </div>
         </div>
 
@@ -71,11 +68,10 @@ const Pricing: React.FC = () => {
               <h3>Yearly</h3>
               <p>Best value! Save 20% with a yearly subscription</p>
             </div>
-            <GalButton
-              type="primary"
-              text="Get Started"
-              onClick={() => console.log('Yearly plan selected')}
-            />
+
+            <Button type="button" variant="primary">
+              Get Started
+            </Button>
           </div>
         </div>
       </div>
@@ -88,16 +84,12 @@ const Pricing: React.FC = () => {
           tortor dolor.
         </p>
         <div className="cta-action-buttons">
-          <GalButton
-            type="primary"
-            text="Contact Us"
-            onClick={handleContactUs}
-          />
-          <GalButton
-            type="secondary"
-            text="Learn More"
-            onClick={() => console.log('Contact Us clicked')}
-          />
+          <Button type="button" variant="primary" onClick={handleContactUs}>
+            Contact Us
+          </Button>
+          <Button type="button" variant="secondary">
+            Learn More
+          </Button>
         </div>
       </div>
     </div>

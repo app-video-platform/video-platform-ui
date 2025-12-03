@@ -7,6 +7,7 @@ import { selectAuthUser } from '@store/auth-store';
 import { selectNotifications } from '@store/notifications';
 
 import './gal-notifications-dropdown.styles.scss';
+import { getCssVar } from '@shared/utils';
 
 const GalNotificationsDropdown: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -21,7 +22,11 @@ const GalNotificationsDropdown: React.FC = () => {
         customClassName="galactica-notifications"
         trigger={({ toggle }) => (
           <button onClick={toggle} className="notifications-button">
-            <GalIcon icon={IoIosNotifications} size={16} />
+            <GalIcon
+              icon={IoIosNotifications}
+              size={16}
+              color={getCssVar('--text-primary')}
+            />
           </button>
         )}
         menu={() => (

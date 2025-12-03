@@ -1,9 +1,8 @@
 /**
  * SectionEditor.test.tsx
- * (Place this file in the same directory as section-editor.component.tsx)
  */
 
-import React, { use } from 'react';
+import React from 'react';
 import {
   render,
   screen,
@@ -13,7 +12,7 @@ import {
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// ── 1) MOCK react-redux useDispatch ───────────────────────────────────────────
+// ── 1) MOCK react-redux ───────────────────────────────────────────
 jest.mock('react-redux', () => ({
   __esModule: true,
   useDispatch: jest.fn(),
@@ -21,115 +20,119 @@ jest.mock('react-redux', () => ({
 }));
 import { useDispatch, useSelector } from 'react-redux';
 
-jest.mock('@store/auth-store/auth.selectors', () => ({
+// ── 2) MOCK selectors / store thunks with UPDATED PATHS ────────────
+jest.mock('@store/auth-store', () => ({
+  __esModule: true,
   selectAuthUser: jest.fn(),
 }));
 import { selectAuthUser } from '@store/auth-store';
 
-// ── 2) MOCK product-store thunks ─────────────────────────────────────────────────
-jest.mock('@store/product-store/product.slice', () => ({
+jest.mock('@store/product-store', () => ({
+  __esModule: true,
   createSection: jest.fn(),
-  updateSectionDetails: jest.fn(),
   deleteSection: jest.fn(),
 }));
-import {
-  createSection,
-  updateSectionDetails,
-  deleteSection,
-} from '@store/product-store';
+import { createSection, deleteSection } from '@store/product-store';
 
-// ── 3) MOCK child components ──────────────────────────────────────────────────────
-
-// 3.1. GalButton → renders a simple <button data-testid="btn-<text>">text</button>
-jest.mock('@shared/ui/gal-button/gal-button.component', () => ({
+// ── 3) MOCK shared UI barrel used by SectionEditor ─────────────────
+jest.mock('@shared/ui', () => ({
   __esModule: true,
-  default: ({
-    text,
-    htmlType,
+  // Minimal Button – we only care about the Remove button
+  Button: ({
+    children,
     onClick,
-    disabled,
+    type,
   }: {
-    text: string;
-    htmlType: 'button' | 'submit';
+    children: React.ReactNode;
     onClick?: () => void;
-    disabled?: boolean;
-    type?: string;
-    customClassName?: string;
+    type?: 'button' | 'submit';
   }) => (
     <button
-      data-testid={`btn-${text.toLowerCase().replace(/\s+/g, '-')}`}
-      type={htmlType}
+      data-testid={
+        typeof children === 'string' &&
+        children.toLowerCase().includes('remove')
+          ? 'btn-remove'
+          : 'btn-generic'
+      }
+      type={type ?? 'button'}
       onClick={onClick}
-      disabled={disabled}
     >
-      {text}
+      {children}
     </button>
   ),
-}));
-
-// 3.2. GalFormInput → renders <input data-testid="input-<name>" …>
-jest.mock('@shared/ui/gal-form-input/gal-form-input.component', () => ({
-  __esModule: true,
-  default: ({
-    label,
-    type,
-    name,
+  // Simple ExpansionPanel stub that just renders header + children
+  ExpansionPanel: ({
+    header,
+    children,
+  }: {
+    header: React.ReactNode;
+    children: React.ReactNode;
+  }) => (
+    <div data-testid="expansion-panel">
+      <div>{header}</div>
+      <div>{children}</div>
+    </div>
+  ),
+  // Simple textarea stub
+  Textarea: ({
     value,
     onChange,
+    ...rest
   }: {
-    label: string;
-    type: string;
-    name: string;
-    value: string;
-    onChange: (e: { target: { name: string; value: string } }) => void;
+    value?: string;
+    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  }) => (
+    <textarea
+      data-testid="section-description"
+      value={value}
+      onChange={onChange}
+      {...rest}
+    />
+  ),
+  // GalUppyFileUploader stub
+  GalUppyFileUploader: ({
+    onFilesChange,
+  }: {
+    onFilesChange: (files: File[]) => void;
+  }) => (
+    <button
+      data-testid="file-uploader"
+      onClick={() =>
+        onFilesChange([
+          new File(['dummy'], 'dummy.txt', { type: 'text/plain' }),
+        ])
+      }
+    >
+      Upload File
+    </button>
+  ),
+  // GalIcon stub
+  GalIcon: () => <span data-testid="gal-icon" />,
+}));
+
+// ── 4) MOCK EditableTitle (local import) ───────────────────────────
+jest.mock('../editable-title', () => ({
+  __esModule: true,
+  EditableTitle: ({
+    value,
+    onChange,
+    placeholder,
+  }: {
+    value?: string;
+    placeholder?: string;
+    onChange: (value: string) => void;
   }) => (
     <input
-      data-testid={`input-${name}`}
-      aria-label={label}
-      type={type}
-      name={name}
-      value={value}
-      onChange={(e) =>
-        onChange({
-          target: {
-            name,
-            value: (e.target as HTMLInputElement).value,
-          },
-        })
-      }
+      data-testid="editable-title"
+      value={value ?? ''}
+      placeholder={placeholder}
+      onChange={(e) => onChange((e.target as HTMLInputElement).value ?? '')}
     />
   ),
 }));
 
-// 3.3. GalUppyFileUploader → renders <button data-testid="file-uploader">Upload File</button>
-jest.mock(
-  '@shared/ui/gal-uppy-file-uploader/gal-uppy-file-uploader.component',
-  () => ({
-    __esModule: true,
-    default: ({
-      onFilesChange,
-    }: {
-      onFilesChange: (files: File[]) => void;
-      allowedFileTypes: string[];
-      disableImporters?: boolean;
-    }) => (
-      <button
-        data-testid="file-uploader"
-        onClick={() => {
-          const fakeFile = new File(['dummy'], 'dummy.txt', {
-            type: 'text/plain',
-          });
-          onFilesChange([fakeFile]);
-        }}
-      >
-        Upload File
-      </button>
-    ),
-  }),
-);
-
-// 3.4. CourseLessons → stubbed out
-jest.mock('./../../course-lessons/course-lessons.component', () => ({
+// ── 5) MOCK CourseLessons (same relative path as component) ────────
+jest.mock('../../course-lessons/course-lessons.component', () => ({
   __esModule: true,
   default: ({ sectionId, lessons }: { sectionId: string; lessons: any[] }) => (
     <div data-testid="course-lessons">
@@ -138,18 +141,25 @@ jest.mock('./../../course-lessons/course-lessons.component', () => ({
   ),
 }));
 
-// ── 4) IMPORT the component under test (in the same folder) ───────────────────────────────────
-import SectionEditor, {
-  NewProductSectionFormData,
-} from './section-editor.component';
+// ── 6) MOCK autosave hook ──────────────────────────────────────────
+jest.mock('@features/product-form/hooks', () => ({
+  __esModule: true,
+  useSectionAutosave: () => ({
+    isAutosaving: false,
+    lastSavedAt: null,
+  }),
+}));
 
-// ── 5) START TESTS ───────────────────────────────────────────────────────────────────────
+// ── 7) IMPORT component & types ────────────────────────────────────
+import SectionEditor from './section-editor.component';
+import { SectionDraft } from '@features/product-form/models';
+
+// ── 8) TESTS ───────────────────────────────────────────────────────
 describe('<SectionEditor />', () => {
   afterEach(() => {
     cleanup();
   });
 
-  // Typed mocks for dispatch/thunks
   const mockedUseDispatch = useDispatch as jest.MockedFunction<
     typeof useDispatch
   >;
@@ -159,21 +169,20 @@ describe('<SectionEditor />', () => {
   const mockedCreateSection = createSection as jest.MockedFunction<
     typeof createSection
   >;
-  const mockedUpdateSection = updateSectionDetails as jest.MockedFunction<
-    typeof updateSectionDetails
-  >;
   const mockedDeleteSection = deleteSection as jest.MockedFunction<
     typeof deleteSection
   >;
 
   let fakeDispatch: jest.Mock<any, any>;
   let removeParentMock: jest.Mock<any, any>;
+  let changeParentMock: jest.Mock<any, any>;
 
-  // A “blank” section object that always has title/description (even if empty)
-  const baseSection: NewProductSectionFormData = {
+  const baseSection: SectionDraft = {
+    // shape doesn’t need to be perfect at runtime
     id: '',
     title: '',
     description: '',
+    position: 0,
     lessons: [],
     files: [],
   };
@@ -181,99 +190,98 @@ describe('<SectionEditor />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Make dispatch(thunkAction) return an object whose .unwrap() resolves
     fakeDispatch = jest.fn((action: any) => ({
       unwrap: () =>
         Promise.resolve({
-          ...action.payload,
+          ...action?.payload,
           id: 'section-xyz',
-          title: action.payload.title,
-          description: action.payload.description,
+          title: action?.payload?.title,
+          description: action?.payload?.description,
         }),
     }));
     mockedUseDispatch.mockReturnValue(fakeDispatch as any);
 
-    mockedUseSelector.mockImplementation((selector) => {
+    mockedUseSelector.mockImplementation((selector: any) => {
       if (selector === selectAuthUser) {
         return { id: 'user-123' };
       }
       return undefined;
     });
+
     mockedCreateSection.mockReset();
-    mockedUpdateSection.mockReset();
     mockedDeleteSection.mockReset();
 
     removeParentMock = jest.fn();
+    changeParentMock = jest.fn();
   });
 
-  // --- 5.3 Removing a Section (new vs existing) ---
+  // --- Removing a new (unsaved) section ----------------------------
   it('removes a new (unsaved) section immediately', () => {
     render(
       <SectionEditor
         index={5}
-        sectionData={{ ...baseSection }} // id = ''
+        section={{ ...baseSection }} // id = ''
         productType="COURSE"
         showRemoveButton={true}
         productId="pid-1"
-        onRemoveFromParent={removeParentMock}
+        onRemove={removeParentMock}
+        onChange={changeParentMock}
       />,
     );
 
-    // “Remove” button appears
     const removeBtn = screen.getByTestId('btn-remove');
     expect(removeBtn).toBeInTheDocument();
 
-    // Click “Remove” → no deleteSection called, immediate parent callback
     fireEvent.click(removeBtn);
+
     expect(mockedDeleteSection).not.toHaveBeenCalled();
     expect(removeParentMock).toHaveBeenCalledWith(5);
   });
 
+  // --- Removing an existing section via thunk ----------------------
   it('removes an existing section via thunk then parent callback', async () => {
-    const existing: NewProductSectionFormData = {
+    const existing: SectionDraft = {
       id: 'to-remove',
       title: 'Title',
       description: 'Desc',
+      position: 8,
       lessons: [],
       files: [],
     };
 
-    // Mock deleteSection to return fake thunk
     const fakeThunk = Symbol('fakeThunk');
     mockedDeleteSection.mockReturnValue(fakeThunk as any);
 
-    // Override fakeDispatch so unwrap resolves
-    fakeDispatch.mockImplementation((action) => ({
+    fakeDispatch.mockImplementation((action: any) => ({
       unwrap: () => Promise.resolve({}),
     }));
 
     render(
       <SectionEditor
         index={7}
-        sectionData={existing}
+        section={existing}
         productType="COURSE"
         showRemoveButton={true}
         productId="pid-1"
-        onRemoveFromParent={removeParentMock}
+        onRemove={removeParentMock}
+        onChange={changeParentMock}
       />,
     );
 
-    // Click “Remove”
     await act(async () => {
       fireEvent.click(screen.getByTestId('btn-remove'));
     });
 
-    // Verify deleteSection call
     expect(mockedDeleteSection).toHaveBeenCalledWith({
       id: 'to-remove',
       userId: 'user-123',
     });
     expect(fakeDispatch).toHaveBeenCalledWith(fakeThunk);
 
-    // Wait for unwrap() → then parent callback
     await act(async () => {
       await Promise.resolve();
     });
+
     expect(removeParentMock).toHaveBeenCalledWith(7);
   });
 });

@@ -1,69 +1,77 @@
-import React, { useEffect, useState } from 'react';
-import { IoIosAddCircleOutline } from 'react-icons/io';
+import React from 'react';
+import { IoAddOutline } from 'react-icons/io5';
 
 import LessonEditor from '../editors/lesson-editor/lesson-editor.component';
-import { GalIcon } from '@shared/ui';
+import { Button, GalIcon } from '@shared/ui';
+import { CourseLesson } from '@api/models';
+import { getCssVar } from '@shared/utils';
 
 import './course-lessons.styles.scss';
 
 interface CourseLessonsProps {
   sectionId: string;
-  lessons: any[];
+  lessons: CourseLesson[];
+  // eslint-disable-next-line no-unused-vars
+  onLessonsChange: (lessons: CourseLesson[]) => void;
 }
 
 const CourseLessons: React.FC<CourseLessonsProps> = ({
   sectionId,
   lessons,
+  onLessonsChange,
 }) => {
-  const [localLessons, setLocalLessons] = useState(lessons);
-
-  useEffect(() => {
-    setLocalLessons(lessons);
-  }, [lessons]);
-
   const handleAddLesson = () => {
-    const newLesson = {
+    const newLesson: CourseLesson = {
       title: '',
       description: '',
+      sectionId,
     };
 
-    setLocalLessons((prevLessons) => {
-      const updated = [...prevLessons, newLesson];
-      return updated;
-    });
+    onLessonsChange([...lessons, newLesson]);
+  };
+
+  const handleLessonChange = (index: number, nextLesson: CourseLesson) => {
+    const updated = lessons.map((lesson: CourseLesson, i: number) =>
+      i === index ? nextLesson : lesson,
+    );
+    onLessonsChange(updated);
   };
 
   const handleRemoveLessonFromList = (index: number) => {
-    setLocalLessons((prevLessons) => {
-      const updated = [...prevLessons];
-      updated.splice(index, 1);
-      return updated;
-    });
+    const updated = lessons.filter((_: CourseLesson, i: number) => i !== index);
+    onLessonsChange(updated);
   };
 
   return (
     <div>
       <div className="course-lessons-header">
         <h3>Course Lessons</h3>
-        <button
-          onClick={handleAddLesson}
-          className="add-lesson-button"
-          type="button"
-        >
-          <GalIcon icon={IoIosAddCircleOutline} color="blue" size={24} />
-        </button>
       </div>
-      {localLessons &&
-        localLessons.length > 0 &&
-        localLessons.map((lesson, index) => (
+      {lessons &&
+        lessons.length > 0 &&
+        lessons.map((lesson, index) => (
           <LessonEditor
             key={index}
             index={index}
             lesson={lesson}
             sectionId={sectionId}
             removeLessonFromList={handleRemoveLessonFromList}
+            onChange={handleLessonChange}
           />
         ))}
+      <Button
+        onClick={handleAddLesson}
+        className="add-lesson-button"
+        type="button"
+        variant="tertiary"
+      >
+        <GalIcon
+          icon={IoAddOutline}
+          color={getCssVar('--text-primary')}
+          size={18}
+        />
+        <span>Add Lesson</span>
+      </Button>
     </div>
   );
 };

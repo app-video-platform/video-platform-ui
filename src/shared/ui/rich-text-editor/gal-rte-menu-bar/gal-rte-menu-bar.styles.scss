@@ -1,21 +1,64 @@
-.menubar {
-  margin-bottom: 0.5rem;
+@use 'sass:color';
+@use '../../../../styles/index.scss' as *;
+
+.gal-rte-menubar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(15, 15, 45, 0.9);
+  border: 1px solid rgba(248, 249, 250, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  font-size: 13px;
 }
 
-.menubar button {
-  margin-right: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #ccc;
-  background: white;
+.gal-rte-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gal-rte-separator {
+  width: 1px;
+  height: 20px;
+  background: rgba(248, 249, 250, 0.12);
+  margin: 0 4px;
+}
+
+.gal-rte-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 4px 6px;
+  min-width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   cursor: pointer;
-}
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
 
-.menubar button.is-active {
-  background: #f0f0f0;
-  border-color: #999;
-}
+  &:hover:not(:disabled) {
+    background: $accent-secondary;
+    pointer-events: all;
+  }
 
-.menubar button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &.is-active {
+    background: color.scale($cool-cosmic-cyan, $lightness: -15%);
+    color: $sea-salt;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
 }

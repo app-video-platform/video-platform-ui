@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { selectAuthUser } from '@store/auth-store';
 import { UserRole } from '@api/models';
-import { SidebarNav } from '@widgets/sidebar-nav';
+import {
+  SidebarLayoutProvider,
+  SidebarNav,
+  useSidebarLayout,
+} from '@widgets/sidebar-nav';
 import { TopNavbar } from '@widgets/top-navbar';
+import { appRoutes } from '@api/constants';
 
 import './app-layout.styles.scss';
 
@@ -17,9 +22,25 @@ const CREATOR_ROUTES = [
   '/app/settings',
 ];
 
-const AppLayout: React.FC = () => {
-  const user = useSelector(selectAuthUser);
+const Shell: React.FC = () => {
   const location = useLocation();
+  const { setIsSidebarCollapsed } = useSidebarLayout();
+
+  useEffect(() => {
+    const matchedRoute = appRoutes.find((route) =>
+      matchPath({ path: route.path, end: route.end }, location.pathname),
+    );
+
+    if (
+      matchedRoute?.collapseSidebarOnLoad === true ||
+      location.pathname.includes('create')
+    ) {
+      setIsSidebarCollapsed(true);
+    }
+  }, [location, setIsSidebarCollapsed]);
+
+  const user = useSelector(selectAuthUser);
+
   const isUserCreator =
     user && user.roles && Object.keys(user.roles).length > 0
       ? user.roles.includes(UserRole.CREATOR || UserRole.ADMIN)
@@ -50,5 +71,11 @@ const AppLayout: React.FC = () => {
     </div>
   );
 };
+
+const AppLayout: React.FC = () => (
+  <SidebarLayoutProvider>
+    <Shell />
+  </SidebarLayoutProvider>
+);
 
 export default AppLayout;

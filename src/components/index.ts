@@ -14,3 +14,5 @@ export * from './gal-shop-cart-dropdown';
 export * from './gal-social-media-input';
 export * from './gal-user-dropdown';
 export * from './gal-wishlist-dropdown';
+export * from './product-card';
+export * from './password-input';

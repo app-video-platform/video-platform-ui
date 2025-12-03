@@ -1,14 +1,9 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  Controller,
-  FormProvider,
-  useForm,
-  useFormContext,
-} from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '@store/auth-store';
-import { GalFormInput } from '@shared/ui';
+import { Input } from '@shared/ui';
 
 export interface NotificationsFormData {
   profileImage: string;
@@ -51,7 +46,7 @@ const SettingsNotificationsTab: React.FC = () => {
           return (
             <>
               <label className="onboarding-input-label">Notifications</label>
-              <GalFormInput
+              <Input
                 type="text"
                 value={field.value}
                 onChange={field.onChange}
@@ -66,8 +61,6 @@ const SettingsNotificationsTab: React.FC = () => {
                 onBlur={(e: { target: { value: string } }) =>
                   field.onChange(e.target.value.trim())
                 }
-                isMaxLengthShown={true}
-                maxLength={50}
               />
               {fieldState.error && (
                 <p className="form-field-error error-text-red">

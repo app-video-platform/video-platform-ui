@@ -4,7 +4,7 @@ import { FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 import { GalProductCard } from '@components';
-import { GalIcon, GalButton } from '@shared/ui';
+import { GalIcon, Button } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import {
   selectTopThreeProducts,
@@ -45,11 +45,13 @@ const CreatorDashboard: React.FC = () => {
         </div>
 
         <div className="action-buttons-container">
-          <GalButton
+          <Button
+            type="button"
+            variant="secondary"
             onClick={() => navigate('my-page-preview')}
-            text="Preview"
-            type="secondary"
-          />
+          >
+            Preview
+          </Button>
         </div>
       </div>
 
@@ -66,11 +68,14 @@ const CreatorDashboard: React.FC = () => {
                 You don&apos;t have any products yet. Go ahead and create one
                 right now!
               </p>
-              <GalButton
+
+              <Button
+                type="button"
+                variant="primary"
                 onClick={() => navigate('products/create')}
-                text="Create Product"
-                type="primary"
-              />
+              >
+                Create Product
+              </Button>
             </div>
           )}
         </div>

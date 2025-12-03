@@ -2,7 +2,14 @@ import React from 'react';
 import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import Underline from '@tiptap/extension-underline';
+
 import GalRTEMenuBar from './gal-rte-menu-bar/gal-rte-menu-bar.component';
+
+import './gal-rich-text-editor.styles.scss';
 
 interface GalRichTextEditorProps {
   initialContent?: JSONContent;
@@ -17,12 +24,18 @@ const GalRichTextEditor: React.FC<GalRichTextEditorProps> = ({
   // 1) Initialize the editor instance via useEditor()
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        // you can disable parts of StarterKit if you want:
-        // heading: false, // for example
+      StarterKit,
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
+        linkOnPaste: true,
+      }),
+      TaskList,
+      TaskItem.configure({
+        nested: true,
       }),
       Image,
-      // …any other extensions you need
+      Underline,
     ],
     content: initialContent || '<p>Start writing your lesson…</p>',
     onUpdate: ({ editor }) => {
@@ -37,14 +50,14 @@ const GalRichTextEditor: React.FC<GalRichTextEditorProps> = ({
     () => () => {
       editor?.destroy();
     },
-    [editor]
+    [editor],
   );
 
   return (
     <div className="course-editor-container">
       <GalRTEMenuBar editor={editor} />
       {/* EditorContent is the actual editable area. */}
-      <EditorContent editor={editor} />
+      <EditorContent editor={editor} className="rte-content" />
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { FaHeart } from 'react-icons/fa';
 
 import { ProductMinimised } from '@api/models';
 import { getAllProductsMinimalAPI } from '@api/services';
-import { GalIcon, GalButton } from '@shared/ui';
+import { GalIcon, Button } from '@shared/ui';
 import { selectAllShopCartProducts, addProductToCart } from '@store/shop-cart';
 import { AppDispatch } from '@store/store';
 import { selectWishlistIds, toggleWishlist } from '@store/wishlist';
@@ -149,25 +149,27 @@ const ExplorePage: React.FC = () => {
                     </button>
                   </div>
                   <div className="explore-card-actions">
-                    <GalButton
-                      text="View Product"
-                      type="secondary"
+                    <Button
+                      type="button"
+                      variant="secondary"
                       onClick={() =>
                         navigate(`/product/${product.id}/${product.type}`)
                       }
-                    />
-                    <GalButton
-                      text={
-                        isInCart(product.id) ? 'Already in cart' : 'Add to cart'
-                      }
-                      type="primary"
+                    >
+                      View Product
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="primary"
                       disabled={isInCart(product.id)}
                       onClick={() => {
                         if (!isInCart(product.id)) {
                           handleAddToCart(product);
                         }
                       }}
-                    />
+                    >
+                      {isInCart(product.id) ? 'Already in cart' : 'Add to cart'}
+                    </Button>
                   </div>
                 </div>
               );

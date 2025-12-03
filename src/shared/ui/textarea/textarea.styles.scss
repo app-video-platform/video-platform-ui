@@ -1,0 +1,56 @@
+@use '../../../styles/variables' as *;
+
+.textarea-wrapper {
+  width: 100%;
+  position: relative;
+
+  .textarea-field {
+    min-height: 100px;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+    padding: $spacing-4 $spacing-5;
+    background-color: $bg-base;
+    border: 1px solid $bg-elevated;
+    color: $text-primary;
+    border-radius: $radius-lg;
+    font-size: 1rem;
+
+    &:focus {
+      outline: none;
+      border-color: $accent-primary;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+    }
+
+    &.input-error {
+      border-color: $error;
+    }
+
+    &.block {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(248, 249, 250, 0.12);
+      padding-left: 0;
+      padding-right: 0;
+      transition: all $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-bottom-color: #3bc9db;
+        box-shadow: 0 2px 0 0 rgba(59, 201, 219, 0.4);
+      }
+
+      &:hover {
+        border-bottom-color: #3bc9db;
+      }
+    }
+  }
+
+  .textarea-max-value {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 10px;
+    opacity: 0.6;
+  }
+}

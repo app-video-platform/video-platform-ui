@@ -7,11 +7,8 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // ── 1) MOCK LessonEditor ────────────────────────────────────────────────────────────
-// We replace LessonEditor with a stub that renders:
-//  - A container <div data-testid="lesson-editor-<index>">…</div>
-//  - Inside it, a “Remove” button (<button data-testid="remove-lesson-<index>">)
-//    that, when clicked, calls removeLessonFromList(index).
-
+// Props in real component:
+//   index, lesson, sectionId, removeLessonFromList, onChange
 jest.mock('../editors/lesson-editor/lesson-editor.component', () => ({
   __esModule: true,
   default: ({
@@ -19,11 +16,13 @@ jest.mock('../editors/lesson-editor/lesson-editor.component', () => ({
     lesson,
     sectionId,
     removeLessonFromList,
+    onChange,
   }: {
     index: number;
     lesson: any;
     sectionId: string;
     removeLessonFromList: (idx: number) => void;
+    onChange: (idx: number, nextLesson: any) => void;
   }) => (
     <div data-testid={`lesson-editor-${index}`}>
       <span data-testid={`lesson-title-${index}`}>{lesson.title ?? ''}</span>
@@ -37,10 +36,39 @@ jest.mock('../editors/lesson-editor/lesson-editor.component', () => ({
   ),
 }));
 
-// ── 2) Import the component under test ──────────────────────────────────────────────
+// ── 2) MOCK @shared/ui (Button + GalIcon) ──────────────────────────────────────────
+jest.mock('@shared/ui', () => ({
+  __esModule: true,
+  Button: ({
+    children,
+    onClick,
+    type,
+    className,
+    variant,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    type?: 'button' | 'submit';
+    className?: string;
+    variant?: string;
+  }) => (
+    <button
+      data-testid="btn-add-lesson"
+      type={type ?? 'button'}
+      onClick={onClick}
+      className={className}
+      data-variant={variant}
+    >
+      {children}
+    </button>
+  ),
+  GalIcon: () => <span data-testid="gal-icon" />,
+}));
+
+// ── 3) Import the component under test ──────────────────────────────────────────────
 import CourseLessons from './course-lessons.component';
 
-// ── 3) Begin tests ─────────────────────────────────────────────────────────────────
+// ── 4) Begin tests ─────────────────────────────────────────────────────────────────
 describe('<CourseLessons />', () => {
   afterEach(() => {
     cleanup();
@@ -52,11 +80,20 @@ describe('<CourseLessons />', () => {
     return Array.from({ length: count }).map((_, i) => ({
       title: `Lesson ${i + 1}`,
       description: `Desc ${i + 1}`,
+      sectionId,
     }));
   }
 
   it('renders no LessonEditor when lessons prop is empty', () => {
-    render(<CourseLessons sectionId={sectionId} lessons={[]} />);
+    const onLessonsChange = jest.fn();
+
+    render(
+      <CourseLessons
+        sectionId={sectionId}
+        lessons={[]}
+        onLessonsChange={onLessonsChange}
+      />,
+    );
 
     // Should render the header
     expect(screen.getByText('Course Lessons')).toBeInTheDocument();
@@ -67,53 +104,69 @@ describe('<CourseLessons />', () => {
 
   it('renders one LessonEditor per item in lessons prop', () => {
     const initialLessons = makeLessons(2);
-    render(<CourseLessons sectionId={sectionId} lessons={initialLessons} />);
+    const onLessonsChange = jest.fn();
+
+    render(
+      <CourseLessons
+        sectionId={sectionId}
+        lessons={initialLessons}
+        onLessonsChange={onLessonsChange}
+      />,
+    );
 
     // We expect exactly two lesson-editor-0 and lesson-editor-1
     for (let i = 0; i < 2; i++) {
       expect(screen.getByTestId(`lesson-editor-${i}`)).toBeInTheDocument();
-      // The mock also renders the title
       expect(screen.getByTestId(`lesson-title-${i}`)).toHaveTextContent(
-        `Lesson ${i + 1}`
+        `Lesson ${i + 1}`,
       );
-      // And a remove button
       expect(screen.getByTestId(`remove-lesson-${i}`)).toBeInTheDocument();
     }
   });
 
-  it('adds a new blank lesson when the “Add Lesson” button is clicked', () => {
+  it('adds a new blank lesson when the “Add Lesson” button is clicked (via onLessonsChange)', () => {
     const initialLessons = makeLessons(1);
-    render(<CourseLessons sectionId={sectionId} lessons={initialLessons} />);
+    const onLessonsChange = jest.fn();
+
+    render(
+      <CourseLessons
+        sectionId={sectionId}
+        lessons={initialLessons}
+        onLessonsChange={onLessonsChange}
+      />,
+    );
 
     // Initially, one lesson-editor-0
     expect(screen.getByTestId('lesson-editor-0')).toBeInTheDocument();
-    expect(screen.queryByTestId('lesson-editor-1')).not.toBeInTheDocument();
 
-    // Click the “Add Lesson” button.
-    // The “Add Lesson” button is the only <button> that has no text besides the icon,
-    // but since our mock LessonEditor also renders a “Remove” button, we need to select carefully.
-    // The “Add Lesson” button is the first button in the DOM whose data-testid is undefined but
-    // has class "add-lesson-button". We can query by role and filter by className:
-    const addBtn = screen.getByRole('button', { name: '' });
-    // Alternatively, get by class:
-    // const addBtn = container.querySelector('.add-lesson-button') as HTMLButtonElement;
-    fireEvent.click(addBtn);
+    // Click the “Add Lesson” button
+    fireEvent.click(screen.getByTestId('btn-add-lesson'));
 
-    // After clicking, there should now be two lesson-editors: 0 and 1
-    expect(screen.getByTestId('lesson-editor-0')).toBeInTheDocument();
-    expect(screen.getByTestId('lesson-editor-1')).toBeInTheDocument();
+    // Component is controlled → we assert onLessonsChange was called correctly
+    expect(onLessonsChange).toHaveBeenCalledTimes(1);
+    const updatedLessons = onLessonsChange.mock.calls[0][0] as any[];
 
-    // The new lesson-editor-1 should have empty title
-    expect(screen.getByTestId('lesson-title-1')).toHaveTextContent('');
-    // And it should also have a remove button
-    expect(screen.getByTestId('remove-lesson-1')).toBeInTheDocument();
+    expect(updatedLessons).toHaveLength(2);
+    // First lesson is unchanged
+    expect(updatedLessons[0].title).toBe('Lesson 1');
+    // New lesson is blank with correct sectionId
+    expect(updatedLessons[1].title).toBe('');
+    expect(updatedLessons[1].description).toBe('');
+    expect(updatedLessons[1].sectionId).toBe(sectionId);
   });
 
-  it('removes a lesson when "Remove" is clicked on a LessonEditor', () => {
+  it('removes a lesson when "Remove" is clicked on a LessonEditor (via onLessonsChange)', () => {
     const initialLessons = makeLessons(3);
-    render(<CourseLessons sectionId={sectionId} lessons={initialLessons} />);
+    const onLessonsChange = jest.fn();
 
-    // For three initial lessons, we have lesson-editor-0,1,2
+    render(
+      <CourseLessons
+        sectionId={sectionId}
+        lessons={initialLessons}
+        onLessonsChange={onLessonsChange}
+      />,
+    );
+
     for (let i = 0; i < 3; i++) {
       expect(screen.getByTestId(`lesson-editor-${i}`)).toBeInTheDocument();
     }
@@ -121,37 +174,45 @@ describe('<CourseLessons />', () => {
     // Click “Remove” on the middle one (index = 1)
     fireEvent.click(screen.getByTestId('remove-lesson-1'));
 
-    // Now the state should have removed index=1, shifting index=2 → index=1
-    // We expect exactly two lesson-editor-* elements: indices 0 and 1
-    expect(screen.getByTestId('lesson-editor-0')).toBeInTheDocument();
-    expect(screen.getByTestId('lesson-editor-1')).toBeInTheDocument();
-    expect(screen.queryByTestId('lesson-editor-2')).not.toBeInTheDocument();
+    // Controlled component → check callback
+    expect(onLessonsChange).toHaveBeenCalledTimes(1);
+    const updatedLessons = onLessonsChange.mock.calls[0][0] as any[];
 
-    // Check that lesson-editor-1 now displays “Lesson 3” (originally at index 2)
-    expect(screen.getByTestId('lesson-title-1')).toHaveTextContent('Lesson 3');
-
-    // Both still have remove buttons:
-    expect(screen.getByTestId('remove-lesson-0')).toBeInTheDocument();
-    expect(screen.getByTestId('remove-lesson-1')).toBeInTheDocument();
+    expect(updatedLessons).toHaveLength(2);
+    // Remaining titles should be Lesson 1 and Lesson 3
+    expect(updatedLessons[0].title).toBe('Lesson 1');
+    expect(updatedLessons[1].title).toBe('Lesson 3');
   });
 
-  it('resets its internal list when the lessons prop changes', () => {
+  it('reflects changes when the lessons prop changes from outside', () => {
+    const onLessonsChange = jest.fn();
+
     const { rerender } = render(
-      <CourseLessons sectionId={sectionId} lessons={makeLessons(1)} />
+      <CourseLessons
+        sectionId={sectionId}
+        lessons={makeLessons(1)}
+        onLessonsChange={onLessonsChange}
+      />,
     );
 
     // Initially 1 editor
     expect(screen.getAllByTestId(/lesson-editor-/)).toHaveLength(1);
     expect(screen.getByTestId('lesson-title-0')).toHaveTextContent('Lesson 1');
 
-    // Now rerender with a different lessons array of length 4
-    rerender(<CourseLessons sectionId={sectionId} lessons={makeLessons(4)} />);
+    // Rerender with 4 lessons
+    rerender(
+      <CourseLessons
+        sectionId={sectionId}
+        lessons={makeLessons(4)}
+        onLessonsChange={onLessonsChange}
+      />,
+    );
 
     // There should now be exactly 4 LessonEditor stubs
     expect(screen.getAllByTestId(/lesson-editor-/)).toHaveLength(4);
     for (let i = 0; i < 4; i++) {
       expect(screen.getByTestId(`lesson-title-${i}`)).toHaveTextContent(
-        `Lesson ${i + 1}`
+        `Lesson ${i + 1}`,
       );
     }
   });

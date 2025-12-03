@@ -2,7 +2,7 @@ import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { MultiStepFormData } from '../multi-step-form.component';
-import { GalFormInput } from '@shared/ui';
+import { Input, Textarea } from '@shared/ui';
 
 import './step-three.styles.scss';
 
@@ -30,13 +30,11 @@ const StepThree: React.FC = () => {
           return (
             <>
               <label className="onboarding-input-label">Bio</label>
-              <GalFormInput
+              <Textarea
                 placeholder="Something about you"
-                type="text"
                 value={field.value}
                 onChange={field.onChange}
                 name={field.name}
-                inputType="textarea"
                 isMaxLengthShown={true}
                 maxLength={250}
                 className={`form-input onboarding-form-input onboarding-form-input__bio${
@@ -73,7 +71,7 @@ const StepThree: React.FC = () => {
               <label className="onboarding-input-label">
                 Tagline / Mission
               </label>
-              <GalFormInput
+              <Input
                 className={`form-input onboarding-form-input${
                   hasError ? ' onboarding-form-input__error' : ''
                 }`}

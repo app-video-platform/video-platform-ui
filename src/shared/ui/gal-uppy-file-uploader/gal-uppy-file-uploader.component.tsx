@@ -140,7 +140,7 @@ const GalUppyFileUploader: React.FC<GalUppyFileUploaderProps> = ({
               ? []
               : ['GoogleDrive', 'Dropbox', 'OneDrive', 'Url', 'Unsplash']
           }
-          height={disableImporters ? 200 : 400}
+          height={disableImporters ? 200 : 200}
           note="Images only, up to 5MB"
           hideUploadButton={true}
           proudlyDisplayPoweredByUppy={true}

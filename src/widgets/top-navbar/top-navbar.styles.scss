@@ -1,3 +1,5 @@
+@use '../../styles/variables' as *;
+
 .galactica-home-nav {
   display: flex;
   width: 100%;
@@ -5,8 +7,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 5px 20px;
-  box-shadow: 0px 4px 5px -3px rgba(0, 0, 0, 0.1),
-    0px 5px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: $shadow-sm;
+  border: 2px solid transparent;
+  background:
+    linear-gradient($bg-surface, $bg-surface) padding-box,
+    linear-gradient(175deg, $bg-base, $accent-secondary) border-box;
 
   .logo-container {
     display: flex;

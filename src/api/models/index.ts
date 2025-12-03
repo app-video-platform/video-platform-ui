@@ -5,3 +5,4 @@ export * from './files';
 export * from './product';
 export * from './socials';
 export * from './user';
+export * from './misc';

@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { selectAuthUser } from '@store/auth-store';
 import { UserRole } from '@api/models';
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import { SmartSearch } from '@features/smart-search';
 import {
   GalWishlistDropdown,
@@ -35,7 +35,7 @@ const TopNavbar: React.FC = () => {
       <div className="home-search-container">
         <SmartSearch />
         <Link to="/app/explore">Explore</Link>
-        {user &&
+        {/* {user &&
           (isUserCreator ? (
             <GalButton
               type="primary"
@@ -45,7 +45,10 @@ const TopNavbar: React.FC = () => {
             />
           ) : (
             <Link to={'library/all-products'}>Library</Link>
-          ))}
+          ))} */}
+        {user && !isUserCreator && (
+          <Link to={'library/all-products'}>Library</Link>
+        )}
       </div>
       {user && (
         <div className="nav-links">
@@ -62,16 +65,20 @@ const TopNavbar: React.FC = () => {
 
       {!user && (
         <div className="nav-action-btns">
-          <GalButton
-            text="Log In"
-            type="secondary"
+          <Button
+            type="button"
+            variant="secondary"
             onClick={() => navigate('/login')}
-          />
-          <GalButton
-            text="Register"
-            type="primary"
-            onClick={() => navigate('/sign-up')}
-          />
+          >
+            Log In
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={() => navigate('/signup')}
+          >
+            Register
+          </Button>
         </div>
       )}
     </nav>

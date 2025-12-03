@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  Controller,
-  FormProvider,
-  useForm,
-  useFormContext,
-} from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '@store/auth-store';
-import { GalFormInput } from '@shared/ui';
+import { PasswordInput } from '@components';
+import { SettingsSection } from '../settings-section';
+import { Button, Input } from '@shared/ui';
 
 export interface AccountSecurityFormData {
   newPassword: string;
   confirmPassword: string;
+  format?: string;
+  currency?: string;
 }
 
 const SettingsAccountSecurityTab: React.FC = () => {
@@ -22,6 +21,8 @@ const SettingsAccountSecurityTab: React.FC = () => {
     defaultValues: {
       newPassword: '',
       confirmPassword: '',
+      format: '',
+      currency: '',
     },
     mode: 'onChange',
   });
@@ -29,77 +30,132 @@ const SettingsAccountSecurityTab: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <h2>Public Profile Picture</h2>
-      <h4>Add a photo of yourself</h4>
-      <div className="category-subheading-line">
-        <span className="category-subheading">Change Password</span>
-        <hr className="category-line" />
+      <div className="settings-header">
+        <div className="title-wrapper">
+          <h2>Account Settings</h2>
+          <p style={{ fontSize: 14 }}>
+            Change your password and account prefferences
+          </p>
+        </div>
+        <div className="settings-actions">
+          <Button variant="secondary">Cancel</Button>
+          <Button variant="primary">Save</Button>
+        </div>
       </div>
 
-      <div className="settings-input-wrapper">
-        <Controller
-          name="newPassword"
-          control={control}
-          rules={{
-            required: { value: true, message: 'This field is required' },
-            minLength: { value: 8, message: 'Min 8 chars' },
-          }}
-          render={({ field, fieldState }) => {
-            const hasError = !!fieldState.error;
-            return (
-              <>
-                <label className="settings-input-label">New Password</label>
-                <GalFormInput
-                  type="text"
-                  value={field.value}
-                  onChange={field.onChange}
-                  name={field.name}
-                  className={`form-input settings-form-input settings-form-input${
-                    hasError ? ' settings-form-input__error' : ''
-                  }`}
-                  passwordField={{ isFieldPassword: true, isMainField: true }}
-                />
-              </>
-            );
-          }}
-        />
-      </div>
+      <hr className="category-line" />
 
-      <div className="settings-input-wrapper">
-        <Controller
-          name="confirmPassword"
-          control={control}
-          rules={{
-            required: { value: true, message: 'This field is required' },
-            minLength: { value: 8, message: 'Min 8 chars' },
-            validate: (value: string) =>
-              value === getValues('newPassword') || 'Passwords do not match',
-          }}
-          render={({ field, fieldState }) => {
-            const hasError = !!fieldState.error;
-            return (
-              <>
-                <label className="settings-input-label">Confirm Password</label>
-                <GalFormInput
-                  type="text"
-                  value={field.value}
-                  onChange={field.onChange}
-                  name={field.name}
-                  className={`form-input settings-form-input settings-form-input${
-                    hasError ? ' settings-form-input__error' : ''
-                  }`}
-                  passwordField={{ isFieldPassword: true, isMainField: false }}
-                />
-                {fieldState.error?.type === 'validate' && (
-                  <p className="form-field-error error-text-red">
-                    {fieldState.error.message}
-                  </p>
-                )}
-              </>
-            );
-          }}
-        />
-      </div>
+      <SettingsSection
+        title="Change Password"
+        subTitle="Change your account password"
+      >
+        <>
+          <Controller
+            name="newPassword"
+            control={control}
+            rules={{
+              required: { value: true, message: 'This field is required' },
+              minLength: { value: 8, message: 'Min 8 chars' },
+            }}
+            render={({ field, fieldState }) => {
+              const hasError = !!fieldState.error;
+              return (
+                <>
+                  <label className="settings-input-label">New Password</label>
+                  <PasswordInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    name={field.name}
+                    className={`form-input settings-form-input settings-form-input${
+                      hasError ? ' settings-form-input__error' : ''
+                    }`}
+                  />
+                </>
+              );
+            }}
+          />
+
+          <Controller
+            name="confirmPassword"
+            control={control}
+            rules={{
+              required: { value: true, message: 'This field is required' },
+              minLength: { value: 8, message: 'Min 8 chars' },
+              validate: (value: string) =>
+                value === getValues('newPassword') || 'Passwords do not match',
+            }}
+            render={({ field, fieldState }) => {
+              const hasError = !!fieldState.error;
+              return (
+                <>
+                  <label className="settings-input-label">
+                    Confirm Password
+                  </label>
+                  <PasswordInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    name={field.name}
+                    className={`form-input settings-form-input settings-form-input${
+                      hasError ? ' settings-form-input__error' : ''
+                    }`}
+                  />
+                  {fieldState.error?.type === 'validate' && (
+                    <p className="form-field-error error-text-red">
+                      {fieldState.error.message}
+                    </p>
+                  )}
+                </>
+              );
+            }}
+          />
+        </>
+      </SettingsSection>
+
+      <hr className="category-line" />
+
+      <SettingsSection
+        title="Account Prefferences"
+        subTitle="Change your time format and currency"
+      >
+        <>
+          <Controller
+            name="format"
+            control={control}
+            render={({ field }) => (
+              <Input
+                type="text"
+                label="Time Format"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                name={field.name}
+              />
+            )}
+          />
+
+          <Controller
+            name="currency"
+            control={control}
+            render={({ field }) => (
+              <Input
+                type="text"
+                label="Currency"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                name={field.name}
+              />
+            )}
+          />
+        </>
+      </SettingsSection>
+
+      <hr className="category-line" />
+
+      <SettingsSection
+        title="Delete Account"
+        subTitle="Delete your account and all your data. We will keep your data for 30 days, then it will be lost forever"
+      >
+        <Button variant="danger">Delete Account</Button>
+      </SettingsSection>
     </FormProvider>
   );
 };

@@ -1,21 +1,25 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { FaArrowRight } from 'react-icons/fa';
+import clsx from 'clsx';
 
-import { GalBoxSelector } from '@components';
-import { AbstractProduct, ProductType } from '@api/types';
-import { GalButton, GalFormInput } from '@shared/ui';
-import { NewProductFormData, FormErrors } from '@pages/app';
+import { AbstractProduct, CreateProductPayload, ProductType } from '@api/types';
+import { Button, GalIcon, Input } from '@shared/ui';
+import { FormErrors } from '@pages/app';
 import { createCourseProduct } from '@store/product-store';
 import { AppDispatch } from '@store/store';
+import { ProductTypeSelector } from '@features/product-form/product-type-selector';
+import { getCssVar } from '@shared/utils';
+import { ProductDraft } from '@features/product-form/models';
 
 import './create-product-step-one.styles.scss';
 
 interface CreateProductStepOneProps {
-  formData: NewProductFormData;
-  setField: <K extends keyof NewProductFormData>(
+  formData: ProductDraft;
+  setField: <K extends keyof ProductDraft>(
     field: K,
-    value: NewProductFormData[K],
+    value: ProductDraft[K],
   ) => void;
   errors: FormErrors;
   showRestOfForm: boolean;
@@ -23,8 +27,6 @@ interface CreateProductStepOneProps {
   setShowLoadingRestOfForm: (loading: boolean) => void;
   setShowRestOfForm: (show: boolean) => void;
 }
-
-const AVAILABLE_TYPES: ProductType[] = ['COURSE', 'DOWNLOAD', 'CONSULTATION'];
 
 const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
   formData,
@@ -38,16 +40,18 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const handleContinue = () => {
+    const { name, type } = formData;
+    if (!name) {
+      return;
+    }
     setShowLoadingRestOfForm(true);
 
-    const { name, description, type } = formData;
-
-    const newProductPayload: AbstractProduct = {
+    const newProductPayload: CreateProductPayload = {
       name,
-      description,
+      // description,
       type: type as ProductType,
       userId: userId ?? '',
-      status: 'draft',
+      status: 'DRAFT',
     };
 
     setTimeout(() => {
@@ -65,6 +69,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
           }
         })
         .catch((error) => {
+          // eslint-disable-next-line no-console
           console.error('Error creating course product:', error);
         })
         .finally(() => {
@@ -73,54 +78,55 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
     }, 500);
   };
 
+  const isDisabled = !formData.name || !formData.type;
+  const readOnly = showRestOfForm;
+
   return (
-    <div>
-      <GalFormInput
-        label="Title"
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={(e: { target: { value: string } }) =>
-          setField('name', e.target.value)
-        }
+    <div className={clsx('step-one', { 'step-one__readonly': readOnly })}>
+      <ProductTypeSelector
+        value={formData.type}
+        onChange={(type) => !readOnly && setField('type', type)}
       />
-      {errors.name && <p className="error-text-red">{errors.name}</p>}
 
-      <GalFormInput
-        label="Description"
-        type="text"
-        name="description"
-        inputType="textarea"
-        value={formData.description}
-        onChange={(e: { target: { value: string } }) =>
-          setField('description', e.target.value)
-        }
-      />
-      <h3>Choose a type</h3>
+      {errors.type && <p className="error-text-red">{errors.type}</p>}
 
-      <div className="type-selectors">
-        <GalBoxSelector<ProductType>
-          selectedOption={formData.type}
-          onSelect={(t) => setField('type', t)}
-          disabledOptions={[]}
-          availableOptions={AVAILABLE_TYPES}
+      <h3 className="title-label">Give it a title</h3>
+      <div className="title-input-row">
+        <Input
+          type="text"
+          name="name"
+          value={formData.name ?? ''}
+          readOnly={readOnly}
+          className="title-input"
+          onChange={(e: { target: { value: string } }) =>
+            setField('name', e.target.value)
+          }
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault(); // optional
+              handleContinue();
+            }
+          }}
         />
-
-        {errors.type && <p className="error-text-red">{errors.type}</p>}
-      </div>
-
-      {!showRestOfForm && (
-        <div className="course-continue-button-wrapper">
-          <GalButton
-            type="primary"
-            htmlType="button"
+        {!showRestOfForm && (
+          <Button
+            variant="primary"
+            type="button"
+            shape="round"
             onClick={() => handleContinue()}
-            text="Continue"
-            customClassName="create-course-continue-button"
-            disabled={!formData.name}
-          />
-        </div>
-      )}
+            className="create-course-continue-button"
+            disabled={isDisabled}
+          >
+            <GalIcon
+              icon={FaArrowRight}
+              color={getCssVar(
+                isDisabled ? '--text-secondary' : '--text-primary',
+              )}
+            />
+          </Button>
+        )}
+      </div>
+      {errors.name && <p className="error-text-red">{errors.name}</p>}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ProductMinimised } from '@api/models';
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import {
   selectAllShopCartProducts,
   selectShopCartTotal,
@@ -95,7 +95,10 @@ const Cart: React.FC = () => {
                   <span>free</span>
                 )}
               </h2>
-              <GalButton text="Procees to checkout ->" type="primary" />
+
+              <Button type="button" variant="primary">
+                Procees to checkout
+              </Button>
             </aside>
           </section>
         </>

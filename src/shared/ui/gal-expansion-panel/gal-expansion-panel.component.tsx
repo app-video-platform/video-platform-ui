@@ -38,7 +38,7 @@ const GalExpansionPanel: React.FC<GalExpansionPanelProps> = ({
   };
 
   return (
-    <div className={`expansion-panel ${disabled ? 'disabled' : ''}`}>
+    <div className={`gal-expansion-panel ${disabled ? 'disabled' : ''}`}>
       <button
         type="button"
         className="expansion-panel__header"

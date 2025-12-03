@@ -1,26 +1,26 @@
+import { IconType } from 'react-icons';
 import { MeetingMethod } from '../../types/meeting-method.types';
 import { ProductStatus, ProductType } from '../../types/products.types';
 import { ConnectedCalendar } from '../calendars/connected-calendar';
-import {
-  CourseProductSection,
-  DownloadProductSectionRequest,
-  DownloadProductSectionResponse,
-} from './section';
+import { CourseProductSection, DownloadSection } from './section';
 
 export interface AbstractProductBase {
-  id?: string;
-  type: ProductType | string;
-  name?: string;
+  id: string;
+  type: ProductType;
+  name: string;
   description?: string;
   status?: ProductStatus;
   price?: 'free' | number;
   userId?: string;
   createdAt?: Date;
+  updatedAt?: Date;
+  imageUrl?: string;
+  sections?: any[];
 }
 
 export interface DownloadProduct extends AbstractProductBase {
   type: 'DOWNLOAD';
-  sections?: DownloadProductSectionRequest[] | DownloadProductSectionResponse[];
+  sections?: DownloadSection[];
 }
 
 // ----- Course product (request)
@@ -61,4 +61,9 @@ export interface IRemoveItemPayload {
 
 export interface IRemoveProductPayload extends IRemoveItemPayload {
   productType: ProductType;
+}
+
+export interface TypeMeta {
+  icon: IconType;
+  color: string;
 }

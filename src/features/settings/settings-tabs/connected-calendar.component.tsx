@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import {
-  GalSelectOption,
-  GalSelect,
-  GalFormInput,
-  GalButton,
-} from '@shared/ui';
+import { Input, Button, Select, SelectOption } from '@shared/ui';
 import { connectCalendarAPI, getAllCalendarProvidersAPI } from '@api/services';
+import { SettingsSection } from '../settings-section';
 
 const ConnectedCalendarTab: React.FC = () => {
-  const [calendarProviders, setCalendarProviders] = useState<GalSelectOption[]>(
+  const [calendarProviders, setCalendarProviders] = useState<SelectOption[]>(
     [],
   );
   const [selectedProvider, setSelectedProvider] = useState<string>('');
@@ -22,7 +18,7 @@ const ConnectedCalendarTab: React.FC = () => {
       try {
         const providers = await getAllCalendarProvidersAPI(); // string[]
         if (isMounted) {
-          const options: GalSelectOption[] = providers.map((provider) => ({
+          const options: SelectOption[] = providers.map((provider) => ({
             value: provider,
             label: provider.charAt(0) + provider.slice(1).toLowerCase(), // e.g. "Google"
           }));
@@ -42,27 +38,54 @@ const ConnectedCalendarTab: React.FC = () => {
     console.log('Tryna connect', selectedProvider, email);
 
     connectCalendarAPI({ provider: selectedProvider, loginHint: email }).then(
-      () => console.log('CONNECTED'),
+      (data) => {
+        console.log('data', data);
+        window.open(data.authorizationUrl, '_blank');
+      },
     );
   };
 
   return (
     <div className="connected-calendar-tab">
-      <div className="connected-calendars"></div>
+      <div className="settings-header">
+        <div className="title-wrapper">
+          <h2>Connected Calendars</h2>
+          <p style={{ fontSize: 14 }}>
+            Add and manage your connected calendars
+          </p>
+        </div>
+      </div>
 
-      <GalSelect
-        options={calendarProviders}
-        name="providers"
-        label="Calendar Providers"
-        value={selectedProvider}
-        onChange={(e: { target: { value: string } }) =>
-          setSelectedProvider(e.target.value)
-        }
-      />
+      <hr className="category-line" />
 
-      <div className="connect-provider">
+      <SettingsSection title="Calendars" subTitle="Connect a calendar provider">
+        <div className="connect-calendar-row">
+          <Select
+            options={calendarProviders}
+            name="providers"
+            label="Calendar Providers"
+            value={selectedProvider}
+            customClassName="calendar-selector"
+            onChange={(e: { target: { value: string } }) =>
+              setSelectedProvider(e.target.value)
+            }
+          />
+
+          <Button
+            type="button"
+            variant="primary"
+            className="connect-calendar-btn"
+            onClick={() => handleCalendarConnect()}
+            disabled={!selectedProvider}
+          >
+            Connect
+          </Button>
+        </div>
+      </SettingsSection>
+
+      {/* <div className="connect-provider">
         <h3>{selectedProvider}</h3>
-        <GalFormInput
+        <Input
           value={email}
           label="Email"
           name="email"
@@ -70,12 +93,14 @@ const ConnectedCalendarTab: React.FC = () => {
             setEmail(e.target.value)
           }
         />
-        <GalButton
-          text="Connect"
-          type="primary"
+        <Button
+          type="button"
+          variant="primary"
           onClick={() => handleCalendarConnect()}
-        />
-      </div>
+        >
+          Connect
+        </Button>
+      </div> */}
     </div>
   );
 };

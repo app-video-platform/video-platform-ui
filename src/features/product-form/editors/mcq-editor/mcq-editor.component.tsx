@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable indent */
+import React, { useEffect } from 'react';
+import clsx from 'clsx';
+
 import { MCQQuestion, QuizOption, TrueFalseQuestion } from '@api/models';
-import { GalFormInput } from '@shared/ui';
+import { Button, CheckboxInput, Input, Radio } from '@shared/ui';
 
 import './mcq-editor.styles.scss';
+import { QuestionType } from '@api/types';
+import { normalizeQuestionForType } from '../../quiz-wizard/question-card/answer-normalizer.util';
+import { MdAdd } from 'react-icons/md';
 
 interface MCQEditorProps {
   question: MCQQuestion | TrueFalseQuestion;
@@ -18,32 +24,30 @@ const MCQEditor: React.FC<MCQEditorProps> = ({
   questionType,
   onChange,
 }) => {
-  const [options, setOptions] = useState<QuizOption[]>([]);
-  useEffect(() => {
-    if (questionType === 'choice') {
-      setOptions(question.options);
-    } else {
-      const trueFalseOptions: QuizOption[] = [
+  const isChoice = questionType === 'choice';
+  const realOptions: QuizOption[] = question.options || [];
+
+  // For MCQ, we render all real options + one ghost option at the bottom
+  const hasGhostRow = isChoice;
+  const displayOptions: QuizOption[] = hasGhostRow
+    ? [
+        ...realOptions,
         {
-          id: uid(),
-          text: 'True',
-          isCorrect: true,
+          id: '__ghost__',
+          text: '',
+          isCorrect: false,
+          position: realOptions.length + 1,
         },
-        {
-          id: uid(),
-          text: 'False',
-          isCorrect: true,
-        },
-      ];
-      setOptions(trueFalseOptions);
-    }
-  }, [question, questionType]);
+      ]
+    : realOptions;
+
+  const totalReal = realOptions.length;
 
   const toggleCorrect = (id: string) => {
     if (question.type === 'multiple_choice_single') {
       onChange({
         ...question,
-        options: question.options.map((o) => ({
+        options: realOptions.map((o) => ({
           ...o,
           isCorrect: o.id === id,
         })),
@@ -51,61 +55,108 @@ const MCQEditor: React.FC<MCQEditorProps> = ({
     } else {
       onChange({
         ...question,
-        options: question.options.map((o) =>
+        options: realOptions.map((o) =>
           o.id === id ? { ...o, isCorrect: !o.isCorrect } : o,
         ),
       });
     }
   };
 
-  const addOption = () =>
+  const addOption = (text: string) =>
     onChange({
       ...question,
-      options: [...question.options, { id: uid(), text: '', isCorrect: false }],
+      options: [
+        ...realOptions,
+        { id: uid(), text, isCorrect: false, position: realOptions.length + 1 },
+      ],
     });
+
   const removeOption = (id: string) =>
     onChange({
       ...question,
-      options: question.options.filter((o) => o.id !== id),
+      options: realOptions.filter((o) => o.id !== id),
     });
+
   const updateText = (id: string, text: string) =>
     onChange({
       ...question,
-      options: question.options.map((o) => (o.id === id ? { ...o, text } : o)),
+      options: realOptions.map((o) => (o.id === id ? { ...o, text } : o)),
     });
+
+  // When typing in the ghost row, promote it to a real option
+  const handleGhostChange = (text: string) => {
+    if (!text.trim()) {
+      return;
+    }
+    addOption(text);
+  };
 
   return (
     <div className="qb-editor qb-editor__mcq">
-      {options.map((o, i) => (
-        <div key={o.id} className="qb-row">
-          <input
-            className="qb-check"
-            type={
-              question.type === 'multiple_choice_multi' ? 'checkbox' : 'radio'
-            }
-            name={`correct-${question.id}`}
-            checked={!!o.isCorrect}
-            onChange={() => toggleCorrect(o.id)}
-          />
-          <GalFormInput
-            placeholder={`Option ${i + 1}`}
-            value={o.text}
-            onChange={(e: { target: { value: string } }) =>
-              updateText(o.id, e.target.value)
-            }
-          />
-          <button
-            type="button"
-            onClick={() => removeOption(o.id)}
-            aria-label="Remove option"
+      {displayOptions.map((o, index) => {
+        const isGhost = hasGhostRow && index === totalReal;
+        const hasValue = !isGhost && !!o.text.trim();
+
+        // For true/false questions, we don’t show the ghost row and keep current behaviour
+        if (!isChoice && isGhost) {
+          return null;
+        }
+        return (
+          <div
+            key={index}
+            className={clsx('qb-row', {
+              ghost: isGhost,
+              'has-value': hasValue,
+            })}
           >
-            Remove
-          </button>
-        </div>
-      ))}
-      <button type="button" onClick={addOption}>
-        + Add option
-      </button>
+            <Input
+              placeholder={
+                isGhost
+                  ? `Add option ${realOptions.length + 1}`
+                  : `Option ${index + 1}`
+              }
+              value={isGhost ? '' : o.text}
+              prefixIcon={isGhost ? MdAdd : undefined}
+              onChange={(e: { target: { value: string } }) =>
+                isGhost
+                  ? handleGhostChange(e.target.value)
+                  : updateText(o.id, e.target.value)
+              }
+              className={clsx({})}
+            />
+            <div className={clsx('answer-actions', { visible: !isGhost })}>
+              <div className="is-correct-container">
+                {question.type === 'multiple_choice_multi' ? (
+                  <CheckboxInput
+                    label="Is Correct"
+                    name={`correct-${question.id}`}
+                    checked={!!o.isCorrect}
+                    onChange={() => toggleCorrect(o.id)}
+                  />
+                ) : (
+                  <Radio
+                    value=""
+                    label="Is Correct"
+                    name={`correct-${question.id}`}
+                    checked={!!o.isCorrect}
+                    onChange={() => toggleCorrect(o.id)}
+                  />
+                )}
+              </div>
+              {question.type !== 'true_false' && (
+                <Button
+                  type="button"
+                  variant="remove"
+                  onClick={() => removeOption(o.id)}
+                  aria-label="Remove option"
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

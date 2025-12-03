@@ -1,71 +1,72 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ProductType } from '@api/types';
 
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import SectionEditor from '../editors/section-editor/section-editor.component';
+import { SectionDraft } from '../models';
 
 import './create-product-sections.styles.scss';
 
 interface CreateProductSectionsProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sections: any[];
+  sections: SectionDraft[];
   productType: ProductType;
   productId: string;
-}
-
-export interface NewProductSectionFormData {
-  id: string; // Initially empty, will be set after product creation
-  title: string;
-  description: string;
+  // eslint-disable-next-line no-unused-vars
+  onSectionsChange: (sections: SectionDraft[]) => void;
 }
 
 const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
   sections,
   productType,
   productId,
+  onSectionsChange,
 }) => {
-  const [formDataList, setFormDataList] = useState<NewProductSectionFormData[]>(
-    [],
-  );
+  const handleRemoveSection = (index: number) => {
+    const updated = sections.filter(
+      (_: SectionDraft, i: number) => i !== index,
+    );
+    onSectionsChange(updated);
+  };
 
-  useEffect(() => {
-    // We clone here so that editing doesn't directly mutate the prop
-    setFormDataList(sections.map((s) => ({ ...s })));
-  }, [sections]);
+  const handleSectionChange = (index: number, nextSection: SectionDraft) => {
+    const updated = sections.map((section: SectionDraft, i: number) =>
+      i === index ? nextSection : section,
+    );
+    onSectionsChange(updated);
+  };
 
-  const handleRemoveFromParent = (index: number) => {
-    setFormDataList((prev) => {
-      const copy = [...prev];
-      copy.splice(index, 1);
-      return copy;
-    });
+  const handleAddSection = () => {
+    const blank: SectionDraft = {
+      id: '',
+      title: '',
+      description: '',
+      position: sections.length + 1,
+      lessons: [],
+      files: [],
+    };
+
+    onSectionsChange([...(sections || []), blank]);
   };
 
   return (
     <div className="sections-wrapper">
-      {formDataList.map((sectionData, index) => (
+      {sections.map((sectionData: SectionDraft, index: number) => (
         <SectionEditor
           key={sectionData.id || index}
           index={index}
-          sectionData={sectionData}
-          onRemoveFromParent={handleRemoveFromParent}
+          section={sectionData}
           productType={productType}
-          showRemoveButton={formDataList.length > 1}
+          showRemoveButton={sections.length > 1}
           productId={productId}
+          onRemove={handleRemoveSection}
+          onChange={handleSectionChange}
         />
       ))}
 
-      <GalButton
-        type="secondary"
-        text="Add Section"
-        htmlType="button"
-        onClick={() => {
-          setFormDataList((prev) => [
-            ...prev,
-            { id: '', title: '', description: '' },
-          ]);
-        }}
-      />
+      <Button type="button" variant="secondary" onClick={handleAddSection}>
+        Add Section
+      </Button>
     </div>
   );
 };

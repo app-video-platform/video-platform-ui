@@ -3,7 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
 import { MultiStepFormData } from '../multi-step-form.component';
-import { GalFormInput } from '@shared/ui';
+import { Input } from '@shared/ui';
 
 import { selectAuthUser } from '@store/auth-store';
 import { SocialMediaLink, SocialPlatforms } from '@api/models';
@@ -92,7 +92,7 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
           const hasError = !!fieldState.error;
           return (
             <>
-              <GalFormInput
+              <Input
                 className={`form-input onboarding-form-input${
                   hasError ? ' onboarding-form-input__error' : ''
                 }`}

@@ -3,9 +3,10 @@ import { useSelector } from 'react-redux';
 import { FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-import { GalDropdown, GalIcon, GalButton } from '@shared/ui';
+import { GalDropdown, GalIcon, Button } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import { selectAllShopCartProducts, selectCartCount } from '@store/shop-cart';
+import { getCssVar } from '@shared/utils';
 
 import './gal-shop-cart-dropdown.styles.scss';
 
@@ -27,7 +28,11 @@ const ShopCartDropdown: React.FC = () => {
         customClassName="galactica-shopping-cart"
         trigger={({ toggle }) => (
           <button onClick={toggle} className="cart-icon-button">
-            <GalIcon icon={FaShoppingCart} size={18} />
+            <GalIcon
+              icon={FaShoppingCart}
+              size={18}
+              color={getCssVar('--text-primary')}
+            />
             {countFromStore > 0 && (
               <span className="badge" aria-live="polite">
                 {formatCount(countFromStore)}
@@ -51,11 +56,13 @@ const ShopCartDropdown: React.FC = () => {
               )}
             </div>
             <div className="cart-checkout-btn">
-              <GalButton
-                text="Go to checkout"
-                type="primary"
+              <Button
+                type="button"
+                variant="primary"
                 onClick={() => navigate('/app/cart')}
-              />
+              >
+                Go to checkout
+              </Button>
             </div>
           </>
         )}

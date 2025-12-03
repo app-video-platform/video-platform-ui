@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import { GalNavDropdown, GalUserDropdown, GalFooter } from '@components';
 
@@ -45,18 +45,22 @@ const Navigation: React.FC = () => {
               ) : (
                 <ul className="nav-link-list">
                   <li>
-                    <GalButton
+                    <Button
+                      type="button"
+                      variant="secondary"
                       onClick={() => handleRedirect('/signin')}
-                      type="secondary"
-                      text="Sign In"
-                    />
+                    >
+                      Sign In
+                    </Button>
                   </li>
                   <li>
-                    <GalButton
+                    <Button
+                      type="button"
+                      variant="primary"
                       onClick={() => handleRedirect('/signup')}
-                      type="primary"
-                      text="Register"
-                    />
+                    >
+                      Register
+                    </Button>
                   </li>
                 </ul>
               )}

@@ -1,66 +1,187 @@
+@use '../../../styles/index.scss' as *;
+
 .settings-page {
+  // max-width: 900px;
+
+  // .banner-wrapper {
+  //   width: 100%;
+  //   position: relative;
+  //   box-shadow: $shadow-sm;
+  //   border-radius: $radius-lg;
+
+  //   .banner-container {
+  //     width: 100%;
+  //     height: 200px;
+  //     border-radius: $radius-lg;
+
+  //     img {
+  //       width: 100%;
+  //       height: 100%;
+  //       display: block;
+  //       object-fit: cover;
+  //       border-radius: $radius-lg;
+  //     }
+  //   }
+
+  //   .avatar-container {
+  //     position: absolute;
+  //     bottom: 0;
+  //     transform: translate(50%, 50%);
+  //     border-radius: 50%;
+  //     width: 150px;
+  //     height: 150px;
+  //     background-color: $bg-base;
+  //     color: $text-primary;
+  //     border: 5px solid $accent-primary;
+  //     z-index: 1;
+  //     display: flex;
+  //     align-items: center;
+  //     justify-content: center;
+  //     font-size: 38px;
+  //     font-weight: 800;
+  //   }
+  // }
+
   .settings-tab-content {
     // width: 700px;
 
-    .category-subheading-line {
+    .settings-header {
       display: inline-flex;
       width: 100%;
-      gap: 20px;
-      color: black;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      .settings-actions {
+        display: flex;
+        gap: $spacing-4;
+
+        .vp-btn {
+          width: 150px;
+        }
+      }
+    }
+
+    .category-line {
+      border-color: $neutral-medium;
       opacity: 0.5;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      align-items: center;
-      font-size: 11px;
-      margin-bottom: 12px;
+      margin: $spacing-4 0;
+    }
 
-      .category-line {
-        flex: 1;
+    .settings-input-row {
+      display: inline-flex;
+      width: 100%;
+      gap: $spacing-3;
+
+      .info-popover {
+        margin-top: 23px;
       }
     }
 
-    .settings-input-wrapper {
-      max-width: 700px;
+    .connect-calendar-row {
+      display: flex;
+      width: 100%;
+      gap: $spacing-8;
+      align-items: flex-end;
 
-      .settings-input-label {
-        margin-left: 20px;
-        font-size: 14px;
-        opacity: 0.8;
+      .calendar-selector {
+        width: 350px;
       }
 
-      .settings-form-input {
-        max-width: 700px;
-        border-radius: 20px;
-        height: 50px;
-        line-height: 50px;
-        padding-left: 30px;
-        background-color: white;
-        border: none;
-        font-size: 16px;
-        color: black;
-        margin-top: 5px;
-        transition: all 0.2s ease;
-        outline: 1px solid transparent;
-
-        &__bio {
-          min-height: 150px;
-          // max-width: 100%;
-          line-height: 18px;
-          font-family: inherit;
-          padding-top: 15px;
-        }
-
-        &:focus {
-          outline: 1px solid white;
-        }
-      }
-
-      .form-field-error {
-        margin-top: -20px;
-        margin-left: 25px;
-        font-size: 13px !important;
-        color: rgba(255, 123, 123, 0.745) !important;
+      .connect-calendar-btn {
+        height: 35px;
+        width: 100px;
+        margin-bottom: $spacing-2;
       }
     }
+
+    .image-changer {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      width: 100%;
+      gap: $spacing-3;
+      margin-top: $spacing-4;
+
+      .avatar-container {
+        grid-area: 1 / 1 / 3 / 2;
+        height: 130px;
+        border: 1px solid $accent-secondary;
+        border-radius: $radius-md;
+        position: relative;
+        background: $bg-base;
+        overflow: hidden; // ⬅️ crops top & bottom of the circle
+        isolation: isolate; // keeps blending/filters local (nice but optional)
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%; // center vertically
+          width: 100%; // ⬅️ circle diameter = wrapper width
+          padding-top: 100%; // makes it a square (aspect-ratio: 1/1)
+          transform: translateY(-50%);
+          pointer-events: none;
+          z-index: -1;
+
+          background: radial-gradient(
+            circle at center,
+            /* Ring 1: center glow */ rgba(59, 201, 219, 0.35) 0%,
+            rgba(59, 201, 219, 0.15) 18%,
+            rgba(59, 201, 219, 0) 22%,
+
+            /* Ring 2 */ rgba($accent-secondary, 0.25) 22%,
+            rgba($accent-secondary, 0.1) 30%,
+            rgba($accent-secondary, 0) 35%,
+
+            /* Ring 3 */ rgba($accent-primary, 0.2) 35%,
+            rgba($accent-primary, 0.08) 50%,
+            rgba($accent-primary, 0) 53%,
+
+            /* Ring 4 */ rgba($accent-tertiary, 0.2) 53%,
+            rgba($accent-tertiary, 0.08) 70%,
+            rgba($accent-tertiary, 0) 75%,
+
+            /* Ring 5 */ rgba($bg-surface, 0.2) 76%,
+            rgba($bg-surface, 0.08) 90%,
+            rgba($bg-surface, 0) 98%,
+
+            /* Background fade */ #151538 100%
+          );
+        }
+
+        .avatar-wrapper {
+          border-radius: 50%;
+          width: 100px;
+          height: 100px;
+          background-color: $bg-base;
+          color: $text-primary;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 32px;
+          font-weight: 800;
+          box-shadow:
+            0 0 0.2rem $bg-base,
+            0 0 0.2rem $bg-base,
+            0 0 2rem $accent-primary,
+            0 0 0.8rem $accent-primary,
+            0 0 2.8rem $accent-secondary,
+            inset 0 0 1.3rem $accent-secondary;
+        }
+      }
+    }
+
+    .settings-form-input {
+      margin-top: $spacing-4;
+    }
+
+    // .settings-input-wrapper {
+    //   margin-top: $spacing-3;
+    //   max-width: 700px;
+    // }
   }
 }

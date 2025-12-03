@@ -4,7 +4,8 @@ import { CiHeart } from 'react-icons/ci';
 import { useNavigate } from 'react-router-dom';
 
 import { selectWishlistCount, selectWishlistProducts } from '@store/wishlist';
-import { GalDropdown, GalIcon, GalButton } from '@shared/ui';
+import { GalDropdown, GalIcon, Button } from '@shared/ui';
+import { getCssVar } from '@shared/utils';
 
 import './gal-wishlist-dropdown.styles.scss';
 
@@ -21,7 +22,11 @@ const GalWishlistDropdown: React.FC = () => {
         customClassName="galactica-wishlist"
         trigger={({ toggle }) => (
           <button onClick={toggle} className="wishlist-icon-button">
-            <GalIcon icon={CiHeart} size={18} />
+            <GalIcon
+              icon={CiHeart}
+              size={18}
+              color={getCssVar('--text-primary')}
+            />
             {wishlistProdCount > 0 && (
               <span className="badge" aria-live="polite">
                 {formatCount(wishlistProdCount)}
@@ -38,11 +43,13 @@ const GalWishlistDropdown: React.FC = () => {
                   <div key={item.id} className="cart-item-box">
                     <span className="item-title">{item.name}</span>{' '}
                     <span className="item-price">{item.price}</span>
-                    <GalButton
-                      text="Add to cart"
-                      type="secondary"
+                    <Button
+                      type="button"
+                      variant="secondary"
                       onClick={() => navigate('/app/cart')}
-                    />
+                    >
+                      Add to cart
+                    </Button>
                   </div>
                 ))
               ) : (
@@ -50,11 +57,13 @@ const GalWishlistDropdown: React.FC = () => {
               )}
             </div>
             <div className="wishlist-cart-btn">
-              <GalButton
-                text="Go to wishlist"
-                type="primary"
+              <Button
+                type="button"
+                variant="primary"
                 onClick={() => navigate('/app/library/my-wishlist')}
-              />
+              >
+                Go to wishlist
+              </Button>
             </div>
           </>
         )}

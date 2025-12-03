@@ -1,55 +1,70 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import clsx from 'clsx';
+import { HiChevronDoubleLeft, HiChevronDoubleRight } from 'react-icons/hi2';
+
+import { appRoutes } from '@api/constants';
+import { GalIcon } from '@shared/ui';
+import { getCssVar } from '@shared/utils';
+import { useSidebarLayout } from './sidebar-layout.context';
 
 import './sidebar-nav.styles.scss';
 
-const SidebarNav: React.FC = () => (
-  <nav className="sidebar-nav">
-    <div className="logo-container">
-      <h2>Galactica</h2>
-    </div>
-    <ul>
-      <li>
-        <Link to="/app" className="sidebar-link">
-          Overview
-        </Link>
-      </li>
-      <li>
-        <Link to="/app/products" className="sidebar-link">
-          Products
-        </Link>
-      </li>
-      <li>
-        <Link to="/app/sales" className="sidebar-link">
-          Sales
-        </Link>
-      </li>
-      <li>
-        <Link to="/app/marketing" className="sidebar-link">
-          Marketing
-        </Link>
-      </li>
-      <li>
-        <Link to="/app/analytics" className="sidebar-link">
-          Analytics
-        </Link>
-      </li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li>
-        <a href="/settings">Messages</a>
-      </li>
-      <li>
-        <Link to="/app/settings" className="sidebar-link">
-          Settings
-        </Link>
-      </li>
-    </ul>
-  </nav>
-);
+const SidebarNav: React.FC = () => {
+  const { isSidebarCollapsed, toggleSidebar } = useSidebarLayout();
+
+  const linkClass = (active: boolean) =>
+    clsx('sidebar-link', { 'sidebar-link__active': active });
+
+  const sidebarClass = clsx('sidebar-nav', {
+    'sidebar-nav__collapsed': isSidebarCollapsed,
+  });
+
+  return (
+    <nav className={sidebarClass}>
+      <div className="logo-container">
+        {!isSidebarCollapsed && <h2>Galactica</h2>}
+      </div>
+      <ul className="routes-list">
+        {appRoutes.map((route, index) => (
+          <li key={index}>
+            <NavLink
+              to={route.path}
+              end={route.end}
+              className={({ isActive }) => linkClass(isActive)}
+            >
+              {({ isActive }) => (
+                <>
+                  <GalIcon
+                    icon={route.icon}
+                    color={
+                      isActive
+                        ? getCssVar('--text-primary')
+                        : getCssVar('--text-secondary')
+                    }
+                    size={20}
+                  />
+                  {!isSidebarCollapsed && <span>{route.label}</span>}
+                </>
+              )}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        className="sidebar-nav-toggle"
+        onClick={toggleSidebar}
+        aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      >
+        <GalIcon
+          icon={isSidebarCollapsed ? HiChevronDoubleRight : HiChevronDoubleLeft}
+          size={18}
+          color={getCssVar('--accent-primary')}
+        />
+      </button>
+    </nav>
+  );
+};
 
 export default SidebarNav;

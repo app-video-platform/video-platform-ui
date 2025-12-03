@@ -37,29 +37,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // 3) Otherwise, we either are still loading, or the user is allowed.
   //    In both cases we render the children. If we’re still loading, show a spinner overlay.
-  return (
-    <div style={{ position: 'relative' }}>
-      {children}
-      {authLoading && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            zIndex: 10,
-          }}
-        >
-          <GalSpinner />
-        </div>
-      )}
-    </div>
-  );
+  return authLoading ? <GalSpinner /> : children;
 };
 
 export default ProtectedRoute;

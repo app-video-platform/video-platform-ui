@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
 
-import { GalGoogleSignInButton } from '@components';
+import { GalGoogleSignInButton, PasswordInput } from '@components';
 import { LoginRequest } from '@api/models';
-import { GalFormInput, GalButton } from '@shared/ui';
+import { Input, Button } from '@shared/ui';
 import { signinUser, getUserProfile } from '@store/auth-store';
 import { AppDispatch } from '@store/store';
 
@@ -20,7 +19,6 @@ const SignIn: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,10 +38,6 @@ const SignIn: React.FC = () => {
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,7 +65,7 @@ const SignIn: React.FC = () => {
     <div>
       <div className="sign-up-container">
         <form onSubmit={handleSubmit} noValidate>
-          <GalFormInput
+          <Input
             label="Email"
             type="email"
             name="email"
@@ -81,27 +75,19 @@ const SignIn: React.FC = () => {
           />
           {errors.email && <p className="error-text-red">{errors.email}</p>}
 
-          <div className="password-group">
-            <GalFormInput
-              label="Password"
-              type={showPassword ? 'text' : 'password'} // Toggle input type
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            <button
-              type="button"
-              className="toggle-password-btn"
-              onClick={() => togglePasswordVisibility()}
-            >
-              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-            </button>
-          </div>
+          <PasswordInput
+            label="Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
           {errors.password && (
             <p className="error-text-red">{errors.password}</p>
           )}
-          <GalButton type="primary" htmlType="submit" text="Sign In" />
+          <Button variant="primary" type="submit">
+            Sign in
+          </Button>
         </form>
 
         <GalGoogleSignInButton data-test-id="google-sign-in-button" />

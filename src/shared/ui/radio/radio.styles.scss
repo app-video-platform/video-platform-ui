@@ -1,0 +1,76 @@
+@use '../../../styles/index.scss' as *;
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  cursor: pointer;
+  padding: $spacing-2 $spacing-3;
+  border-radius: $spacing-3;
+  transition:
+    background 0.15s ease,
+    border-color 0.2s ease;
+
+  // Background hover
+  &:hover:not(.radio--disabled) {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  input[type='radio'] {
+    display: none;
+  }
+
+  // Custom radio circle
+  .radio__control {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid $text-secondary;
+    position: relative;
+    flex-shrink: 0;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  // When checked
+  &.checked .radio__control {
+    border-color: $accent-primary;
+    box-shadow: 0 0 10px rgba($accent-primary, 0.5);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 8px;
+      height: 8px;
+      background: $accent-primary;
+      border-radius: 50%;
+    }
+  }
+
+  // Text
+  .radio__content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-1;
+  }
+
+  .radio__label {
+    font-size: 14px;
+    color: $text-primary;
+    font-weight: 500;
+  }
+
+  .radio__description {
+    font-size: 12px;
+    color: $text-secondary;
+    opacity: 0.8;
+  }
+}

@@ -1,15 +1,12 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-import { selectAuthUser } from '@store/auth-store';
-import { GalTabs } from '@shared/ui';
+import { Tabs } from '@shared/ui';
 import {
   ConnectedCalendarTab,
   SettingsAccountSecurityTab,
-  SettingsCloseAccountTab,
   SettingsNotificationsTab,
   SettingsPaymentMethodTab,
-  SettingsPhotoTab,
   SettingsPrivacyTab,
   SettingsProfileTab,
   SettingsSubscriptionsTab,
@@ -17,87 +14,111 @@ import {
 
 import './settings-page.styles.scss';
 
+type SettingsTabSlug =
+  | 'profile'
+  | 'account'
+  | 'subscriptions'
+  | 'payment'
+  | 'calendar'
+  | 'privacy'
+  | 'notifications';
+
 const SettingsPage: React.FC = () => {
-  const user = useSelector(selectAuthUser);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const tabsConfig = useMemo(
+    () => [
+      {
+        slug: 'profile' as SettingsTabSlug,
+        label: 'Profile',
+        content: (
+          <div className="settings-tab-content">
+            <SettingsProfileTab />
+          </div>
+        ),
+      },
+      {
+        slug: 'account' as SettingsTabSlug,
+        label: 'Account',
+        content: (
+          <div className="settings-tab-content">
+            <SettingsAccountSecurityTab />
+          </div>
+        ),
+      },
+      {
+        slug: 'subscriptions' as SettingsTabSlug,
+        label: 'Subscriptions',
+        content: (
+          <div className="settings-tab-content">
+            <SettingsSubscriptionsTab />
+          </div>
+        ),
+      },
+      {
+        slug: 'payment' as SettingsTabSlug,
+        label: 'Payment Methods',
+        content: (
+          <div className="settings-tab-content">
+            <SettingsPaymentMethodTab />
+          </div>
+        ),
+      },
+      {
+        slug: 'calendar' as SettingsTabSlug,
+        label: 'Calendar',
+        content: (
+          <div className="settings-tab-content">
+            <ConnectedCalendarTab />
+          </div>
+        ),
+      },
+      {
+        slug: 'privacy' as SettingsTabSlug,
+        label: 'Privacy',
+        content: (
+          <div className="settings-tab-content">
+            <SettingsPrivacyTab />
+          </div>
+        ),
+      },
+      {
+        slug: 'notifications' as SettingsTabSlug,
+        label: 'Notifications',
+        content: (
+          <div className="settings-tab-content">
+            <SettingsNotificationsTab />
+          </div>
+        ),
+      },
+    ],
+    [],
+  );
+
+  const tabFromUrl = (searchParams.get('tab') as SettingsTabSlug) || 'profile';
+
+  const activeIndex = (() => {
+    const idx = tabsConfig.findIndex((t) => t.slug === tabFromUrl);
+    return idx === -1 ? 0 : idx;
+  })();
+
+  const handleTabChange = (index: number) => {
+    const next = tabsConfig[index];
+    if (!next) {
+      return;
+    }
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set('tab', next.slug);
+    setSearchParams(nextParams, { replace: true }); // avoid polluting history if you want
+  };
 
   return (
     <div className="settings-page">
-      <GalTabs
-        defaultIndex={0}
-        items={[
-          {
-            label: 'Profile',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsProfileTab />
-              </div>
-            ),
-          },
-          {
-            label: 'Photo',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsPhotoTab />
-              </div>
-            ),
-          },
-          {
-            label: 'Account Security',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsAccountSecurityTab />
-              </div>
-            ),
-          },
-          {
-            label: 'My Subscriptions',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsSubscriptionsTab />
-              </div>
-            ),
-          },
-          {
-            label: 'Payment Methods',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsPaymentMethodTab />
-              </div>
-            ),
-          },
-          {
-            label: 'Connected Calendar',
-            content: (
-              <div className="settings-tab-content">
-                <ConnectedCalendarTab />
-              </div>
-            ),
-          },
-          {
-            label: 'Privacy',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsPrivacyTab />
-              </div>
-            ),
-          },
-          {
-            label: 'Notification preferences',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsNotificationsTab />
-              </div>
-            ),
-          },
-          {
-            label: 'Close account',
-            content: (
-              <div className="settings-tab-content">
-                <SettingsCloseAccountTab />
-              </div>
-            ),
-          },
-        ]}
+      <Tabs
+        items={tabsConfig.map(({ label, content }) => ({ label, content }))}
+        activeIndex={activeIndex}
+        onChange={handleTabChange}
       />
     </div>
   );

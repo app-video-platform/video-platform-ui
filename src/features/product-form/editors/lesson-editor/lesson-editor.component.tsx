@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
-import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import { JSONContent } from '@tiptap/react';
 
 import { GalBoxSelector } from '@components';
 import QuizWizard from '../../quiz-wizard/quiz-wizard.component';
@@ -13,8 +10,9 @@ import {
   GalUppyFileUploader,
   GalRichTextEditor,
   GalIcon,
-  GalFormInput,
-  GalButton,
+  Button,
+  Textarea,
+  ExpansionPanel,
 } from '@shared/ui';
 import { CourseLesson, LessonCreate, IRemoveItemPayload } from '@api/models';
 import { LessonType } from '@api/types';
@@ -25,22 +23,20 @@ import {
   deleteLesson,
 } from '@store/product-store';
 import { AppDispatch } from '@store/store';
+import { EditableTitle } from '../editable-title';
+import { LESSON_META } from '@api/constants';
 
 import './lesson-editor.styles.scss';
+import { useLessonAutosave } from '@features/product-form/hooks';
 
 interface LessonEditorProps {
   lesson: CourseLesson;
   index: number;
   sectionId: string;
+  // eslint-disable-next-line no-unused-vars
   removeLessonFromList: (index: number) => void;
-}
-
-interface LessonFormData {
-  id?: string; // Optional, will be set after lesson creation
-  title: string;
-  description: string;
-  content: string;
-  type?: LessonType; // Optional, depending on your requirements
+  // eslint-disable-next-line no-unused-vars
+  onChange: (index: number, lessong: CourseLesson) => void;
 }
 
 const LessonEditor: React.FC<LessonEditorProps> = ({
@@ -48,45 +44,48 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   index,
   sectionId,
   removeLessonFromList,
+  onChange,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
 
-  const [formData, setFormData] = React.useState<LessonFormData>({
-    title: '',
-    description: '',
-    content: '',
-    type: '' as LessonType,
-    id: lesson.id || '', // Set the ID if it exists
-  });
-
   const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
-  const [contentJSON, setContentJSON] = React.useState<any>(null);
+  const [contentJSON, setContentJSON] = React.useState<JSONContent | null>(
+    null,
+  );
 
   const [isLessonCreated, setIsLessonCreated] = useState(false);
 
-  useEffect(() => {
-    if (lesson) {
-      setFormData({
-        title: lesson.title || '',
-        description: lesson.description || '',
-        content: lesson.content || '',
-        id: lesson.id || '',
-        type: lesson.type || ('VIDEO' as LessonType),
-      });
-    }
+  const { isAutosaving, lastSavedAt } = useLessonAutosave({
+    lesson,
+    user,
+    sectionId,
+    dispatch,
+  });
 
+  useEffect(() => {
+    if (isLessonCreated) {
+      return;
+    }
     if (lesson && lesson.id) {
       setIsLessonCreated(true);
     }
+    if (!lesson.id && lesson.type && lesson.title) {
+      handleCreateLesson();
+    }
   }, [lesson]);
+
+  const updateLesson = (patch: Partial<CourseLesson>) => {
+    const next: CourseLesson = {
+      ...lesson,
+      ...patch,
+    };
+    onChange(index, next);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    updateLesson({ [name]: value } as any);
   };
 
   const handleCreateLesson = () => {
@@ -96,19 +95,19 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       return;
     }
 
-    if (!formData.title) {
+    if (!lesson.title) {
       window.alert('Lesson title is required');
       return;
     }
-    if (!formData.type) {
+    if (!lesson.type) {
       window.alert('Lesson type is required');
       return;
     }
 
     const createLessonPayload: LessonCreate = {
-      title: formData.title,
-      type: formData.type, // Default to VIDEO if not specified
-      description: formData.description,
+      title: lesson.title,
+      type: lesson.type, //Default to VIDEO if not specified
+      description: lesson.description ?? '',
       position: index + 1, // Assuming position is based on the index
       sectionId: sectionId, // Assuming lesson has a sectionId
       userId: user.id, // User ID from the auth state
@@ -117,13 +116,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     dispatch(createLesson(createLessonPayload))
       .unwrap()
       .then((response) => {
-        setFormData({
-          title: response.title ?? '',
-          description: response.description ?? '',
-          content: '',
-          id: response.id, // Set the ID after creation
-          type: response.type || ('VIDEO' as LessonType), // Default to VIDEO if not specified
-        });
+        updateLesson({ id: response.id });
         setIsLessonCreated(true);
       })
       .catch((error) => {
@@ -136,8 +129,8 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       console.error('User ID is not available for update');
       return;
     }
-    // Logic to update an existing lesson
-    const lessonId = lesson.id ?? formData.id;
+    //Logic to update an existing lesson
+    const lessonId = lesson.id ?? lesson.id;
 
     if (!lessonId) {
       console.error('Lesson ID is not available for update');
@@ -145,11 +138,11 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     }
 
     const updateLessonPayload: CourseLesson = {
-      ...formData,
+      ...lesson,
       id: lessonId,
       sectionId: sectionId, // Assuming lesson has a sectionId
-      position: index + 1, // Assuming position is based on the index
-      // userId: user.id, // User ID from the auth state
+      position: index + 1, //Assuming position is based on the index
+      userId: user.id, // User ID from the auth state
     };
 
     dispatch(updateLessonDetails(updateLessonPayload))
@@ -171,9 +164,9 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       console.error('User ID is not available for deletion');
       return;
     }
-    if (formData.id) {
+    if (lesson.id) {
       const removeLessonPayload: IRemoveItemPayload = {
-        id: formData.id, // Use the ID from formData
+        id: lesson.id, //Use the ID from formData
         userId: user.id, // Ensure user ID is available
       };
 
@@ -193,7 +186,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   };
 
   const renderContentField = () => {
-    switch (formData.type) {
+    switch (lesson.type) {
       case 'VIDEO':
         return (
           <GalUppyFileUploader
@@ -206,7 +199,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         return (
           <div className="form-input-group">
             <GalRichTextEditor
-              initialContent={contentJSON}
+              initialContent={contentJSON ?? {}}
               onChange={(json) => setContentJSON(json)}
             />
           </div>
@@ -223,72 +216,74 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         );
 
       default:
-        // If no valid type is selected, return null or a message
+        //If no valid type is selected, return null or a message
         return null;
     }
   };
 
   return (
-    <div className="lesson-editor">
-      <div className="lesson-editor-header">
-        <h4>Lesson {index + 1}</h4>
-        <button
-          className="remove-lesson-button"
-          type="button"
-          onClick={handleDeleteLesson}
-        >
-          <GalIcon icon={MdDeleteForever} size={24} color="red" />
-        </button>
-      </div>
-      <div>
-        <GalFormInput
-          label="Lesson Title"
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-        />
-
-        <GalFormInput
-          label="Lesson Description"
-          type="text"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-        />
-
-        <GalBoxSelector<LessonType>
-          selectedOption={formData.type}
-          onSelect={(type) => setFormData((prev) => ({ ...prev, type }))}
-          availableOptions={['VIDEO', 'ARTICLE', 'QUIZ']} // Example lesson types
-          disabledOptions={[]} // Add any disabled options if needed
-        />
-
-        {}
-
-        <div className="content-field">
-          {isLessonCreated ? (
-            <>
-              {renderContentField()}
-              <GalButton
-                type="primary"
-                text="Update Lesson"
-                htmlType="button"
-                onClick={handleUpdateLesson}
-              />
-            </>
-          ) : (
-            <GalButton
-              type="primary"
-              text="Create Lesson"
-              htmlType="button"
-              onClick={handleCreateLesson}
-              disabled={!formData.title}
+    <ExpansionPanel
+      className="lesson-editor"
+      id={`lesson-${lesson.id}`}
+      defaultExpanded={true}
+      hideToggle={!lesson.id}
+      header={
+        <div className="lesson-editor-header">
+          <div className="lesson-title-block">
+            <GalIcon
+              icon={
+                LESSON_META[(lesson.type as LessonType) ?? 'ASSIGNMENT'].icon
+              }
+              color={
+                LESSON_META[(lesson.type as LessonType) ?? 'ASSIGNMENT'].color
+              }
+              size={24}
             />
+            <EditableTitle
+              value={lesson.title ?? ''}
+              placeholder={`Untitled lesson ${index + 1}`}
+              onChange={(title: string) => updateLesson({ title })}
+              small
+            />
+          </div>
+          <Button type="button" onClick={handleDeleteLesson} variant="remove">
+            Remove
+          </Button>
+        </div>
+      }
+    >
+      <>
+        <div className="lesson-type-selectors">
+          <GalBoxSelector<LessonType>
+            selectedOption={lesson.type}
+            selectFor="lesson"
+            onSelect={(type) => updateLesson({ type })}
+            availableOptions={['VIDEO', 'ARTICLE', 'QUIZ']} // Example lesson types
+            disabledOptions={[]} //Add any disabled options if needed
+          />
+        </div>
+        <div className="content-field">
+          {isLessonCreated && (
+            <>
+              <Textarea
+                value={lesson.description ?? ''}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  updateLesson({ description: e.target.value })
+                }
+                placeholder="Write a short description for this lesson..."
+                isMaxLengthShown={true}
+                maxLength={250}
+                className="lesson-description"
+                block
+              />
+              <div className="lesson-content-wrapper">
+                {renderContentField()}
+              </div>
+            </>
           )}
         </div>
-      </div>
-    </div>
+      </>
+    </ExpansionPanel>
   );
 };
 

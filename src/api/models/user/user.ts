@@ -9,6 +9,7 @@ export interface User {
   roles: UserRole[];
   onboardingCompleted?: boolean;
   title?: string;
+  imageUrl?: string;
   bio?: string;
   taglineMission?: string;
   website?: string;

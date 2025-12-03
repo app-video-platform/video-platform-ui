@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import { AppDispatch } from '@store/store';
 import { resetOnboarding } from '@store/auth-store';
 
@@ -43,12 +43,16 @@ const CountdownRedirect: React.FC = () => {
       <p>You will be redirected to your dashboard in {seconds} seconds</p>;
       <p>
         Or you can{' '}
-        <GalButton
-          type="primary"
-          text="go now"
+        <Button
+          type="button"
+          variant="primary"
           onClick={() => navigate('/app')}
-        />
-        <GalButton type="primary" text="RESET" onClick={handleReset} />
+        >
+          Go now
+        </Button>
+        <Button type="button" variant="primary" onClick={handleReset}>
+          RESET
+        </Button>
       </p>
     </div>
   );

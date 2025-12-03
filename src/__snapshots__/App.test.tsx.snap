@@ -63,7 +63,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
           >
             <li>
               <button
-                class="vp-button vp-button--secondary undefined"
+                class="vp-btn vp-btn__secondary vp-btn__square"
                 type="button"
               >
                 Sign In
@@ -71,7 +71,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
             </li>
             <li>
               <button
-                class="vp-button vp-button--primary undefined"
+                class="vp-btn vp-btn__primary vp-btn__square"
                 type="button"
               >
                 Register
@@ -102,7 +102,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
         </p>
         <button
-          class="vp-button vp-button--primary hero-cta"
+          class="vp-btn vp-btn__primary vp-btn__square hero-cta"
           type="button"
         >
           Launch Now
@@ -270,13 +270,13 @@ exports[`App Component matches snapshot after navigation 1`] = `
         class="btns-container"
       >
         <button
-          class="vp-button vp-button--primary undefined"
+          class="vp-btn vp-btn__primary vp-btn__square"
           type="button"
         >
           Launch Now
         </button>
         <button
-          class="vp-button vp-button--secondary undefined"
+          class="vp-btn vp-btn__secondary vp-btn__square"
           type="button"
         >
           Learn More

@@ -1,99 +1,71 @@
 @use 'sass:color';
+@use '../../../../../styles/index.scss' as *;
 
-.price-selector-wrapper, .sections-container {
-  margin-top: 40px;
-}
-
-.image-uploader {
-  display: flex;
+.product-builder {
   width: 100%;
-  align-items: center;
-  margin-top: 40px;
 
-  .image-uploader-box {
-    width: 50%;
-  }
-}
-
-.create-new-product-header {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-
-  h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: black;
-  }
-}
-
-
-// .action-btns-wrapper {
-//   display: flex;
-//   width: 100%;
-//   margin-top: 40px;
-//   justify-content: center;
-// }
-
-.type-selectors-container {
-  display: flex;
-  width: 60%;
-  margin: auto;
-  justify-content: space-between;
-
-  .type-box {
-    height: 110px;
-    width: 130px;
-    border: 4px solid black;
-    border-radius: 15px;
+  &__full {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.5s ease;
+    // gap: $spacing-5;
+    align-items: flex-start; // important so the sticky element doesn't stretch
+  }
 
-    &__selected {
-      border-color: rgb(19, 170, 19);
-      background-color: rgb(248, 255, 241);
+  .product-create-sidebar {
+    flex: 0 0 280px; // sidebar column width
+    max-width: 320px;
+  }
 
-      &:hover {
-        background-color: rgb(248, 255, 241) !important;
-      }
-    }
-
-    &:hover {
-      background-color: rgb(216, 216, 216);
-    }
+  .product-create-section {
+    flex: 1 1 auto;
+    min-width: 0; // so content can shrink instead of overflowing
   }
 }
 
-.save-product-btn {
-  height: 80px;
-  width: 150px;
-  background-color: black;
-  color: white;
-  margin: 20px auto;
-  border-radius: 20px;
+.product-create-hero {
+  // max-width: 640px;
+  margin: $spacing-7 auto 0;
+  transition: opacity 0.2s ease;
+
+  &__collapsed {
+    position: absolute;
+    // GSAP will handle transforms; keep it positionally flexible
+  }
+
+  &__hidden {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+  }
+}
+
+.product-summary-header {
   display: flex;
-  justify-content: center;
   align-items: center;
-
-  &:hover {
-    background-color: color.scale(black, $lightness: 10%);
-  }
-}
-
-.type-box__disabled {
+  gap: 12px;
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(-8px);
   pointer-events: none;
-  opacity: 0.5;
-}
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 
+  &__visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 
-.course-continue-button-wrapper {
-  width: 100%;
-  
-  .create-course-continue-button {
-    margin: 20px auto;
-    display: block;
+  &__type-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba($muted-galactic-purple, 0.6);
+    font-size: 12px;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
   }
 }

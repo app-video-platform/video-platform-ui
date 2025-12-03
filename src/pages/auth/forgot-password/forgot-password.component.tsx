@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 import React, { useState } from 'react';
 
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import {
   ChangePassword,
   EnterCode,
@@ -64,13 +64,9 @@ const ForgotPassword: React.FC = () => {
   return (
     <div className="forgot-password-page">
       {renderStep()}
-
-      <GalButton
-        text="Back to Sign In"
-        htmlType="button"
-        type="neutral"
-        customClassName="back-btn"
-      />
+      <Button type="button" variant="neutral" className="back-btn">
+        Back to Sign In
+      </Button>
     </div>
   );
 };

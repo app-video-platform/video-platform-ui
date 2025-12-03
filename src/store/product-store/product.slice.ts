@@ -9,6 +9,7 @@ import {
   IRemoveItemPayload,
   CourseLesson,
   LessonCreate,
+  AbstractProductBase,
 } from '@api/models';
 import {
   createProductAPI,
@@ -24,7 +25,7 @@ import {
   addImageToProductAPI,
   getProductByProductIdAPI,
 } from '@api/services';
-import { AbstractProduct, ProductType } from '@api/types';
+import { AbstractProduct, CreateProductPayload, ProductType } from '@api/types';
 import { extractErrorMessage } from '@shared/utils';
 
 interface ProductState {
@@ -43,7 +44,7 @@ const initialState: ProductState = {
 
 export const createCourseProduct = createAsyncThunk<
   AbstractProduct, // what this thunk returns on success
-  AbstractProduct, // the argument you pass in
+  CreateProductPayload, // the argument you pass in
   { rejectValue: string }
 >('products/createCourseProduct', async (payload, thunkAPI) => {
   try {
@@ -56,7 +57,7 @@ export const createCourseProduct = createAsyncThunk<
 
 export const updateCourseProductDetails = createAsyncThunk<
   AbstractProduct, // what this thunk returns on success
-  AbstractProduct, // the argument you pass in
+  AbstractProductBase, // the argument you pass in
   { rejectValue: string }
 >('products/updateCourseProductDetails', async (payload, thunkAPI) => {
   try {
@@ -73,7 +74,7 @@ export const deleteProduct = createAsyncThunk<
   { rejectValue: string }
 >('products/deleteProduct', async (payload, thunkAPI) => {
   try {
-    const response = await deleteProductAPI(payload);
+    const response: string = await deleteProductAPI(payload);
     return response;
   } catch (err: unknown) {
     return thunkAPI.rejectWithValue(extractErrorMessage(err));
@@ -179,8 +180,8 @@ export const addImageToProduct = createAsyncThunk<
   'products/addImageToProduct',
   async ({ productId, image }, { rejectWithValue }) => {
     try {
-      const response = await addImageToProductAPI(image, productId);
-      return response; // API returns user info with token
+      const res = await addImageToProductAPI(image, productId);
+      return res; // API returns user info with token
     } catch (error: unknown) {
       return rejectWithValue(extractErrorMessage(error));
     }
@@ -224,14 +225,16 @@ const productsSlice = createSlice({
     },
 
     deleteSectionFromStore(state, action: PayloadAction<string>) {
-      if (
-        state.currentProduct &&
-        state.currentProduct.type !== 'CONSULTATION'
-      ) {
-        state.currentProduct.sections = state.currentProduct.sections?.filter(
-          (section) => section.id !== action.payload,
-        );
-      }
+      // if (
+      //   state.currentProduct &&
+      //   state.currentProduct.type !== 'CONSULTATION' &&
+      //   state.currentProduct.sections &&
+      //   state.currentProduct.sections.length > 0
+      // ) {
+      //   state.currentProduct.sections = state.currentProduct.sections.filter(
+      //     (section) => section.id !== action.payload,
+      //   );
+      // }
     },
 
     deleteLessonFromStore(

@@ -1,0 +1,14 @@
+@use '../../../styles/index.scss' as *;
+
+.settings-section {
+  display: flex;
+  width: 100%;
+
+  .section-header {
+    width: 40%;
+  }
+
+  .section-content {
+    flex: 1;
+  }
+}

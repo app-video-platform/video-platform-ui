@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 
 import './home.styles.scss';
 
@@ -21,12 +21,14 @@ const Home: React.FC = () => {
             tortor dolor.
           </p>
 
-          <GalButton
-            text="Launch Now"
-            type="primary"
+          <Button
+            type="button"
+            variant="primary"
+            className="hero-cta"
             onClick={() => navigate('pricing')}
-            customClassName="hero-cta"
-          />
+          >
+            Launch Now
+          </Button>
         </div>
         <div className="hero-image"></div>
       </section>
@@ -122,16 +124,21 @@ const Home: React.FC = () => {
           tortor dolor.
         </p>
         <div className="btns-container">
-          <GalButton
-            text="Launch Now"
-            type="primary"
+          <Button
+            type="button"
+            variant="primary"
             onClick={() => navigate('pricing')}
-          />
-          <GalButton
-            text="Learn More"
-            type="secondary"
+          >
+            Launch Now
+          </Button>
+
+          <Button
+            type="button"
+            variant="secondary"
             onClick={() => navigate('pricing')}
-          />
+          >
+            Learn More
+          </Button>
         </div>
       </section>
     </main>

@@ -1,0 +1,49 @@
+@use '../../../styles/index.scss' as *;
+
+.builder-sidebar {
+  background: rgba($color: $bg-elevated, $alpha: 0.4);
+  border-radius: $radius-md;
+  border: 2px solid transparent;
+  background:
+    linear-gradient($bg-surface, $bg-surface) padding-box,
+    /* inner layer */ linear-gradient(135deg, $bg-base, $accent-secondary)
+      border-box; /* gradient border */
+  width: 240px;
+  min-height: 500px;
+
+  .builder-sidebar-tabs {
+    list-style: none;
+    padding: $spacing-5;
+
+    .sidebar-tab {
+      line-height: 3rem;
+      color: $text-primary;
+      display: inline-flex;
+      gap: $spacing-2;
+
+      &__active {
+        color: $accent-primary-dark;
+      }
+    }
+
+    .sidebar-outline-section {
+      margin-left: $spacing-3;
+      line-height: 2rem;
+      color: $text-primary;
+      display: inline-flex;
+      gap: $spacing-2;
+    }
+
+    .builder-sidebar-outline-lessons {
+      list-style: none;
+
+      .sidebar-outline-lesson {
+        margin-left: $spacing-6;
+        line-height: 1.5rem;
+        color: $text-primary;
+        display: inline-flex;
+        gap: $spacing-2;
+      }
+    }
+  }
+}

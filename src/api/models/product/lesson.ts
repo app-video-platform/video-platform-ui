@@ -1,3 +1,4 @@
+import { QuizQuestion } from '@api/types';
 import { LessonType } from '../../types/products.types';
 
 export interface CourseLesson {
@@ -21,4 +22,10 @@ export interface LessonCreate {
   content?: string;
   description: string;
   position?: number;
+}
+
+export interface QuizLesson extends CourseLesson {
+  passingScore: number;
+  questions: QuizQuestion[];
+  totalScore?: number;
 }

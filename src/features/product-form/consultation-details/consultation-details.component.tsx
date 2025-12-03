@@ -2,20 +2,22 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 
-import { GalSelect, GalFormInput, GalSelectOption } from '@shared/ui';
-import { NewProductFormData, FormErrors } from '@pages/app';
+import { Select, Input, SelectOption } from '@shared/ui';
+import { FormErrors } from '@pages/app';
 import {
   MeetingMethods,
   CANCELATION_POLICIES,
   CancelationPolicyId,
 } from '@api/enums';
 import { CancelationPolicy } from '@api/models';
+import { MeetingMethod } from '@api/types';
+import { ProductDraft } from '../models';
 
 import './consultation-details.styles.scss';
 
 export interface IConsultationDetails {
   duration: number;
-  meetingMethod: MeetingMethods;
+  meetingMethod?: MeetingMethod;
   customLocation?: string;
   bufferBefore?: number;
   bufferAfter?: number;
@@ -25,7 +27,7 @@ export interface IConsultationDetails {
 }
 
 interface ConsultationDetailsProps {
-  formData: NewProductFormData;
+  formData: ProductDraft;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFormData: (e: any) => void;
   errors: FormErrors;
@@ -56,7 +58,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
       cancelationPolicy: defaultPolicy,
     });
 
-  const TIME_OPTIONS: GalSelectOption[] = Array.from(
+  const TIME_OPTIONS: SelectOption[] = Array.from(
     { length: (120 - 20) / 5 + 1 },
     (_, i) => {
       const value = 20 + i * 5;
@@ -67,7 +69,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
     },
   );
 
-  const MEETING_METHOD_OPTIONS: GalSelectOption[] = Object.entries(
+  const MEETING_METHOD_OPTIONS: SelectOption[] = Object.entries(
     MeetingMethods,
   ).map(([key, value]) => ({
     value: key, // 'ZOOM', 'GOOGLE', etc.
@@ -86,7 +88,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
 
   return (
     <div className="consultation-details">
-      <GalSelect
+      <Select
         options={TIME_OPTIONS}
         name="duration"
         label="Duration"
@@ -96,18 +98,18 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
         }
       />
 
-      <GalSelect
+      <Select
         options={MEETING_METHOD_OPTIONS}
         name="meetingMethod"
         label="Meeting Method"
-        value={consultationForm.meetingMethod}
+        value={consultationForm.meetingMethod ?? ''}
         onChange={(e: { target: { value: string } }) =>
           handleFormChange('meetingMethod', e.target.value)
         }
       />
 
       {consultationForm.meetingMethod === MeetingMethods.OTHER && (
-        <GalFormInput
+        <Input
           label="Custom Location"
           type="text"
           name="customLocation"
@@ -118,7 +120,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
         />
       )}
 
-      <GalFormInput
+      <Input
         label="Buffer Time Before"
         type="number"
         name="bufferBefore"
@@ -128,7 +130,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
         }
       />
 
-      <GalFormInput
+      <Input
         label="Buffer Time After"
         type="number"
         name="bufferAfter"
@@ -138,7 +140,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
         }
       />
 
-      <GalFormInput
+      <Input
         label="Max Sessions per Day"
         type="number"
         name="maxSessions"
@@ -148,7 +150,7 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
         }
       />
 
-      <GalFormInput
+      <Input
         label="Confirmation Message"
         type="number"
         name="confirmationMessage"

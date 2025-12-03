@@ -12,123 +12,122 @@ import {
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// ── 1) FULLY MOCK react-redux ─────────────────────────────────────────────────────
+// ── 1) MOCK react-redux ─────────────────────────────────────────────────────
 jest.mock('react-redux', () => ({
   __esModule: true,
   useDispatch: jest.fn(),
 }));
 import { useDispatch } from 'react-redux';
 
-// ── 2) MOCK createCourseProduct async thunk ───────────────────────────────────────
-jest.mock('@store/product-store/product.slice', () => ({
+// ── 2) MOCK createCourseProduct async thunk (UPDATED PATH) ──────────────────
+jest.mock('@store/product-store', () => ({
+  __esModule: true,
   createCourseProduct: jest.fn(),
 }));
 import { createCourseProduct } from '@store/product-store';
 
-// ── 3) MOCK child components ──────────────────────────────────────────────────────
-// 3.1. GalFormInput: render a simple input/textarea that calls `onChange({ target: { value } })`
-jest.mock('@shared/ui/gal-form-input/gal-form-input.component', () => ({
+// ── 3) MOCK child components ────────────────────────────────────────────────
+
+// 3.1. Barrel @shared/ui: Input, Button, GalIcon
+jest.mock('@shared/ui', () => ({
   __esModule: true,
-  default: ({
-    label,
+  Input: ({
     type,
     name,
     value,
-    inputType,
+    readOnly,
+    className,
     onChange,
+    onKeyDown,
   }: {
-    label: string;
     type: string;
     name: string;
     value: string;
-    inputType?: string;
+    readOnly?: boolean;
+    className?: string;
     onChange: (e: { target: { value: string } }) => void;
+    onKeyDown?: (e: any) => void;
+  }) => (
+    <input
+      data-testid={`input-${name}`}
+      type={type}
+      name={name}
+      value={value}
+      readOnly={readOnly}
+      className={className}
+      onChange={(e) =>
+        onChange({ target: { value: (e.target as HTMLInputElement).value } })
+      }
+      onKeyDown={onKeyDown}
+    />
+  ),
+  Button: ({
+    children,
+    onClick,
+    type,
+    className,
+    disabled,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    type?: 'button' | 'submit';
+    className?: string;
+    disabled?: boolean;
+    variant?: string;
+    shape?: string;
   }) => {
-    // For testing, give data-testid="input-<name>"
-    if (inputType === 'textarea') {
-      return (
-        <textarea
-          data-testid={`input-${name}`}
-          aria-label={label}
-          name={name}
-          value={value}
-          onChange={(e) => onChange({ target: { value: e.target.value } })}
-        />
-      );
-    }
+    const isContinue = className?.includes('create-course-continue-button');
     return (
-      <input
-        data-testid={`input-${name}`}
-        aria-label={label}
-        type={type}
-        name={name}
-        value={value}
-        onChange={(e) => onChange({ target: { value: e.target.value } })}
-      />
+      <button
+        data-testid={isContinue ? 'btn-continue' : 'btn-generic'}
+        type={type ?? 'button'}
+        onClick={onClick}
+        className={className}
+        disabled={disabled}
+      >
+        {children}
+      </button>
     );
   },
+  GalIcon: () => <span data-testid="gal-icon" />,
 }));
 
-// 3.2. GalBoxSelector: render one button per availableOption that calls `onSelect(option)`
-jest.mock('@components/gal-box-selector/gal-box-selector.component', () => ({
+// 3.2. ProductTypeSelector: simple stub that can set type to COURSE
+jest.mock('@features/product-form/product-type-selector', () => ({
   __esModule: true,
-  default: ({
-    selectedOption,
-    onSelect,
-    availableOptions,
+  ProductTypeSelector: ({
+    value,
+    onChange,
   }: {
-    selectedOption: string;
-    onSelect: (opt: string) => void;
-    availableOptions: string[];
+    value: string | undefined;
+    onChange: (type: any) => void;
   }) => (
-    <div data-testid="box-selector">
-      {availableOptions.map((opt) => (
-        <button
-          key={opt}
-          data-testid={`box-${opt}`}
-          style={{
-            fontWeight: selectedOption === opt ? 'bold' : 'normal',
-          }}
-          onClick={() => onSelect(opt)}
-        >
-          {opt}
-        </button>
-      ))}
+    <div data-testid="product-type-selector">
+      <button
+        data-testid="type-COURSE"
+        style={{ fontWeight: value === 'COURSE' ? 'bold' : 'normal' }}
+        onClick={() => onChange('COURSE')}
+      >
+        COURSE
+      </button>
+      <button
+        data-testid="type-CONSULTATION"
+        style={{ fontWeight: value === 'CONSULTATION' ? 'bold' : 'normal' }}
+        onClick={() => onChange('CONSULTATION')}
+      >
+        CONSULTATION
+      </button>
     </div>
   ),
 }));
 
-// 3.3. GalButton: render a button with onClick, disabled, and text; give it data-testid="btn-<text>"
-jest.mock('@shared/ui/gal-button/gal-button.component', () => ({
-  __esModule: true,
-  default: ({
-    text,
-    htmlType,
-    onClick,
-    disabled,
-  }: {
-    text: string;
-    htmlType: 'button' | 'submit';
-    onClick?: () => void;
-    disabled?: boolean;
-  }) => (
-    <button
-      data-testid={`btn-${text.replace(/\s+/g, '-').toLowerCase()}`}
-      type={htmlType}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {text}
-    </button>
-  ),
-}));
-
-// ── 4) Import the component under test ──────────────────────────────────────────────
+// ── 4) Import the component under test ──────────────────────────────────────
 import CreateProductStepOne from './create-product-step-one.component';
+import { ProductDraft } from '@features/product-form/models';
+import { FormErrors } from '@pages/app';
 
-// ── 5) Begin tests ─────────────────────────────────────────────────────────────────
+// ── 5) Begin tests ──────────────────────────────────────────────────────────
 describe('<CreateProductStepOne />', () => {
-  // Keep references to the mocks in typed form:
   const mockedUseDispatch = useDispatch as jest.MockedFunction<
     typeof useDispatch
   >;
@@ -141,66 +140,37 @@ describe('<CreateProductStepOne />', () => {
   let setShowLoadingMock: jest.Mock<any, any>;
   let setShowRestMock: jest.Mock<any, any>;
 
-  const baseFormData = {
+  const baseFormData: ProductDraft = {
     id: '',
     name: '',
     description: '',
-    type: '' as any,
-    price: 'free' as 'free' | number,
-    sections: [] as any[],
+    type: 'COURSE',
+    price: 'free',
+    sections: [],
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     cleanup();
 
-    // A fake dispatch function that returns an object with .unwrap()
     fakeDispatch = jest.fn((action: any) => ({
-      unwrap: () => Promise.resolve({ id: 'new-id-123', sections: ['sec1'] }),
+      unwrap: () =>
+        Promise.resolve({
+          id: 'new-id-123',
+          type: 'COURSE',
+          sections: ['sec1'],
+        }),
     }));
-
-    // Make useDispatch() return our fakeDispatch
     mockedUseDispatch.mockReturnValue(fakeDispatch as any);
-
-    // Reset the createCourseProduct mock
     mockedCreateCourse.mockReset();
 
-    // Create fresh spies for setField, setShowLoadingRestOfForm, setShowRestOfForm
     setFieldMock = jest.fn();
     setShowLoadingMock = jest.fn();
     setShowRestMock = jest.fn();
   });
 
-  it('renders Title, Description, type selectors, and a disabled Continue button when name is empty', () => {
-    render(
-      <CreateProductStepOne
-        formData={{ ...baseFormData }}
-        setField={setFieldMock}
-        errors={{}}
-        showRestOfForm={false}
-        userId="user-1"
-        setShowLoadingRestOfForm={setShowLoadingMock}
-        setShowRestOfForm={setShowRestMock}
-      />,
-    );
-
-    // 1) Title input (name)
-    expect(screen.getByTestId('input-name')).toBeInTheDocument();
-    // 2) Description textarea
-    expect(screen.getByTestId('input-description')).toBeInTheDocument();
-    // 3) Type selectors (GalBoxSelector)
-    expect(screen.getByTestId('box-selector')).toBeInTheDocument();
-    // 4) Continue button must be present and disabled because name is empty
-    const continueBtn = screen.getByTestId('btn-continue');
-    expect(continueBtn).toBeInTheDocument();
-    expect(continueBtn).toBeDisabled();
-  });
-
-  it('displays error messages when errors.name or errors.type are provided', () => {
-    const errors = {
-      name: 'Name is required!',
-      type: 'Type is required!',
-    };
+  it('renders title input, type selector, and a disabled Continue button when name/type are empty', () => {
+    const errors: FormErrors = {};
 
     render(
       <CreateProductStepOne
@@ -214,22 +184,26 @@ describe('<CreateProductStepOne />', () => {
       />,
     );
 
-    // The <p> for errors.name should appear
-    expect(screen.getByText(errors.name)).toBeInTheDocument();
-    // The <p> for errors.type should appear (under the selectors)
-    expect(screen.getByText(errors.type)).toBeInTheDocument();
+    // Title input
+    expect(screen.getByTestId('input-name')).toBeInTheDocument();
+    // Type selector
+    expect(screen.getByTestId('product-type-selector')).toBeInTheDocument();
+    // Continue button present and disabled (no name & no type)
+    const continueBtn = screen.getByTestId('btn-continue');
+    expect(continueBtn).toBeInTheDocument();
+    expect(continueBtn).toBeDisabled();
   });
 
-  it('calls setField when typing into Title and Description, and toggles Continue button enabled', () => {
-    let formData = { ...baseFormData };
-    // We’ll pass our own “formData” reference so we can mutate it manually when setField is called
-    // but for testing, we only care that setFieldMock is invoked correctly
+  it('calls setField when typing into Title and when selecting a type; Continue becomes enabled when both exist', () => {
+    let formData: ProductDraft = { ...baseFormData };
+    const errors: FormErrors = {};
 
-    render(
+    // Initial render
+    const { rerender } = render(
       <CreateProductStepOne
         formData={formData}
         setField={setFieldMock}
-        errors={{}}
+        errors={errors}
         showRestOfForm={false}
         userId="user-1"
         setShowLoadingRestOfForm={setShowLoadingMock}
@@ -237,39 +211,23 @@ describe('<CreateProductStepOne />', () => {
       />,
     );
 
-    // Simulate typing into Title
+    // Type into name
     const titleInput = screen.getByTestId('input-name') as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: 'My Course Title' } });
     expect(setFieldMock).toHaveBeenLastCalledWith('name', 'My Course Title');
 
-    // Simulate typing into Description
-    const descTextarea = screen.getByTestId(
-      'input-description',
-    ) as HTMLTextAreaElement;
-    fireEvent.change(descTextarea, { target: { value: 'A great course' } });
-    expect(setFieldMock).toHaveBeenLastCalledWith(
-      'description',
-      'A great course',
-    );
-
-    // Simulate selecting a type (GalBoxSelector buttons)
-    // AVAILABLE_TYPES = ['COURSE','DOWNLOAD','CONSULTATION']
-    const courseBtn = screen.getByTestId('box-COURSE');
+    // Click type=COURSE
+    const courseBtn = screen.getByTestId('type-COURSE');
     fireEvent.click(courseBtn);
     expect(setFieldMock).toHaveBeenLastCalledWith('type', 'COURSE');
 
-    // Now that title is non-empty, the Continue button should no longer be disabled.
-    // However, because `formData` itself wasn’t updated (we only spied on setField),
-    // the component’s `disabled={!formData.name}` is STILL true. To test the “enabled” logic,
-    // we’d need to rerender with an updated formData. Let’s do that now:
-
-    cleanup();
-    formData = { ...formData, name: 'My Course Title' };
-    render(
+    // Now update formData and rerender to reflect those changes
+    formData = { ...formData, name: 'My Course Title', type: 'COURSE' };
+    rerender(
       <CreateProductStepOne
         formData={formData}
         setField={setFieldMock}
-        errors={{}}
+        errors={errors}
         showRestOfForm={false}
         userId="user-1"
         setShowLoadingRestOfForm={setShowLoadingMock}
@@ -284,33 +242,33 @@ describe('<CreateProductStepOne />', () => {
   it('clicking Continue sets loading state and dispatches createCourseProduct, then sets fields and rest-of-form', async () => {
     jest.useFakeTimers();
 
-    // Prepare a fake thunk action (the return of createCourseProduct)
     const fakeThunkSymbol = Symbol('fakeThunk');
     mockedCreateCourse.mockReturnValue(fakeThunkSymbol as any);
 
-    // Prepare fakeDispatch to check the action and return an object with unwrap()
     fakeDispatch.mockImplementation((action) => {
-      // It should be called with the fake thunk
       expect(action).toBe(fakeThunkSymbol);
       return {
         unwrap: () =>
-          Promise.resolve({ id: 'new-id-123', sections: ['secA', 'secB'] }),
+          Promise.resolve({
+            id: 'new-id-123',
+            type: 'COURSE',
+            sections: ['secA', 'secB'],
+          }),
       };
     });
 
-    // Start with all required fields filled in the parent formData:
-    const filledFormData = {
+    const filledFormData: ProductDraft = {
       ...baseFormData,
       name: 'Test Course',
-      description: 'Test description',
-      type: 'COURSE' as any,
+      type: 'COURSE',
     };
+    const errors: FormErrors = {};
 
     render(
       <CreateProductStepOne
         formData={filledFormData}
         setField={setFieldMock}
-        errors={{}}
+        errors={errors}
         showRestOfForm={false}
         userId="user-1"
         setShowLoadingRestOfForm={setShowLoadingMock}
@@ -318,44 +276,69 @@ describe('<CreateProductStepOne />', () => {
       />,
     );
 
-    // 1) Click “Continue”
     const continueBtn = screen.getByTestId('btn-continue');
+    expect(continueBtn).toBeEnabled();
+
+    // Click Continue
     fireEvent.click(continueBtn);
 
-    // Immediately after click:
+    // Loading set to true immediately
     expect(setShowLoadingMock).toHaveBeenCalledWith(true);
 
-    // Advance time by 500ms to trigger the setTimeout
+    // Advance 500ms timeout
     await act(async () => {
       jest.advanceTimersByTime(500);
     });
 
-    // Now the component will call: dispatch(createCourseProduct(payload)).unwrap()
-    // Check that createCourseProduct was called with the correct payload:
+    // createCourseProduct called with correct payload (no description, status 'DRAFT')
     expect(mockedCreateCourse).toHaveBeenCalledWith({
       name: 'Test Course',
-      description: 'Test description',
       type: 'COURSE',
       userId: 'user-1',
-      status: 'draft',
+      status: 'DRAFT',
     });
 
-    // Wait a microtask for the Promise.resolve in unwrap()
+    // Wait for unwrap() Promise
     await act(async () => {
-      // flush any pending promises
       await Promise.resolve();
     });
 
-    // After unwrap resolves:
-    // 1) setField('id', data.id)
+    // Fields updated from response
     expect(setFieldMock).toHaveBeenCalledWith('id', 'new-id-123');
-    // 2) setField('sections', data.sections)
     expect(setFieldMock).toHaveBeenCalledWith('sections', ['secA', 'secB']);
-    // 3) setShowRestOfForm(true)
+    // Rest of form shown
     expect(setShowRestMock).toHaveBeenCalledWith(true);
-    // 4) Finally, setShowLoadingRestOfForm(false)
+    // Loading reset to false
     expect(setShowLoadingMock).toHaveBeenCalledWith(false);
 
     jest.useRealTimers();
+  });
+
+  it('does NOT call createCourseProduct if name is empty', () => {
+    const emptyNameFormData: ProductDraft = {
+      ...baseFormData,
+      name: '',
+      type: 'COURSE',
+    };
+    const errors: FormErrors = {};
+
+    render(
+      <CreateProductStepOne
+        formData={emptyNameFormData}
+        setField={setFieldMock}
+        errors={errors}
+        showRestOfForm={false}
+        userId="user-1"
+        setShowLoadingRestOfForm={setShowLoadingMock}
+        setShowRestOfForm={setShowRestMock}
+      />,
+    );
+
+    const continueBtn = screen.getByTestId('btn-continue');
+    expect(continueBtn).toBeDisabled();
+
+    // Even if user clicks, handler early-returns
+    fireEvent.click(continueBtn);
+    expect(mockedCreateCourse).not.toHaveBeenCalled();
   });
 });

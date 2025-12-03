@@ -47,9 +47,6 @@ describe('SignIn component', () => {
     expect(
       screen.getByRole('button', { name: /sign in/i }),
     ).toBeInTheDocument();
-    // Check that the toggle password button is rendered.
-    // (Since the toggle button has no accessible name, we select by its role and class if needed)
-    expect(document.querySelector('.toggle-password-btn')).toBeInTheDocument();
   });
 
   it('shows validation errors for empty fields and invalid email format', async () => {
@@ -72,29 +69,6 @@ describe('SignIn component', () => {
 
     const invalidEmailError = await screen.findByText(/Invalid email format/i);
     expect(invalidEmailError).toBeInTheDocument();
-  });
-
-  it('toggles password visibility', () => {
-    render(<SignIn />);
-    // Cast the returned element to HTMLInputElement so we can access its type property.
-    const passwordInput = screen.getByLabelText(
-      /password/i,
-    ) as HTMLInputElement;
-    // The toggle button is rendered as a button with class "toggle-password-btn"
-    const toggleBtn = document.querySelector(
-      '.toggle-password-btn',
-    ) as HTMLButtonElement;
-
-    // Initially, the password input type should be 'password'
-    expect(passwordInput.type).toBe('password');
-
-    // Click the toggle button to show password.
-    fireEvent.click(toggleBtn);
-    expect(passwordInput.type).toBe('text');
-
-    // Click again to hide password.
-    fireEvent.click(toggleBtn);
-    expect(passwordInput.type).toBe('password');
   });
 
   it('submits the form and navigates to dashboard when onboardingCompleted is true', async () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { GalFormInput } from '@shared/ui';
+import { Input } from '@shared/ui';
 
 interface GalPriceSelectorProps {
   price: 'free' | number;
@@ -63,7 +63,7 @@ const GalPriceSelector: React.FC<GalPriceSelectorProps> = ({
       </label>
 
       {selectedPriceMode === 'paid' && (
-        <GalFormInput
+        <Input
           label="Price"
           type="text"
           name="price"

@@ -15,8 +15,8 @@
 
     .app-header {
       height: 64px;
-      background: #e8e8e8;
-      border-bottom: 1px solid #e0e0e0;
+      background: #0f0f2d;
+      border-bottom: 1px solid #0f0f2d;
       position: sticky;
       top: 0;
       z-index: 100; /* keep above content */
@@ -25,8 +25,8 @@
     .content {
       flex: 1; /* fill space below navbar */
       overflow-y: auto; /* scrollable area */
-      padding: 24px 48px;
-      background: #f9f9f9;
+      padding: 24px 48px 48px;
+      // background: #f9f9f9;
     }
   }
 }

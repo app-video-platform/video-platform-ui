@@ -1,258 +1,207 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { PiRectangleDashed } from 'react-icons/pi';
 
 import CourseLessons from '../../course-lessons/course-lessons.component';
 import {
+  CourseLesson,
   CourseProductSection,
   CourseSectionCreateRequest,
-  CourseSectionUpdateRequest,
   IRemoveItemPayload,
 } from '@api/models';
 import { ProductType } from '@api/types';
-import { GalButton, GalFormInput, GalUppyFileUploader } from '@shared/ui';
-import { selectAuthUser } from '@store/auth-store';
 import {
-  deleteSection,
-  updateSectionDetails,
-  createSection,
-} from '@store/product-store';
+  Button,
+  ExpansionPanel,
+  GalIcon,
+  GalUppyFileUploader,
+  Textarea,
+} from '@shared/ui';
+import { selectAuthUser } from '@store/auth-store';
+import { deleteSection, createSection } from '@store/product-store';
 import { AppDispatch } from '@store/store';
+import { EditableTitle } from '../editable-title';
+import { getCssVar } from '@shared/utils';
+import { SectionDraft } from '@features/product-form/models';
 
 import './section-editor.styles.scss';
+import { useSectionAutosave } from '@features/product-form/hooks';
 
-export interface NewProductSectionFormData {
-  id: string;
-  title: string;
-  description: string;
-  lessons?: any[]; // Optional: lessons for courses, etc.
-  files?: File[]; // Optional: files for downloads, etc.
-}
-
-// Define the props that SectionEditor needs
 interface SectionEditorProps {
   index: number;
-  sectionData: NewProductSectionFormData;
+  section: SectionDraft;
   productType: ProductType;
   showRemoveButton?: boolean;
   productId: string;
-  onRemoveFromParent: (index: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  onRemove: (index: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  onChange: (index: number, section: SectionDraft) => void;
 }
 
 const SectionEditor: React.FC<SectionEditorProps> = ({
   index,
-  sectionData,
+  section,
   productType,
   showRemoveButton,
   productId,
-  onRemoveFromParent,
+  onRemove,
+  onChange,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector(selectAuthUser);
-
-  const safeSectionData: NewProductSectionFormData = {
-    id: sectionData?.id || '',
-    title: sectionData?.title || '',
-    description: sectionData?.description || '',
-    lessons: sectionData?.lessons ? [...sectionData.lessons] : [],
-    files: sectionData?.files ? [...sectionData.files] : [],
-  };
-
-  const [localData, setLocalData] =
-    useState<NewProductSectionFormData>(safeSectionData);
   const [files, setFiles] = useState<File[]>([]);
 
-  useEffect(() => {
-    if (sectionData && sectionData.id !== localData.id) {
-      setLocalData({
-        id: sectionData.id || '',
-        title: sectionData.title || '',
-        description: sectionData.description || '',
-        lessons: sectionData.lessons ? [...sectionData.lessons] : [],
-        files: sectionData.files ? [...sectionData.files] : [],
-      });
-    }
-    // We intentionally omit localData from the dependency array here,
-    // because we only want to sync when sectionData.id itself changes.
-  }, [sectionData.id, sectionData.title, sectionData.description]);
+  const { isAutosaving, lastSavedAt } = useSectionAutosave({
+    section,
+    user,
+    productId,
+    dispatch,
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setLocalData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  useEffect(() => {
+    if (section && section.id) {
+      return;
+    }
+    if (!section.id && section && section.title) {
+      handleSectionCreation();
+    }
+  }, [section]);
+
+  const updateSection = (patch: Partial<SectionDraft>) => {
+    const next: SectionDraft = {
+      ...section,
+      ...patch,
+    };
+    onChange(index, next);
   };
 
   const handleRemove = () => {
     if (!user || !user.id) {
-      console.error('User ID is not available for removal');
       return;
     }
 
-    if (localData.id) {
+    if (section.id) {
       const removeSectionPayload: IRemoveItemPayload = {
-        id: localData.id,
-        userId: user.id, // Replace with actual user ID from auth state if needed
+        id: section.id,
+        userId: user.id,
       };
 
       dispatch(deleteSection(removeSectionPayload))
         .unwrap()
-        .then(() => {
-          onRemoveFromParent(index);
-        })
-        .catch((err) => {
-          console.error('Failed to delete section (child):', err);
-        });
+        .then(() => onRemove(index));
     } else {
-      onRemoveFromParent(index);
+      onRemove(index);
     }
-  };
-
-  const handleUpdate = () => {
-    if (!user || !user.id) {
-      console.error('User ID is not available for update');
-      return;
-    }
-
-    const updatedSection: CourseSectionUpdateRequest = {
-      ...localData,
-      position: index,
-      productId: productId,
-      userId: user.id, // Replace with actual user ID from auth state if needed
-    };
-
-    // Dispatch the update from inside the child
-    dispatch(updateSectionDetails(updatedSection))
-      .unwrap()
-      .then((updated) => {
-        // Optionally sync localData to match the “confirmed” updated data:
-      })
-      .catch((err) => {
-        console.error('Failed to update section (child):', err);
-      });
   };
 
   const handleSectionCreation = () => {
-    if (localData.id) {
-      console.warn(
-        'Section already exists, cannot create again:',
-        localData.id,
-      );
+    if (section.id) {
       return;
     }
 
     if (!user || !user.id) {
-      console.error('User ID is not available for creation');
       return;
     }
 
-    if (!localData.title) {
-      console.warn('Section title is required for creation');
+    if (!section.title) {
       window.alert('Section title is required for creation');
       return;
     }
 
     const newSection: CourseSectionCreateRequest = {
-      // ...localData,
-      title: localData.title,
-      description: localData.description,
+      title: section.title,
+      description: section.description,
       position: index,
-      productId: productId,
-      userId: user.id, // Replace with actual user ID from auth state if needed
+      productId,
+      userId: user.id,
     };
 
     dispatch(createSection(newSection))
       .unwrap()
       .then((createdSection: CourseProductSection) => {
-        // Optionally sync localData to match the “confirmed” created data:
-        setLocalData({
-          ...createdSection,
+        const normalized: SectionDraft = {
           id: createdSection.id ?? '',
           title: createdSection.title ?? '',
           description: createdSection.description ?? '',
-        });
-      })
-      .catch((err) => {
-        console.error('Failed to create section (child):', err);
+          position: createdSection.position,
+          lessons: createdSection.lessons ?? [],
+          // files: createdSection.files ?? [],
+        };
+        onChange(index, normalized);
       });
   };
 
-  const handleFilesChange = (files: File[]) => {
-    // Callback to update the form's state with files from GalUppyFileUploader
-    setFiles(files);
+  const handleFilesChange = (filesFromUploader: File[]) => {
+    setFiles(filesFromUploader);
+    // updateSection({ files: filesFromUploader });
   };
 
-  const isUnchanged =
-    localData.title === sectionData.title &&
-    localData.description === sectionData.description;
+  const handleLessonsChange = (lessons: CourseLesson[]) => {
+    updateSection({ lessons });
+  };
+
+  const sectionDomId = section.id || `temp-${index}`;
 
   return (
-    <div className="section-container">
-      <div className="section-header-line">
-        <h3>Section {index + 1}</h3>
+    <ExpansionPanel
+      className="section-editor"
+      id={`lesson-${sectionDomId}`}
+      defaultExpanded={true}
+      hideToggle={!section.id}
+      header={
         <>
-          {localData.id && (
-            <GalButton
-              onClick={handleUpdate}
-              text="Update section"
-              type="primary"
-              disabled={isUnchanged}
-              htmlType="button"
-            />
-          )}
-          {showRemoveButton && (
-            <GalButton
-              onClick={handleRemove}
-              text="Remove"
-              type="secondary"
-              htmlType="button"
-            />
-          )}
+          <div className="section-divider">
+            <span className="divider-title">Section {index + 1}</span>
+            <div className="divider-line" />
+          </div>
+          <div className="section-header-line">
+            <div className="section-title-block">
+              <GalIcon
+                icon={PiRectangleDashed}
+                size={24}
+                color={getCssVar('--text-primary')}
+              />
+              <EditableTitle
+                value={section.title}
+                placeholder={`Untitled section ${index + 1}`}
+                onChange={(title: string) => updateSection({ title })}
+              />
+            </div>
+            {showRemoveButton && (
+              <Button onClick={handleRemove} variant="remove" type="button">
+                Remove
+              </Button>
+            )}
+          </div>
         </>
-      </div>
-
-      <GalFormInput
-        label="Section Title"
-        type="text"
-        name="title"
-        value={localData.title}
-        onChange={handleChange}
+      }
+    >
+      <Textarea
+        value={section.description ?? ''}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+          updateSection({ description: e.target.value })
+        }
+        placeholder="Write a short description for this section..."
+        isMaxLengthShown={true}
+        maxLength={250}
+        className="section-description"
+        block
       />
 
-      <GalFormInput
-        label="Section Description"
-        type="text"
-        name="description"
-        value={localData.description}
-        onChange={handleChange}
-      />
-
-      {!localData.id && (
-        <GalButton
-          onClick={handleSectionCreation}
-          text="Create section"
-          type="primary"
-          htmlType="button"
-          disabled={!localData.title}
-        />
-      )}
-
-      {localData.id &&
+      {section.id &&
         (() => {
           switch (productType) {
             case 'COURSE':
               return (
                 <div className="course-specific-fields">
                   <CourseLessons
-                    key={localData.id}
-                    sectionId={localData.id}
-                    lessons={localData.lessons || []}
+                    key={section.id}
+                    sectionId={section.id}
+                    lessons={(section as CourseProductSection).lessons || []}
+                    onLessonsChange={handleLessonsChange}
                   />
                 </div>
               );
@@ -267,7 +216,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
               return null;
           }
         })()}
-    </div>
+    </ExpansionPanel>
   );
 };
 

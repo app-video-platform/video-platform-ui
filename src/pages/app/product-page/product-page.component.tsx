@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { AbstractProduct, ProductType } from '@api/types';
-import { GalButton, GalExpansionPanel } from '@shared/ui';
+import { Button, GalExpansionPanel } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import { getProductByProductId } from '@store/product-store';
 import { AppDispatch } from '@store/store';
@@ -81,19 +81,25 @@ const ProductPage: React.FC = () => {
               <p>{product?.price}</p>
               <div className="cta-buttons">
                 {isOwner ? (
-                  <GalButton
-                    type="primary"
-                    text="Edit"
+                  <Button
+                    type="button"
+                    variant="primary"
                     onClick={() =>
                       navigate(
                         `/app/products/edit/${product.type}/${product.id}`,
                       )
                     }
-                  />
+                  >
+                    Edit
+                  </Button>
                 ) : (
                   <>
-                    <GalButton type="primary" text="Add to Cart" />
-                    <GalButton type="secondary" text="Buy Now" />
+                    <Button type="button" variant="primary">
+                      Add to Cart
+                    </Button>
+                    <Button type="button" variant="secondary">
+                      Buy Now
+                    </Button>
                   </>
                 )}
               </div>

@@ -1,9 +1,11 @@
+@use '../../../styles/index.scss' as *;
+
 .custom-uppy-dashboard .uppy-Dashboard-inner {
-  background-color: #f8f9fa; // page background
-  border-radius: 20px;
-  padding: 20px;
+  background-color: $bg-base; // page background
+  border-radius: $radius-lg;
+  padding: $spacing-5;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: 230px !important;
+  height: 130px !important;
   margin: 50px auto;
   border-style: dashed;
 }

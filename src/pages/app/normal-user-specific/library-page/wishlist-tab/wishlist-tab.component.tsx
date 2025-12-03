@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ProductMinimised } from '@api/models';
-import { GalButton } from '@shared/ui';
+import { Button } from '@shared/ui';
 import { selectCartIds } from '@store/shop-cart';
 import { AppDispatch } from '@store/store';
 import {
@@ -57,19 +57,21 @@ const WishlistTab: React.FC = () => {
                 <p className="wishlist-product-price">{prod.price}</p>
               </div>
               <div className="wishlist-product-actions">
-                <GalButton
-                  text="Remove from wishlist"
-                  type="secondary"
-                  htmlType="button"
+                <Button
+                  type="button"
+                  variant="secondary"
                   onClick={() => handleRemoveFromWishlist(prod)}
-                />
-                <GalButton
-                  text={inCart ? 'Already in cart' : 'Move to cart'}
-                  type="primary"
-                  htmlType="button"
+                >
+                  Remove from wishlist
+                </Button>
+                <Button
+                  type="button"
+                  variant="primary"
                   disabled={inCart}
                   onClick={() => handleMoveToCart(prod)}
-                />
+                >
+                  {inCart ? 'Already in cart' : 'Move to cart'}
+                </Button>
               </div>
             </div>
           );

@@ -1,11 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '@store/auth-store';
-import { GalFormInput } from '@shared/ui';
-import { GalSocialMediaInput } from '@components';
-import { SocialMediaLink } from '@api/models';
+import { Button, InfoPopover, Input, Textarea } from '@shared/ui';
+import { getProfileNameInitials } from '@shared/utils';
+import { SettingsSection } from '../settings-section';
+import { SocialInput } from '../social-input';
 
 export interface ProfileFormData {
   firstName: string;
@@ -14,19 +15,27 @@ export interface ProfileFormData {
   bio: string;
   tagline: string;
   website: string;
+  publicEmail?: string;
+  phone?: string;
+  imageUrl?: string;
+  facebook?: string;
+  instagram?: string;
+  xPlatform?: string;
+  youtube?: string;
+  tiktok?: string;
 }
 
-interface SettingsSocials {
-  initialLinks: SocialMediaLink[];
-  newLinks: SocialMediaLink[];
-}
+// interface SettingsSocials {
+//   initialLinks: SocialMediaLink[];
+//   newLinks: SocialMediaLink[];
+// }
 
 const SettingsProfileTab: React.FC = () => {
   const user = useSelector(selectAuthUser);
-  const [socialLinks, setSocialLinks] = useState<SettingsSocials>({
-    initialLinks: [],
-    newLinks: [],
-  });
+  // const [socialLinks, setSocialLinks] = useState<SettingsSocials>({
+  //   initialLinks: [],
+  //   newLinks: [],
+  // });
 
   const methods = useForm<ProfileFormData>({
     defaultValues: {
@@ -36,6 +45,14 @@ const SettingsProfileTab: React.FC = () => {
       bio: '',
       website: '',
       tagline: '',
+      imageUrl: '',
+      publicEmail: '',
+      phone: '',
+      facebook: '',
+      instagram: '',
+      xPlatform: '',
+      tiktok: '',
+      youtube: '',
     },
     mode: 'onTouched',
   });
@@ -52,223 +69,278 @@ const SettingsProfileTab: React.FC = () => {
         website: user.website,
         tagline: user.taglineMission,
       });
-
-      if (user.socialLinks && user.socialLinks.length > 0) {
-        setSocialLinks({ initialLinks: user.socialLinks, newLinks: [] });
-      }
     }
   }, [user, methods]);
 
-  const handleSocialLinksChange = useCallback((links: SocialMediaLink[]) => {
-    setSocialLinks((prev) => ({ ...prev, newLinks: links }));
-  }, []);
-
   return (
     <FormProvider {...methods}>
-      <h2>Public Profile</h2>
-      <h4>Add some information about yourself</h4>
-
-      <div className="category-subheading-line">
-        <span className="category-subheading">Basics</span>
-        <hr className="category-line" />
+      <div className="settings-header">
+        <div className="title-wrapper">
+          <h2>Public Profile</h2>
+          <p style={{ fontSize: 14 }}>
+            Update your personal info, like profile picture and display name
+          </p>
+        </div>
+        <div className="settings-actions">
+          <Button variant="secondary">Cancel</Button>
+          <Button variant="primary">Save</Button>
+        </div>
       </div>
 
-      <div className="settings-input-wrapper">
-        <Controller
-          name="firstName"
-          control={control}
-          render={({ field }) => (
-            <>
-              <label className="settings-input-label">First Name</label>
-              <GalFormInput
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                className="form-input settings-form-input"
-              />
-            </>
-          )}
-        />
-      </div>
+      <hr className="category-line" />
 
-      <div className="settings-input-wrapper">
-        <Controller
-          name="lastName"
-          control={control}
-          render={({ field }) => (
-            <>
-              <label className="settings-input-label">Last Name</label>
-              <GalFormInput
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                className="form-input settings-form-input"
-              />
-            </>
-          )}
-        />
-      </div>
-
-      <div className="settings-input-wrapper">
-        <Controller
-          name="title"
-          control={control}
-          render={({ field }) => (
-            <>
-              <label className="settings-input-label">Title</label>
-              <GalFormInput
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                className="form-input settings-form-input"
-              />
-            </>
-          )}
-        />
-      </div>
-
-      <div className="category-subheading-line">
-        <span className="category-subheading">Biography</span>
-        <hr className="category-line" />
-      </div>
-      <div className="settings-input-wrapper">
-        <Controller
-          name="bio"
-          control={control}
-          rules={{
-            minLength: {
-              value: 30,
-              message: 'Your bio should be at least 30 characters long',
-            },
-            maxLength: {
-              value: 250,
-              // eslint-disable-next-line quotes
-              message: "Your bio can't exceed 250 characters",
-            },
-          }}
-          render={({ field, fieldState }) => {
-            const hasError = !!fieldState.error;
-            return (
-              <>
-                <label className="settings-input-label">Bio</label>
-                <GalFormInput
+      <SettingsSection
+        title="Basic Info"
+        subTitle="Edit your name and profile image"
+      >
+        <>
+          <div className="settings-input-row">
+            <Controller
+              name="firstName"
+              control={control}
+              render={({ field }) => (
+                <Input
                   type="text"
-                  value={field.value}
-                  onChange={field.onChange}
-                  name={field.name}
-                  inputType="textarea"
-                  className={`form-input settings-form-input settings-form-input__bio${
-                    hasError ? ' settings-form-input__error' : ''
-                  }`}
-                  isMaxLengthShown={true}
-                  maxLength={250}
-                />
-                {fieldState.error && (
-                  <p className="form-field-error error-text-red">
-                    {fieldState.error.message}
-                  </p>
-                )}
-              </>
-            );
-          }}
-        />
-      </div>
-
-      <div className="settings-input-wrapper">
-        <Controller
-          name="tagline"
-          control={control}
-          rules={{
-            minLength: {
-              value: 10,
-              message: 'Your tagline should be at least 10 characters',
-            },
-            maxLength: {
-              value: 120,
-              message: 'Your tagline can not exceed 120 characters',
-            },
-          }}
-          render={({ field, fieldState }) => {
-            const hasError = !!fieldState.error;
-            return (
-              <>
-                <label className="settings-input-label">
-                  Tagline / Mission
-                </label>
-                <GalFormInput
-                  className={`form-input settings-form-input${
-                    hasError ? ' settings-form-input__error' : ''
-                  }`}
-                  placeholder="Tell us what drives you"
-                  type="text"
-                  value={field.value}
-                  onChange={field.onChange}
-                  name={field.name}
-                  isMaxLengthShown={true}
-                  maxLength={120}
-                />
-                {fieldState.error && (
-                  <p className="form-field-error error-text-red">
-                    {fieldState.error.message}
-                  </p>
-                )}
-              </>
-            );
-          }}
-        />
-      </div>
-
-      <div className="category-subheading-line">
-        <span className="category-subheading">Links</span>
-        <hr className="category-line" />
-      </div>
-
-      <div className="settings-input-wrapper">
-        <Controller
-          name="website"
-          control={control}
-          rules={{
-            pattern: {
-              value: URL_PATTERN,
-              message:
-                'Enter a valid URL (e.g. https://example.com or www.example.com)',
-            },
-          }}
-          render={({ field, fieldState }) => {
-            const hasError = !!fieldState.error;
-            return (
-              <>
-                <label className="settings-input-label">Website</label>
-                <GalFormInput
-                  className={`form-input settings-form-input${
-                    hasError ? ' settings-form-input__error' : ''
-                  }`}
-                  placeholder="Website"
-                  type="text"
+                  label="First Name"
                   value={field.value}
                   onChange={field.onChange}
                   name={field.name}
                 />
-                {fieldState.error && (
-                  <p className="form-field-error error-text-red">
-                    {fieldState.error.message}
-                  </p>
+              )}
+            />
+            <Controller
+              name="lastName"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  type="text"
+                  label="Last Name"
+                  value={field.value}
+                  onChange={field.onChange}
+                  name={field.name}
+                />
+              )}
+            />
+          </div>
+          <Input
+            type="text"
+            label="Email"
+            value={user?.email ?? ''}
+            className="form-input settings-form-input"
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onChange={() => {}}
+            disabled
+          />
+          <div className="image-changer">
+            <div className="avatar-container">
+              <div className="avatar-wrapper">
+                {user?.imageUrl ? (
+                  <img
+                    src={user?.imageUrl}
+                    alt={user?.firstName}
+                    className="user-avatar"
+                  />
+                ) : (
+                  getProfileNameInitials(
+                    user?.firstName ?? '',
+                    user?.lastName ?? '',
+                  )
                 )}
-              </>
-            );
-          }}
-        />
-      </div>
+              </div>
+            </div>
+            <Button variant="tertiary">Change picture</Button>
+            <Button variant="secondary">Remove picture</Button>
+          </div>
+        </>
+      </SettingsSection>
 
-      <div className="social-media-circle-container">
-        <GalSocialMediaInput
-          initialSocialLinks={socialLinks.initialLinks}
-          onChange={handleSocialLinksChange}
-        />
-      </div>
+      <hr className="category-line" />
+
+      <SettingsSection
+        title="Public Info"
+        subTitle="Tell us something about yourself and your mission"
+      >
+        <>
+          <Controller
+            name="bio"
+            control={control}
+            rules={{
+              minLength: {
+                value: 30,
+                message: 'Your bio should be at least 30 characters long',
+              },
+              maxLength: {
+                value: 250,
+                // eslint-disable-next-line quotes
+                message: "Your bio can't exceed 250 characters",
+              },
+            }}
+            render={({ field, fieldState }) => (
+              <Textarea
+                label="Bio"
+                value={field.value}
+                onChange={field.onChange}
+                name={field.name}
+                error={fieldState.error?.message}
+                isMaxLengthShown={true}
+                maxLength={250}
+              />
+            )}
+          />
+          <Controller
+            name="title"
+            control={control}
+            render={({ field }) => (
+              <Input
+                type="text"
+                label="Title"
+                value={field.value}
+                onChange={field.onChange}
+                name={field.name}
+                className="settings-form-input"
+              />
+            )}
+          />
+          <Controller
+            name="tagline"
+            control={control}
+            rules={{
+              minLength: {
+                value: 10,
+                message: 'Your tagline should be at least 10 characters',
+              },
+              maxLength: {
+                value: 120,
+                message: 'Your tagline can not exceed 120 characters',
+              },
+            }}
+            render={({ field, fieldState }) => (
+              <Input
+                placeholder="Tell us what drives you"
+                type="text"
+                label="Tagline / Mission"
+                className="settings-form-input"
+                value={field.value}
+                onChange={field.onChange}
+                name={field.name}
+                error={fieldState.error?.message}
+              />
+            )}
+          />
+        </>
+      </SettingsSection>
+
+      <hr className="category-line" />
+
+      <SettingsSection
+        title="Contact Info"
+        subTitle="Update your public contact information"
+      >
+        <>
+          <div className="settings-input-row">
+            <Controller
+              name="publicEmail"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  type="text"
+                  label="Public email"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  name={field.name}
+                />
+              )}
+            />
+
+            <InfoPopover className="info-popover">
+              <span>
+                This is the email showed on your storefront and what your
+                clients can see.
+              </span>
+            </InfoPopover>
+          </div>
+          <Controller
+            name="phone"
+            control={control}
+            render={({ field }) => (
+              <Input
+                type="text"
+                label="Phone number"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                name={field.name}
+                className="settings-form-input"
+              />
+            )}
+          />
+          <Controller
+            name="website"
+            control={control}
+            rules={{
+              pattern: {
+                value: URL_PATTERN,
+                message:
+                  'Enter a valid URL (e.g. https://example.com or www.example.com)',
+              },
+            }}
+            render={({ field, fieldState }) => (
+              <Input
+                label="Website"
+                placeholder="my-website.com"
+                type="text"
+                value={field.value}
+                onChange={field.onChange}
+                name={field.name}
+                error={fieldState.error?.message}
+                className="settings-form-input"
+              />
+            )}
+          />
+        </>
+      </SettingsSection>
+
+      <hr className="category-line" />
+
+      <SettingsSection title="Social Media" subTitle="Your social media links">
+        <>
+          <SocialInput
+            label="Facebook"
+            value="www.facebook.com/"
+            control={control}
+            name="facebook"
+          />
+          <SocialInput
+            label="Instagram"
+            value="www.instagram.com/"
+            control={control}
+            name="instagram"
+            margin
+          />
+          <SocialInput
+            label="X"
+            value="www.x.com/"
+            control={control}
+            name="xPlatform"
+            margin
+          />
+
+          <SocialInput
+            label="Youtube"
+            value="www.youtube.com/"
+            control={control}
+            name="youtube"
+            margin
+          />
+
+          <SocialInput
+            label="TikTok"
+            value="www.tiktok.com/"
+            control={control}
+            name="tiktok"
+            margin
+          />
+        </>
+      </SettingsSection>
     </FormProvider>
   );
 };

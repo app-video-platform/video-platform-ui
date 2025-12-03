@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { GalFormInput, GalCheckboxInput, GalButton } from '@shared/ui';
+import { Input, Button, Textarea, CheckboxInput } from '@shared/ui';
 
 import './gal-contact-form.styles.scss';
 
@@ -30,7 +30,7 @@ const GalContactForm: React.FC = () => {
     <form className="contact-form" onSubmit={handleSubmit}>
       <div className="form-inputs">
         <div className="inline-inputs">
-          <GalFormInput
+          <Input
             label="First Name"
             type="text"
             name="firstName"
@@ -38,7 +38,7 @@ const GalContactForm: React.FC = () => {
             onChange={handleChange}
             required
           />
-          <GalFormInput
+          <Input
             label="Last Name"
             type="text"
             name="lastName"
@@ -48,7 +48,7 @@ const GalContactForm: React.FC = () => {
           />
         </div>
         <div className="inline-inputs">
-          <GalFormInput
+          <Input
             label="Email"
             type="email"
             name="email"
@@ -56,7 +56,7 @@ const GalContactForm: React.FC = () => {
             onChange={handleChange}
             required
           />
-          <GalFormInput
+          <Input
             label="Topic"
             type="topic"
             name="topic"
@@ -65,16 +65,14 @@ const GalContactForm: React.FC = () => {
             required
           />
         </div>
-        <GalFormInput
+        <Textarea
           label="Message"
-          type="message"
           name="message"
           value={formData.message}
           onChange={handleChange}
-          inputType="textarea"
           required
         />
-        <GalCheckboxInput
+        <CheckboxInput
           label="I agree to the terms and conditions"
           name="agree"
           checked={formData.agree}
@@ -82,7 +80,9 @@ const GalContactForm: React.FC = () => {
           disabled={false}
         />
       </div>
-      <GalButton htmlType="submit" text="Beam it up!" type="primary" />
+      <Button type="submit" variant="primary">
+        Beam it Up
+      </Button>
     </form>
   );
 };
