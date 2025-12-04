@@ -17,6 +17,9 @@ const ConnectedCalendarTab: React.FC = () => {
     (async () => {
       try {
         const providers = await getAllCalendarProvidersAPI(); // string[]
+
+        console.log('providers', providers);
+
         if (isMounted) {
           const options: SelectOption[] = providers.map((provider) => ({
             value: provider,
