@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { Input, Button, Select, SelectOption } from '@shared/ui';
+import { Input, Button, Select, SelectOption, InfoPopover } from '@shared/ui';
 import { connectCalendarAPI, getAllCalendarProvidersAPI } from '@api/services';
 import { SettingsSection } from '../settings-section';
+import { selectAuthUser } from '@store/auth-store';
 
 const ConnectedCalendarTab: React.FC = () => {
+  const user = useSelector(selectAuthUser);
+
   const [calendarProviders, setCalendarProviders] = useState<SelectOption[]>(
     [],
   );
   const [selectedProvider, setSelectedProvider] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
+  const [email, setEmail] = useState<string>(user?.email ?? '');
 
   useEffect(() => {
     let isMounted = true; // optional safety to avoid setting state after unmount
@@ -62,6 +66,22 @@ const ConnectedCalendarTab: React.FC = () => {
       <hr className="category-line" />
 
       <SettingsSection title="Calendars" subTitle="Connect a calendar provider">
+        <div className="settings-input-row">
+          <Input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            label="Email"
+            type="text"
+            name="email"
+          />
+          <InfoPopover className="info-popover" position="left">
+            <span>
+              The email connected to your calendar. Usually your main email, but
+              if you are using another one for calendars, you can change it
+              here.
+            </span>
+          </InfoPopover>
+        </div>
         <div className="connect-calendar-row">
           <Select
             options={calendarProviders}

@@ -252,7 +252,7 @@ const SettingsProfileTab: React.FC = () => {
               )}
             />
 
-            <InfoPopover className="info-popover">
+            <InfoPopover className="info-popover" position="left">
               <span>
                 This is the email showed on your storefront and what your
                 clients can see.
