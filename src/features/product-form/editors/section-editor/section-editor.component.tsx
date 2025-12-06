@@ -9,8 +9,9 @@ import {
   CourseProductSection,
   CourseSectionCreateRequest,
   IRemoveItemPayload,
+  ProductType,
+  AppDispatch,
 } from '@api/models';
-import { ProductType } from '@api/types';
 import {
   Button,
   ExpansionPanel,
@@ -20,7 +21,6 @@ import {
 } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import { deleteSection, createSection } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { EditableTitle } from '../editable-title';
 import { getCssVar } from '@shared/utils';
 import { SectionDraft } from '@features/product-form/models';

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { Button } from '@shared/ui';
-import { AppDispatch } from '@store/store';
 import { resetOnboarding } from '@store/auth-store';
+import { AppDispatch } from '@api/models';
 
 const CountdownRedirect: React.FC = () => {
   const [seconds, setSeconds] = useState<number>(10);

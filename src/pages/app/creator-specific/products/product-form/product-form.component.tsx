@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 import { GalPriceSelector } from '@components';
@@ -13,8 +13,9 @@ import {
   useProductFormAnimation,
   BasicInfo,
   SectionDraft,
+  ProductHeader,
 } from '@features/product-form';
-import { ProductWithSections } from '@api/types';
+import { ProductWithSections } from '@api/models';
 
 import './product-form.styles.scss';
 
@@ -47,12 +48,6 @@ const ProductForm: React.FC = () => {
   const [hasHeroCollapsed, setHasHeroCollapsed] = useState(false);
 
   const container = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
-
-  const [isSidebarStuck, setIsSidebarStuck] = useState(false);
-  const [sidebarFixedStyle, setSidebarFixedStyle] =
-    useState<React.CSSProperties>({});
 
   useEffect(() => {
     if (!formData.type) {
@@ -70,83 +65,19 @@ const ProductForm: React.FC = () => {
     setHasHeroCollapsed(true);
   });
 
-  useEffect(() => {
-    const formRoot = container.current;
-    if (!formRoot) {
-      return;
-    }
-
-    const scrollEl = formRoot.closest('main.content') as HTMLElement | null;
-    if (!scrollEl) {
-      return;
-    }
-
-    const headerEl = headerRef.current;
-
-    const handleScroll = () => {
-      if (!headerEl) {
-        return;
-      }
-
-      const scrollTop = scrollEl.scrollTop;
-
-      // How far to scroll before the sidebar "locks".
-      // This is basically "past the header".
-      const triggerPoint = headerEl.offsetHeight;
-
-      setIsSidebarStuck(scrollTop > triggerPoint);
-    };
-
-    // run once to set initial state
-    handleScroll();
-
-    scrollEl.addEventListener('scroll', handleScroll);
-    return () => {
-      scrollEl.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  // --- measure sidebar position/width for the fixed state ---
-  useLayoutEffect(() => {
-    if (!sidebarRef.current) {
-      return;
-    }
-
-    const rect = sidebarRef.current.getBoundingClientRect();
-
-    setSidebarFixedStyle({
-      position: 'fixed',
-      top: 110, // <--- adjust to your app top bar height + content padding
-      left: rect.left,
-      width: rect.width,
-      zIndex: 20,
-    });
-  }, [showRestOfForm]);
-
   if (!user || !user.id) {
     return <p>You must be logged in to create a product.</p>;
   }
 
   return (
     <div ref={container}>
-      <div className="product-header" ref={headerRef}>
-        <h1>Create New Product</h1>
-        {showRestOfForm && (
-          <div
-            className={clsx('product-summary-header', {
-              'product-summary-header__visible': hasHeroCollapsed,
-            })}
-          >
-            <div className="product-summary-header__type-pill">
-              {/* re-use same icons as ProductTypeSelector */}
-              {formData.type === 'COURSE' && '🎓 Course'}
-              {formData.type === 'DOWNLOAD' && '⬇️ Download'}
-              {formData.type === 'CONSULTATION' && '🎧 Consultation'}
-            </div>
-            <div className="product-summary-header__title">{formData.name}</div>
-          </div>
-        )}
-      </div>
+      <ProductHeader
+        formData={formData}
+        hasHeroCollapsed={hasHeroCollapsed}
+        showRestOfForm={showRestOfForm}
+        headerRef={undefined}
+      />
+
       <form onSubmit={handleSubmit}>
         {!showRestOfForm && (
           <div
@@ -176,19 +107,14 @@ const ProductForm: React.FC = () => {
             })}
           >
             <div className="product-create-sidebar">
-              <div
-                ref={sidebarRef}
-                style={isSidebarStuck ? sidebarFixedStyle : undefined}
-              >
-                <BuilderSidebar
-                  productType={formData.type}
-                  activeTab={activeTab}
-                  sections={sidebarSections} // your sections + lessons summary
-                  onChange={(tab) => setActiveTab(tab)}
-                  onSectionClick={handleSidebarSectionClick}
-                  onLessonClick={handleSidebarLessonClick}
-                />
-              </div>
+              <BuilderSidebar
+                productType={formData.type}
+                activeTab={activeTab}
+                sections={sidebarSections} // your sections + lessons summary
+                onChange={(tab) => setActiveTab(tab)}
+                onSectionClick={handleSidebarSectionClick}
+                onLessonClick={handleSidebarLessonClick}
+              />
             </div>
 
             <div className="product-create-section">

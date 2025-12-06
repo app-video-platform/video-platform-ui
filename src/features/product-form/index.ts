@@ -6,5 +6,7 @@ export * from './course-lessons';
 export * from './editors';
 export * from './hooks';
 export * from './quiz-wizard';
-export * from './product-type-selector';
 export * from './models';
+export * from './product-filters';
+export * from './product-header';
+export * from './product-type-selector';

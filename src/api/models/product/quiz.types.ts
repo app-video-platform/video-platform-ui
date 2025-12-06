@@ -1,4 +1,4 @@
-import { MCQQuestion, TrueFalseQuestion } from '../models/product/quiz';
+import { MCQQuestion, TrueFalseQuestion } from './quiz';
 
 export type QuestionType =
   | 'multiple_choice_single'

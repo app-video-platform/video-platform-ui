@@ -1,6 +1,5 @@
 /* eslint-disable indent */
 import { AbstractProductBase } from '@api/models';
-import { MeetingMethod } from '@api/types';
 import { selectAuthUser } from '@store/auth-store';
 import { ProductDraft } from '../models/product-form';
 

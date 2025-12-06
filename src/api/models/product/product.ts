@@ -1,7 +1,7 @@
 import { IconType } from 'react-icons';
-import { MeetingMethod } from '../../types/meeting-method.types';
-import { ProductStatus, ProductType } from '../../types/products.types';
 import { ConnectedCalendar } from '../calendars/connected-calendar';
+import { MeetingMethod } from './meeting-method.types';
+import { ProductType, ProductStatus } from './products.types';
 import { CourseProductSection, DownloadSection } from './section';
 
 export interface AbstractProductBase {

@@ -1,9 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import { ProductType } from '@api/types';
+import { ProductType, AppDispatch } from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
-import { AppDispatch } from '@store/store';
 import { UseProductFormFacadeResult } from '../models/product-form';
 import { useProductAutosave } from './use-product-autosave.hook';
 import { useProductFormState } from './use-product-form-state.hook';

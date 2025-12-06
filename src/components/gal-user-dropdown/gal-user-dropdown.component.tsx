@@ -2,15 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { UserRole } from '@api/models';
-import { GalDropdown } from '@shared/ui';
+import { UserRole, AppDispatch } from '@api/models';
+import { GalDropdown, UserAvatar } from '@shared/ui';
 import {
   selectAuthUser,
   changeUserRole,
   logout,
   logoutUser,
 } from '@store/auth-store';
-import { AppDispatch } from '@store/store';
 import { getProfileNameInitials } from '@shared/utils';
 
 import './gal-user-dropdown.styles.scss';
@@ -64,7 +63,10 @@ const GalUserDropdown: React.FC = () => {
         customClassName="galactica-nav"
         trigger={({ toggle }) => (
           <button onClick={toggle} className="user-profile-button">
-            {getProfileNameInitials(user.firstName, user.lastName)}
+            <UserAvatar
+              imageUrl={user.imageUrl ?? ''}
+              alt={`${user.firstName} ${user.lastName}`}
+            />
           </button>
         )}
         menu={() => (

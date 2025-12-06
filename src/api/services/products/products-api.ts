@@ -5,11 +5,7 @@ import {
   ConfirmUploadRequestDto,
   FileS3UploadResponseDto,
 } from '../../models/files/confirm-upload';
-import {
-  AbstractProduct,
-  CreateProductPayload,
-  ProductType,
-} from '../../types/products.types';
+
 import {
   AbstractProductBase,
   IRemoveItemPayload,
@@ -21,7 +17,13 @@ import {
   CourseSectionCreateRequest,
   CourseSectionUpdateRequest,
 } from '../../models/product/section';
-import { CourseLesson, LessonCreate } from '../../models/product/lesson';
+import {
+  CreateProductPayload,
+  AbstractProduct,
+  ProductType,
+  CourseLesson,
+  LessonCreate,
+} from '@api/models';
 
 export const createProductAPI = async (payload: CreateProductPayload) => {
   try {

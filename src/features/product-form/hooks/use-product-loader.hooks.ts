@@ -1,8 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 
-import { ProductType } from '@api/types';
+import { ProductType, AppDispatch } from '@api/models';
 import { getProductByProductId } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { ProductDraft, FormErrors } from '../models/product-form';
 import { getAutosaveSnapshot } from '../utils/form-data-mapper.utils';
 

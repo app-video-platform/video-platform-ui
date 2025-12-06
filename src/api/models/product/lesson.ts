@@ -1,5 +1,5 @@
-import { QuizQuestion } from '@api/types';
-import { LessonType } from '../../types/products.types';
+import { LessonType } from './products.types';
+import { QuizQuestion } from './quiz.types';
 
 export interface CourseLesson {
   id?: string;

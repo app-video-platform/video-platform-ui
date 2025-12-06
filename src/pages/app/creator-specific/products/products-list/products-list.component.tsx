@@ -2,12 +2,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { FaSearch } from 'react-icons/fa';
-import { CiCircleRemove } from 'react-icons/ci';
-import { BiSort } from 'react-icons/bi';
-import { IoIosPricetags } from 'react-icons/io';
-import { MdOutlineTypeSpecimen } from 'react-icons/md';
-import { SiStatuspal } from 'react-icons/si';
 
 import { selectAuthUser } from '@store/auth-store';
 import {
@@ -16,25 +10,12 @@ import {
   selectProductsError,
   getAllProductsByUserId,
 } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { ProductCard } from '@components';
-import { Button, Input, Select, SelectOption } from '@shared/ui';
-import { AbstractProduct, ProductStatus, ProductType } from '@api/types';
+import { Button } from '@shared/ui';
+import { AbstractProduct, AppDispatch } from '@api/models';
+import { ProductFilters, ProductFilterForm } from '@features/product-form';
 
 import './products-list.styles.scss';
-
-type StatusFilter = 'all' | ProductStatus;
-type TypeFilter = 'all' | ProductType;
-type PriceFilter = 'all' | 'free' | 'paid';
-type SortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc';
-
-interface FilterForm {
-  searchTerm: string;
-  statusFilter: StatusFilter;
-  typeFilter: TypeFilter;
-  priceFilter: PriceFilter;
-  sortBy: SortOption;
-}
 
 const ProductsList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -51,12 +32,12 @@ const ProductsList: React.FC = () => {
     }
   }, [dispatch, user]);
 
-  const [filterForm, setFilterForm] = useState<FilterForm>({
-    searchTerm: '',
+  const [filterForm, setFilterForm] = useState<ProductFilterForm>({
+    search: '',
     statusFilter: 'all',
     typeFilter: 'all',
     priceFilter: 'all',
-    sortBy: 'date-desc',
+    sort: 'date-desc',
   });
 
   const hasProducts = products && products.length > 0;
@@ -69,14 +50,14 @@ const ProductsList: React.FC = () => {
     }
 
     const {
-      searchTerm,
+      search,
       statusFilter,
       typeFilter,
       priceFilter,
-      sortBy = 'date-desc',
+      sort = 'date-desc',
     } = filterForm;
 
-    const term = searchTerm?.trim().toLowerCase() ?? '';
+    const term = search?.trim().toLowerCase() ?? '';
 
     const filtered = products.filter((p) => {
       const matchesSearch =
@@ -105,7 +86,7 @@ const ProductsList: React.FC = () => {
     };
 
     return filtered.sort((a, b) => {
-      switch (sortBy) {
+      switch (sort) {
         case 'date-asc':
           return getTime(a) - getTime(b);
         case 'date-desc':
@@ -132,43 +113,6 @@ const ProductsList: React.FC = () => {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFilterForm((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleSearchReset = () =>
-    setFilterForm((prevData) => ({ ...prevData, searchTerm: '' }));
-
-  const STATUS_OPTIONS: SelectOption[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Draft', value: 'DRAFT' },
-    { label: 'Published', value: 'PUBLISHED' },
-    { label: 'Hidden', value: 'HIDDEN' },
-  ];
-
-  const TYPE_OPTIONS: SelectOption[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Courses', value: 'COURSE' },
-    { label: 'Download Packages', value: 'DOWNLOAD' },
-    { label: 'Consultation Sessions', value: 'CONSULTATION' },
-  ];
-
-  const PRICE_OPTIONS: SelectOption[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Free', value: 'free' },
-    { label: 'Paid', value: 'paid' },
-  ];
-
-  const SORT_OPTIONS: SelectOption[] = [
-    { label: 'Newest first', value: 'date-desc' },
-    { label: 'Oldest first', value: 'date-asc' },
-    { label: 'Name A → Z', value: 'name-asc' },
-    { label: 'Name Z → A', value: 'name-desc' },
-  ];
-
   return (
     <div>
       <div className="products-header">
@@ -183,53 +127,7 @@ const ProductsList: React.FC = () => {
       </div>
       <div className="divider" />
 
-      <div className="products-filter-row">
-        <div className="filters">
-          <Input
-            value={filterForm.searchTerm ?? ''}
-            prefixIcon={FaSearch}
-            suffixIcon={CiCircleRemove}
-            handleSuffixClick={handleSearchReset}
-            onChange={handleChange}
-            placeholder="Search your products..."
-            name="searchTerm"
-            className="search-input"
-          />
-          <Select
-            name="statusFilter"
-            value={filterForm.statusFilter}
-            options={STATUS_OPTIONS}
-            onChange={handleChange}
-            customClassName="status-select"
-            prefixIcon={SiStatuspal}
-          />
-          <Select
-            name="typeFilter"
-            value={filterForm.typeFilter}
-            options={TYPE_OPTIONS}
-            onChange={handleChange}
-            customClassName="status-select"
-            prefixIcon={MdOutlineTypeSpecimen}
-          />
-          <Select
-            name="priceFilter"
-            value={filterForm.priceFilter}
-            options={PRICE_OPTIONS}
-            onChange={handleChange}
-            customClassName="status-select"
-            prefixIcon={IoIosPricetags}
-          />
-        </div>
-
-        <Select
-          name="sortBy"
-          value={filterForm.sortBy}
-          options={SORT_OPTIONS}
-          onChange={handleChange}
-          customClassName="sort-select"
-          prefixIcon={BiSort}
-        />
-      </div>
+      <ProductFilters filterForm={filterForm} setFilterForm={setFilterForm} />
       {hasIssues ? (
         renderMessage()
       ) : (

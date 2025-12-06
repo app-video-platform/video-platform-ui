@@ -2,8 +2,10 @@ import {
   ConnectedCalendar,
   CourseProductSection,
   DownloadSection,
+  ProductType,
+  ProductStatus,
+  MeetingMethod,
 } from '@api/models';
-import { ProductType, ProductStatus, MeetingMethod } from '@api/types';
 import { selectAuthUser } from '@store/auth-store';
 import { BuilderSectionNavItem } from '../builder-sidebar';
 

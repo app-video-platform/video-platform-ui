@@ -1,10 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ProductMinimised } from '@api/models';
+import { ProductMinimised, AppDispatch } from '@api/models';
 import { Button } from '@shared/ui';
 import { selectCartIds } from '@store/shop-cart';
-import { AppDispatch } from '@store/store';
 import {
   selectWishlistProducts,
   removeFromWishlist,

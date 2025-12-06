@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ProductMinimised } from '@api/models';
+import { ProductMinimised, AppDispatch } from '@api/models';
 import { Button } from '@shared/ui';
 import {
   selectAllShopCartProducts,
@@ -9,7 +9,6 @@ import {
   removeProductFromCart,
   moveCartItemToWishlist,
 } from '@store/shop-cart';
-import { AppDispatch } from '@store/store';
 import { selectWishlistIds } from '@store/wishlist';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../../assets/image-placeholder.png');

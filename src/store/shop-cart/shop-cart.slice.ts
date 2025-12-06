@@ -6,8 +6,7 @@ import {
   ThunkAction,
 } from '@reduxjs/toolkit';
 
-import { ProductMinimised } from '@api/models';
-import { RootState } from '../store';
+import { ProductMinimised, RootState } from '@api/models';
 import { addToWishlist } from '../wishlist/wishlist.slice';
 
 const STORAGE_KEY = 'cart:v1';

@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import GalProductCard from './gal-product-box.component';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
-import { ProductStatus, ProductType } from '@api/types';
+import { ProductStatus, ProductType } from '@api/models';
 
 // Create a dummy placeholder value as used in your component.
 // In your component, placeholderImage is imported via require.

@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AbstractProduct, ProductType } from '@api/types';
+import { AbstractProduct, ProductType, AppDispatch } from '@api/models';
 import { Button, GalExpansionPanel } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import { getProductByProductId } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../assets/image-placeholder.png');
 

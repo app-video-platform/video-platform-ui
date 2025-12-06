@@ -1,4 +1,4 @@
-import { QuestionType, QuizQuestion } from '../../types/quiz.types';
+import { QuestionType, QuizQuestion } from './quiz.types';
 
 export interface QuizOption {
   id: string;

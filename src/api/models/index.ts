@@ -6,3 +6,4 @@ export * from './product';
 export * from './socials';
 export * from './user';
 export * from './misc';
+export * from './reviews';

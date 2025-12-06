@@ -3,7 +3,7 @@ import {
   CourseProduct,
   ConsultationProduct,
   AbstractProductBase,
-} from '../models/product/product';
+} from './product';
 
 export type AbstractProduct =
   | DownloadProduct

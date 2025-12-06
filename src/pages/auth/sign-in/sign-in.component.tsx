@@ -3,10 +3,9 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { GalGoogleSignInButton, PasswordInput } from '@components';
-import { LoginRequest } from '@api/models';
+import { LoginRequest, AppDispatch } from '@api/models';
 import { Input, Button } from '@shared/ui';
 import { signinUser, getUserProfile } from '@store/auth-store';
-import { AppDispatch } from '@store/store';
 
 import './sign-in.styles.scss';
 

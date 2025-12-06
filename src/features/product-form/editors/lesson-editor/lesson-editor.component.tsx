@@ -14,15 +14,19 @@ import {
   Textarea,
   ExpansionPanel,
 } from '@shared/ui';
-import { CourseLesson, LessonCreate, IRemoveItemPayload } from '@api/models';
-import { LessonType } from '@api/types';
+import {
+  CourseLesson,
+  LessonCreate,
+  IRemoveItemPayload,
+  LessonType,
+  AppDispatch,
+} from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
 import {
   createLesson,
   updateLessonDetails,
   deleteLesson,
 } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { EditableTitle } from '../editable-title';
 import { LESSON_META } from '@api/constants';
 

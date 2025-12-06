@@ -3,8 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 
 import { selectAuthUser } from '@store/auth-store';
 import { updateLessonDetails } from '@store/product-store';
-import { AppDispatch } from '@store/store';
-import { CourseLesson } from '@api/models';
+import { CourseLesson, AppDispatch } from '@api/models';
 
 interface UseLessonAutosaveParams {
   lesson: CourseLesson;

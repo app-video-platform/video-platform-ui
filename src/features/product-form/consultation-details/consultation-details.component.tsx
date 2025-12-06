@@ -9,8 +9,7 @@ import {
   CANCELATION_POLICIES,
   CancelationPolicyId,
 } from '@api/enums';
-import { CancelationPolicy } from '@api/models';
-import { MeetingMethod } from '@api/types';
+import { CancelationPolicy, MeetingMethod } from '@api/models';
 import { ProductDraft } from '../models';
 
 import './consultation-details.styles.scss';

@@ -1,0 +1,7 @@
+@use '../../../styles/index.scss' as *;
+
+.vp-divider {
+  border-color: $neutral-medium;
+  opacity: 0.5;
+  margin: $spacing-4 0;
+}

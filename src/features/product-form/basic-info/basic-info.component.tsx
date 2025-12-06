@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ProductType } from '@api/types';
+import { ProductType } from '@api/models';
 import { GalBoxSelector } from '@components';
 import { Input, Textarea } from '@shared/ui';
 import { ProductDraft } from '../models';

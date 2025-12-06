@@ -1,5 +1,9 @@
-import { MCQQuestion, QuizOption, TrueFalseQuestion } from '@api/models';
-import { QuestionType } from '@api/types';
+import {
+  MCQQuestion,
+  QuizOption,
+  TrueFalseQuestion,
+  QuestionType,
+} from '@api/models';
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 

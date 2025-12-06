@@ -10,6 +10,9 @@ import {
   CourseLesson,
   LessonCreate,
   AbstractProductBase,
+  AbstractProduct,
+  CreateProductPayload,
+  ProductType,
 } from '@api/models';
 import {
   createProductAPI,
@@ -25,7 +28,6 @@ import {
   addImageToProductAPI,
   getProductByProductIdAPI,
 } from '@api/services';
-import { AbstractProduct, CreateProductPayload, ProductType } from '@api/types';
 import { extractErrorMessage } from '@shared/utils';
 
 interface ProductState {
@@ -100,6 +102,8 @@ export const updateSectionDetails = createAsyncThunk<
   { rejectValue: string }
 >('products/updateSectionDetails', async (payload, thunkAPI) => {
   try {
+    console.log('update sec');
+
     const response = await updateSectionDetailsAPI(payload);
     return response;
   } catch (err: unknown) {

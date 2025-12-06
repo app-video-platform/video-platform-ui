@@ -1,6 +1,6 @@
 import React from 'react';
-import { ProductType } from '@api/types';
 
+import { ProductType } from '@api/models';
 import { Button } from '@shared/ui';
 import SectionEditor from '../editors/section-editor/section-editor.component';
 import { SectionDraft } from '../models';

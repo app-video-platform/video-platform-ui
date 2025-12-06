@@ -5,6 +5,7 @@ import { Input, Button, Select, SelectOption, InfoPopover } from '@shared/ui';
 import { connectCalendarAPI, getAllCalendarProvidersAPI } from '@api/services';
 import { SettingsSection } from '../settings-section';
 import { selectAuthUser } from '@store/auth-store';
+import { PageHeader } from '@components';
 
 const ConnectedCalendarTab: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -54,16 +55,10 @@ const ConnectedCalendarTab: React.FC = () => {
 
   return (
     <div className="connected-calendar-tab">
-      <div className="settings-header">
-        <div className="title-wrapper">
-          <h2>Connected Calendars</h2>
-          <p style={{ fontSize: 14 }}>
-            Add and manage your connected calendars
-          </p>
-        </div>
-      </div>
-
-      <hr className="category-line" />
+      <PageHeader
+        title="Connected Calendars"
+        subTitle="Add and manage your connected calendars"
+      />
 
       <SettingsSection title="Calendars" subTitle="Connect a calendar provider">
         <div className="settings-input-row">

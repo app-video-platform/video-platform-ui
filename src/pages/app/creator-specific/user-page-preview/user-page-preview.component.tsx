@@ -3,8 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { GalProductCard } from '@components';
-import { User, UserRole } from '@api/models';
-import { AbstractProduct, ProductType, ProductStatus } from '@api/types';
+import {
+  User,
+  UserRole,
+  AbstractProduct,
+  ProductType,
+  ProductStatus,
+} from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
 import { selectAllProducts } from '@store/product-store';
 

@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
-import { RegisterRequest } from '@api/models';
+import { RegisterRequest, AppDispatch } from '@api/models';
 import { Input, Button } from '@shared/ui';
 import { signupUser } from '@store/auth-store';
-import { AppDispatch } from '@store/store';
+import { PasswordInput } from '@components';
 
 import './sign-up.styles.scss';
-import { PasswordInput } from '@components';
 
 export interface SignupFormData {
   firstName: string;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ProductType } from '@api/types';
+import { ProductType } from '@api/models';
 
 import './product-type-selector.styles.scss';
 

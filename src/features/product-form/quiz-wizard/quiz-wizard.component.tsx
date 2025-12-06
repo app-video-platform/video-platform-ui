@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Button, Input, Radio, RadioGroup } from '@shared/ui';
-import { MCQQuestion, QuizDraft } from '@api/models';
-import { QuizQuestion } from '@api/types';
+import { MCQQuestion, QuizDraft, QuizQuestion } from '@api/models';
 import QuestionCard from './question-card/question-card.component';
 
 import './quiz-wizard.styles.scss';

@@ -1,20 +1,15 @@
 /* eslint-disable indent */
 import React, { useState } from 'react';
-import clsx from 'clsx';
-import { IoChevronDown } from 'react-icons/io5';
 
 import {
   Input,
-  GalIcon,
   Textarea,
   Toggle,
   InfoPopover,
   ExpansionPanel,
 } from '@shared/ui';
-import { MCQQuestion } from '@api/models';
-import { QuestionType, QuizQuestion } from '@api/types';
+import { MCQQuestion, QuestionType, QuizQuestion } from '@api/models';
 import MCQEditor from '../../editors/mcq-editor/mcq-editor.component';
-import { getCssVar } from '@shared/utils';
 import { EditableTitle } from '@features/product-form/editors';
 import { GalBoxSelector } from '@components';
 import { normalizeQuestionForType } from './answer-normalizer.util';

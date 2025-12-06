@@ -1,12 +1,21 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { selectAuthUser } from '@store/auth-store';
-import { Button, InfoPopover, Input, Textarea } from '@shared/ui';
+import {
+  Button,
+  Divider,
+  InfoPopover,
+  Input,
+  Textarea,
+  UserAvatar,
+} from '@shared/ui';
 import { getProfileNameInitials } from '@shared/utils';
 import { SettingsSection } from '../settings-section';
 import { SocialInput } from '../social-input';
+import { PageHeader } from '@components';
 
 export interface ProfileFormData {
   firstName: string;
@@ -74,20 +83,15 @@ const SettingsProfileTab: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <div className="settings-header">
-        <div className="title-wrapper">
-          <h2>Public Profile</h2>
-          <p style={{ fontSize: 14 }}>
-            Update your personal info, like profile picture and display name
-          </p>
-        </div>
-        <div className="settings-actions">
-          <Button variant="secondary">Cancel</Button>
-          <Button variant="primary">Save</Button>
-        </div>
-      </div>
-
-      <hr className="category-line" />
+      <PageHeader
+        title="Public Profile"
+        subTitle=" Update your personal info, like profile picture and display name"
+        primaryLabel="Save"
+        onPrimaryClick={() => {
+          toast.success('Product created successfully!');
+        }}
+        secondaryLabel="Cancel"
+      />
 
       <SettingsSection
         title="Basic Info"
@@ -134,18 +138,11 @@ const SettingsProfileTab: React.FC = () => {
           <div className="image-changer">
             <div className="avatar-container">
               <div className="avatar-wrapper">
-                {user?.imageUrl ? (
-                  <img
-                    src={user?.imageUrl}
-                    alt={user?.firstName}
-                    className="user-avatar"
-                  />
-                ) : (
-                  getProfileNameInitials(
-                    user?.firstName ?? '',
-                    user?.lastName ?? '',
-                  )
-                )}
+                <UserAvatar
+                  imageUrl={user?.imageUrl ?? ''}
+                  alt={user?.firstName}
+                  large
+                />
               </div>
             </div>
             <Button variant="tertiary">Change picture</Button>
@@ -154,7 +151,7 @@ const SettingsProfileTab: React.FC = () => {
         </>
       </SettingsSection>
 
-      <hr className="category-line" />
+      <Divider />
 
       <SettingsSection
         title="Public Info"
@@ -230,7 +227,7 @@ const SettingsProfileTab: React.FC = () => {
         </>
       </SettingsSection>
 
-      <hr className="category-line" />
+      <Divider />
 
       <SettingsSection
         title="Contact Info"
@@ -299,7 +296,7 @@ const SettingsProfileTab: React.FC = () => {
         </>
       </SettingsSection>
 
-      <hr className="category-line" />
+      <Divider />
 
       <SettingsSection title="Social Media" subTitle="Your social media links">
         <>

@@ -2,7 +2,7 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import { LessonType, ProductType, QuestionType } from '@api/types';
+import { LessonType, ProductType, QuestionType } from '@api/models';
 import { LESSON_META, PRODUCT_META, QUESTION_META } from '@api/index';
 import { GalIcon } from '@shared/ui';
 

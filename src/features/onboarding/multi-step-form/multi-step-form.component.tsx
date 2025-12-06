@@ -11,9 +11,8 @@ import StepThree from './step-three/step-three.component';
 import StepFour from './step-four/step-four.component';
 import StepFive from './step-five/step-five.component';
 import { Button } from '@shared/ui';
-import { SocialMediaLink, UpdateUserRequest } from '@api/models';
+import { SocialMediaLink, UpdateUserRequest, AppDispatch } from '@api/models';
 import { selectAuthUser, updateUserDetails } from '@store/auth-store';
-import { AppDispatch } from '@store/store';
 
 import './multi-step-form.styles.scss';
 

@@ -1,14 +1,12 @@
 /* eslint-disable indent */
-import React, { useEffect } from 'react';
+import React from 'react';
 import clsx from 'clsx';
+import { MdAdd } from 'react-icons/md';
 
 import { MCQQuestion, QuizOption, TrueFalseQuestion } from '@api/models';
 import { Button, CheckboxInput, Input, Radio } from '@shared/ui';
 
 import './mcq-editor.styles.scss';
-import { QuestionType } from '@api/types';
-import { normalizeQuestionForType } from '../../quiz-wizard/question-card/answer-normalizer.util';
-import { MdAdd } from 'react-icons/md';
 
 interface MCQEditorProps {
   question: MCQQuestion | TrueFalseQuestion;

@@ -3,12 +3,12 @@ import { useState, useRef, useEffect } from 'react';
 
 import { selectAuthUser } from '@store/auth-store';
 import { updateCourseProductDetails } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { ProductDraft } from '../models/product-form';
 import {
   getAutosaveSnapshot,
   mapFormDataToProductPayload,
 } from '../utils/form-data-mapper.utils';
+import { AppDispatch } from '@api/models';
 
 interface UseProductAutosaveParams {
   formData: ProductDraft;

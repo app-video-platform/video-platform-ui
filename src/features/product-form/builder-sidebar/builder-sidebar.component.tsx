@@ -8,7 +8,7 @@ import { MdPermMedia } from 'react-icons/md';
 import { CgDetailsMore } from 'react-icons/cg';
 import { PiRectangleDashed } from 'react-icons/pi';
 
-import { LessonType, ProductType } from '@api/types';
+import { LessonType, ProductType } from '@api/models';
 import { GalIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { LESSON_META } from '@api/constants';

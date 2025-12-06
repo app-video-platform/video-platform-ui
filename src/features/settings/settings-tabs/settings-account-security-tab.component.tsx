@@ -3,9 +3,9 @@ import { useSelector } from 'react-redux';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '@store/auth-store';
-import { PasswordInput } from '@components';
+import { PageHeader, PasswordInput } from '@components';
 import { SettingsSection } from '../settings-section';
-import { Button, Input } from '@shared/ui';
+import { Button, Divider, Input } from '@shared/ui';
 
 export interface AccountSecurityFormData {
   newPassword: string;
@@ -30,20 +30,12 @@ const SettingsAccountSecurityTab: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <div className="settings-header">
-        <div className="title-wrapper">
-          <h2>Account Settings</h2>
-          <p style={{ fontSize: 14 }}>
-            Change your password and account prefferences
-          </p>
-        </div>
-        <div className="settings-actions">
-          <Button variant="secondary">Cancel</Button>
-          <Button variant="primary">Save</Button>
-        </div>
-      </div>
-
-      <hr className="category-line" />
+      <PageHeader
+        title="Account Settings"
+        subTitle="Change your password and account prefferences"
+        primaryLabel="Save"
+        secondaryLabel="Cancel"
+      />
 
       <SettingsSection
         title="Change Password"
@@ -111,7 +103,7 @@ const SettingsAccountSecurityTab: React.FC = () => {
         </>
       </SettingsSection>
 
-      <hr className="category-line" />
+      <Divider />
 
       <SettingsSection
         title="Account Prefferences"
@@ -148,7 +140,7 @@ const SettingsAccountSecurityTab: React.FC = () => {
         </>
       </SettingsSection>
 
-      <hr className="category-line" />
+      <Divider />
 
       <SettingsSection
         title="Delete Account"

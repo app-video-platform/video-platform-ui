@@ -3,6 +3,7 @@
 
 .product-builder {
   width: 100%;
+  position: relative;
 
   &__full {
     display: flex;
@@ -13,6 +14,8 @@
   .product-create-sidebar {
     flex: 0 0 280px; // sidebar column width
     max-width: 320px;
+    position: sticky;
+    top: 110px;
   }
 
   .product-create-section {
@@ -39,33 +42,8 @@
   }
 }
 
-.product-summary-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-
-  &__visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
-  &__type-pill {
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba($muted-galactic-purple, 0.6);
-    font-size: 12px;
-  }
-
-  &__title {
-    font-size: 18px;
-    font-weight: 600;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

@@ -10,7 +10,7 @@ import {
   selectTopThreeProducts,
   getAllProductsByUserId,
 } from '@store/product-store';
-import { AppDispatch } from '@store/store';
+import { AppDispatch } from '@api/models';
 
 import './creator-dashboard.styles.scss';
 

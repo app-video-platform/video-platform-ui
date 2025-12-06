@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import clsx from 'clsx';
 
 import { selectAuthUser } from '@store/auth-store';
 import { UserRole } from '@api/models';
@@ -25,6 +26,7 @@ const CREATOR_ROUTES = [
 const Shell: React.FC = () => {
   const location = useLocation();
   const { setIsSidebarCollapsed } = useSidebarLayout();
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 
   useEffect(() => {
     const matchedRoute = appRoutes.find((route) =>
@@ -51,8 +53,48 @@ const Shell: React.FC = () => {
   );
   const showSidebar = inCreatorArea && isUserCreator;
 
+  const isBuilderRoute = location.pathname.startsWith('/app/products/create');
+
+  useEffect(() => {
+    if (!isBuilderRoute) {
+      setIsHeaderCollapsed(false);
+      return;
+    }
+
+    const scrollEl = document.querySelector(
+      'main.content',
+    ) as HTMLElement | null;
+    if (!scrollEl) {
+      return;
+    }
+
+    const handleScroll = () => {
+      const y = scrollEl.scrollTop;
+
+      // First scroll down → collapse
+      // Back to top (or almost) → expand
+      if (y > 8) {
+        setIsHeaderCollapsed(true);
+      } else {
+        setIsHeaderCollapsed(false);
+      }
+    };
+
+    handleScroll(); // set initial state
+
+    scrollEl.addEventListener('scroll', handleScroll);
+    return () => {
+      scrollEl.removeEventListener('scroll', handleScroll);
+    };
+  }, [isBuilderRoute, location.pathname]);
+
   return (
-    <div className="app-layout">
+    <div
+      className={clsx('app-layout', {
+        'app-layout--builder-mode': isBuilderRoute,
+        'app-layout--header-collapsed': isBuilderRoute && isHeaderCollapsed,
+      })}
+    >
       {showSidebar && (
         <aside className="sidebar">
           <SidebarNav />
@@ -60,7 +102,11 @@ const Shell: React.FC = () => {
       )}
 
       <div className="app-container">
-        <header className="app-header">
+        <header
+          className={clsx('app-header', {
+            'app-header--collapsed': isBuilderRoute && isHeaderCollapsed,
+          })}
+        >
           <TopNavbar />
         </header>
 

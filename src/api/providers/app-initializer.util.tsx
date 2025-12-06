@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { getUserProfile } from '@store/auth-store';
-import { AppDispatch } from '@store/store';
+import { AppDispatch } from '..';
 
 interface AppInitializerProps {
   children: React.ReactNode;

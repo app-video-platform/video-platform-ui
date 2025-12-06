@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Toaster } from 'sonner';
 
 import RoutesDev from './devtools/__routes-dev';
 import { About, Contact, Home, Pricing } from '@pages/marketing-site';
@@ -46,6 +47,7 @@ const App = () => {
 
   return (
     <AppInitializer>
+      <Toaster position="top-center" richColors closeButton />
       <Routes>
         <Route path="/" element={<Navigation />}>
           <Route index element={<Home />} />

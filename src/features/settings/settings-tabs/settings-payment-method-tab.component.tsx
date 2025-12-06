@@ -3,8 +3,9 @@ import { useSelector } from 'react-redux';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '@store/auth-store';
-import { Button, Input } from '@shared/ui';
+import { Button, Divider, Input } from '@shared/ui';
 import { SettingsSection } from '../settings-section';
+import { PageHeader } from '@components';
 
 export interface PaymentMethodFormData {
   businessName: string;
@@ -27,14 +28,7 @@ const SettingsPaymentMethodTab: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <div className="settings-header">
-        <div className="title-wrapper">
-          <h2>Payment Method</h2>
-          <p style={{ fontSize: 14 }}>Add Payment Method</p>
-        </div>
-      </div>
-
-      <hr className="category-line" />
+      <PageHeader title="Payment Method" subTitle="Add Payment Method" />
 
       <SettingsSection
         title="Business"
@@ -69,7 +63,7 @@ const SettingsPaymentMethodTab: React.FC = () => {
         />
       </SettingsSection>
 
-      <hr className="category-line" />
+      <Divider />
 
       <SettingsSection
         title="Payment Provider"

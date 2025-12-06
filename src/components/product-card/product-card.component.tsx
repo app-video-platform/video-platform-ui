@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
-import { AbstractProduct } from '@api/types';
+import { AbstractProduct } from '@api/models';
 import { Button, StatusChip } from '@shared/ui';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../assets/image-placeholder.png');

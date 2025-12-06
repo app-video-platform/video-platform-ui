@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
-import { IRemoveProductPayload } from '@api/models';
+import { IRemoveProductPayload, AppDispatch } from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
 import {
   updateCourseProductDetails,
   deleteProduct,
 } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { ProductDraft, FormErrors } from '../models/product-form';
 import { mapFormDataToProductPayload } from '../utils/form-data-mapper.utils';
 

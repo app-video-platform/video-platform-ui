@@ -3,9 +3,8 @@ import { useState, useRef, useEffect } from 'react';
 
 import { selectAuthUser } from '@store/auth-store';
 import { updateSectionDetails } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { SectionDraft } from '../models/product-form';
-import { CourseSectionUpdateRequest } from '@api/models';
+import { CourseSectionUpdateRequest, AppDispatch } from '@api/models';
 
 interface UseSectionAutosaveParams {
   section: SectionDraft;

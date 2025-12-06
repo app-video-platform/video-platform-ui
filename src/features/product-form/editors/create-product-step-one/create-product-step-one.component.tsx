@@ -4,11 +4,10 @@ import { useDispatch } from 'react-redux';
 import { FaArrowRight } from 'react-icons/fa';
 import clsx from 'clsx';
 
-import { AbstractProduct, CreateProductPayload, ProductType } from '@api/types';
+import { CreateProductPayload, ProductType, AppDispatch } from '@api/models';
 import { Button, GalIcon, Input } from '@shared/ui';
 import { FormErrors } from '@pages/app';
 import { createCourseProduct } from '@store/product-store';
-import { AppDispatch } from '@store/store';
 import { ProductTypeSelector } from '@features/product-form/product-type-selector';
 import { getCssVar } from '@shared/utils';
 import { ProductDraft } from '@features/product-form/models';

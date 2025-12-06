@@ -201,8 +201,7 @@ jest.mock('@api/constants', () => ({
 
 // ── 6) IMPORT component & types ───────────────────────────────────────
 import LessonEditor from './lesson-editor.component';
-import { CourseLesson } from '@api/models';
-import { LessonType } from '@api/types';
+import { CourseLesson, LessonType } from '@api/models';
 
 // ── 7) TESTS ──────────────────────────────────────────────────────────
 describe('<LessonEditor />', () => {

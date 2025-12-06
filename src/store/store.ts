@@ -9,6 +9,7 @@ import shopCartReducer, {
 } from './shop-cart/shop-cart.slice';
 import wishlistReducer from './wishlist/wishlist.slice';
 import { setupProductListeners } from './listeners/product-listeners';
+import { reviewsSlice } from './reviews-store';
 
 const listenerMiddleware = createListenerMiddleware();
 
@@ -23,6 +24,7 @@ export const store = configureStore({
     notifications: notificationsReducer,
     shopCart: shopCartReducer,
     wishlist: wishlistReducer,
+    reviews: reviewsSlice,
   },
   preloadedState: preloadedCart
     ? ({ shopCart: preloadedCart } as { shopCart: ShopCartState })
@@ -40,6 +42,3 @@ store.subscribe(() => {
     lastSaved = snapshot;
   }
 });
-
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;

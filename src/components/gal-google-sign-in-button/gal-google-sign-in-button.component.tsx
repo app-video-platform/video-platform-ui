@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { googleSignInUser, getUserProfile } from '@store/auth-store';
-import { AppDispatch } from '@store/store';
+import { AppDispatch } from '@api/models';
 
 const GalGoogleSignInButton: React.FC = () => {
   const googleButton = useRef<HTMLDivElement | null>(null);

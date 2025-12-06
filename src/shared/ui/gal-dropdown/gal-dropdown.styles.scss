@@ -1,3 +1,5 @@
+@use '../../../styles/index.scss' as *;
+
 .galactica-dropdown {
   display: inline-block;
   position: relative;
@@ -8,7 +10,8 @@
     left: 0;
     z-index: 0;
     width: 150px;
-    background-color: lightblue;
+    background-color: $bg-surface;
+    border-radius: $radius-md;
     display: flex;
     flex-direction: column;
     gap: 10px;

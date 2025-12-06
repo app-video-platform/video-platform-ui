@@ -1,4 +1,4 @@
-import { RootState } from '../store';
+import { RootState } from '@api/models';
 
 export const selectAuthUser = (state: RootState) => state.auth.user;
 export const selectAuthLoading = (state: RootState) => state.auth.loading;

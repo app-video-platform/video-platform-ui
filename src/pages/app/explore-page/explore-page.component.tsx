@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa';
 
-import { ProductMinimised } from '@api/models';
+import { ProductMinimised, AppDispatch } from '@api/models';
 import { getAllProductsMinimalAPI } from '@api/services';
 import { GalIcon, Button } from '@shared/ui';
 import { selectAllShopCartProducts, addProductToCart } from '@store/shop-cart';
-import { AppDispatch } from '@store/store';
 import { selectWishlistIds, toggleWishlist } from '@store/wishlist';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../assets/image-placeholder.png');
