@@ -1,4 +1,5 @@
 import { LessonType } from './products.types';
+import { QuizDraft } from './quiz';
 import { QuizQuestion } from './quiz.types';
 
 export interface CourseLesson {
@@ -8,6 +9,7 @@ export interface CourseLesson {
   videoUrl?: string;
   content?: string;
   position?: number;
+  quiz?: QuizDraft;
   sectionId: string;
   description: string;
   userId?: string;

@@ -1,61 +1,57 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 
-import { Select, Input, SelectOption } from '@shared/ui';
+import {
+  Select,
+  Input,
+  SelectOption,
+  Textarea,
+  InfoPopover,
+  RadioGroup,
+  Radio,
+} from '@shared/ui';
 import { FormErrors } from '@pages/app';
 import {
   MeetingMethods,
   CANCELATION_POLICIES,
   CancelationPolicyId,
 } from '@api/enums';
-import { CancelationPolicy, MeetingMethod } from '@api/models';
+import { ConsultationDetails } from '@api/models';
 import { ProductDraft } from '../models';
 
 import './consultation-details.styles.scss';
 
-export interface IConsultationDetails {
-  duration: number;
-  meetingMethod?: MeetingMethod;
-  customLocation?: string;
-  bufferBefore?: number;
-  bufferAfter?: number;
-  maxSessions?: number;
-  confirmationMessage?: string;
-  cancelationPolicy?: CancelationPolicy;
-}
-
 interface ConsultationDetailsProps {
   formData: ProductDraft;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setFormData: (e: any) => void;
+  // eslint-disable-next-line no-unused-vars
+  setFormData: (e: ProductDraft) => void;
   errors: FormErrors;
-  // showRestOfForm: boolean;
-  userId: string;
-  // setShowLoadingRestOfForm: (loading: boolean) => void;
-  // setShowRestOfForm: (show: boolean) => void;
 }
 
-const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
+const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
   formData,
   setFormData,
-  errors,
-  userId,
 }) => {
   const defaultPolicy = CANCELATION_POLICIES.find(
     (p) => p.id === CancelationPolicyId.Full24h,
   );
-  const [consultationForm, setConsultationForm] =
-    useState<IConsultationDetails>({
-      duration: 0,
-      maxSessions: 999,
-      meetingMethod: MeetingMethods.ZOOM,
+
+  useEffect(() => {
+    const consDetails: ConsultationDetails = {
+      bufferAfterMinutes: 10,
+      bufferBeforeMinutes: 10,
+      cancellationPolicy: defaultPolicy?.id,
+      confirmationMessage:
+        'Thanks for booking! Please check your inbox for the Zoom link.',
+      connectedCalendars: [],
       customLocation: '',
-      bufferAfter: 0,
-      bufferBefore: 0,
-      confirmationMessage: '',
-      cancelationPolicy: defaultPolicy,
-    });
+      duration: 50,
+      maxSessionsPerDay: 8,
+      meetingMethod: MeetingMethods.ZOOM,
+    };
+    const newData = { ...formData, consultationDetails: consDetails };
+    setFormData(newData);
+  }, []);
 
   const TIME_OPTIONS: SelectOption[] = Array.from(
     { length: (120 - 20) / 5 + 1 },
@@ -76,90 +72,144 @@ const ConsultationDetails: React.FC<ConsultationDetailsProps> = ({
   }));
 
   const handleFormChange = (field: string, value: string | number) => {
-    setConsultationForm((prev: IConsultationDetails) => ({
-      ...prev,
-      [field]: value,
-    }));
+    const consDetails = { ...formData.consultationDetails, [field]: value };
 
-    const newData = { ...formData, consultationDetails: consultationForm };
+    const newData = { ...formData, consultationDetails: consDetails };
+    setFormData(newData);
+  };
+
+  const handleCancellationPolicyChange = (policyId: string) => {
+    const policy = CANCELATION_POLICIES.find((p) => p.id === policyId);
+    const newData = {
+      ...formData,
+      consultationDetails: {
+        ...formData.consultationDetails,
+        cancelationPolicy: policy,
+      },
+    };
     setFormData(newData);
   };
 
   return (
     <div className="consultation-details">
-      <Select
-        options={TIME_OPTIONS}
-        name="duration"
-        label="Duration"
-        value={consultationForm.duration}
-        onChange={(e: { target: { value: string } }) =>
-          handleFormChange('duration', Number(e.target.value))
-        }
-      />
+      <div className="inline-fields">
+        <Select
+          options={TIME_OPTIONS}
+          name="duration"
+          label="Meeting Duration"
+          value={formData.consultationDetails?.duration ?? 0}
+          onChange={(e: { target: { value: string } }) =>
+            handleFormChange('duration', Number(e.target.value))
+          }
+        />
 
-      <Select
-        options={MEETING_METHOD_OPTIONS}
-        name="meetingMethod"
-        label="Meeting Method"
-        value={consultationForm.meetingMethod ?? ''}
-        onChange={(e: { target: { value: string } }) =>
-          handleFormChange('meetingMethod', e.target.value)
-        }
-      />
+        <Select
+          options={MEETING_METHOD_OPTIONS}
+          name="meetingMethod"
+          label="Meeting Method"
+          value={formData.consultationDetails?.meetingMethod ?? ''}
+          onChange={(e: { target: { value: string } }) =>
+            handleFormChange('meetingMethod', e.target.value)
+          }
+        />
+      </div>
 
-      {consultationForm.meetingMethod === MeetingMethods.OTHER && (
+      {formData.consultationDetails?.meetingMethod === MeetingMethods.OTHER && (
         <Input
           label="Custom Location"
           type="text"
           name="customLocation"
-          value={consultationForm.customLocation ?? ''}
+          value={formData.consultationDetails?.customLocation ?? ''}
           onChange={(e: { target: { value: string } }) =>
             handleFormChange('customLocation', e.target.value)
           }
         />
       )}
 
-      <Input
-        label="Buffer Time Before"
-        type="number"
-        name="bufferBefore"
-        value={consultationForm.bufferBefore ?? ''}
-        onChange={(e: { target: { value: string } }) =>
-          handleFormChange('bufferBefore', e.target.value)
-        }
-      />
+      <div className="sentence-field">
+        <span>I want</span>
 
-      <Input
-        label="Buffer Time After"
-        type="number"
-        name="bufferAfter"
-        value={consultationForm.bufferAfter ?? ''}
-        onChange={(e: { target: { value: string } }) =>
-          handleFormChange('bufferAfter', e.target.value)
-        }
-      />
+        <Input
+          type="number"
+          name="bufferBefore"
+          className="sentence-input"
+          value={formData.consultationDetails?.bufferBeforeMinutes ?? ''}
+          onChange={(e: { target: { value: string } }) =>
+            handleFormChange('bufferBefore', e.target.value)
+          }
+        />
+        <span>minutes buffer before each meeting</span>
+        <InfoPopover>
+          Extra time added before each session. This prevents back-to-back
+          bookings and gives you preparation time before meeting the next client
+        </InfoPopover>
+      </div>
 
-      <Input
-        label="Max Sessions per Day"
-        type="number"
-        name="maxSessions"
-        value={consultationForm.maxSessions ?? ''}
-        onChange={(e: { target: { value: string } }) =>
-          handleFormChange('maxSessions', e.target.value)
-        }
-      />
+      <div className="sentence-field">
+        <span>I want</span>
 
-      <Input
+        <Input
+          type="number"
+          name="bufferAfter"
+          className="sentence-input"
+          value={formData.consultationDetails?.bufferAfterMinutes ?? ''}
+          onChange={(e: { target: { value: string } }) =>
+            handleFormChange('bufferAfter', e.target.value)
+          }
+        />
+        <span>minutes buffer after each meeting</span>
+        <InfoPopover>
+          Extra time added after each session to prevent immediate back-to-back
+          bookings
+        </InfoPopover>
+      </div>
+
+      <div className="sentence-field">
+        <span>I can do maximum</span>
+
+        <Input
+          type="number"
+          name="maxSessions"
+          className="sentence-input"
+          value={formData.consultationDetails?.maxSessionsPerDay ?? ''}
+          onChange={(e: { target: { value: string } }) =>
+            handleFormChange('maxSessions', e.target.value)
+          }
+        />
+        <span>session per day</span>
+        <InfoPopover>
+          The maximum number of sessions you allow clients to book in a single
+          day
+        </InfoPopover>
+      </div>
+
+      <Textarea
         label="Confirmation Message"
-        type="number"
         name="confirmationMessage"
-        value={consultationForm.confirmationMessage ?? ''}
+        value={formData.consultationDetails?.confirmationMessage ?? ''}
         onChange={(e: { target: { value: string } }) =>
           handleFormChange('confirmationMessage', e.target.value)
         }
       />
+
+      <RadioGroup
+        name="cancelationPolicy"
+        value={formData.consultationDetails?.cancellationPolicy ?? ''}
+        onChange={(v) => handleCancellationPolicyChange(v)}
+        label="Cancellation Policy"
+        className="cancellation-group"
+      >
+        {CANCELATION_POLICIES.map((policy, index) => (
+          <Radio
+            key={index}
+            value={policy.id}
+            label={policy.label}
+            description={policy.notes}
+          />
+        ))}
+      </RadioGroup>
     </div>
   );
 };
 
-export default ConsultationDetails;
+export default ConsultationDetailsSection;

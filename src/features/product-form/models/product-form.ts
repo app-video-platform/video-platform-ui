@@ -1,10 +1,9 @@
 import {
-  ConnectedCalendar,
   CourseProductSection,
   DownloadSection,
   ProductType,
   ProductStatus,
-  MeetingMethod,
+  ConsultationDetails,
 } from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
 import { BuilderSectionNavItem } from '../builder-sidebar';
@@ -30,17 +29,8 @@ export interface ProductDraft {
 
   // for COURSES + DOWNLOADS (optional in the form)
   sections?: SectionDraft[];
-
   // CONSULTATION-only fields (all optional in draft, enforced at submit)
-  durationMinutes?: number;
-  meetingMethod?: MeetingMethod;
-  customLocation?: string;
-  bufferBeforeMinutes?: number;
-  bufferAfterMinutes?: number;
-  maxSessionsPerDay?: number;
-  confirmationMessage?: string;
-  cancellationPolicy?: string;
-  connectedCalendars?: ConnectedCalendar[];
+  consultationDetails?: ConsultationDetails;
 }
 
 export type SectionDraft = CourseProductSection | DownloadSection;

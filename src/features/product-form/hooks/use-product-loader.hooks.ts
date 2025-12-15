@@ -59,16 +59,10 @@ export const useProductLoader = ({
             sections: product.sections || [],
           };
         } else if (product.type === 'CONSULTATION') {
+          const consultationDetails = product.consultationDetails;
           newData = {
             ...baseData,
-            durationMinutes: product.durationMinutes ?? 60,
-            meetingMethod: product.meetingMethod ?? 'ZOOM',
-            customLocation: product.customLocation ?? '',
-            bufferBeforeMinutes: product.bufferBeforeMinutes ?? 0,
-            bufferAfterMinutes: product.bufferAfterMinutes ?? 0,
-            cancellationPolicy: product.cancellationPolicy ?? '',
-            maxSessionsPerDay: product.maxSessionsPerDay ?? 1,
-            confirmationMessage: product.confirmationMessage ?? '',
+            consultationDetails,
           };
         }
 

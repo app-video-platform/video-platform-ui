@@ -14,18 +14,19 @@ interface QuizWizardProps {
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-const emptyMCQ: MCQQuestion = {
+const getEmptyMCQ = (position: number): MCQQuestion => ({
   id: uid(),
   title: 'How many cats do I have?',
   type: 'multiple_choice_single',
   points: 1,
   explanation: '',
+  position,
   shuffle: true,
   options: [
     { id: uid(), text: '0', isCorrect: false, position: 1 },
     { id: uid(), text: 'more than 0', isCorrect: true, position: 2 },
   ],
-};
+});
 
 const splitPointsEvenly = (total: number, count: number): number[] => {
   if (count <= 0) {
@@ -46,7 +47,7 @@ const splitPointsEvenly = (total: number, count: number): number[] => {
 const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
   const [quiz, setQuiz] = useState<QuizDraft>(() => ({
     id: initial?.id ?? uid(),
-    questions: initial?.questions ?? [emptyMCQ],
+    questions: initial?.questions ?? [getEmptyMCQ(1)],
     passingScore: initial?.passingScore ?? 70,
   }));
 
@@ -131,9 +132,10 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
   };
 
   const addQuestion = () => {
+    const position = quiz.questions.length + 1;
     setQuiz((qz) => ({
       ...qz,
-      questions: [...qz.questions, emptyMCQ],
+      questions: [...qz.questions, getEmptyMCQ(position)],
     }));
   };
 

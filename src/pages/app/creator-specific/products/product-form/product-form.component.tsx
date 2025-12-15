@@ -5,7 +5,7 @@ import { GalPriceSelector } from '@components';
 import { GalUppyFileUploader } from '@shared/ui';
 import {
   CreateProductStepOne,
-  ConsultationDetails,
+  ConsultationDetailsSection,
   CreateProductSections,
   BuilderSidebar,
   BuilderTab,
@@ -50,7 +50,7 @@ const ProductForm: React.FC = () => {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!formData.type) {
+    if (!formData.type || !showRestOfForm) {
       return;
     }
 
@@ -59,7 +59,7 @@ const ProductForm: React.FC = () => {
         formData.type === 'CONSULTATION' ? 'consultation-details' : 'sections';
       setActiveTab(tab);
     }
-  }, [formData.type]);
+  }, [formData.type, showRestOfForm]);
 
   useProductFormAnimation(container, showRestOfForm, () => {
     setHasHeroCollapsed(true);
@@ -144,11 +144,10 @@ const ProductForm: React.FC = () => {
               )}
 
               {activeTab === 'consultation-details' && (
-                <ConsultationDetails
+                <ConsultationDetailsSection
                   formData={formData}
                   errors={errors}
                   setFormData={setFormData}
-                  userId={user.id}
                 />
               )}
 

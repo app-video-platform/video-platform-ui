@@ -14,6 +14,7 @@ export interface QuizQuestionBase {
   points: number; // award on full correctness
   explanation?: string; // shown after submit
   shuffle?: boolean;
+  position: number;
 }
 
 export interface MCQQuestion extends QuizQuestionBase {

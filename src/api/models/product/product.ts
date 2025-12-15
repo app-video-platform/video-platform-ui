@@ -16,6 +16,7 @@ export interface AbstractProductBase {
   updatedAt?: Date;
   imageUrl?: string;
   sections?: any[];
+  consultationDetails?: ConsultationDetails;
 }
 
 export interface DownloadProduct extends AbstractProductBase {
@@ -31,7 +32,11 @@ export interface CourseProduct extends AbstractProductBase {
 
 export interface ConsultationProduct extends AbstractProductBase {
   type: 'CONSULTATION';
-  durationMinutes?: number;
+  consultationDetails?: ConsultationDetails;
+}
+
+export interface ConsultationDetails {
+  duration?: number;
   meetingMethod?: MeetingMethod;
   customLocation?: string;
   bufferBeforeMinutes?: number;
