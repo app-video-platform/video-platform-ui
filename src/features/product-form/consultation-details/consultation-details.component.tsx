@@ -45,7 +45,7 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
         'Thanks for booking! Please check your inbox for the Zoom link.',
       connectedCalendars: [],
       customLocation: '',
-      duration: 50,
+      durationMinutes: 50,
       maxSessionsPerDay: 8,
       meetingMethod: MeetingMethods.ZOOM,
     };
@@ -95,11 +95,11 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
       <div className="inline-fields">
         <Select
           options={TIME_OPTIONS}
-          name="duration"
+          name="durationMinutes"
           label="Meeting Duration"
-          value={formData.consultationDetails?.duration ?? 0}
+          value={formData.consultationDetails?.durationMinutes ?? 0}
           onChange={(e: { target: { value: string } }) =>
-            handleFormChange('duration', Number(e.target.value))
+            handleFormChange('durationMinutes', Number(e.target.value))
           }
         />
 
@@ -131,11 +131,11 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
 
         <Input
           type="number"
-          name="bufferBefore"
+          name="bufferBeforeMinutes"
           className="sentence-input"
-          value={formData.consultationDetails?.bufferBeforeMinutes ?? ''}
+          value={formData.consultationDetails?.bufferBeforeMinutes ?? 10}
           onChange={(e: { target: { value: string } }) =>
-            handleFormChange('bufferBefore', e.target.value)
+            handleFormChange('bufferBeforeMinutes', e.target.value)
           }
         />
         <span>minutes buffer before each meeting</span>
@@ -150,11 +150,11 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
 
         <Input
           type="number"
-          name="bufferAfter"
+          name="bufferAfterMinutes"
           className="sentence-input"
           value={formData.consultationDetails?.bufferAfterMinutes ?? ''}
           onChange={(e: { target: { value: string } }) =>
-            handleFormChange('bufferAfter', e.target.value)
+            handleFormChange('bufferAfterMinutes', e.target.value)
           }
         />
         <span>minutes buffer after each meeting</span>
@@ -169,11 +169,11 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
 
         <Input
           type="number"
-          name="maxSessions"
+          name="maxSessionsPerDay"
           className="sentence-input"
           value={formData.consultationDetails?.maxSessionsPerDay ?? ''}
           onChange={(e: { target: { value: string } }) =>
-            handleFormChange('maxSessions', e.target.value)
+            handleFormChange('maxSessionsPerDay', e.target.value)
           }
         />
         <span>session per day</span>
@@ -193,7 +193,7 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
       />
 
       <RadioGroup
-        name="cancelationPolicy"
+        name="cancellationPolicy"
         value={formData.consultationDetails?.cancellationPolicy ?? ''}
         onChange={(v) => handleCancellationPolicyChange(v)}
         label="Cancellation Policy"

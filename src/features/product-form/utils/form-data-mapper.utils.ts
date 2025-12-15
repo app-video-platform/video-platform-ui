@@ -16,26 +16,36 @@ export const mapFormDataToProductPayload = (
     userId: user?.id,
   };
 
+  const consDetails = formData.consultationDetails;
+
   switch (formData.type) {
     case 'COURSE':
       return {
         ...base,
         type: 'COURSE',
-        // sections: formData.sections ?? [],
       };
 
     case 'DOWNLOAD':
       return {
         ...base,
         type: 'DOWNLOAD',
-        sections: formData.sections ?? [],
       };
 
     case 'CONSULTATION':
       return {
         ...base,
         type: 'CONSULTATION',
-        consultationDetails: formData.consultationDetails,
+        consultationDetails: {
+          bufferAfterMinutes: Number(consDetails?.bufferAfterMinutes),
+          bufferBeforeMinutes: Number(consDetails?.bufferBeforeMinutes),
+          cancellationPolicy: consDetails?.cancellationPolicy,
+          confirmationMessage: consDetails?.confirmationMessage,
+          connectedCalendars: consDetails?.connectedCalendars,
+          customLocation: consDetails?.customLocation,
+          durationMinutes: Number(consDetails?.durationMinutes),
+          maxSessionsPerDay: Number(consDetails?.maxSessionsPerDay),
+          meetingMethod: consDetails?.meetingMethod,
+        },
       };
 
     default:

@@ -36,7 +36,7 @@ export interface ConsultationProduct extends AbstractProductBase {
 }
 
 export interface ConsultationDetails {
-  duration?: number;
+  durationMinutes?: number;
   meetingMethod?: MeetingMethod;
   customLocation?: string;
   bufferBeforeMinutes?: number;
