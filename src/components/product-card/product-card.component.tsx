@@ -23,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   const handleGoToEdit = () => {
-    navigate(`/edit/${product.id}`);
+    navigate(`/edit/${product.type}/${product.id}`);
   };
 
   return (

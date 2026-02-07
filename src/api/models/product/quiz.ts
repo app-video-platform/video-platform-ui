@@ -28,8 +28,7 @@ export interface TrueFalseQuestion extends QuizQuestionBase {
 }
 
 export interface QuizDraft {
-  id: string;
-  questions: QuizQuestion[];
+  questions?: QuizQuestion[];
   passingScore?: number; // optional passing threshold in %
   totalScore?: number;
 }

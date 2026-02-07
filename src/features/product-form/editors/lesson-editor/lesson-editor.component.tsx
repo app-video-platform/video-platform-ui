@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,16 +21,12 @@ import {
   AppDispatch,
 } from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
-import {
-  createLesson,
-  updateLessonDetails,
-  deleteLesson,
-} from '@store/product-store';
+import { createLesson, deleteLesson } from '@store/product-store';
 import { EditableTitle } from '../editable-title';
 import { LESSON_META } from '@api/constants';
+import { useLessonAutosave } from '@features/product-form/hooks';
 
 import './lesson-editor.styles.scss';
-import { useLessonAutosave } from '@features/product-form/hooks';
 
 interface LessonEditorProps {
   lesson: CourseLesson;
@@ -40,7 +35,7 @@ interface LessonEditorProps {
   // eslint-disable-next-line no-unused-vars
   removeLessonFromList: (index: number) => void;
   // eslint-disable-next-line no-unused-vars
-  onChange: (index: number, lessong: CourseLesson) => void;
+  onChange: (index: number, lesson: CourseLesson) => void;
 }
 
 const LessonEditor: React.FC<LessonEditorProps> = ({
@@ -87,11 +82,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     onChange(index, next);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    updateLesson({ [name]: value } as any);
-  };
-
   const handleCreateLesson = () => {
     // Logic to create a new lesson
     if (!user || !user.id) {
@@ -122,40 +112,6 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       .then((response) => {
         updateLesson({ id: response.id });
         setIsLessonCreated(true);
-      })
-      .catch((error) => {
-        console.error('Failed to create lesson:', error);
-      });
-  };
-
-  const handleUpdateLesson = () => {
-    if (!user || !user.id) {
-      console.error('User ID is not available for update');
-      return;
-    }
-    //Logic to update an existing lesson
-    const lessonId = lesson.id ?? lesson.id;
-
-    if (!lessonId) {
-      console.error('Lesson ID is not available for update');
-      return;
-    }
-
-    const updateLessonPayload: CourseLesson = {
-      ...lesson,
-      id: lessonId,
-      sectionId: sectionId, // Assuming lesson has a sectionId
-      position: index + 1, //Assuming position is based on the index
-      userId: user.id, // User ID from the auth state
-    };
-
-    dispatch(updateLessonDetails(updateLessonPayload))
-      .unwrap()
-      .then((response) => {
-        console.info('Lesson updated successfully:', response);
-      })
-      .catch((error) => {
-        console.error('Failed to update lesson:', error);
       });
   };
 
@@ -210,7 +166,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         );
 
       case 'QUIZ':
-        return <QuizWizard />;
+        return <QuizWizard lesson={lesson} updateLesson={updateLesson} />;
 
       case 'ASSIGNMENT':
         return (

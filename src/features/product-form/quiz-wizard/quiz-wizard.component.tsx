@@ -1,93 +1,81 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button, Input, Radio, RadioGroup } from '@shared/ui';
-import { MCQQuestion, QuizDraft, QuizQuestion } from '@api/models';
+import { CourseLesson, QuizDraft, QuizQuestion } from '@api/models';
 import QuestionCard from './question-card/question-card.component';
 
 import './quiz-wizard.styles.scss';
+import {
+  autoSplitQuizPoints,
+  getEmptyMCQ,
+  normalizeQuestionPositions,
+  syncTotalScoreToPoints,
+} from '../utils/quiz.utils';
 
 interface QuizWizardProps {
-  initial?: Partial<QuizDraft>;
+  lesson?: Partial<CourseLesson>;
   // eslint-disable-next-line no-unused-vars
-  onSave?: (quiz: QuizDraft) => Promise<void> | void; // hook for API integration
+  updateLesson: (quiz: Partial<CourseLesson>) => void; // hook for API integration
 }
 
-const uid = () => Math.random().toString(36).slice(2, 10);
+const QuizWizard: React.FC<QuizWizardProps> = ({ lesson, updateLesson }) => {
+  const didInit = useRef(false);
 
-const getEmptyMCQ = (position: number): MCQQuestion => ({
-  id: uid(),
-  title: 'How many cats do I have?',
-  type: 'multiple_choice_single',
-  points: 1,
-  explanation: '',
-  position,
-  shuffle: true,
-  options: [
-    { id: uid(), text: '0', isCorrect: false, position: 1 },
-    { id: uid(), text: 'more than 0', isCorrect: true, position: 2 },
-  ],
-});
-
-const splitPointsEvenly = (total: number, count: number): number[] => {
-  if (count <= 0) {
-    return [];
-  }
-  const base = Math.floor(total / count);
-  let remainder = total - base * count;
-
-  return Array.from({ length: count }, () => {
-    const extra = remainder > 0 ? 1 : 0;
-    if (remainder > 0) {
-      remainder -= 1;
+  useEffect(() => {
+    if (didInit.current) {
+      return;
     }
-    return base + extra;
-  });
-};
+    didInit.current = true;
 
-const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
-  const [quiz, setQuiz] = useState<QuizDraft>(() => ({
-    id: initial?.id ?? uid(),
-    questions: initial?.questions ?? [getEmptyMCQ(1)],
-    passingScore: initial?.passingScore ?? 70,
-  }));
+    const nextQuiz = ensureQuizDefaults(lesson);
+    // Only write if lesson.quiz is missing or incomplete
+    const shouldWrite =
+      !lesson?.quiz ||
+      !lesson.quiz.questions?.length ||
+      lesson.quiz.passingScore === null ||
+      lesson.quiz.totalScore === null;
+
+    if (shouldWrite) {
+      updateLesson({ quiz: nextQuiz });
+    }
+  }, []);
 
   const [scoreType, setScoreType] = useState<'auto' | 'manual'>('auto');
 
   const totalPoints = useMemo(
-    () => quiz.questions.reduce((sum, q) => sum + q.points, 0),
-    [quiz.questions],
+    () => lesson?.quiz?.questions?.reduce((sum, q) => sum + q.points, 0),
+    [lesson?.quiz?.questions],
   );
+
+  const ensureQuizDefaults = (lesson?: Partial<CourseLesson>): QuizDraft => {
+    const existing = lesson?.quiz;
+
+    return {
+      passingScore: existing?.passingScore ?? 80,
+      totalScore: existing?.totalScore ?? 100,
+      questions: existing?.questions?.length
+        ? existing.questions
+        : [getEmptyMCQ(1)],
+    };
+  };
 
   useEffect(() => {
     if (scoreType !== 'auto') {
       return;
     }
 
-    setQuiz((qz) => {
-      const count = qz.questions.length;
-      if (!count) {
-        return qz;
-      }
+    const current = lesson?.quiz;
+    if (!current?.questions?.length) {
+      return;
+    }
 
-      const total = qz.totalScore ?? totalPoints;
-      const perQuestion = splitPointsEvenly(total, count);
+    const nextQuiz = autoSplitQuizPoints(current);
 
-      let changed = false;
-      const nextQuestions = qz.questions.map((q, idx) => {
-        const nextPoints = perQuestion[idx];
-        if (q.points !== nextPoints) {
-          changed = true;
-          return { ...q, points: nextPoints };
-        }
-        return q;
-      });
-
-      if (!changed) {
-        return qz;
-      }
-      return { ...qz, questions: nextQuestions };
-    });
-  }, [scoreType, quiz.totalScore, quiz.questions.length, totalPoints]);
+    // Important: only update if something changed (function returns same object if no change)
+    if (nextQuiz !== current) {
+      updateLesson({ quiz: nextQuiz });
+    }
+  }, [scoreType, lesson?.quiz, updateLesson]);
 
   // Manual mode: keep totalScore in sync with sum of question points
   useEffect(() => {
@@ -95,48 +83,87 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
       return;
     }
 
-    setQuiz((qz) => {
-      if (qz.totalScore === totalPoints) {
-        return qz;
-      }
-      return { ...qz, totalScore: totalPoints };
-    });
-  }, [scoreType, totalPoints]);
+    const current = lesson?.quiz;
+    if (!current?.questions?.length) {
+      return;
+    }
+
+    const nextQuiz = syncTotalScoreToPoints(current);
+
+    if (nextQuiz !== current) {
+      updateLesson({ quiz: nextQuiz });
+    }
+  }, [scoreType, lesson?.quiz, updateLesson]);
 
   const updateQuestion = (qid: string, next: QuizQuestion) => {
-    setQuiz((qz) => ({
-      ...qz,
-      questions: qz.questions.map((q) => (q.id === qid ? next : q)),
-    }));
+    const current = lesson?.quiz ?? ensureQuizDefaults(lesson);
+    const nextQuestions = current.questions?.map((q) =>
+      q.id === qid ? next : q,
+    );
+
+    // keep positions in sync if you want:
+    // const normalized = nextQuestions.map((q, i) => ({ ...q, position: i + 1 }));
+
+    updateLesson({ quiz: { ...current, questions: nextQuestions } });
   };
 
   const removeQuestion = (qid: string) => {
-    setQuiz((qz) => ({
-      ...qz,
-      questions: qz.questions.filter((q) => q.id !== qid),
-    }));
+    const current = lesson?.quiz ?? ensureQuizDefaults(lesson);
+
+    updateLesson({
+      quiz: {
+        ...current,
+        questions: current.questions?.filter((q) => q.id !== qid),
+      },
+    });
   };
 
   const moveQuestion = (qid: string, dir: -1 | 1) => {
-    setQuiz((qz) => {
-      const idx = qz.questions.findIndex((q) => q.id === qid);
-      if (idx < 0) {
-        return qz;
-      }
-      const next = [...qz.questions];
-      const newIdx = Math.min(next.length - 1, Math.max(0, idx + dir));
-      const [spliced] = next.splice(idx, 1);
-      next.splice(newIdx, 0, spliced);
-      return { ...qz, questions: next };
+    const current = lesson?.quiz ?? ensureQuizDefaults(lesson);
+    const questions = current.questions ?? [];
+
+    const idx = questions.findIndex((q) => q.id === qid);
+    if (idx < 0) {
+      return;
+    }
+
+    const next = [...questions];
+    const newIdx = Math.min(next.length - 1, Math.max(0, idx + dir));
+    if (newIdx === idx) {
+      return;
+    }
+
+    const [spliced] = next.splice(idx, 1);
+    next.splice(newIdx, 0, spliced);
+
+    updateLesson({
+      quiz: {
+        ...current,
+        questions: normalizeQuestionPositions(next),
+      },
     });
   };
 
   const addQuestion = () => {
-    const position = quiz.questions.length + 1;
-    setQuiz((qz) => ({
-      ...qz,
-      questions: [...qz.questions, getEmptyMCQ(position)],
-    }));
+    const current = lesson?.quiz ?? ensureQuizDefaults(lesson);
+    const questions = current.questions ?? [];
+
+    const next = [...questions, getEmptyMCQ(questions.length + 1)];
+
+    updateLesson({
+      quiz: {
+        ...current,
+        questions: normalizeQuestionPositions(next),
+      },
+    });
+  };
+
+  const updateQuiz = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    const quiz = { ...lesson?.quiz, [name]: value };
+    updateLesson({ quiz });
   };
 
   return (
@@ -162,40 +189,30 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ initial, onSave }) => {
 
       <div className="scores-row">
         <Input
-          value={quiz.passingScore ?? 80}
+          value={lesson?.quiz?.passingScore ?? 80}
           label="Passing Score"
           name="passingScore"
           type="number"
           className="score-input"
-          onChange={(e: { target: { value: any } }) =>
-            setQuiz((q) => ({
-              ...q,
-              passingScore: Number(e.target.value || 0),
-            }))
-          }
+          onChange={updateQuiz}
         />
         <Input
-          value={scoreType === 'auto' ? (quiz.totalScore ?? 0) : totalPoints}
+          value={
+            scoreType === 'auto'
+              ? (lesson?.quiz?.totalScore ?? 0)
+              : (totalPoints ?? 100)
+          }
           label="Total points"
           name="totalPoints"
           className="score-input"
           type="number"
           readOnly={scoreType === 'manual'}
-          onChange={(e) => {
-            if (scoreType === 'manual') {
-              return;
-            }
-            const value = Number(e.target.value || 0);
-            setQuiz((q) => ({
-              ...q,
-              totalScore: value,
-            }));
-          }}
+          onChange={updateQuiz}
         />
       </div>
 
       <section className="questions">
-        {quiz.questions.map((q, idx) => (
+        {lesson?.quiz?.questions?.map((q, idx) => (
           <QuestionCard
             key={idx}
             question={q}
