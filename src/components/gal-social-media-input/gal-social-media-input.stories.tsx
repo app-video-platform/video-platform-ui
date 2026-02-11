@@ -1,11 +1,9 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5'; // or '@storybook/react-vite'
 import { useState } from 'react';
+
 import GalSocialMediaInput from './gal-social-media-input.component';
-import {
-  SocialPlatforms,
-  SocialMediaLink,
-} from '../../api/models/socials/social-media-link';
+import { SocialPlatforms, SocialMediaLink } from '@api/models';
 
 const meta: Meta<typeof GalSocialMediaInput> = {
   title: 'Components/GalSocialMediaInput',

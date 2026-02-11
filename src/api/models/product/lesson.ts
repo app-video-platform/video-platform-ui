@@ -1,4 +1,6 @@
-import { LessonType } from '../../types/products.types';
+import { LessonType } from './products.types';
+import { QuizDraft } from './quiz';
+import { QuizQuestion } from './quiz.types';
 
 export interface CourseLesson {
   id?: string;
@@ -7,6 +9,7 @@ export interface CourseLesson {
   videoUrl?: string;
   content?: string;
   position?: number;
+  quiz?: QuizDraft;
   sectionId: string;
   description: string;
   userId?: string;
@@ -21,4 +24,10 @@ export interface LessonCreate {
   content?: string;
   description: string;
   position?: number;
+}
+
+export interface QuizLesson extends CourseLesson {
+  passingScore: number;
+  questions: QuizQuestion[];
+  totalScore?: number;
 }

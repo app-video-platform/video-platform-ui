@@ -1,0 +1,16 @@
+@use '../../../styles/index.scss' as *;
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $accent-secondary;
+  border-radius: 50%;
+
+  &__large {
+    width: 70px;
+    height: 70px;
+  }
+}

@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import GalProductCard from './gal-product-box.component';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
-import { ProductStatus, ProductType } from '../../api/types/products.types';
+import { ProductStatus, ProductType } from '@api/models';
 
 // Create a dummy placeholder value as used in your component.
 // In your component, placeholderImage is imported via require.
@@ -14,7 +14,7 @@ jest.mock('../../assets/image-placeholder.png', () => 'placeholder-image.jpg');
 describe('GalProductCard component', () => {
   const dateForTesting = new Date('2021-08-15T12:00:00Z');
   const typeForTesting: ProductType = 'DOWNLOAD';
-  const statusForTesting: ProductStatus = 'draft';
+  const statusForTesting: ProductStatus = 'DRAFT';
   const productPriceForTesting: 'free' | number = 'free';
 
   const formattedDate = dateForTesting.toLocaleString('en-GB', {

@@ -1,4 +1,4 @@
-import { RootState } from './store';
+import { RootState } from '@api/models';
 
 export const makeSelectWishlistToCartState = (id: string) => (s: RootState) => {
   const inWishlist = s.wishlist.products.some((p) => p.id === id);

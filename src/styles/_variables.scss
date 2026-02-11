@@ -1,11 +1,111 @@
-$primary-color: #007bff;
-$secondary-color: #6c757d;
-$background-color: #f8f9fa;
-$text-color: #333;
-$font-family: "Arial", sans-serif;
+@use 'sass:color';
+// ==============================
+// 🎨 GALACTICA Design Tokens
+// ==============================
 
-$font-size-xxl: 64px;
-$font-size-xl: 48px;
-$font-size-l: 24px;
+// --------- GENERAL COLORS -------
+$deep-cosmic-blue: #151538;
+$muted-galactic-purple: #3a2e6f;
+$warm-yellow-orange: #ffbd41;
+$near-black: #0f0f2d;
+$sea-salt: #f8f9fa;
+$french-grey: #c3c0c5;
+$smoky-black: #0b0500;
+$dark-gunmetal: #21252b;
+$jet: #2a2b2e;
+$space-indigo: #1d1d45;
+$cool-cosmic-cyan: #3bc9db;
 
-$font-size-medium: 18px;
+$jade: #00a878; // success
+$cornell-red: #bd1e1e; //error
+$orange: #fcab10; // warning
+
+// helper colors
+$stellar-cyan: #5be4ff;
+$aurora-green: #7dffb2;
+$supernova-orange-pink: #ff7a6f;
+$deep-magenta-pulse: #d66bff;
+
+// --------- REUSABLE VARIABLES -------
+
+// --------- COLORS -------
+// Primary palette
+$accent-primary: $warm-yellow-orange;
+$accent-primary-dark: color.scale($accent-primary, $lightness: -25%);
+$accent-primary-light: color.scale($accent-primary, $lightness: 25%);
+
+$accent-secondary: $muted-galactic-purple;
+$accent-secondary-dark: color.scale($accent-secondary, $lightness: -25%);
+$accent-secondary-light: color.scale($accent-secondary, $lightness: 25%);
+
+$accent-tertiary: $cool-cosmic-cyan;
+$accent-tertiary-dark: color.scale($accent-tertiary, $lightness: -25%);
+$accent-tertiary-light: color.scale($accent-tertiary, $lightness: 25%);
+
+// Backgrounds
+$bg-base: $near-black; // primary background
+$bg-elevated: $deep-cosmic-blue; // first elevation level
+$bg-surface: $space-indigo; // second elevation level
+
+// Neutrals
+$neutral-light: $dark-gunmetal; // form backgrounds
+$neutral-medium: $jet; // Borders, dividers
+
+// Accents
+$success: $jade;
+$success-light: color.scale($success, $lightness: 50%);
+$warning: $orange;
+$warning-light: color.scale($warning, $lightness: 50%);
+$error: $cornell-red;
+$error-light: color.scale($error, $lightness: 50%);
+
+// Text
+$text-primary: $sea-salt;
+$text-secondary: $french-grey;
+$text-inverse: $muted-galactic-purple;
+
+// ---------- TYPOGRAPHY ----------
+
+// Font families
+$font-heading: 'Bebas Neue', sans-serif;
+$font-body: 'Open Sans', sans-serif;
+$font-mono: 'Roboto Mono', monospace;
+
+// Font sizes (rem-based scale)
+$size-xxl: 4rem; // 64px
+$size-xl: 3rem; // 48px
+$size-h1: 2rem; // ~32px
+$size-h2: 1.5rem; // ~24px
+$size-h3: 1.25rem; // ~20px
+$size-body: 1rem; // ~16px
+$size-small: 0.875rem; // ~14px
+$size-xsmall: 0.688rem; // ~11px
+
+// ---------- SPACING & SIZING ----------
+
+// 4px baseline spacing system
+$spacing-1: 4px;
+$spacing-2: 8px;
+$spacing-3: 12px;
+$spacing-4: 16px;
+$spacing-5: 24px;
+$spacing-6: 32px;
+$spacing-7: 48px;
+$spacing-8: 64px;
+
+// Border radius
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 20px;
+
+// Shadows
+$shadow-sm:
+  0 4px 20px rgba(34, 34, 34, 0.35),
+  0 0 30px rgba(83, 68, 145, 0.15);
+$shadow-md: 0 2px 8px color.scale($dark-gunmetal, $lightness: 70%);
+$shadow-lg: 0 4px 16px color.scale($dark-gunmetal, $lightness: 65%);
+
+// ---------- TRANSITIONS ----------
+$transition-fast: 0.2s ease-in-out;
+$transition-normal: 0.3s ease-in-out;
+$transition-slow: 0.5s ease-in-out;

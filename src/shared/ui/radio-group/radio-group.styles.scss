@@ -1,0 +1,26 @@
+@use '../../../styles/index.scss' as *;
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+
+  .radio-group-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 4px;
+  }
+
+  .radio-group-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .radio-group-error {
+    color: $error;
+    font-size: 12px;
+    margin-top: $spacing-1;
+  }
+}

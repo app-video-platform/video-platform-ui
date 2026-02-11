@@ -1,0 +1,49 @@
+@use 'sass:color';
+@use '../../../../../styles/index.scss' as *;
+
+.product-builder {
+  width: 100%;
+  position: relative;
+
+  &__full {
+    display: flex;
+    // gap: $spacing-5;
+    align-items: flex-start; // important so the sticky element doesn't stretch
+  }
+
+  .product-create-sidebar {
+    flex: 0 0 280px; // sidebar column width
+    max-width: 320px;
+    position: sticky;
+    top: 110px;
+  }
+
+  .product-create-section {
+    flex: 1 1 auto;
+    min-width: 0; // so content can shrink instead of overflowing
+  }
+}
+
+.product-create-hero {
+  // max-width: 640px;
+  margin: $spacing-7 auto 0;
+  transition: opacity 0.2s ease;
+
+  &__collapsed {
+    position: absolute;
+    // GSAP will handle transforms; keep it positionally flexible
+  }
+
+  &__hidden {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

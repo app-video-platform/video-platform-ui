@@ -1,26 +1,27 @@
-import { MeetingMethod } from '../../types/meeting-method.types';
-import { ProductStatus, ProductType } from '../../types/products.types';
+import { IconType } from 'react-icons';
 import { ConnectedCalendar } from '../calendars/connected-calendar';
-import {
-  CourseProductSection,
-  DownloadProductSectionRequest,
-  DownloadProductSectionResponse,
-} from './section';
+import { MeetingMethod } from './meeting-method.types';
+import { ProductType, ProductStatus } from './products.types';
+import { CourseProductSection, DownloadSection } from './section';
 
 export interface AbstractProductBase {
-  id?: string;
-  type: ProductType | string;
-  name?: string;
+  id: string;
+  type: ProductType;
+  name: string;
   description?: string;
   status?: ProductStatus;
   price?: 'free' | number;
   userId?: string;
   createdAt?: Date;
+  updatedAt?: Date;
+  imageUrl?: string;
+  sections?: any[];
+  consultationDetails?: ConsultationDetails;
 }
 
 export interface DownloadProduct extends AbstractProductBase {
   type: 'DOWNLOAD';
-  sections?: DownloadProductSectionRequest[] | DownloadProductSectionResponse[];
+  sections?: DownloadSection[];
 }
 
 // ----- Course product (request)
@@ -31,6 +32,10 @@ export interface CourseProduct extends AbstractProductBase {
 
 export interface ConsultationProduct extends AbstractProductBase {
   type: 'CONSULTATION';
+  consultationDetails?: ConsultationDetails;
+}
+
+export interface ConsultationDetails {
   durationMinutes?: number;
   meetingMethod?: MeetingMethod;
   customLocation?: string;
@@ -61,4 +66,9 @@ export interface IRemoveItemPayload {
 
 export interface IRemoveProductPayload extends IRemoveItemPayload {
   productType: ProductType;
+}
+
+export interface TypeMeta {
+  icon: IconType;
+  color: string;
 }

@@ -1,0 +1,1190 @@
+import { Link } from 'react-router-dom';
+import GalExpansionPanel from '../ui/gal-expansion-panel/gal-expansion-panel.component.tsx';
+import Artboard from '../../assets/1x/Artboard 1.png';
+
+# Developer Dashboard
+
+<GalExpansionPanel header="Intro">
+  <p>
+    Welcome to the developer dashboard. Here you can manage your development
+    tasks and monitor progress.
+  </p>
+  <p>
+    So, mă gândeam să fac pagina asta ca să avem un track la chestiile
+    implementate pe aici, poate și cum funcționează, poate și ce ar mai trebui
+    făcut la ele. Așa, chestii random.
+  </p>
+  <p>
+    În principiu, aici ar trebui să fie un fel de dashboard pentru dezvoltatori,
+    unde să putem vedea ce am implementat, ce mai trebuie făcut și poate și cum
+    funcționează fiecare feature.
+  </p>
+  <p>
+    Holy fuck, dude, paragraful de sus o fost generat în perfectă română de VS
+    Code Copilot AI (chiar dacă doar a rescris paragraful meu 😂). Noice.
+  </p>
+  <p>
+    Și da, în caz că te întrebai, m-am chinuit oțâră să scriu asta cu
+    diacritice.
+  </p>
+</GalExpansionPanel>
+
+<GalExpansionPanel header="Routes">
+
+Here we got some info about the routes created for the app, split into several categories.
+
+  <GalExpansionPanel header="Static Pages">
+    <div className="dev-panel-content">
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Galactica Landing Page</h3>
+        <span className="method"/>
+        <Link className="route-info" to={'/'}>Galactica</Link>
+        <div className="item-box-content">
+          - the first thing users see when navigating to galactica.com
+          - depending on the route we take, the URL will probably be galactica.com
+            - currently: [app.serious-debauchery.click](https://app.serious-debauchery.click)
+        </div>
+      </div>
+    
+
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">About Page</h3>
+        <span className="method"/>
+        <Link className="route-info" to={'/about'}>About</Link>
+        <div className="item-box-content">
+          - Classic about page
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Pricing Page</h3>
+        <span className="method"/>
+        <Link className="route-info" to={'/pricing'}>Pricing</Link>
+        <div className="item-box-content">
+          - Classic pricing page
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Contact Page</h3>
+        <span className="method"/>
+        <Link className="route-info" to={'/contact'}>Contact</Link>
+        <div className="item-box-content">
+          - Classic contact page
+        </div>
+      </div>
+    </div>
+
+  </GalExpansionPanel>
+
+<GalExpansionPanel header="User Authentication">
+  <div className="dev-panel-content">
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Sign Up Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/signup'}>
+        Sign Up
+      </Link>
+      <div className="item-box-content">- Classic sign up form</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Sign In Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/signin'}>
+        Sign In
+      </Link>
+      <div className="item-box-content">- Classic sign in form</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Forgot Password Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/forgot-password'}>
+        Forgot Password
+      </Link>
+      <div className="item-box-content">
+        - Classic forgot password flow (built in a step-by-step wizard style) 1.
+        User enters their email and clicks continue (step 1) 2. User enters the
+        OTP received in email in the OTP input and clicks continue (step 2) 3.
+        User enters the new password (2 times) and clicks change password (step
+        3) 4. User is redirected to the sign in page (step 4)
+      </div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Email Verification Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/verify-email'}>
+        Email Verification
+      </Link>
+      <div className="item-box-content">- Classic email verification flow</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Email Sent Confirmation Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/email-sent'}>
+        Email Sent Confirmation
+      </Link>
+      <div className="item-box-content">- Classic email confirmation page</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Not Found Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/not-found'}>
+        Not Found
+      </Link>
+      <div className="item-box-content">- Classic not found error page</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Unauthorized Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/unauthorized'}>
+        Unauthorized
+      </Link>
+      <div className="item-box-content">- Classic unauthorized error page</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Onboarding Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/onboarding'}>
+        Onboarding
+      </Link>
+      <div className="item-box-content">
+        - Classic user onboarding flow (step-by-step wizard) 1. Welcome page
+        with next steps explanation, where user can skip or continue (step 1) 2.
+        Basic profile info, like a profile photo and the title. Here user can
+        also go back (step 2) 3. Some other basic profile info, like bio and the
+        user's mission (step 3) 4. Some additional info, like website, location
+        (city, country) and the user's social media (step 4) 5. Success tab,
+        with options to continue onboarding (not yet implemented), go back, or
+        go directly to dashboard (step 5) 6. There is one more tab which says
+        that the onboarding is already completed, and it redirects in 10 seconds
+        to dashboard
+      </div>
+    </div>
+  </div>
+</GalExpansionPanel>
+
+  <GalExpansionPanel header="Galactica App">
+    <div className="dev-panel-content">
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Galactica App Home</h3>
+        <span className="method"/>
+        <Link className="route-info" to={'/app'}>App Home</Link>
+        <div className="item-box-content">
+          - This is the main page a logged user with any role is redirected to 
+          - Depending on the route we take, the URL will either be app.galactica.com or galactica.com/app
+            - currently: [app.serious-debauchery.click/app](https://app.serious-debauchery.click/app) 
+          - Here they have a navbar/sidenav specific to them, with products, sales info, marketing, and routing to all the pages specific to their role  
+          - This is the central hub of the app, acts as a dashboard for logged users
+          - The route is protected (only logged in users have access to it)
+        </div>
+      </div>
+
+      <div style={{height: '30px'}} />
+      ## Visitor pages (visible for ALL users)
+
+      <div className="dev-group">
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Explore</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/explore'}>Explore</Link>
+          <div className="item-box-content">
+            - A page seen by everyone
+            - Topnav contains a link to this pages, shown at all times to all users
+            - Here users can find top products and instructors
+          </div>
+        </div>
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Search Results</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/explore/search'}>Search</Link>
+          <div className="item-box-content">
+            - A page seen by everyone
+            - When using the search box in Topnav, clicking on a result redirect to this page
+            - the URL contains also query params for term, page, size, and storefront
+            - is not redirected through a link, only by clicking on a search result
+            - can be used for persistent search filters (e.g. copy and paste link for same results)
+          </div>
+        </div>
+
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Product Details Page</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/product/mockId/mockType'}>Product Details</Link>
+          <div className="item-box-content">
+            - A page seen by everyone
+            - This is the presentation page for a product
+            - the URL contains subroutes for product Id and product Type
+            - is not redirected through a link, only by clicking the 'View Product' button on a product card
+            - can be used for persistent search filters (e.g. copy and paste link for same product info)
+          </div>
+        </div>
+
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Storefront</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/store/mockUserId'}>Storefront</Link>
+          <div className="item-box-content">
+            - A page seen by everyone
+            - This is the presentation page for an user (their storefront)
+              - contains information about the instructor and a list of their products
+            - the URL contains subroutes for user Id
+            - can be redirected to in two ways:
+              - click on instructor name on a Product card
+              - select search result in search box
+            - can be used for persistent search filters (e.g. copy and paste link for same product info)
+          </div>
+        </div>
+      </div>
+
+      <div style={{height: '30px'}} />
+      ## Creator pages (visible only for users with role CREATOR)
+
+      <div className="dev-group">
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Products</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/products'}>Products</Link>
+          <div className="item-box-content">
+            - Here the user can manage their created products
+            - see details about customers, sales, etc.
+            - has quick access to edit products, and create new ones
+          </div>
+        </div>
+
+        <div className="dev-group">
+          <div className="dev-item-box">
+            <h3 className="item-box-header">Create Product</h3>
+            <span className="method"/>
+            <Link className="route-info" to={'/app/products/create'}>Create Product</Link>
+            <div className="item-box-content">
+              - This is the page specifically for creating new products
+              - The flow chosen follows best practices for this situation, but the UX needs improvements (too many buttons, too many clicks)
+            </div>
+          </div>
+
+          <div className="dev-item-box">
+            <h3 className="item-box-header">Edit Product</h3>
+            <span className="method"/>
+            <Link className="route-info" to={'/app/products/edit/COURSE/course-id'}>Edit Product</Link>
+            <div className="item-box-content">
+              - This is the page specifically for editing existing products
+              - Technically it's still the same component as creating a product, but with parameters in the URL
+            </div>
+          </div>
+        </div>
+
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Instructor Storefront Preview</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/dashboard/my-page-preview'}>Storefront Preview</Link>
+          <div className="item-box-content">
+            - User's storefront page
+            - Can edit themes, colors, items, information
+            - The settings created in this page will be used for the creators real storefront (seen by customers)
+          </div>
+        </div>
+
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Sales Page</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/dashboard/sales'}>Sales</Link>
+          <div className="item-box-content">
+            - User's sale information page
+            - Here they can see details about purchases, can edit prices, can see analytics and sale trends
+          </div>
+        </div>
+
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Marketing Page</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/dashboard/marketing'}>Marketing</Link>
+          <div className="item-box-content">
+            - User's marketing page
+            - Here they can see their marketing campaigns, can create new ones, can edit existing ones, and can see analytics
+            - Also reviews from customers are shown here
+            - This is also a hub for communication (messages, live sessions)
+          </div>
+        </div>
+      </div>
+
+      <div style={{height: '30px'}} />
+      ## Normal User pages (visible only for users with role User)
+       <div className="dev-group">
+          <div className="dev-item-box">
+            <h3 className="item-box-header">Normal User Home/Dashboard Page</h3>
+            <span className="method"/>
+            <Link className="route-info" to={'/app'}>Home/Dashboard</Link>
+            <div className="item-box-content">
+              - Depending on the route we take, the URL will probably be app.galactica.com
+                - currently: [app.serious-debauchery.click/app](https://app.serious-debauchery.click/app)
+              - This is the creator's main hub, with a navbar with a search bar, link to course, cart, and notification
+              - Here they can search for courses, products, or creators
+              - Here they can see their most recently started courses, and other categories of products tailored to the user's preferences
+            </div>
+          </div>
+       </div>
+
+
+      <div style={{height: '30px'}} />
+      ## All logged pages (visible only for logged in users with any role)
+      <div className="dev-group">
+        <div className="dev-item-box">
+          <h3 className="item-box-header">Settings</h3>
+          <span className="method"/>
+          <Link className="route-info" to={'/app/settings'}>Settings</Link>
+          <div className="item-box-content">
+            - This is the settings page for any user
+            - Here they can change their basic information
+            - Here they can also update user role specific settings
+            - Depending on the user role, there will be different tabs and/or sections shown
+          </div>
+        </div>
+       </div>
+
+    </div>
+
+  </GalExpansionPanel>
+</GalExpansionPanel>
+
+<GalExpansionPanel header="API Endpoints">
+  <GalExpansionPanel header="Authentication">
+    <div className="dev-panel-content">
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Register (registerUser)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/auth/register</span>
+        <div className="item-box-content">
+          - Endpoint used for registering a new user
+          - **Payload:**
+            - ```js
+              {
+                email: string,
+                password: string,
+                firstName: string,
+                lastName: string
+              }
+              ```
+          - **Response:**  
+            - ```js
+              {
+                message: string
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Sign In (signInUser)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/auth/login</span>
+        <div className="item-box-content">
+          - Endpoint used for signing in a user
+          - **Payload:**
+            - ```js
+              {
+                email: string,
+                password: string
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                message: string
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Verify Email (verifyEmailApi)</h3>
+        <span className="method">GET</span>
+        <span className="route-info">api/auth/verify?token=````token````</span>
+        <div className="item-box-content">
+          - Endpoint used for verifying a user's email
+          - **Payload:**
+            - ```js
+              {
+                token: string
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                message: string
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Refresh token</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/auth/refresh</span>
+        <div className="item-box-content">
+          - Endpoint used for refreshing the user's authentication token
+          - **Payload:** _none (based on cookies/session)_
+          - **Response:**
+            - ```js
+              {
+                token: string
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Sign Out (logoutAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/auth/logout</span>
+        <div className="item-box-content">
+          - Endpoint used for signing out a user
+          - **Payload:** _none_
+          - **Response:** _none_
+        </div>
+      </div>
+
+    <div className="dev-item-box">
+        <h3 className="item-box-header">Sign In With Google (googleAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/auth/googleSignIn</span>
+        <div className="item-box-content">
+          - Endpoint used for signing in a user with Google
+          - **Payload:**
+            - ```js
+              {
+                idToken: string
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                message: string
+              }
+              ```
+        </div>
+      </div>
+
+    <div className="dev-item-box">
+        <h3 className="item-box-header">Forgot Password (forgotPasswordAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/auth/forgot</span>
+        <div className="item-box-content">
+          - Endpoint used for initiating the forgot password flow (resetting password)
+          - **Payload:**
+            - ```js
+              {
+                email: string
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                message: string
+              }
+              ```
+        </div>
+      </div>
+    </div>
+
+  </GalExpansionPanel>
+
+  <GalExpansionPanel header="User">
+   <div className="dev-panel-content">
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Get User Profile (getUserProfileAPI)</h3>
+        <span className="method">GET</span>
+        <span className="route-info">api/user/userInfo</span>
+        <div className="item-box-content">
+          - Endpoint used for retrieving the user's profile information
+          - **Payload:** _none (based on cookies/session)_
+          - **Response:**
+            - ```js
+              {
+                id: string,
+                firstName: string;
+                lastName: string;
+                email: string;
+                role: string[];
+              }
+              ```
+        </div>
+      </div>
+    </div>
+  </GalExpansionPanel>
+
+  <GalExpansionPanel header="Products">
+    <div className="dev-panel-content">
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Create Product (createProductAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/products</span>
+        <div className="item-box-content">
+          - Endpoint used for creating a new product
+          - **Payload:**
+            - ```js
+              {
+                name: string;
+                description: string;
+                type: ProductType;
+                userId: string;
+                status: 'draft';
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                id: string;
+                type?: ProductType;
+                name?: string;
+                description?: string;
+                status?: string;
+                price?: 'free' | number;
+                userId?: string;
+                sections?: Sections[];
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Update Product Details (updateProductDetailsAPI)</h3>
+        <span className="method">PUT</span>
+        <span className="route-info">api/products</span>
+        <div className="item-box-content">
+          - Endpoint used for updating an existing product's details
+          - **Payload:**
+            - ```js
+              {
+                id: string;
+                userId: string;
+                name?: string;
+                description?: string;
+                type?: ProductType;
+                status?: ProductStatus;
+                price?: 'free' | number;
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                id: string;
+                type?: ProductType;
+                name?: string;
+                description?: string;
+                status?: string;
+                price?: 'free' | number;
+                userId?: string;
+                sections?: Sections[];
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Delete Product (deleteProductAPI)</h3>
+        <span className="method">DELETE</span>
+        <span className="route-info">api/products?userId=**userId**&productType=**productType**&id=**id**</span>
+        <div className="item-box-content">
+          - Endpoint used for deleting an existing product
+          - **Payload:** _none (based on userId, productType, and id parameters)_
+          - **Response:**
+            - ```js
+              {
+                message: string;
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Create Section (createSectionAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/products/course/section</span>
+        <div className="item-box-content">
+          - Endpoint used for creating a new section in a course product
+          - **Payload:**
+            - ```js
+              {
+                productId?: string;
+                id?: string;
+                title?: string;
+                description?: string;
+                position: number;
+                content?: SectionContentType;
+                userId: string;
+                files?: File[];
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                productId?: string;
+                id?: string;
+                title?: string;
+                description?: string;
+                position: number;
+                content?: SectionContentType;
+                userId: string;
+                files?: File[];
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Update Section Details (updateSectionDetailsAPI)</h3>
+        <span className="method">PUT</span>
+        <span className="route-info">api/products/course/section</span>
+        <div className="item-box-content">
+          - Endpoint used for updating an existing section's details
+          - **Payload:**
+            - ```js
+              {
+                productId?: string;
+                id?: string;
+                title?: string;
+                description?: string;
+                position: number;
+                content?: SectionContentType;
+                userId: string;
+                files?: File[];
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                message: string;
+              }
+              ```
+        </div>
+      </div>
+
+       <div className="dev-item-box">
+        <h3 className="item-box-header">Delete Section (deleteSectionAPI)</h3>
+        <span className="method">DELETE</span>
+        <span className="route-info">api/products/course/section?userId=**userId**&id=**id**</span>
+        <div className="item-box-content">
+          - Endpoint used for deleting an existing section
+          - **Payload:** _none (based on userId and id parameters)_
+          - **Response:**
+            - ```js
+              {
+                message: string;
+              }
+              ```
+        </div>
+      </div>
+
+       <div className="dev-item-box">
+        <h3 className="item-box-header">Create Lesson (createLessonAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/products/course/section/lesson</span>
+        <div className="item-box-content">
+          - Endpoint used for creating a new lesson in a section
+          - **Payload:**
+            - ```js
+              {
+                title: string;
+                description?: string;
+                type?: LessonType;
+                position: number;
+                sectionId: string;
+                userId: string;
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                id: string;
+                sectionId: string; // ID of the section to which this lesson belongs
+                userId: string; // ID of the user who created the lesson
+                title: string;
+                position: number; // Position in the section
+                type?: LessonType;
+                description?: string;
+                content?: string; // URL or text content
+                duration?: number; // Duration in seconds
+                videoUrl?: string; // URL for video content
+              }
+              ```
+        </div>
+      </div>
+
+       <div className="dev-item-box">
+        <h3 className="item-box-header">Update Lesson Details (updateLessonDetailsAPI)</h3>
+        <span className="method">PUT</span>
+        <span className="route-info">api/products/course/section/lesson</span>
+        <div className="item-box-content">
+          - Endpoint used for updating an existing lesson's details
+          - **Payload:**
+            - ```js
+              {
+                id: string; // ID of the lesson to update
+                sectionId: string; // ID of the section to which this lesson belongs
+                userId: string; // ID of the user who created the lesson
+                title?: string; // New title for the lesson
+                description?: string; // New description for the lesson
+                type?: LessonType; // New type of the lesson (e.g., video, text)
+                position?: number; // New position in the section
+                content?: string; // New content URL or text
+                duration?: number; // New duration in seconds
+                videoUrl?: string; // New URL for video content
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                message: string; // Confirmation message
+              }
+              ```
+        </div>
+      </div>
+
+       <div className="dev-item-box">
+        <h3 className="item-box-header">Delete Lesson (deleteLessonAPI)</h3>
+        <span className="method">DELETE</span>
+        <span className="route-info">api/products/course/section/lesson?userId=**userId**&id=**id**</span>
+        <div className="item-box-content">
+          - Endpoint used for deleting an existing lesson
+          - **Payload:** _none (based on userId and id parameters)_
+          - **Response:**
+            - ```js
+              {
+                message: string; // Confirmation message
+              }
+              ```
+        </div>
+      </div>
+
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Get All User's Products (getAllProductsByUserIdAPI)</h3>
+        <span className="method">GET</span>
+        <span className="route-info">api/products?userId=**userId**</span>
+        <div className="item-box-content">
+          - Endpoint used for retrieving all products created by a specific user
+          - **Payload:** _none (based on userId parameter)_
+          - **Response:**
+            - ```js
+              Array<{
+                id: string;
+                type?: ProductType;
+                name?: string;
+                description?: string;
+                status?: string;
+                price?: 'free' | number;
+                userId?: string;
+                sections?: Sections[];
+              }>;
+            ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Retrieve a specific product (getProductByProductIdAPI)</h3>
+        <span className="method">GET</span>
+        <span className="route-info">api/products/getProduct?productId=**productId**&type=**productType**</span>
+        <div className="item-box-content">
+          - Endpoint used for retrieving a specific product by its ID and type
+          - **DUDE!** Ne trebuie un alt endpoint care duce ca si asta tot produsul, dar fara content, ca sa putem sa afisam pe pagina de product pe care o vad clientii inainte sa cumpere
+          - **Payload:** _none (based on productId and productType parameters)_
+          - **Response:**
+            - ```js
+              {
+                id: string;
+                type?: ProductType;
+                name?: string;
+                description?: string;
+                status?: string;
+                price?: 'free' | number;
+                userId?: string;
+                sections?: Sections[];
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Add card image for product (addImageToProductAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">api/products/image?productId=**productId**</span>
+        <div className="item-box-content">
+          - Endpoint used for adding a card image to a product
+          - **Payload:** _none (based on productId parameter)_
+          - **Response:**
+            - ```js
+              {
+                message: string; // Confirmation message
+              }
+              ```
+        </div>
+      </div>
+    </div>
+
+  </GalExpansionPanel>
+
+  <GalExpansionPanel header="Files">
+    <div className="dev-panel-content">
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Get Presigned URL (getPresignedUrlAPI)</h3>
+        <span className="method">GET</span>
+        <span className="route-info">/api/files/presigned-url</span>
+        <div className="item-box-content">
+          - Endpoint used for retrieving a presigned URL for file uploads
+          - **Payload:** _none (based on query parameters)_
+          - **Response:**
+            - ```js
+              {
+                fileId: string,
+                presignedUrl: string,
+                key: string,
+                fileUrl: string
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Upload To Presigned URL (uploadToPresignedUrl)</h3>
+        <span className="method">PUT</span>
+        <span className="route-info">**presignedURL**</span>
+        <div className="item-box-content">
+          - Endpoint used for uploading a file to a presigned URL
+          - **Payload:** _file data (binary)_
+          - **Response:** _none (the file is uploaded directly to the presigned URL)_
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header">Confirm File Is Uploaded (confirmFileUploadAPI)</h3>
+        <span className="method">POST</span>
+        <span className="route-info">/api/files/confirm-upload</span>
+        <div className="item-box-content">
+          - Endpoint used for confirming that a file has been uploaded
+          - **Payload:**
+            - ```js
+              {
+                sectionId: string;
+                fileId: string;
+                key: string;
+                fileUrl: string;
+                fileName: string;
+                fileSize: number;
+                fileType: string;
+              }
+              ```
+          - **Response:**
+            - ```js
+              {
+                message: string; // Confirmation message
+              }
+              ```
+        </div>
+      </div>
+
+      <div className="dev-item-box">
+        <h3 className="item-box-header"></h3>
+        <span className="method"></span>
+        <span className="route-info"></span>
+        <div className="item-box-content">
+        </div>
+      </div>
+    </div>
+
+  </GalExpansionPanel>
+</GalExpansionPanel>
+
+<GalExpansionPanel header='UI Component Architecture Proposal'>
+  <div className="dev-panel-content">
+    <div className="dev-item-box">
+      <div className="item-box-content">
+        # So, avem niste architecture Proposal
+        Dar nu e pentru UI, e pentru routing si domain.
+        Ideea ii ca is doua feluri de a face aplicatie ca si a noastra: 
+          - **Subdomain Model**
+          - **Path-Based Model**
+
+        Noi deocamdata folosim Path-Based Model, adica avem un singur domeniu, si in functie de path-ul URL-ului, afisam diferite pagini.
+        Pentru a separa partea statica de partea de galactica app, o sa folosim un path ````/app```` pentru toate paginile
+
+        Cealalata propunere ar fi sa avem partea statica pe un domeniu normal, si aplicatia pe un subdomeniu, gen app.galactica.com.
+
+        Am avut o discutie cu prietenul nostru comun, si a facut o comparare intre modele, e sub textul asta. Am facut si eu o imagine frumoasa ca acompaniament.
+
+        <img src={Artboard} width={'80%'} style={{margin: '30px auto'}}/>
+
+        # Frontend Architecture Comparison: Split-Subdomain vs Single-Domain Models
+
+        ---
+
+        ## 📘 Model 1: Split-Subdomain Architecture ("Subdomain Model")
+
+        ### 🌍 Domain Structure:
+        - `www.yourwebsite.com` → Public site (landing, about, sign in, etc.)
+        - `app.yourwebsite.com` → Authenticated app (dashboards, products, storefronts)
+
+        ### ✅ Pros:
+        - Clear separation of concerns (marketing vs app)
+        - Independent deployment pipelines
+        - Easier to optimize SEO and performance for the public site
+        - More scalable for future features (e.g., mobile, international versions)
+        - More professional SaaS-like experience
+
+        ### ❌ Cons:
+        - More complex setup (DNS, deployment, routing)
+        - Cross-domain login/session handling may require cookie or token config
+
+        ### 🧱 Minimal Monorepo Folder Structure:
+        ```
+        creator-platform/
+        ├── apps/
+        │   ├── www/         # Public site (React or Next.js)
+        │   ├── app/         # Creator/user dashboard app
+        ├── packages/
+        │   ├── ui/          # Shared UI components
+        │   ├── auth/        # Shared auth logic
+        │   ├── utils/       # Shared helpers
+        ```
+
+        ---
+
+        ## 📗 Model 2: Single-Domain with URL Prefix Architecture ("Path-Based Model")
+
+        ### 🌍 Domain Structure:
+        - `www.yourwebsite.com/` → Public site
+        - `www.yourwebsite.com/app/...` → Authenticated app (dashboard, library, etc.)
+
+        ### ✅ Pros:
+        - Simpler deployment (single domain, single host or service)
+        - Easier cookie/session management (no cross-domain issues)
+        - Can be built as a single SPA (e.g., with route-based layout switching)
+
+        ### ❌ Cons:
+        - Harder to decouple public site from app logic over time
+        - All changes require a single redeploy
+        - May cause confusion or route collision if not managed carefully
+        - SEO tuning and page load performance harder to isolate
+
+        ### 🧱 Minimal Folder Structure (Single App):
+        ```
+        creator-platform/
+        ├── src/
+        │   ├── components/
+        │   ├── pages/
+        │   │   ├── index.jsx             # Home
+        │   │   ├── about.jsx
+        │   │   ├── app/
+        │   │   │   ├── dashboard.jsx     # Creator dashboard
+        │   │   │   ├── library.jsx       # Buyer dashboard
+        │   │   │   ├── explore.jsx       # Product discovery
+        │   ├── layouts/
+        │   │   ├── PublicLayout.jsx
+        │   │   ├── AppLayout.jsx
+        ├── App.js or main.tsx
+        ```
+
+        ---
+
+        ## 🏁 Recommendation
+
+        - Choose **Subdomain Model** if:
+          - You want cleaner codebase separation and professional SaaS UX
+          - You plan to scale long-term (e.g., mobile app, admin portal, marketing team)
+
+        - Choose **Path-Based Model** if:
+          - You're in early MVP stage or working solo/small team
+          - You prefer simplicity over separation right now
+          - You want minimal hosting complexity
+
+        ---
+
+
+
+        <div style={{height: '60px'}}/>
+
+        Deci aici avem o propunere de arhitectura pentru UI, care se bazeaza pe modelul de path-based (cat de cat asa am implementat).
+
+        <div style={{height: '20px'}}/>
+        # Subdomain Model - React UI Component Architecture
+
+        This is a modular list of React components for both the public site and authenticated app interface.
+
+        ---
+
+        ## 🌐 Public Site (Static Pages)
+
+          - HomePage
+          - AboutPage
+          - PricingPage
+          - ContactPage
+          - SignInPage
+          - SignUpPage
+          - EmailVerificationPage
+          - TermsAndPrivacyPage
+
+        ---
+
+        ## 🔐 Authentication & Onboarding
+
+          - AuthWrapper (protect routes)
+          - OnboardingStepper
+          - OnboardingProfileForm
+          - OnboardingPreferencesForm
+          - IntroTourOverlay
+
+        ---
+
+        ## 🧭 Layout Components
+
+          - PublicLayout (for static pages)
+          - AppLayout (for authenticated users)
+          - SidebarNavigation
+          - TopNavbar
+          - NotificationBell
+          - UserAvatarDropdown
+
+        ---
+
+        ## 🏠 Dashboard (Creator)
+
+          - DashboardOverview
+          - DashboardMetricsCard
+          - RecentActivityFeed
+          - QuickActionsPanel
+
+        ---
+
+        ## 🛍 Products
+
+          - ProductList
+          - ProductCard
+          - ProductTypeTabs (Courses / Downloads / Sessions)
+          - CreateProductWrapper
+            - CreateCourseForm
+            - CreateDownloadForm
+            - CreateConsultationForm
+          - EditProductPage
+          - ProductDetailsPage
+
+        ---
+
+        ## 📅 Consultations
+
+          - BookingCalendar
+          - TimeSlotPicker
+          - BookingForm
+          - ConsultationConfirmation
+          - MyConsultations (User-side)
+          - ConsultationManager (Creator-side)
+          - JoinSessionButton
+
+        ---
+
+        ## 💳 Checkout & Orders
+
+          - CheckoutPage
+          - PaymentForm (StripeElements)
+          - OrderSummary
+          - OrderHistory (User)
+          - OrdersDashboard (Creator)
+
+        ---
+
+        ## 🎓 Course Viewer
+
+          - CoursePlayer
+          - LessonListSidebar
+          - LessonViewer
+          - MarkAsCompleteButton
+          - ProgressTracker
+
+        ---
+
+        ## 🛒 Storefront
+
+          - CreatorStorefront
+          - StorefrontEditor
+          - FeaturedProducts
+          - StorefrontHeader
+
+        ---
+
+        ## 📈 Analytics
+
+          - AnalyticsDashboard
+          - SalesGraph
+          - ProductPerformanceTable
+          - TrafficStats
+
+        ---
+
+        ## 📣 Marketing & Engagement
+
+          - MarketingDashboard
+          - EmailCampaignForm
+          - AudienceSelector
+          - EmailPreview
+          - CampaignHistory
+          - CouponList
+          - CreateCouponForm
+          - AffiliateDashboard
+          - InviteAffiliateForm
+          - CommissionSettings
+
+        ---
+
+        ## 💬 Communication
+
+          - MessagesInbox
+          - MessageThread
+          - SendMessageForm
+          - ReviewsList
+          - ReviewItem
+          - LeaveReviewForm
+
+        ---
+
+        ## ⚙️ Settings
+
+          - AccountSettings
+          - BillingSettings
+          - ProfileSettings
+          - PasswordChangeForm
+          - ConnectedApps (Zoom, Calendar)
+          - NotificationPreferences
+
+        ---
+
+        ## 🔧 Admin (Optional)
+
+          - AdminDashboard
+          - UserManagementTable
+          - ProductModerationPanel
+          - PlatformMetrics
+
+        ---
+
+        ## 🧱 Utility Components
+
+          - Modal
+          - Tooltip
+          - Button
+          - Input
+          - Select
+          - ToggleSwitch
+          - Avatar
+          - DatePicker
+          - FileUploader
+      </div>
+    </div>
+
+  </div>
+</GalExpansionPanel>

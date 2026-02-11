@@ -3,25 +3,18 @@ import { CourseLesson } from './lesson';
 
 export interface CourseProductSection {
   id?: string;
-  title?: string;
+  title: string;
   description?: string;
   productId?: string;
-  position?: number;
+  position: number;
   lessons?: CourseLesson[];
 }
 
-export interface DownloadProductSectionRequest {
+export interface DownloadSection {
   id?: string;
-  title?: string;
+  title: string;
   description?: string;
-  position?: number;
-}
-
-export interface DownloadProductSectionResponse {
-  id?: string;
-  title?: string;
-  description?: string;
-  position?: number;
+  position: number;
   files?: FileDownloadProductResponse[];
 }
 

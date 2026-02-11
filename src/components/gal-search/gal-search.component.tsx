@@ -1,7 +1,8 @@
 import React, { FormEvent } from 'react';
 import { CiSearch } from 'react-icons/ci';
 
-import GalIcon from '../gal-icon-component/gal-icon.component';
+import { GalIcon } from '@shared/ui';
+import { getCssVar } from '@shared/utils';
 
 import './gal-search.styles.scss';
 
@@ -58,7 +59,11 @@ const GalSearch: React.FC<GalSearchProps> = ({
         className="search-button"
         aria-label="Submit search"
       >
-        <GalIcon icon={CiSearch} size={24} />
+        <GalIcon
+          icon={CiSearch}
+          size={24}
+          color={getCssVar('--text-primary')}
+        />
       </button>
     </form>
   );

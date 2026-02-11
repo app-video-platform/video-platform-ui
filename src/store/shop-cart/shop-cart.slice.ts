@@ -1,13 +1,12 @@
 /* eslint-disable indent */
-import { AxiosError } from 'axios';
 import {
   AnyAction,
   createSlice,
   PayloadAction,
   ThunkAction,
 } from '@reduxjs/toolkit';
-import { ProductMinimised } from '../../api/models/product/product';
-import { RootState } from '../store';
+
+import { ProductMinimised, RootState } from '@api/models';
 import { addToWishlist } from '../wishlist/wishlist.slice';
 
 const STORAGE_KEY = 'cart:v1';
@@ -48,7 +47,7 @@ export const saveCartToStorage = (state: ShopCartState) => {
 };
 
 const getNumericPrice = (p: ProductMinimised): number => {
-  const price = (p as any).price;
+  const price = p.price;
   if (price === 'free' || price === null) {
     return 0;
   }
@@ -57,15 +56,6 @@ const getNumericPrice = (p: ProductMinimised): number => {
 
 const recomputeTotal = (items: ProductMinimised[]) =>
   items.reduce((sum, p) => sum + getNumericPrice(p), 0);
-
-export const extractErrorMessage = (err: unknown): string => {
-  if (err instanceof AxiosError && err.response?.data?.message) {
-    return err.response.data.message;
-  } else if (err instanceof Error) {
-    return err.message;
-  }
-  return 'An unknown error occurred';
-};
 
 export const moveCartItemToWishlist =
   (productId: string): ThunkAction<void, RootState, unknown, AnyAction> =>

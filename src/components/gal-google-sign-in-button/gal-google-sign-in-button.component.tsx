@@ -1,11 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../store/store';
-import {
-  getUserProfile,
-  googleSignInUser,
-} from '../../store/auth-store/auth.slice';
 import { useNavigate } from 'react-router-dom';
+
+import { googleSignInUser, getUserProfile } from '@store/auth-store';
+import { AppDispatch } from '@api/models';
 
 const GalGoogleSignInButton: React.FC = () => {
   const googleButton = useRef<HTMLDivElement | null>(null);

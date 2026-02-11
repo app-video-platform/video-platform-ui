@@ -18,9 +18,20 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
+    "baseUrl": "src",
+    "paths": {
+      "@api/*": ["api/*"],
+      "@components": ["components/index.ts"],
+      "@components/*": ["components/*"],
+      "@features/*": ["features/*"],
+      "@pages/*": ["pages/*"],
+      "@shared/*": ["shared/*"],
+      "@store/*": ["store/*"],
+      "@widgets/*": ["widgets/*"]
+    }
   },
   "include": [
     "src",
-    "src/global.d.ts",
+    "src/global.d.ts"
   ]
 }

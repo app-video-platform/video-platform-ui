@@ -1,0 +1,50 @@
+@use '../../styles/index.scss' as *;
+
+.gal-user-dropdown {
+  // .user-profile-button {
+  //   padding: 15px;
+  //   background-color: $accent-primary;
+  //   border-radius: 50%;
+  //   color: $text-inverse;
+  //   font-weight: 700;
+  // }
+
+  .galactica-nav {
+    width: 350px;
+    background: $bg-base;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+    right: 0;
+    left: unset;
+
+    .logout-btn {
+      cursor: pointer;
+    }
+
+    .role-selector {
+      display: flex;
+      align-items: center;
+
+      .role-button {
+        padding: 0.4rem 0.8rem;
+        background: #fff;
+        cursor: pointer;
+
+        &.selected {
+          font-weight: bold;
+        }
+
+        &:hover {
+          background: #f0f0f0;
+        }
+      }
+    }
+  }
+}
+
+.dev-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

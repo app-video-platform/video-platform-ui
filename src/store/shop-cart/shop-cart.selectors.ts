@@ -1,5 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../store';
+
+import { RootState } from '@api/models';
 
 export const selectAllShopCartProducts = (state: RootState) =>
   state.shopCart.products;

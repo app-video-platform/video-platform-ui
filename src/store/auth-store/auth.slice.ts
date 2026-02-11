@@ -1,25 +1,23 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  googleAPI,
-  logoutAPI,
-  registerUser,
-  signInUser,
-  verifyEmailApi,
-} from '../../api/services/auth/auth-api';
-import {
-  getUserProfileAPI,
-  updateUserDetailsAPI,
-} from '../../api/services/user/user-api';
 
 import {
+  GoogleLoginRequest,
+  LoginRequest,
+  RegisterRequest,
+  UpdateUserRequest,
   User,
   UserRole,
-} from '../../api/models/user/user';
-import { AxiosError } from 'axios';
-import { RegisterRequest } from '../../api/models/auth/register-request';
-import { GoogleLoginRequest } from '../../api/models/auth/google-login';
-import { LoginRequest } from '../../api/models/auth/login-request';
-import { UpdateUserRequest } from '../../api/models/user/update-user-request';
+} from '@api/models';
+import {
+  registerUser,
+  verifyEmailApi,
+  signInUser,
+  googleAPI,
+  getUserProfileAPI,
+  logoutAPI,
+  updateUserDetailsAPI,
+} from '@api/services';
+import { extractErrorMessage } from '@shared/utils';
 
 interface AuthState {
   user: null | User;
@@ -33,15 +31,6 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   isUserLoggedIn: null,
-};
-
-export const extractErrorMessage = (err: unknown): string => {
-  if (err instanceof AxiosError && err.response?.data?.message) {
-    return err.response.data.message;
-  } else if (err instanceof Error) {
-    return err.message;
-  }
-  return 'An unknown error occurred';
 };
 
 // Registration thunk: returns a success message from the backend.
@@ -238,7 +227,7 @@ const authSlice = createSlice({
           state.loading = false;
           state.user = action.payload;
           state.isUserLoggedIn = true;
-        }
+        },
       )
       .addCase(getUserProfile.rejected, (state) => {
         state.loading = false;
@@ -262,7 +251,7 @@ const authSlice = createSlice({
         (state, action: PayloadAction<User>) => {
           state.loading = false;
           state.user = action.payload;
-        }
+        },
       )
       .addCase(updateUserDetails.rejected, (state) => {
         state.loading = false;

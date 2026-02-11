@@ -32,7 +32,7 @@ describe('GalPriceSelector component', () => {
     // Paid radio should now be checked.
     expect(paidRadio).toBeChecked();
 
-    // The GalFormInput should now be rendered.
+    // The Input should now be rendered.
     const priceInput = screen.getByLabelText(/Price/i);
     expect(priceInput).toBeInTheDocument();
 

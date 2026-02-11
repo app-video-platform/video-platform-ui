@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { SocialMediaLink } from '../socials/social-media-link';
 
 export interface User {
@@ -8,6 +9,7 @@ export interface User {
   roles: UserRole[];
   onboardingCompleted?: boolean;
   title?: string;
+  imageUrl?: string;
   bio?: string;
   taglineMission?: string;
   website?: string;

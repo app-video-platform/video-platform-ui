@@ -9,13 +9,10 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { FaTiktok } from 'react-icons/fa6';
 import { FaYoutube } from 'react-icons/fa';
 
-import GalIcon from '../gal-icon-component/gal-icon.component';
+import { GalIcon } from '@shared/ui';
 
 import './gal-social-media-input.styles.scss';
-import {
-  SocialMediaLink,
-  SocialPlatforms,
-} from '../../api/models/socials/social-media-link';
+import { SocialMediaLink, SocialPlatforms } from '@api/models';
 
 interface Option {
   id: SocialPlatforms;

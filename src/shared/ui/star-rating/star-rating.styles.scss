@@ -1,0 +1,12 @@
+@use '../../../styles/index.scss' as *;
+
+.star-rating-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  .star-rating {
+    display: flex;
+    gap: $spacing-1;
+  }
+}

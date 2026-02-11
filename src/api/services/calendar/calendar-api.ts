@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import httpClient from '../../http-client';
 import {
   ConnectInitRequest,
@@ -6,8 +7,10 @@ import {
 
 export const getAllCalendarProvidersAPI = async () => {
   try {
-    const response = await httpClient.get<string[]>('api/calendars/providers');
-    return response.data;
+    const response = await httpClient.get<{ providers: string[] }>(
+      'api/calendars/providers',
+    );
+    return response.data.providers;
   } catch (error) {
     console.error('Error getting all calendar providers:', error);
     throw error;

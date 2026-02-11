@@ -12,6 +12,11 @@ module.exports = {
     react: {
       version: 'detect',
     },
+    'import/resolver': {
+      'typescript': {
+        'project': './tsconfig.json'
+      }
+    }
   },
   extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended', 'plugin:storybook/recommended'],
   rules: {

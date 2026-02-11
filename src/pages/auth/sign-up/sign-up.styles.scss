@@ -1,0 +1,53 @@
+@use '../../../styles/index.scss' as *;
+
+.sign-up-container {
+  width: 800px;
+  margin: 50px auto;
+  padding: 50px;
+  background: $bg-elevated;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+
+  .sign-up-btn {
+    margin: $spacing-7 auto 0;
+    display: block;
+    width: 150px;
+  }
+}
+
+// .password-rules {
+//   list-style: none;
+//   padding: 0;
+//   font-size: 14px;
+//   margin-top: 5px;
+
+//   .password-rule {
+//     transition: color 0.3s ease;
+
+//     &.grey {
+//       color: grey;
+//     }
+
+//     &.red {
+//       color: red;
+//     }
+
+//     &.green {
+//       color: green;
+//     }
+//   }
+// }
+
+// .toggle-password-btn {
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+//   position: absolute;
+//   right: 10px;
+//   top: 50%;
+//   transform: translateY(-50%);
+// }
+
+// .password-group {
+//   position: relative;
+// }

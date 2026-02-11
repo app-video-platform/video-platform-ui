@@ -2,7 +2,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 // or '@storybook/react-vite' if using Vite
 import { useState } from 'react';
-import { OSMLocationSearch } from './gal-location-search.component';
+import OSMLocationSearch from './gal-location-search.component';
 import type { GalLocation } from './gal-location-search.component';
 
 const meta: Meta<typeof OSMLocationSearch> = {
@@ -29,7 +29,11 @@ export const Default: Story = {
 
     return (
       <div style={{ width: '400px' }}>
-        <OSMLocationSearch onSelect={(place) => setSelected(place)} />
+        <OSMLocationSearch
+          onSelect={(place: React.SetStateAction<GalLocation | null>) =>
+            setSelected(place)
+          }
+        />
         {selected && (
           <div
             style={{

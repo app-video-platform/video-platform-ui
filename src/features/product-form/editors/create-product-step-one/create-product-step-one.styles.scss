@@ -1,0 +1,28 @@
+.title-label {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 18px;
+  color: #c3c0c5;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.title-input-row {
+  position: relative;
+  width: 700px;
+  margin: auto;
+
+  .title-input input {
+    text-align: center;
+  }
+
+  .create-course-continue-button {
+    position: absolute;
+    right: -5px;
+    top: -1px;
+    padding: 0;
+    height: 55px;
+    width: 55px;
+    min-width: 50px;
+  }
+}

@@ -1,0 +1,57 @@
+@use '../../styles/variables' as *;
+
+.galactica-home-nav {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 20px;
+  box-shadow: $shadow-sm;
+  border: 2px solid transparent;
+  background:
+    linear-gradient($bg-surface, $bg-surface) padding-box,
+    linear-gradient(175deg, $bg-base, $accent-secondary) border-box;
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2d3e50;
+    color: white;
+  }
+
+  .home-search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 70px;
+    gap: 20px;
+
+    .galactica-home-search {
+      width: 550px;
+
+      &__creator {
+        width: 350px;
+      }
+    }
+
+    .create-product-btn {
+      margin-left: 100px;
+      width: 150px;
+      height: 36px;
+      min-width: 80px !important;
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .nav-action-btns {
+    display: flex;
+    gap: 10px;
+  }
+}

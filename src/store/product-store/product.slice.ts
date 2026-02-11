@@ -1,32 +1,34 @@
 /* eslint-disable indent */
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  addImageToProductAPI,
-  createProductAPI,
-  getAllProductsByUserIdAPI,
-  updateProductDetailsAPI,
-  updateSectionDetailsAPI,
-  createSectionAPI,
-  createLessonAPI,
-  updateLessonDetailsAPI,
-  deleteLessonAPI,
-  deleteSectionAPI,
-  deleteProductAPI,
-  getProductByProductIdAPI,
-} from '../../api/services/products/products-api';
 
-import { AxiosError } from 'axios';
-import { AbstractProduct, ProductType } from '../../api/types/products.types';
 import {
+  IRemoveProductPayload,
   CourseProductSection,
   CourseSectionCreateRequest,
   CourseSectionUpdateRequest,
-} from '../../api/models/product/section';
-import {
   IRemoveItemPayload,
-  IRemoveProductPayload,
-} from '../../api/models/product/product';
-import { CourseLesson, LessonCreate } from '../../api/models/product/lesson';
+  CourseLesson,
+  LessonCreate,
+  AbstractProductBase,
+  AbstractProduct,
+  CreateProductPayload,
+  ProductType,
+} from '@api/models';
+import {
+  createProductAPI,
+  updateProductDetailsAPI,
+  deleteProductAPI,
+  createSectionAPI,
+  updateSectionDetailsAPI,
+  deleteSectionAPI,
+  createLessonAPI,
+  updateLessonDetailsAPI,
+  deleteLessonAPI,
+  getAllProductsByUserIdAPI,
+  addImageToProductAPI,
+  getProductByProductIdAPI,
+} from '@api/services';
+import { extractErrorMessage } from '@shared/utils';
 
 interface ProductState {
   products: null | AbstractProduct[];
@@ -42,18 +44,9 @@ const initialState: ProductState = {
   error: null,
 };
 
-export const extractErrorMessage = (err: unknown): string => {
-  if (err instanceof AxiosError && err.response?.data?.message) {
-    return err.response.data.message;
-  } else if (err instanceof Error) {
-    return err.message;
-  }
-  return 'An unknown error occurred';
-};
-
 export const createCourseProduct = createAsyncThunk<
   AbstractProduct, // what this thunk returns on success
-  AbstractProduct, // the argument you pass in
+  CreateProductPayload, // the argument you pass in
   { rejectValue: string }
 >('products/createCourseProduct', async (payload, thunkAPI) => {
   try {
@@ -66,7 +59,7 @@ export const createCourseProduct = createAsyncThunk<
 
 export const updateCourseProductDetails = createAsyncThunk<
   AbstractProduct, // what this thunk returns on success
-  AbstractProduct, // the argument you pass in
+  AbstractProductBase, // the argument you pass in
   { rejectValue: string }
 >('products/updateCourseProductDetails', async (payload, thunkAPI) => {
   try {
@@ -83,7 +76,7 @@ export const deleteProduct = createAsyncThunk<
   { rejectValue: string }
 >('products/deleteProduct', async (payload, thunkAPI) => {
   try {
-    const response = await deleteProductAPI(payload);
+    const response: string = await deleteProductAPI(payload);
     return response;
   } catch (err: unknown) {
     return thunkAPI.rejectWithValue(extractErrorMessage(err));
@@ -109,6 +102,8 @@ export const updateSectionDetails = createAsyncThunk<
   { rejectValue: string }
 >('products/updateSectionDetails', async (payload, thunkAPI) => {
   try {
+    console.log('update sec');
+
     const response = await updateSectionDetailsAPI(payload);
     return response;
   } catch (err: unknown) {
@@ -189,8 +184,8 @@ export const addImageToProduct = createAsyncThunk<
   'products/addImageToProduct',
   async ({ productId, image }, { rejectWithValue }) => {
     try {
-      const response = await addImageToProductAPI(image, productId);
-      return response; // API returns user info with token
+      const res = await addImageToProductAPI(image, productId);
+      return res; // API returns user info with token
     } catch (error: unknown) {
       return rejectWithValue(extractErrorMessage(error));
     }
@@ -234,14 +229,16 @@ const productsSlice = createSlice({
     },
 
     deleteSectionFromStore(state, action: PayloadAction<string>) {
-      if (
-        state.currentProduct &&
-        state.currentProduct.type !== 'CONSULTATION'
-      ) {
-        state.currentProduct.sections = state.currentProduct.sections?.filter(
-          (section) => section.id !== action.payload,
-        );
-      }
+      // if (
+      //   state.currentProduct &&
+      //   state.currentProduct.type !== 'CONSULTATION' &&
+      //   state.currentProduct.sections &&
+      //   state.currentProduct.sections.length > 0
+      // ) {
+      //   state.currentProduct.sections = state.currentProduct.sections.filter(
+      //     (section) => section.id !== action.payload,
+      //   );
+      // }
     },
 
     deleteLessonFromStore(

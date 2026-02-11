@@ -1,5 +1,43 @@
-// @import 'variables';
-@use './variables' as *;
+@use 'variables' as *;
+
+:root {
+  --accent-primary: #{$accent-primary};
+  --accent-primary-dark: #{$accent-primary-dark};
+  --accent-primary-light: #{$accent-primary-light};
+
+  --accent-secondary: #{$accent-secondary};
+  --accent-secondary-dark: #{$accent-secondary-dark};
+  --accent-secondary-light: #{$accent-secondary-light};
+
+  --accent-tertiary: #{$accent-tertiary};
+  --accent-tertiary-dark: #{$accent-tertiary-dark};
+  --accent-tertiary-light: #{$accent-tertiary-light};
+
+  --bg-base: #{$bg-base};
+  --bg-elevated: #{$bg-elevated};
+  --bg-surface: #{$bg-surface};
+
+  --text-primary: #{$text-primary};
+  --text-secondary: #{$text-secondary};
+  --text-inverse: #{$text-inverse};
+
+  --neutral-light: #{$neutral-light};
+  --neutral-medium: #{$neutral-medium};
+
+  --success: #{$success};
+  --success-light: #{$success-light};
+
+  --warning: #{$warning};
+  --warning-light: #{$warning-light};
+
+  --error: #{$error};
+  --error-light: #{$error-light};
+
+  --stellar-cyan: #{$stellar-cyan};
+  --aurora-green: #{$aurora-green};
+  --supernova-orange-pink: #{$supernova-orange-pink};
+  --deep-magenta-pulse: #{$deep-magenta-pulse};
+}
 
 * {
   margin: 0;
@@ -7,17 +45,73 @@
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-heading;
+}
+
+textarea {
+  font-family: $font-body;
+  font-size: 14px;
+}
+
 body {
-  font-family: $font-family;
-  color: $text-color;
-  background-color: $background-color;
+  font-family: $font-body;
+  color: $text-primary;
+  background-image: linear-gradient(
+    145deg,
+    hsl(240deg 50% 12%) 0%,
+    hsl(240deg 47% 13%) 13%,
+    hsl(240deg 45% 15%) 23%,
+    hsl(240deg 43% 16%) 33%,
+    hsl(240deg 42% 17%) 40%,
+    hsl(240deg 41% 18%) 47%,
+    hsl(240deg 41% 19%) 53%,
+    hsl(240deg 41% 19%) 58%,
+    hsl(240deg 42% 18%) 62%,
+    hsl(240deg 43% 17%) 67%,
+    hsl(240deg 43% 17%) 72%,
+    hsl(240deg 44% 16%) 79%,
+    hsl(240deg 45% 15%) 100%
+  );
   line-height: 1.6;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: transparent;
+    opacity: 0.7;
+
+    /* one tiny “star”, then many copies via box-shadow */
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    z-index: -1;
+    box-shadow:
+      20vw 10vh 0 rgba(248, 249, 250, 0.7),
+      50vw 30vh 0 rgba(248, 249, 250, 0.5),
+      80vw 15vh 0 rgba(248, 249, 250, 0.8),
+      10vw 60vh 0 rgba(248, 249, 250, 0.6),
+      70vw 75vh 0 rgba(248, 249, 250, 0.9),
+      30vw 85vh 0 rgba(248, 249, 250, 0.5);
+    /* ...add more points for denser sky */
+
+    animation: twinkle 6s ease-in-out infinite alternate;
+  }
 }
 
 button {
   background: unset;
   border: unset;
   cursor: pointer;
+  font-family: $font-body;
+  font-weight: 500;
 }
 
 a,
@@ -45,22 +139,37 @@ Link {
 }
 
 .error-text-red {
-  color: red;
-  font-size: 11px;
+  color: $error;
+  font-size: $size-xsmall;
 }
 
 .gal-huge-header {
-  font-size: $font-size-xxl;
+  font-size: $size-xxl;
 }
 
 .gal-big-header {
-  font-size: $font-size-xl;
+  font-size: $size-xl;
 }
 
 .gal-medium-header {
-  font-size: $font-size-l;
+  font-size: $size-h1;
 }
 
-.gal-subtext {
-  font-size: $font-size-medium;
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: $neutral-medium;
+  margin: $spacing-2 0 $spacing-5;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.4;
+  }
 }

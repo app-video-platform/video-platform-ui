@@ -1,4 +1,4 @@
-import { NotificationType } from '../../types/notifications.types';
+import { NotificationType } from '../product';
 
 export interface INotification {
   id: string;

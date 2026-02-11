@@ -1,5 +1,5 @@
 import { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { getCookie } from '../../utils/cookie.util';
+import { getCookie } from '@shared/utils';
 
 /**
  * Attaches a request interceptor that automatically adds
@@ -17,6 +17,7 @@ export function attachCsrfInterceptor(httpClient: AxiosInstance) {
       // Skip attaching CSRF for excluded endpoints
       if (
         config.url &&
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         excluded.some((endpoint) => config.url!.includes(endpoint))
       ) {
         return config;
@@ -37,6 +38,6 @@ export function attachCsrfInterceptor(httpClient: AxiosInstance) {
       }
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
   );
 }

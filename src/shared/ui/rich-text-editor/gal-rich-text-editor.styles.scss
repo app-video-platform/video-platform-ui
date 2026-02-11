@@ -1,0 +1,24 @@
+@use '../../../styles/index.scss' as *;
+
+.course-editor-wrapper {
+  border: 1px solid $accent-tertiary;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.rte-content {
+  min-height: 300px;
+  padding: 0.5rem;
+  border: 1px solid $accent-secondary;
+  border-radius: 4px;
+  background: $bg-base;
+
+  .ProseMirror-focused {
+    outline: none;
+  }
+}
+
+/* TipTap injects contenteditable divs—these styles help it look decent by default: */
+.editor-content p {
+  margin: 0.75rem 0;
+}

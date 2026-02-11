@@ -1,0 +1,81 @@
+@use '../../../../styles/index.scss' as *;
+
+.question-card {
+  border: 1px solid $accent-secondary;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: 0 1px 2px rgba(198, 198, 198, 0.02);
+  padding: $spacing-6 $spacing-4 $spacing-4;
+  position: relative;
+
+  .question-index {
+    position: absolute;
+    background-color: $bg-elevated;
+    padding: 0 $spacing-3;
+    top: -10px;
+    left: 30px;
+    font-weight: 100;
+  }
+
+  .question-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    .question-chevron {
+      transition: transform 0.2s ease;
+
+      &.expanded {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  // .question-card-body {
+  //   display: grid;
+  //   gap: $spacing-3;
+  //   margin-top: $spacing-6;
+
+  .qc-title-row {
+    display: inline-flex;
+    gap: 50px;
+    width: 100%;
+
+    .qc-question {
+      flex: 1;
+    }
+
+    .qc-points {
+      width: 150px;
+    }
+  }
+
+  .question-row {
+    display: inline-flex;
+    width: 100%;
+    margin-top: $spacing-6;
+
+    .points-input {
+      width: 130px;
+    }
+  }
+
+  .answers-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: $text-secondary;
+    margin-top: $spacing-4;
+  }
+
+  .shuffle-row {
+    display: inline-flex;
+    gap: $spacing-5;
+    margin: $spacing-5 0;
+  }
+  // }
+}
+
+.is-danger {
+  color: red;
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import GalButton from '../gal-button/gal-button.component';
+import { Button } from '@shared/ui';
 
 import './gal-cta-section.styles.scss';
 
@@ -32,18 +32,12 @@ const GalCtaSection: React.FC<GalCtaSectionProps> = ({
       <h1>{headerText}</h1>
       <p>{descriptionText}</p>
       <div className="cta-action-buttons">
-        <GalButton
-          htmlType="button"
-          type="primary"
-          text="Launch now"
-          onClick={handleLaunchNow}
-        />
-        <GalButton
-          htmlType="button"
-          type="secondary"
-          text="Learn more"
-          onClick={handleLearnMore}
-        />
+        <Button type="button" variant="primary" onClick={handleLaunchNow}>
+          Launch now
+        </Button>
+        <Button type="button" variant="secondary" onClick={handleLearnMore}>
+          Learn more
+        </Button>
       </div>
       {/* </div> */}
     </section>

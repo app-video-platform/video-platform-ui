@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import httpClient from '../../http-client';
 
 import { GoogleLoginRequest } from '../../models/auth/google-login';
@@ -19,7 +20,7 @@ export const registerUser = async (userData: RegisterRequest) => {
     const response = await httpClient.post<string>(
       'api/auth/register',
       userData,
-      { withCredentials: false }
+      { withCredentials: false },
     );
     return response.data;
   } catch (error) {
@@ -53,7 +54,10 @@ export const logoutAPI = async () => {
 
 export const googleAPI = async (idToken: GoogleLoginRequest) => {
   try {
-    const response = await httpClient.post<string>('api/auth/googleSignIn', idToken);
+    const response = await httpClient.post<string>(
+      'api/auth/googleSignIn',
+      idToken,
+    );
     return response.data;
   } catch (error) {
     console.error('Error signing in with Google:', error);

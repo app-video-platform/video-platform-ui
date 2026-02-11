@@ -1,0 +1,43 @@
+@use '../../../../styles/index.scss' as *;
+
+.lesson-editor {
+  background-color: $bg-elevated;
+  border-radius: 10px;
+  padding: 30px;
+  margin-bottom: 10px;
+
+  .lesson-editor-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    .lesson-title-block {
+      display: inline-flex;
+      gap: $spacing-5;
+    }
+  }
+
+  .lesson-editor-body {
+    overflow: hidden;
+    transition:
+      max-height 0.25s ease,
+      opacity 0.2s ease;
+  }
+
+  .lesson-type-selectors {
+    margin: $spacing-5 0;
+  }
+
+  .lesson-description {
+    max-width: 650px;
+  }
+
+  .lesson-content-wrapper {
+    margin-top: $spacing-7;
+  }
+}
+
+.content-field {
+  margin-top: 30px;
+}

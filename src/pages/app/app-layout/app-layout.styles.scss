@@ -1,0 +1,51 @@
+.app-layout {
+  display: flex;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+
+  .sidebar {
+    height: 100dvh;
+  }
+
+  .app-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .app-header {
+      height: 64px;
+      background: #0f0f2d;
+      border-bottom: 1px solid #0f0f2d;
+      position: sticky;
+      top: 0;
+      z-index: 100; /* keep above content */
+      transition:
+        transform 0.25s ease-out,
+        height 0.25s ease-out,
+        padding 0.25s ease-out,
+        border 0.25s ease-out;
+    }
+
+    .app-header--collapsed {
+      transform: translateY(-100%);
+      height: 0;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+    }
+
+    .content {
+      flex: 1; /* fill space below navbar */
+      overflow-y: auto; /* scrollable area */
+      padding: 24px 48px 48px;
+      // background: #f9f9f9;
+    }
+  }
+
+  &.app-layout--builder-mode.app-layout--header-collapsed {
+    .app-container .content {
+      padding-top: 0; // pull content up a bit when top navbar is gone
+    }
+  }
+}
