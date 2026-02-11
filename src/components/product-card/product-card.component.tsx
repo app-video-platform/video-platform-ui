@@ -33,14 +33,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="product-card-header">
           <div>
             <h2>{product.name}</h2>
-            <p className="last-update">
-              Last update:{' '}
-              <span>
-                {format(product.createdAt ?? new Date(), 'EEE, do MMM')}
-              </span>
-            </p>
+            <p className="product-type">{product.type}</p>
           </div>
-          <StatusChip status={product.status ?? 'DRAFT'} />
+          <div className="status-wrapper">
+            <span className="last-update">
+              Last update:{' '}
+              {format(product.createdAt ?? new Date(), 'EEE, do MMM')}
+            </span>
+            <StatusChip status={product.status ?? 'DRAFT'} />
+          </div>
         </div>
 
         <div className="card-row">

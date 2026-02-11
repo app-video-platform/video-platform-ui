@@ -25,6 +25,12 @@
       display: inline-flex;
       width: 100%;
       justify-content: space-between;
+    }
+
+    .status-wrapper {
+      display: flex;
+      gap: $spacing-6;
+      align-items: flex-start;
 
       .last-update {
         font-size: 12px;
