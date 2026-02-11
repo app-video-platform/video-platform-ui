@@ -11,8 +11,8 @@ import {
 import { MCQQuestion, QuestionType, QuizQuestion } from '@api/models';
 import MCQEditor from '../../editors/mcq-editor/mcq-editor.component';
 import { EditableTitle } from '@features/product-form/editors';
-import { GalBoxSelector } from '@components';
 import { normalizeQuestionForType } from './answer-normalizer.util';
+import { BoxSelector } from '@features/product-form/box-selector';
 
 import './question-card.styles.scss';
 
@@ -67,7 +67,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       }
     >
       <div className="question-row">
-        <GalBoxSelector<QuestionType>
+        <BoxSelector<QuestionType>
           selectedOption={question.type}
           selectFor="question"
           onSelect={(type) => handleTypeChange(type)}

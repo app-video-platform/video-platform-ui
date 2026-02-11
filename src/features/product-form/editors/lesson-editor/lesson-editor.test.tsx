@@ -94,7 +94,7 @@ jest.mock('@shared/ui', () => ({
       {...rest}
     />
   ),
-  GalUppyFileUploader: ({
+  UppyFileUploader: ({
     onFilesChange,
   }: {
     onFilesChange: (files: File[]) => void;
@@ -122,13 +122,13 @@ jest.mock('@shared/ui', () => ({
       RichText
     </div>
   ),
-  GalIcon: () => <span data-testid="gal-icon" />,
+  VPIcon: () => <span data-testid="gal-icon" />,
 }));
 
-// ── 4) MOCK GalBoxSelector from @components ───────────────────────────
-jest.mock('@components', () => ({
+// ── 4) MOCK BoxSelector ───────────────────────────────────────────────
+jest.mock('@features/product-form/box-selector', () => ({
   __esModule: true,
-  GalBoxSelector: ({
+  BoxSelector: ({
     selectedOption,
     onSelect,
     availableOptions,

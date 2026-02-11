@@ -1,4 +1,5 @@
 export * from './basic-info';
+export * from './box-selector';
 export * from './builder-sidebar';
 export * from './consultation-details';
 export * from './create-product-sections';
@@ -7,6 +8,7 @@ export * from './editors';
 export * from './hooks';
 export * from './quiz-wizard';
 export * from './models';
+export * from './price-selector';
 export * from './product-filters';
 export * from './product-header';
 export * from './product-type-selector';

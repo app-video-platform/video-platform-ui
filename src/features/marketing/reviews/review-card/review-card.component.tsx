@@ -1,13 +1,13 @@
 import React from 'react';
 import { format } from 'date-fns';
+import clsx from 'clsx';
 
 import { Review } from '@api/models';
-import { GalIcon, StarRating, UserAvatar } from '@shared/ui';
+import { VPIcon, StarRating, UserAvatar } from '@shared/ui';
 import { PRODUCT_META } from '@api/constants';
-import { MenuDropdown } from '@components';
+import { MenuDropdown } from '@features/dropdowns';
 
 import './review-card.styles.scss';
-import clsx from 'clsx';
 
 interface ReviewCardProps {
   review: Review;
@@ -27,7 +27,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => (
         </div>
       </div>
       <div className="product-details">
-        <GalIcon
+        <VPIcon
           icon={PRODUCT_META[review.product.type].icon}
           color={PRODUCT_META[review.product.type].color}
           size={24}

@@ -13,20 +13,10 @@ import {
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// ── 1) Mock @components (GalPriceSelector) ──────────────────────────────
-jest.mock('@components', () => ({
-  __esModule: true,
-  GalPriceSelector: ({ price }: { price: number }) => (
-    <div data-testid="price-selector">
-      GalPriceSelector (price: {String(price)})
-    </div>
-  ),
-}));
-
-// ── 2) Mock @shared/ui (GalUppyFileUploader) ────────────────────────────
+// ── 1) Mock @shared/ui (UppyFileUploader) ────────────────────────────
 jest.mock('@shared/ui', () => ({
   __esModule: true,
-  GalUppyFileUploader: ({
+  UppyFileUploader: ({
     onFilesChange,
   }: {
     onFilesChange: (files: File[]) => void;
@@ -39,7 +29,7 @@ jest.mock('@shared/ui', () => ({
   ),
 }));
 
-// ── 3) Mock @features/product-form (facade + children) ──────────────────
+// ── 2) Mock @features/product-form (facade + children) ──────────────────
 const mockUseProductFormFacade = jest.fn();
 const mockUseProductFormAnimation = jest.fn();
 
@@ -121,9 +111,14 @@ jest.mock('@features/product-form', () => ({
   SectionDraft: {} as any,
 
   ProductHeader: () => <div data-testid="product-header">ProductHeader</div>,
+  PriceSelector: ({ price }: { price: number }) => (
+    <div data-testid="price-selector">
+      PriceSelector (price: {String(price)})
+    </div>
+  ),
 }));
 
-// ── 4) Import component under test (after mocks) ────────────────────────
+// ── 3) Import component under test (after mocks) ────────────────────────
 import ProductForm from './product-form.component';
 
 // ── 5) Helpers ───────────────────────────────────────────────────────────
@@ -222,7 +217,7 @@ describe('<ProductForm />', () => {
     expect(screen.queryByTestId('step-one-continue')).not.toBeInTheDocument();
   });
 
-  it('clicking Pricing tab shows the GalPriceSelector panel', async () => {
+  it('clicking Pricing tab shows the PriceSelector panel', async () => {
     const state = makeFacadeState({
       showRestOfForm: true,
       formData: {
@@ -247,13 +242,13 @@ describe('<ProductForm />', () => {
     // Click the "Pricing" tab in our mocked sidebar
     fireEvent.click(screen.getByTestId('tab-pricing'));
 
-    // Now the pricing panel should show our GalPriceSelector stub
+    // Now the pricing panel should show our PriceSelector stub
     expect(screen.getByTestId('price-selector')).toBeInTheDocument();
     // And sections panel should be gone
     expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
   });
 
-  it('clicking Media tab shows the image uploader (GalUppyFileUploader)', async () => {
+  it('clicking Media tab shows the image uploader (UppyFileUploader)', async () => {
     const state = makeFacadeState({
       showRestOfForm: true,
       formData: {

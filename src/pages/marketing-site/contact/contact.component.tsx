@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { ExpansionPanel } from '@shared/ui';
-import { GalCtaSection, GalContactForm } from '@components';
+import { ContactForm } from '@features/contact';
+import { CtaSection } from '@shared/components';
 
 import './contact.styles.scss';
 
@@ -24,7 +25,7 @@ const Contact: React.FC = () => (
         </div>
       </div>
       <div className="contact-form-container">
-        <GalContactForm />
+        <ContactForm />
       </div>
     </div>
     <div className="faq-section">
@@ -55,7 +56,7 @@ const Contact: React.FC = () => (
       </div>
     </div>
 
-    <GalCtaSection
+    <CtaSection
       headerText="Not a member yet?"
       descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     />

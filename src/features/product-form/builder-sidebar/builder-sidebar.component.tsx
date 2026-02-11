@@ -9,7 +9,7 @@ import { CgDetailsMore } from 'react-icons/cg';
 import { PiRectangleDashed } from 'react-icons/pi';
 
 import { LessonType, ProductType } from '@api/models';
-import { GalIcon } from '@shared/ui';
+import { VPIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { LESSON_META } from '@api/constants';
 
@@ -131,7 +131,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
                 aria-controls={`tab-panel-${tab.id}`}
                 onClick={() => onChange(tab.id)}
               >
-                <GalIcon
+                <VPIcon
                   icon={tab.icon}
                   size={16}
                   color={getCssVar(
@@ -162,7 +162,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
                           }
                         }}
                       >
-                        <GalIcon
+                        <VPIcon
                           icon={PiRectangleDashed}
                           size={16}
                           color={getCssVar('--text-primary')}
@@ -187,7 +187,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
                                     onLessonClick?.(lesson.id);
                                   }}
                                 >
-                                  <GalIcon
+                                  <VPIcon
                                     icon={
                                       LESSON_META[lesson.type ?? 'ASSIGNMENT']
                                         .icon

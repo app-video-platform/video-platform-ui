@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux';
 
 import { Button } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
-import { GalNavDropdown, GalUserDropdown, GalFooter } from '@components';
+import { NavDropdown, UserDropdown } from '@features/dropdowns';
+import { VPFooter } from '@shared/components';
 
 import './nav.styles.scss';
 
@@ -32,7 +33,7 @@ const Navigation: React.FC = () => {
             <li>
               <Link to={'/pricing'}>Pricing</Link>
             </li>
-            <GalNavDropdown />
+            <NavDropdown />
 
             <li>
               <Link to={'/contact'}>Contact Us</Link>
@@ -41,7 +42,7 @@ const Navigation: React.FC = () => {
           <div className="user-buttons">
             <ul className="nav-link-list">
               {user ? (
-                <GalUserDropdown />
+                <UserDropdown />
               ) : (
                 <ul className="nav-link-list">
                   <li>
@@ -69,7 +70,7 @@ const Navigation: React.FC = () => {
         </div>
       </nav>
       <Outlet />
-      <GalFooter />
+      <VPFooter />
     </Fragment>
   );
 };

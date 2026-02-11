@@ -4,7 +4,7 @@ import { AiOutlineProduct } from 'react-icons/ai';
 import { MdOutlineVisibility } from 'react-icons/md';
 
 import { SelectOption } from '@shared/ui';
-import { Filters, FilterSelector } from '@components';
+import { Filters, FilterSelector } from '@shared/components';
 
 export type StatusFilter = 'all' | 'visible' | 'hidden';
 export type RatingFilter = 'all' | 1 | 2 | 3 | 4 | 5;

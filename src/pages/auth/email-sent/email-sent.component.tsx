@@ -1,13 +1,13 @@
 import React from 'react';
 import { CiCircleCheck } from 'react-icons/ci';
 
-import { GalIcon } from '@shared/ui';
+import { VPIcon } from '@shared/ui';
 
 import './email-sent.styles.scss';
 
 const EmailSent: React.FC = () => (
   <div className="email-sent-message-container">
-    <GalIcon icon={CiCircleCheck} color="green" size={100} />
+    <VPIcon icon={CiCircleCheck} color="green" size={100} />
     {/* <CiCircleCheck color='green' size={100} /> */}
 
     <h2>Check your email</h2>

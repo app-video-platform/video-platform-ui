@@ -6,7 +6,7 @@ import { FaHeart } from 'react-icons/fa';
 
 import { ProductMinimised, AppDispatch } from '@api/models';
 import { getAllProductsMinimalAPI } from '@api/services';
-import { GalIcon, Button } from '@shared/ui';
+import { VPIcon, Button } from '@shared/ui';
 import { selectAllShopCartProducts, addProductToCart } from '@store/shop-cart';
 import { selectWishlistIds, toggleWishlist } from '@store/wishlist';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -110,9 +110,9 @@ const ExplorePage: React.FC = () => {
                     title={wished ? 'Remove from wishlist' : 'Add to wishlist'}
                   >
                     {wished ? (
-                      <GalIcon icon={FaHeart} size={22} color="red" />
+                      <VPIcon icon={FaHeart} size={22} color="red" />
                     ) : (
-                      <GalIcon icon={FaRegHeart} size={22} />
+                      <VPIcon icon={FaRegHeart} size={22} />
                     )}
                   </button>
                   <div className="product-card-details">

@@ -10,9 +10,7 @@ import {
   selectAllShopCartProducts,
   selectShopCartTotal,
 } from '../../../store/shop-cart/shop-cart.selectors';
-import GalExpansionPanel from '../../../components/gal-expansion-group/gal-expansion-panel/gal-expansion-panel.component';
-import GalExpansionGroup from '../../../components/gal-expansion-group/gal-expansion-group.component';
-import { GalIcon } from '@shared/ui';
+import { ExpansionGroup, ExpansionPanel, VPIcon } from '@shared/ui';
 
 import './checkout.styles.scss';
 
@@ -74,19 +72,18 @@ const Checkout: React.FC = () => {
       <div className="checkout-grid">
         <div className="checkout-order-details">
           <h2>Payment Method</h2>
-          <GalExpansionGroup
+          <ExpansionGroup
             mode="radio"
             value={method}
             onValueChange={setMethod}
             accordion
             name="checkout-payment-method"
           >
-            <GalExpansionPanel
-              value="paypal"
+            <ExpansionPanel
               header={
                 <div className="pm-header">
                   {/* <PaypalIcon className="pm-icon" /> */}
-                  <GalIcon icon={FaPaypal} size={18} />
+                  <VPIcon icon={FaPaypal} size={18} />
                   <span>PayPal</span>
                 </div>
               }
@@ -104,14 +101,13 @@ const Checkout: React.FC = () => {
                   Continue to PayPal
                 </button>
               </div>
-            </GalExpansionPanel>
+            </ExpansionPanel>
 
-            <GalExpansionPanel
-              value="applepay"
+            <ExpansionPanel
               header={
                 <div className="pm-header">
                   {/* <ApplePayIcon className="pm-icon" /> */}
-                  <GalIcon icon={FaApplePay} size={32} />
+                  <VPIcon icon={FaApplePay} size={32} />
 
                   <span>Apple&nbsp;Pay</span>
                 </div>
@@ -128,14 +124,13 @@ const Checkout: React.FC = () => {
                   Pay with Apple Pay
                 </button>
               </div>
-            </GalExpansionPanel>
+            </ExpansionPanel>
 
-            <GalExpansionPanel
-              value="card"
+            <ExpansionPanel
               header={
                 <div className="pm-header">
                   {/* <CardIcon className="pm-icon" /> */}
-                  <GalIcon icon={FaCreditCard} size={18} />
+                  <VPIcon icon={FaCreditCard} size={18} />
                   <span>Credit / Debit Card</span>
                 </div>
               }
@@ -176,14 +171,13 @@ const Checkout: React.FC = () => {
                 </div>
                 <button type="submit">Pay now</button>
               </form>
-            </GalExpansionPanel>
+            </ExpansionPanel>
 
-            <GalExpansionPanel
-              value="googlepay"
+            <ExpansionPanel
               header={
                 <div className="pm-header">
                   {/* <ApplePayIcon className="pm-icon" /> */}
-                  <GalIcon icon={FaGooglePay} size={32} />
+                  <VPIcon icon={FaGooglePay} size={32} />
 
                   <span>Google&nbsp;Pay</span>
                 </div>
@@ -200,8 +194,8 @@ const Checkout: React.FC = () => {
                   Pay with Apple Pay
                 </button>
               </div>
-            </GalExpansionPanel>
-          </GalExpansionGroup>
+            </ExpansionPanel>
+          </ExpansionGroup>
         </div>
         <aside className="checkout-order-summary">
           <h2>Order summary</h2>

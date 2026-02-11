@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { GalProductCard } from '@components';
+import { ProductCard } from '@shared/components';
 import {
   User,
   UserRole,
@@ -381,7 +381,7 @@ const UserPagePreview: React.FC = () => {
         <div className="products-list">
           {downloads.map((item) => (
             <div key={item.id}>
-              <GalProductCard product={item} />
+              <ProductCard product={item} />
             </div>
           ))}
         </div>
@@ -390,7 +390,7 @@ const UserPagePreview: React.FC = () => {
         <div className="products-list">
           {courses.map((item) => (
             <div key={item.id}>
-              <GalProductCard product={item} />
+              <ProductCard product={item} />
             </div>
           ))}
         </div>
@@ -399,7 +399,7 @@ const UserPagePreview: React.FC = () => {
         <div className="products-list">
           {consultations.map((item) => (
             <div key={item.id}>
-              <GalProductCard product={item} />
+              <ProductCard product={item} />
             </div>
           ))}
         </div>

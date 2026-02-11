@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from 'react-icons/hi2';
 
 import { appRoutes } from '@api/constants';
-import { GalIcon } from '@shared/ui';
+import { VPIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { useSidebarLayout } from './sidebar-layout.context';
 
@@ -35,7 +35,7 @@ const SidebarNav: React.FC = () => {
             >
               {({ isActive }) => (
                 <>
-                  <GalIcon
+                  <VPIcon
                     icon={route.icon}
                     color={
                       isActive
@@ -57,7 +57,7 @@ const SidebarNav: React.FC = () => {
         onClick={toggleSidebar}
         aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
-        <GalIcon
+        <VPIcon
           icon={isSidebarCollapsed ? HiChevronDoubleRight : HiChevronDoubleLeft}
           size={18}
           color={getCssVar('--accent-primary')}

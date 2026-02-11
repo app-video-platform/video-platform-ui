@@ -18,21 +18,22 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock child components
-jest.mock(
-  '@components/gal-user-dropdown/gal-user-dropdown.component.tsx',
-  () => {
-    const MockUserProfile = () => (
-      <div data-testid="user-profile-dropdown">GalUserDropdown</div>
-    );
-    MockUserProfile.displayName = 'GalUserDropdown';
-    return MockUserProfile;
-  },
-);
+jest.mock('@features/dropdowns', () => {
+  const actual = jest.requireActual('@features/dropdowns');
+  return {
+    ...actual,
+    UserDropdown: () => (
+      <div data-testid="user-profile-dropdown">UserDropdown</div>
+    ),
+  };
+});
 
-jest.mock('@components/gal-footer/gal-footer.component', () => {
-  const MockFooter = () => <footer data-testid="footer">GalFooter</footer>;
-  MockFooter.displayName = 'GalFooter';
-  return MockFooter;
+jest.mock('@shared/components', () => {
+  const actual = jest.requireActual('@shared/components');
+  return {
+    ...actual,
+    VPFooter: () => <footer data-testid="footer">VPFooter</footer>,
+  };
 });
 
 describe('Navigation component', () => {
@@ -100,7 +101,7 @@ describe('Navigation component', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/signin');
   });
 
-  it('renders the Outlet and GalFooter component', () => {
+  it('renders the Outlet and VPFooter component', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
     render(<Navigation />);
 

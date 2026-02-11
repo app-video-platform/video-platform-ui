@@ -5,7 +5,7 @@ import { Input, Button, Select, SelectOption, InfoPopover } from '@shared/ui';
 import { connectCalendarAPI, getAllCalendarProvidersAPI } from '@api/services';
 import { SettingsSection } from '../settings-section';
 import { selectAuthUser } from '@store/auth-store';
-import { PageHeader } from '@components';
+import { PageHeader } from '@shared/components';
 
 const ConnectedCalendarTab: React.FC = () => {
   const user = useSelector(selectAuthUser);

@@ -17,6 +17,13 @@ const config: StorybookConfig = {
     if (!config.resolve) config.resolve = {};
     if (!config.resolve.extensions)
       config.resolve.extensions = ['.ts', '.tsx', '.js', '.jsx'];
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      '@emotion/is-prop-valid': path.resolve(
+        __dirname,
+        '../src/shared/utils/shims/emotion-is-prop-valid.ts',
+      ),
+    };
     // Prefer the plugin to stay in sync with tsconfig.json
     config.resolve.plugins = [
       ...(config.resolve.plugins || []),

@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-import { GalProductCard } from '@components';
-import { GalIcon, Button } from '@shared/ui';
+import { ProductCard } from '@shared/components';
+import { VPIcon, Button } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import {
   selectTopThreeProducts,
@@ -30,7 +30,7 @@ const CreatorDashboard: React.FC = () => {
     <div className="user-dashboard-container">
       {/* <FaUser className="user-avatar" /> */}
       <div className="user-banner">
-        <GalIcon icon={FaUser} size={100} className="user-avatar" />
+        <VPIcon icon={FaUser} size={100} className="user-avatar" />
         <div className="user-profile">
           <div className="user-info-box">
             <h2>
@@ -60,7 +60,7 @@ const CreatorDashboard: React.FC = () => {
         <div className="product-cards">
           {topThreeProducts && topThreeProducts.length > 0 ? (
             topThreeProducts.map((item) => (
-              <GalProductCard key={item.id} product={item} />
+              <ProductCard key={item.id} product={item} />
             ))
           ) : (
             <div>

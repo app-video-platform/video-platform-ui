@@ -29,7 +29,7 @@ import {
 import { IconType } from 'react-icons';
 import clsx from 'clsx';
 
-import { GalIcon } from '@shared/ui/gal-icon';
+import { VPIcon } from '@shared/ui/vp-icon';
 import { getCssVar } from '@shared/utils';
 
 import './gal-rte-menu-bar.styles.scss';
@@ -247,7 +247,7 @@ export default function GalRTEMenuBar({ editor }: GalMenuBarProps) {
             aria-label={action.aria}
             title={action.aria}
           >
-            <GalIcon
+            <VPIcon
               icon={action.icon}
               size={14}
               color={getCssVar('--text-primary')}
@@ -270,7 +270,7 @@ export default function GalRTEMenuBar({ editor }: GalMenuBarProps) {
             aria-label={action.aria}
             title={action.aria}
           >
-            <GalIcon
+            <VPIcon
               icon={action.icon}
               size={14}
               color={getCssVar('--text-primary')}
@@ -293,7 +293,7 @@ export default function GalRTEMenuBar({ editor }: GalMenuBarProps) {
             aria-label={action.aria}
             title={action.aria}
           >
-            <GalIcon
+            <VPIcon
               icon={action.icon}
               size={14}
               color={getCssVar('--text-primary')}
@@ -316,7 +316,7 @@ export default function GalRTEMenuBar({ editor }: GalMenuBarProps) {
             aria-label={action.aria}
             title={action.aria}
           >
-            <GalIcon
+            <VPIcon
               icon={action.icon}
               size={14}
               color={getCssVar('--text-primary')}
@@ -339,7 +339,7 @@ export default function GalRTEMenuBar({ editor }: GalMenuBarProps) {
             aria-label={action.aria}
             title={action.aria}
           >
-            <GalIcon
+            <VPIcon
               icon={action.icon}
               size={14}
               color={getCssVar('--text-primary')}

@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
-import { GalPriceSelector } from '@components';
-import { GalUppyFileUploader } from '@shared/ui';
+import { UppyFileUploader } from '@shared/ui';
 import {
   CreateProductStepOne,
   ConsultationDetailsSection,
@@ -14,6 +13,7 @@ import {
   BasicInfo,
   SectionDraft,
   ProductHeader,
+  PriceSelector,
 } from '@features/product-form';
 import { ProductWithSections } from '@api/models';
 
@@ -125,7 +125,7 @@ const ProductForm: React.FC = () => {
               {activeTab === 'pricing' && (
                 <div className="price-selector-wrapper">
                   <h3>Choose Your Price Option</h3>
-                  <GalPriceSelector
+                  <PriceSelector
                     price={formData.price ?? 0}
                     setPrice={handleSetPrice}
                   />
@@ -157,7 +157,7 @@ const ProductForm: React.FC = () => {
                     <h3>Upload an image</h3>
                   </div>
                   <div className="image-uploader-box">
-                    <GalUppyFileUploader
+                    <UppyFileUploader
                       onFilesChange={handleImageChange}
                       allowedFileTypes={['image/*']}
                       disableImporters={true}
