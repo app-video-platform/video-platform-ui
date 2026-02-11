@@ -2,6 +2,13 @@
 
 exports[`App Component matches snapshot after navigation 1`] = `
 <div>
+  <section
+    aria-atomic="false"
+    aria-label="Notifications alt+T"
+    aria-live="polite"
+    aria-relevant="additions text"
+    tabindex="-1"
+  />
   <nav
     class="website-navbar"
   >

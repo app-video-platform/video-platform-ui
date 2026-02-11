@@ -21,7 +21,7 @@ describe('Calendars API', () => {
   describe('getAllCalendarProvidersAPI', () => {
     it('returns provider list when GET resolves', async () => {
       const providers = ['google', 'outlook', 'apple'];
-      mockedHttpClient.get.mockResolvedValueOnce({ data: providers });
+      mockedHttpClient.get.mockResolvedValueOnce({ data: { providers } });
 
       await expect(getAllCalendarProvidersAPI()).resolves.toEqual(providers);
       expect(mockedHttpClient.get).toHaveBeenCalledWith(

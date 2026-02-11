@@ -62,7 +62,11 @@ const GalUserDropdown: React.FC = () => {
       <GalDropdown
         customClassName="galactica-nav"
         trigger={({ toggle }) => (
-          <button onClick={toggle} className="user-profile-button">
+          <button
+            onClick={toggle}
+            className="user-profile-button"
+            aria-label={getProfileNameInitials(user.firstName, user.lastName)}
+          >
             <UserAvatar
               imageUrl={user.imageUrl ?? ''}
               alt={`${user.firstName} ${user.lastName}`}

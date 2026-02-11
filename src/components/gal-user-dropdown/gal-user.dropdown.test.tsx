@@ -28,10 +28,12 @@ jest.mock('react-redux', () => {
 
 describe('GalUserDropdown component', () => {
   const dummyUser = {
+    id: 'user-1',
     firstName: 'John',
     lastName: 'Doe',
     email: 'john.doe@example.com',
-    role: [UserRole.ADMIN, UserRole.USER],
+    roles: [UserRole.ADMIN, UserRole.USER],
+    imageUrl: '',
   };
 
   let mockDispatch: jest.Mock;

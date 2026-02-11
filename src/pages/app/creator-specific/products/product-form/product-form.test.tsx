@@ -68,7 +68,7 @@ jest.mock('@features/product-form', () => ({
   BasicInfo: () => <div data-testid="basic-info">BasicInfo</div>,
 
   // consultation details tab stub
-  ConsultationDetails: () => (
+  ConsultationDetailsSection: () => (
     <div data-testid="consultation-details">ConsultationDetails</div>
   ),
 
@@ -119,6 +119,8 @@ jest.mock('@features/product-form', () => ({
   // runtime placeholders for types (not actually used at runtime)
   BuilderTab: {} as any,
   SectionDraft: {} as any,
+
+  ProductHeader: () => <div data-testid="product-header">ProductHeader</div>,
 }));
 
 // ── 4) Import component under test (after mocks) ────────────────────────
