@@ -35,7 +35,7 @@ const Shell: React.FC = () => {
 
     if (
       matchedRoute?.collapseSidebarOnLoad === true ||
-      location.pathname.includes('create')
+      location.pathname.includes('create' || 'edit')
     ) {
       setIsSidebarCollapsed(true);
     }
@@ -53,7 +53,9 @@ const Shell: React.FC = () => {
   );
   const showSidebar = inCreatorArea && isUserCreator;
 
-  const isBuilderRoute = location.pathname.startsWith('/app/products/create');
+  const isBuilderRoute =
+    location.pathname.startsWith('/app/products/create') ||
+    location.pathname.startsWith('/app/products/edit');
 
   useEffect(() => {
     if (!isBuilderRoute) {
