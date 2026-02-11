@@ -1,20 +1,20 @@
 /* eslint-disable indent */
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  selectAllShopCartProducts,
-  selectShopCartTotal,
-} from '../../../store/shop-cart/shop-cart.selectors';
-import GalExpansionPanel from '../../../components/gal-expansion-group/gal-expansion-panel/gal-expansion-panel.component';
-
 import { FaPaypal } from 'react-icons/fa';
 import { FaGooglePay } from 'react-icons/fa';
 import { FaApplePay } from 'react-icons/fa';
 import { FaCreditCard } from 'react-icons/fa';
 
-import './checkout.styles.scss';
+import {
+  selectAllShopCartProducts,
+  selectShopCartTotal,
+} from '../../../store/shop-cart/shop-cart.selectors';
+import GalExpansionPanel from '../../../components/gal-expansion-group/gal-expansion-panel/gal-expansion-panel.component';
 import GalExpansionGroup from '../../../components/gal-expansion-group/gal-expansion-group.component';
-import GalIcon from '../../../components/gal-icon-component/gal-icon.component';
+import { GalIcon } from '@shared/ui';
+
+import './checkout.styles.scss';
 
 const Checkout: React.FC = () => {
   const cartProducts = useSelector(selectAllShopCartProducts);
