@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { RegisterRequest, AppDispatch } from '@api/models';
 import { Input, Button } from '@shared/ui';
 import { signupUser } from '@store/auth-store';
-import { PasswordInput } from '@components';
+import { PasswordInput } from '@shared/components';
 
 import './sign-up.styles.scss';
 

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 
 import { selectAuthUser } from '@store/auth-store';
-import { PageHeader, PasswordInput } from '@components';
+import { PageHeader, PasswordInput } from '@shared/components';
 import { SettingsSection } from '../settings-section';
 import { Button, Divider, Input } from '@shared/ui';
 

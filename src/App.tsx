@@ -41,6 +41,7 @@ import { AppInitializer, ProtectedRoute } from '@api/providers';
 import { UserRole } from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
 import { Navigation } from '@widgets/nav';
+import Checkout from './pages/app/checkout/checkout.component';
 
 const App = () => {
   const user = useSelector(selectAuthUser);
@@ -177,6 +178,7 @@ const App = () => {
             <Route path="my-page-preview" element={<UserPagePreview />} />
 
             <Route path="cart" element={<Cart />} />
+            <Route path="checkout" element={<Checkout />} />
 
             {/* Fallback inside /app */}
             <Route path="*" element={<Navigate to="/app" replace />} />

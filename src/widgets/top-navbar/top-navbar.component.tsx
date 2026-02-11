@@ -7,11 +7,11 @@ import { UserRole } from '@api/models';
 import { Button } from '@shared/ui';
 import { SmartSearch } from '@features/smart-search';
 import {
-  GalWishlistDropdown,
+  UserDropdown,
+  NotificationsDropdown,
+  WishlistDropdown,
   ShopCartDropdown,
-  GalNotificationsDropdown,
-  GalUserDropdown,
-} from '@components';
+} from '@features/dropdowns';
 
 import './top-navbar.styles.scss';
 
@@ -54,12 +54,12 @@ const TopNavbar: React.FC = () => {
         <div className="nav-links">
           {!isUserCreator && (
             <>
-              <GalWishlistDropdown />
+              <WishlistDropdown />
               <ShopCartDropdown />
             </>
           )}
-          <GalNotificationsDropdown />
-          <GalUserDropdown />
+          <NotificationsDropdown />
+          <UserDropdown />
         </div>
       )}
 

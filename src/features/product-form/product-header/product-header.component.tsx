@@ -10,7 +10,7 @@ import {
   selectProductsLoading,
 } from '@store/product-store';
 import { Button } from '@shared/ui';
-import { SavingIndicator } from '@components';
+import { SavingIndicator } from '@shared/components';
 
 import './product-header.styles.scss';
 

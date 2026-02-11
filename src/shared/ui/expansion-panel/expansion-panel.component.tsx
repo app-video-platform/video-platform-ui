@@ -3,7 +3,7 @@ import React, { useState, ReactNode, useRef } from 'react';
 import { IoChevronDown } from 'react-icons/io5';
 
 import { getCssVar } from '@shared/utils';
-import { GalIcon } from '../gal-icon';
+import { VPIcon } from '../vp-icon';
 
 import './expansion-panel.styles.scss';
 
@@ -54,7 +54,7 @@ const ExpansionPanel: React.FC<ExpansionPanelProps> = ({
             aria-disabled={disabled}
             aria-controls="expansion-panel-content"
           >
-            <GalIcon
+            <VPIcon
               icon={IoChevronDown}
               color={getCssVar('--text-primary')}
               className={clsx('panel-chevron', { expanded: isOpen })}

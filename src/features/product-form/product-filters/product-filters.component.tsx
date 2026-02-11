@@ -4,7 +4,7 @@ import { MdOutlineTypeSpecimen } from 'react-icons/md';
 import { IoIosPricetags } from 'react-icons/io';
 
 import { ProductStatus, ProductType } from '@api/models';
-import { Filters, FilterSelector } from '@components';
+import { Filters, FilterSelector } from '@shared/components';
 import { SelectOption } from '@shared/ui';
 
 type StatusFilter = 'all' | ProductStatus;

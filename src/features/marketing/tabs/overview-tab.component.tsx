@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PageHeader } from '@components';
+import { PageHeader } from '@shared/components';
 
 const OverviewTab: React.FC = () => (
   <div>

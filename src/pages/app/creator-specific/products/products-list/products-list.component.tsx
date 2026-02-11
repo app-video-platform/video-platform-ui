@@ -10,7 +10,7 @@ import {
   selectProductsError,
   getAllProductsByUserId,
 } from '@store/product-store';
-import { ProductCard } from '@components';
+import { ProductCard } from '@shared/components';
 import { Button } from '@shared/ui';
 import { AbstractProduct, AppDispatch } from '@api/models';
 import { ProductFilters, ProductFilterForm } from '@features/product-form';

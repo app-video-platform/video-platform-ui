@@ -1,3 +1,5 @@
+export * from './contact';
+export * from './dropdowns';
 export * from './marketing';
 export * from './onboarding';
 export * from './password-change';

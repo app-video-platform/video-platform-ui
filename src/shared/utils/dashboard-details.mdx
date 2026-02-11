@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import GalExpansionPanel from '../ui/gal-expansion-panel/gal-expansion-panel.component.tsx';
+import ExpansionPanel from '../ui/expansion-panel/expansion-panel.component.tsx';
 import Artboard from '../../assets/1x/Artboard 1.png';
 
 # Developer Dashboard
 
-<GalExpansionPanel header="Intro">
+<ExpansionPanel header="Intro">
   <p>
     Welcome to the developer dashboard. Here you can manage your development
     tasks and monitor progress.
@@ -27,13 +27,13 @@ import Artboard from '../../assets/1x/Artboard 1.png';
     Și da, în caz că te întrebai, m-am chinuit oțâră să scriu asta cu
     diacritice.
   </p>
-</GalExpansionPanel>
+</ExpansionPanel>
 
-<GalExpansionPanel header="Routes">
+<ExpansionPanel header="Routes">
 
 Here we got some info about the routes created for the app, split into several categories.
 
-  <GalExpansionPanel header="Static Pages">
+  <ExpansionPanel header="Static Pages">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Galactica Landing Page</h3>
@@ -45,8 +45,7 @@ Here we got some info about the routes created for the app, split into several c
             - currently: [app.serious-debauchery.click](https://app.serious-debauchery.click)
         </div>
       </div>
-    
-      
+
 
       <div className="dev-item-box">
         <h3 className="item-box-header">About Page</h3>
@@ -75,95 +74,104 @@ Here we got some info about the routes created for the app, split into several c
         </div>
       </div>
     </div>
-  </GalExpansionPanel>
 
-  <GalExpansionPanel header="User Authentication">
-    <div className="dev-panel-content">
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Sign Up Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/signup'}>Sign Up</Link>
-        <div className="item-box-content">
-          - Classic sign up form
-        </div>
-      </div>
-  
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Sign In Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/signin'}>Sign In</Link>
-        <div className="item-box-content">
-          - Classic sign in form
-        </div>
-      </div>
-    
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Forgot Password Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/forgot-password'}>Forgot Password</Link>
-        <div className="item-box-content">
-          - Classic forgot password flow (built in a step-by-step wizard style)
-            1. User enters their email and clicks continue (step 1)
-            2. User enters the OTP received in email in the OTP input and clicks continue (step 2)
-            3. User enters the new password (2 times) and clicks change password (step 3)
-            4. User is redirected to the sign in page (step 4)
-        </div>
-      </div>
-    
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Email Verification Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/verify-email'}>Email Verification</Link>
-        <div className="item-box-content">
-          - Classic email verification flow
-        </div>
-      </div>
-    
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Email Sent Confirmation Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/email-sent'}>Email Sent Confirmation</Link>
-        <div className="item-box-content">
-          - Classic email confirmation page
-        </div>
-      </div>
-    
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Not Found Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/not-found'}>Not Found</Link>
-        <div className="item-box-content">
-          - Classic not found error page
-        </div>
-      </div>
-    
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Unauthorized Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/unauthorized'}>Unauthorized</Link>
-        <div className="item-box-content">
-          - Classic unauthorized error page
-        </div>
-      </div>
-   
-      <div className="dev-item-box">
-        <h3 className="item-box-header">Onboarding Page</h3>
-        <span className="method"/>
-        <Link className="route-info" to={'/onboarding'}>Onboarding</Link>
-        <div className="item-box-content">
-          - Classic user onboarding flow (step-by-step wizard)
-            1. Welcome page with next steps explanation, where user can skip or continue (step 1)
-            2. Basic profile info, like a profile photo and the title. Here user can also go back (step 2)
-            3. Some other basic profile info, like bio and the user's mission (step 3)
-            4. Some additional info, like website, location (city, country) and the user's social media (step 4)
-            5. Success tab, with options to continue onboarding (not yet implemented), go back, or go directly to dashboard (step 5)
-            6. There is one more tab which says that the onboarding is already completed, and it redirects in 10 seconds to dashboard
-        </div>
+  </ExpansionPanel>
+
+<ExpansionPanel header="User Authentication">
+  <div className="dev-panel-content">
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Sign Up Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/signup'}>
+        Sign Up
+      </Link>
+      <div className="item-box-content">- Classic sign up form</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Sign In Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/signin'}>
+        Sign In
+      </Link>
+      <div className="item-box-content">- Classic sign in form</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Forgot Password Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/forgot-password'}>
+        Forgot Password
+      </Link>
+      <div className="item-box-content">
+        - Classic forgot password flow (built in a step-by-step wizard style) 1.
+        User enters their email and clicks continue (step 1) 2. User enters the
+        OTP received in email in the OTP input and clicks continue (step 2) 3.
+        User enters the new password (2 times) and clicks change password (step
+        3) 4. User is redirected to the sign in page (step 4)
       </div>
     </div>
-  </GalExpansionPanel>
 
-  <GalExpansionPanel header="Galactica App">
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Email Verification Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/verify-email'}>
+        Email Verification
+      </Link>
+      <div className="item-box-content">- Classic email verification flow</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Email Sent Confirmation Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/email-sent'}>
+        Email Sent Confirmation
+      </Link>
+      <div className="item-box-content">- Classic email confirmation page</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Not Found Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/not-found'}>
+        Not Found
+      </Link>
+      <div className="item-box-content">- Classic not found error page</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Unauthorized Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/unauthorized'}>
+        Unauthorized
+      </Link>
+      <div className="item-box-content">- Classic unauthorized error page</div>
+    </div>
+
+    <div className="dev-item-box">
+      <h3 className="item-box-header">Onboarding Page</h3>
+      <span className="method" />
+      <Link className="route-info" to={'/onboarding'}>
+        Onboarding
+      </Link>
+      <div className="item-box-content">
+        - Classic user onboarding flow (step-by-step wizard) 1. Welcome page
+        with next steps explanation, where user can skip or continue (step 1) 2.
+        Basic profile info, like a profile photo and the title. Here user can
+        also go back (step 2) 3. Some other basic profile info, like bio and the
+        user's mission (step 3) 4. Some additional info, like website, location
+        (city, country) and the user's social media (step 4) 5. Success tab,
+        with options to continue onboarding (not yet implemented), go back, or
+        go directly to dashboard (step 5) 6. There is one more tab which says
+        that the onboarding is already completed, and it redirects in 10 seconds
+        to dashboard
+      </div>
+    </div>
+
+  </div>
+</ExpansionPanel>
+
+  <ExpansionPanel header="Galactica App">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Galactica App Home</h3>
@@ -246,7 +254,7 @@ Here we got some info about the routes created for the app, split into several c
           <Link className="route-info" to={'/app/products'}>Products</Link>
           <div className="item-box-content">
             - Here the user can manage their created products
-            - see details about customers, sales, etc. 
+            - see details about customers, sales, etc.
             - has quick access to edit products, and create new ones
           </div>
         </div>
@@ -272,7 +280,7 @@ Here we got some info about the routes created for the app, split into several c
             </div>
           </div>
         </div>
-      
+
         <div className="dev-item-box">
           <h3 className="item-box-header">Instructor Storefront Preview</h3>
           <span className="method"/>
@@ -323,7 +331,7 @@ Here we got some info about the routes created for the app, split into several c
             </div>
           </div>
        </div>
-      
+
 
       <div style={{height: '30px'}} />
       ## All logged pages (visible only for logged in users with any role)
@@ -340,13 +348,14 @@ Here we got some info about the routes created for the app, split into several c
           </div>
         </div>
        </div>
-      
-    </div>
-  </GalExpansionPanel>
-</GalExpansionPanel>
 
-<GalExpansionPanel header="API Endpoints">
-  <GalExpansionPanel header="Authentication">
+    </div>
+
+  </ExpansionPanel>
+</ExpansionPanel>
+
+<ExpansionPanel header="API Endpoints">
+  <ExpansionPanel header="Authentication">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Register (registerUser)</h3>
@@ -400,7 +409,7 @@ Here we got some info about the routes created for the app, split into several c
         <span className="route-info">api/auth/verify?token=````token````</span>
         <div className="item-box-content">
           - Endpoint used for verifying a user's email
-          - **Payload:**  
+          - **Payload:**
             - ```js
               {
                 token: string
@@ -484,9 +493,10 @@ Here we got some info about the routes created for the app, split into several c
         </div>
       </div>
     </div>
-  </GalExpansionPanel>
 
-  <GalExpansionPanel header="User">
+  </ExpansionPanel>
+
+  <ExpansionPanel header="User">
    <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Get User Profile (getUserProfileAPI)</h3>
@@ -508,9 +518,9 @@ Here we got some info about the routes created for the app, split into several c
         </div>
       </div>
     </div>
-  </GalExpansionPanel>
+  </ExpansionPanel>
 
-  <GalExpansionPanel header="Products">
+  <ExpansionPanel header="Products">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Create Product (createProductAPI)</h3>
@@ -818,9 +828,10 @@ Here we got some info about the routes created for the app, split into several c
         </div>
       </div>
     </div>
-  </GalExpansionPanel>
 
-  <GalExpansionPanel header="Files">
+  </ExpansionPanel>
+
+  <ExpansionPanel header="Files">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Get Presigned URL (getPresignedUrlAPI)</h3>
@@ -887,10 +898,11 @@ Here we got some info about the routes created for the app, split into several c
         </div>
       </div>
     </div>
-  </GalExpansionPanel>
-</GalExpansionPanel>
 
-<GalExpansionPanel header='UI Component Architecture Proposal'>
+  </ExpansionPanel>
+</ExpansionPanel>
+
+<ExpansionPanel header='UI Component Architecture Proposal'>
   <div className="dev-panel-content">
     <div className="dev-item-box">
       <div className="item-box-content">
@@ -902,7 +914,7 @@ Here we got some info about the routes created for the app, split into several c
 
         Noi deocamdata folosim Path-Based Model, adica avem un singur domeniu, si in functie de path-ul URL-ului, afisam diferite pagini.
         Pentru a separa partea statica de partea de galactica app, o sa folosim un path ````/app```` pentru toate paginile
-        
+
         Cealalata propunere ar fi sa avem partea statica pe un domeniu normal, si aplicatia pe un subdomeniu, gen app.galactica.com.
 
         Am avut o discutie cu prietenul nostru comun, si a facut o comparare intre modele, e sub textul asta. Am facut si eu o imagine frumoasa ca acompaniament.
@@ -1173,5 +1185,6 @@ Here we got some info about the routes created for the app, split into several c
           - FileUploader
       </div>
     </div>
+
   </div>
-</GalExpansionPanel>
+</ExpansionPanel>

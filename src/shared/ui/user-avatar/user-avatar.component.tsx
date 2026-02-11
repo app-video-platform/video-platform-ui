@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { FaRegUser } from 'react-icons/fa';
 
 import { getCssVar } from '@shared/utils';
-import { GalIcon } from '../gal-icon';
+import { VPIcon } from '../vp-icon';
 
 import './user-avatar.styles.scss';
 
@@ -26,7 +26,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
       {hasAvatar ? (
         <img src={imageUrl} alt={alt} />
       ) : (
-        <GalIcon
+        <VPIcon
           icon={FaRegUser}
           size={large ? 24 : 18}
           color={getCssVar('--text-primary')}

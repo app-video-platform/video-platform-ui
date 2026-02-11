@@ -1,8 +1,8 @@
 import React from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
 
-import { GalIcon } from '@shared/ui';
-import { GalCtaSection } from '@components';
+import { VPIcon } from '@shared/ui';
+import { CtaSection } from '@shared/components';
 
 import './about.styles.scss';
 
@@ -70,19 +70,19 @@ const About: React.FC = () => (
       {/* <div className="different-list-container"> */}
       <ul className="different-list">
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <VPIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <VPIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <VPIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <VPIcon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
       </ul>
@@ -108,7 +108,7 @@ const About: React.FC = () => (
       </div>
     </section>
 
-    <GalCtaSection
+    <CtaSection
       headerText="Start building with us"
       descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
       Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor."

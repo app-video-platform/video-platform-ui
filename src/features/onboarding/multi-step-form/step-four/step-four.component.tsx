@@ -9,9 +9,9 @@ import { selectAuthUser } from '@store/auth-store';
 import { SocialMediaLink, SocialPlatforms } from '@api/models';
 import {
   GalLocation,
-  GalSocialMediaInput,
+  SocialMediaInput,
   OSMLocationSearch,
-} from '@components';
+} from '@shared/components';
 
 import './step-four.styles.scss';
 
@@ -117,7 +117,7 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
       </div>
 
       <div className="social-media-circle-container">
-        <GalSocialMediaInput
+        <SocialMediaInput
           initialSocialLinks={initialLinks}
           onChange={handleSocialMediaChange}
         />

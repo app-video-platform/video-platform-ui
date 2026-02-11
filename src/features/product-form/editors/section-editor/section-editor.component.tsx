@@ -15,8 +15,8 @@ import {
 import {
   Button,
   ExpansionPanel,
-  GalIcon,
-  GalUppyFileUploader,
+  VPIcon,
+  UppyFileUploader,
   Textarea,
 } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
@@ -159,7 +159,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           </div>
           <div className="section-header-line">
             <div className="section-title-block">
-              <GalIcon
+              <VPIcon
                 icon={PiRectangleDashed}
                 size={24}
                 color={getCssVar('--text-primary')}
@@ -208,7 +208,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
             case 'DOWNLOAD':
               return (
                 <div className="download-specific-fields">
-                  <GalUppyFileUploader onFilesChange={handleFilesChange} />
+                  <UppyFileUploader onFilesChange={handleFilesChange} />
                 </div>
               );
 

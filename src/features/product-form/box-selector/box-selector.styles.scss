@@ -1,0 +1,136 @@
+@use '../../../styles/index.scss' as *;
+
+.box-selectors {
+  display: flex;
+  width: 100%;
+  margin: auto;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+
+  .option-box {
+    height: 50px;
+    min-width: 200px;
+    padding: 0 $spacing-3;
+    border: 2px solid $accent-secondary;
+    border-radius: $radius-md;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    gap: $spacing-2;
+    transition: all 0.3s ease;
+
+    &.small {
+      height: 35px;
+      width: 130px;
+      font-size: 12px;
+    }
+
+    &__video {
+      &.selected {
+        background-color: rgba($color: $stellar-cyan, $alpha: 0.2);
+        border-color: $stellar-cyan;
+        color: $stellar-cyan;
+      }
+
+      &:hover {
+        background-color: rgba($color: $stellar-cyan, $alpha: 0.2);
+      }
+    }
+
+    &__article {
+      &.selected {
+        background-color: rgba($color: $aurora-green, $alpha: 0.2);
+        border-color: $aurora-green;
+        color: $aurora-green;
+      }
+
+      &:hover {
+        background-color: rgba($color: $aurora-green, $alpha: 0.2);
+      }
+    }
+
+    &__assignment {
+      &.selected {
+        background-color: rgba($color: $deep-magenta-pulse, $alpha: 0.2);
+        border-color: $deep-magenta-pulse;
+        color: $deep-magenta-pulse;
+      }
+
+      &:hover {
+        background-color: rgba($color: $deep-magenta-pulse, $alpha: 0.2);
+      }
+    }
+
+    &__quiz {
+      &.selected {
+        background-color: rgba($color: $supernova-orange-pink, $alpha: 0.2);
+        border-color: $supernova-orange-pink;
+        color: $supernova-orange-pink;
+      }
+
+      &:hover {
+        background-color: rgba($color: $supernova-orange-pink, $alpha: 0.2);
+      }
+    }
+
+    &__course {
+      &.selected {
+        background-color: rgba($color: $accent-primary, $alpha: 0.2);
+        border-color: $accent-primary;
+        color: $accent-primary;
+      }
+
+      &:hover {
+        background-color: rgba($color: $accent-primary, $alpha: 0.2);
+      }
+    }
+
+    &__download {
+      &.selected {
+        background-color: rgba($color: $accent-secondary, $alpha: 0.2);
+        border-color: $accent-secondary;
+        color: $accent-secondary;
+      }
+
+      &:hover {
+        background-color: rgba($color: $accent-secondary, $alpha: 0.2);
+      }
+    }
+
+    &__consultation {
+      &.selected {
+        background-color: rgba($color: $accent-tertiary, $alpha: 0.2);
+        border-color: $accent-tertiary;
+        color: $accent-tertiary;
+      }
+
+      &:hover {
+        background-color: rgba($color: $accent-tertiary, $alpha: 0.2);
+      }
+    }
+
+    &__multiple_choice_single,
+    &__multiple_choice_multi,
+    &__true_false {
+      &.selected {
+        background-color: rgba($color: $accent-tertiary, $alpha: 0.2);
+        border-color: $accent-tertiary;
+        color: $accent-tertiary;
+      }
+
+      &:hover {
+        background-color: rgba($color: $accent-tertiary, $alpha: 0.2);
+      }
+    }
+
+    // &:hover {
+    //   background-color: rgb(216, 216, 216);
+    // }
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+}

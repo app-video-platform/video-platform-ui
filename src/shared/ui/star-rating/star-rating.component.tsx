@@ -3,7 +3,7 @@ import { FaRegStar } from 'react-icons/fa';
 import { FaStar } from 'react-icons/fa';
 
 import { getCssVar } from '@shared/utils';
-import { GalIcon } from '../gal-icon';
+import { VPIcon } from '../vp-icon';
 
 import './star-rating.styles.scss';
 
@@ -50,7 +50,7 @@ const StarRating: React.FC<StarRatingProps> = ({
                 padding: 0,
               }}
             >
-              <GalIcon
+              <VPIcon
                 icon={icon}
                 size={small ? 18 : 24}
                 color={getCssVar('--accent-primary')}

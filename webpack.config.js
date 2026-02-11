@@ -17,6 +17,12 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.mdx'],
+    alias: {
+      '@emotion/is-prop-valid': path.resolve(
+        __dirname,
+        'src/shared/utils/shims/emotion-is-prop-valid.ts'
+      ),
+    },
     plugins: [
       new TsconfigPathsPlugin({ configFile: path.resolve(__dirname, 'tsconfig.json') }),
     ]

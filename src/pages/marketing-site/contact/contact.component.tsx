@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { GalExpansionPanel } from '@shared/ui';
-import { GalCtaSection, GalContactForm } from '@components';
+import { ExpansionPanel } from '@shared/ui';
+import { ContactForm } from '@features/contact';
+import { CtaSection } from '@shared/components';
 
 import './contact.styles.scss';
 
@@ -24,21 +25,21 @@ const Contact: React.FC = () => (
         </div>
       </div>
       <div className="contact-form-container">
-        <GalContactForm />
+        <ContactForm />
       </div>
     </div>
     <div className="faq-section">
       <h1>Frequently Asked Questions</h1>
       <p className="subheading">Find here answers to some common questions</p>
       <div className="faq-list">
-        <GalExpansionPanel header="How do I reset my password?">
+        <ExpansionPanel header="How do I reset my password?">
           <p>
             Click on &quot;Forgot Password&quot; at the login page and follow
             the instructions.
           </p>
-        </GalExpansionPanel>
+        </ExpansionPanel>
 
-        <GalExpansionPanel
+        <ExpansionPanel
           header="Where can I find my purchase history?"
           defaultExpanded
         >
@@ -47,15 +48,15 @@ const Contact: React.FC = () => (
             You can reach our support team via the contact form above or email
             us directly.
           </p>
-        </GalExpansionPanel>
+        </ExpansionPanel>
 
-        <GalExpansionPanel header="How can I contact support?">
+        <ExpansionPanel header="How can I contact support?">
           <p>This panel can’t be opened because it’s disabled. (haha no)</p>
-        </GalExpansionPanel>
+        </ExpansionPanel>
       </div>
     </div>
 
-    <GalCtaSection
+    <CtaSection
       headerText="Not a member yet?"
       descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     />

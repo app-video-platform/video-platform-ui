@@ -5,7 +5,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { selectAuthUser } from '@store/auth-store';
 import { Button, Divider, Input } from '@shared/ui';
 import { SettingsSection } from '../settings-section';
-import { PageHeader } from '@components';
+import { PageHeader } from '@shared/components';
 
 export interface PaymentMethodFormData {
   businessName: string;

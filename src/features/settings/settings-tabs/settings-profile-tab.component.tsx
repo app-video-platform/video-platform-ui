@@ -15,7 +15,7 @@ import {
 import { getProfileNameInitials } from '@shared/utils';
 import { SettingsSection } from '../settings-section';
 import { SocialInput } from '../social-input';
-import { PageHeader } from '@components';
+import { PageHeader } from '@shared/components';
 
 export interface ProfileFormData {
   firstName: string;

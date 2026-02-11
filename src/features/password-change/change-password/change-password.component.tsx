@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@shared/ui';
-import { GalPasswordsContainer } from '@components';
+import { PasswordsContainer } from '@shared/components';
 
 import './change-password.styles.scss';
 
@@ -31,7 +31,7 @@ const ChangePassword: React.FC = () => {
 
   return (
     <>
-      <GalPasswordsContainer
+      <PasswordsContainer
         passwordInput={formData.password}
         passwordErrors={errors.password}
         confirmPasswordInput={formData.confirmPassword}

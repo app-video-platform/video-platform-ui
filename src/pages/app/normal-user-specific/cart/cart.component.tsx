@@ -10,6 +10,7 @@ import {
   moveCartItemToWishlist,
 } from '@store/shop-cart';
 import { selectWishlistIds } from '@store/wishlist';
+import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../../assets/image-placeholder.png');
 
@@ -17,6 +18,7 @@ import './cart.styles.scss';
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const cartProducts = useSelector(selectAllShopCartProducts);
   const cartTotal = useSelector(selectShopCartTotal);
   const wishlistIds = useSelector(selectWishlistIds);
@@ -95,8 +97,12 @@ const Cart: React.FC = () => {
                 )}
               </h2>
 
-              <Button type="button" variant="primary">
-                Procees to checkout
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => navigate('/app/checkout')}
+              >
+                Proceed to checkout
               </Button>
             </aside>
           </section>

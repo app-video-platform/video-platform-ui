@@ -1,0 +1,15 @@
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+
+  .inline-inputs {
+    display: flex;
+    gap: 20px;
+  }
+
+  .group .form-input {
+    margin: 10px 0;
+  }
+}

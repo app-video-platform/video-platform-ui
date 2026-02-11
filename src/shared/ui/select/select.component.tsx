@@ -3,7 +3,7 @@ import { IconType } from 'react-icons';
 import clsx from 'clsx';
 import { IoChevronDown } from 'react-icons/io5';
 
-import { GalIcon } from '../gal-icon';
+import { VPIcon } from '../vp-icon';
 
 import './select.styles.scss';
 import { getCssVar } from '@shared/utils';
@@ -61,7 +61,7 @@ const Select: React.FC<SelectProps> = ({
       )}
       <div className={clsx('select-row', { 'select-row__small': small })}>
         {prefixIcon && (
-          <GalIcon
+          <VPIcon
             className="select-prefix"
             icon={prefixIcon}
             color={getCssVar('--text-secondary')}
@@ -86,7 +86,7 @@ const Select: React.FC<SelectProps> = ({
             </option>
           ))}
         </select>
-        <GalIcon
+        <VPIcon
           icon={IoChevronDown}
           color={getCssVar('--text-primary')}
           size={18}

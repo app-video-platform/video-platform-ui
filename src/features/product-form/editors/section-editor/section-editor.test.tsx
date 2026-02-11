@@ -89,8 +89,8 @@ jest.mock('@shared/ui', () => ({
       {...rest}
     />
   ),
-  // GalUppyFileUploader stub
-  GalUppyFileUploader: ({
+  // UppyFileUploader stub
+  UppyFileUploader: ({
     onFilesChange,
   }: {
     onFilesChange: (files: File[]) => void;
@@ -106,8 +106,8 @@ jest.mock('@shared/ui', () => ({
       Upload File
     </button>
   ),
-  // GalIcon stub
-  GalIcon: () => <span data-testid="gal-icon" />,
+  // VPIcon stub
+  VPIcon: () => <span data-testid="gal-icon" />,
 }));
 
 // ── 4) MOCK EditableTitle (local import) ───────────────────────────

@@ -2,7 +2,7 @@ import React from 'react';
 import { IoAddOutline } from 'react-icons/io5';
 
 import LessonEditor from '../editors/lesson-editor/lesson-editor.component';
-import { Button, GalIcon } from '@shared/ui';
+import { Button, VPIcon } from '@shared/ui';
 import { CourseLesson } from '@api/models';
 import { getCssVar } from '@shared/utils';
 
@@ -65,7 +65,7 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
         type="button"
         variant="tertiary"
       >
-        <GalIcon
+        <VPIcon
           icon={IoAddOutline}
           color={getCssVar('--text-primary')}
           size={18}

@@ -5,7 +5,7 @@ import { FaArrowRight } from 'react-icons/fa';
 import clsx from 'clsx';
 
 import { CreateProductPayload, ProductType, AppDispatch } from '@api/models';
-import { Button, GalIcon, Input } from '@shared/ui';
+import { Button, VPIcon, Input } from '@shared/ui';
 import { FormErrors } from '@pages/app';
 import { createCourseProduct } from '@store/product-store';
 import { ProductTypeSelector } from '@features/product-form/product-type-selector';
@@ -116,7 +116,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
             className="create-course-continue-button"
             disabled={isDisabled}
           >
-            <GalIcon
+            <VPIcon
               icon={FaArrowRight}
               color={getCssVar(
                 isDisabled ? '--text-secondary' : '--text-primary',

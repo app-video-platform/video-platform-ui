@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { ProductType } from '@api/models';
-import { GalBoxSelector } from '@components';
 import { Input, Textarea } from '@shared/ui';
 import { ProductDraft } from '../models';
+import { BoxSelector } from '../box-selector';
 
 import './basic-info.styles.scss';
 
@@ -32,7 +32,7 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ formData, setField }) => (
 
     <div className="product-type-selectors">
       <span className="type-selectors-label">Product Type</span>
-      <GalBoxSelector<ProductType>
+      <BoxSelector<ProductType>
         selectedOption={formData.type}
         selectFor="product"
         onSelect={(type) => setField('type', type)}

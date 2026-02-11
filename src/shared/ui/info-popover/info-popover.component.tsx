@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { CiCircleInfo } from 'react-icons/ci';
 
-import { GalIcon } from '../gal-icon';
+import { VPIcon } from '../vp-icon';
 
 import './info-popover.styles.scss';
 import { getCssVar } from '@shared/utils';
@@ -40,7 +40,7 @@ const InfoPopover: React.FC<PopoverProps> = ({
         onClick={() => setOpen((v) => !v)}
         className="info-popover-toggler"
       >
-        <GalIcon
+        <VPIcon
           icon={CiCircleInfo}
           size={24}
           color={getCssVar('--text-primary')}
