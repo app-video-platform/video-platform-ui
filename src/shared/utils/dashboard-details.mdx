@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import GalExpansionPanel from '../ui/gal-expansion-panel/gal-expansion-panel.component.tsx';
+import ExpansionPanel from '../ui/expansion-panel/expansion-panel.component.tsx';
 import Artboard from '../../assets/1x/Artboard 1.png';
 
 # Developer Dashboard
 
-<GalExpansionPanel header="Intro">
+<ExpansionPanel header="Intro">
   <p>
     Welcome to the developer dashboard. Here you can manage your development
     tasks and monitor progress.
@@ -27,13 +27,13 @@ import Artboard from '../../assets/1x/Artboard 1.png';
     Și da, în caz că te întrebai, m-am chinuit oțâră să scriu asta cu
     diacritice.
   </p>
-</GalExpansionPanel>
+</ExpansionPanel>
 
-<GalExpansionPanel header="Routes">
+<ExpansionPanel header="Routes">
 
 Here we got some info about the routes created for the app, split into several categories.
 
-  <GalExpansionPanel header="Static Pages">
+  <ExpansionPanel header="Static Pages">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Galactica Landing Page</h3>
@@ -45,7 +45,6 @@ Here we got some info about the routes created for the app, split into several c
             - currently: [app.serious-debauchery.click](https://app.serious-debauchery.click)
         </div>
       </div>
-    
 
 
       <div className="dev-item-box">
@@ -76,9 +75,9 @@ Here we got some info about the routes created for the app, split into several c
       </div>
     </div>
 
-  </GalExpansionPanel>
+  </ExpansionPanel>
 
-<GalExpansionPanel header="User Authentication">
+<ExpansionPanel header="User Authentication">
   <div className="dev-panel-content">
     <div className="dev-item-box">
       <h3 className="item-box-header">Sign Up Page</h3>
@@ -168,10 +167,11 @@ Here we got some info about the routes created for the app, split into several c
         to dashboard
       </div>
     </div>
-  </div>
-</GalExpansionPanel>
 
-  <GalExpansionPanel header="Galactica App">
+  </div>
+</ExpansionPanel>
+
+  <ExpansionPanel header="Galactica App">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Galactica App Home</h3>
@@ -351,11 +351,11 @@ Here we got some info about the routes created for the app, split into several c
 
     </div>
 
-  </GalExpansionPanel>
-</GalExpansionPanel>
+  </ExpansionPanel>
+</ExpansionPanel>
 
-<GalExpansionPanel header="API Endpoints">
-  <GalExpansionPanel header="Authentication">
+<ExpansionPanel header="API Endpoints">
+  <ExpansionPanel header="Authentication">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Register (registerUser)</h3>
@@ -494,9 +494,9 @@ Here we got some info about the routes created for the app, split into several c
       </div>
     </div>
 
-  </GalExpansionPanel>
+  </ExpansionPanel>
 
-  <GalExpansionPanel header="User">
+  <ExpansionPanel header="User">
    <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Get User Profile (getUserProfileAPI)</h3>
@@ -518,9 +518,9 @@ Here we got some info about the routes created for the app, split into several c
         </div>
       </div>
     </div>
-  </GalExpansionPanel>
+  </ExpansionPanel>
 
-  <GalExpansionPanel header="Products">
+  <ExpansionPanel header="Products">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Create Product (createProductAPI)</h3>
@@ -829,9 +829,9 @@ Here we got some info about the routes created for the app, split into several c
       </div>
     </div>
 
-  </GalExpansionPanel>
+  </ExpansionPanel>
 
-  <GalExpansionPanel header="Files">
+  <ExpansionPanel header="Files">
     <div className="dev-panel-content">
       <div className="dev-item-box">
         <h3 className="item-box-header">Get Presigned URL (getPresignedUrlAPI)</h3>
@@ -899,10 +899,10 @@ Here we got some info about the routes created for the app, split into several c
       </div>
     </div>
 
-  </GalExpansionPanel>
-</GalExpansionPanel>
+  </ExpansionPanel>
+</ExpansionPanel>
 
-<GalExpansionPanel header='UI Component Architecture Proposal'>
+<ExpansionPanel header='UI Component Architecture Proposal'>
   <div className="dev-panel-content">
     <div className="dev-item-box">
       <div className="item-box-content">
@@ -1187,4 +1187,4 @@ Here we got some info about the routes created for the app, split into several c
     </div>
 
   </div>
-</GalExpansionPanel>
+</ExpansionPanel>

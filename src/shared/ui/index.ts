@@ -1,6 +1,5 @@
 export * from './gal-breadcrumb';
 export * from './gal-dropdown';
-export * from './gal-expansion-panel';
 export * from './gal-icon';
 export * from './gal-otp-input';
 export * from './gal-spinner';
