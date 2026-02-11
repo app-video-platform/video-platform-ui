@@ -102,7 +102,7 @@ const Cart: React.FC = () => {
                 variant="primary"
                 onClick={() => navigate('/app/checkout')}
               >
-                Procees to checkout
+                Proceed to checkout
               </Button>
             </aside>
           </section>

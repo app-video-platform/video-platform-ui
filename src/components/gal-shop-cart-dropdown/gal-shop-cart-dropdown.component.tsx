@@ -61,7 +61,7 @@ const ShopCartDropdown: React.FC = () => {
                 variant="primary"
                 onClick={() => navigate('/app/cart')}
               >
-                Go to checkout
+                Go to cart
               </Button>
             </div>
           </>

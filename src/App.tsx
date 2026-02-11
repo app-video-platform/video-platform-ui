@@ -41,7 +41,7 @@ import { AppInitializer, ProtectedRoute } from '@api/providers';
 import { UserRole } from '@api/models';
 import { selectAuthUser } from '@store/auth-store';
 import { Navigation } from '@widgets/nav';
-import Checkout from './galactica-app/normal-user-specific/checkout/checkout.component';
+import Checkout from './pages/app/checkout/checkout.component';
 
 const App = () => {
   const user = useSelector(selectAuthUser);

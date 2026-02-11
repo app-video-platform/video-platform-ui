@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { AbstractProduct, ProductType, AppDispatch } from '@api/models';
-import { Button, GalExpansionPanel } from '@shared/ui';
+import { Button, ExpansionPanel } from '@shared/ui';
 import { selectAuthUser } from '@store/auth-store';
 import { getProductByProductId } from '@store/product-store';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -96,7 +96,11 @@ const ProductPage: React.FC = () => {
                     <Button type="button" variant="primary">
                       Add to Cart
                     </Button>
-                    <Button type="button" variant="secondary">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => navigate('/app/checkout')}
+                    >
                       Buy Now
                     </Button>
                   </>
@@ -133,10 +137,7 @@ const ProductPage: React.FC = () => {
             </p>
             {product.type === 'COURSE' &&
               product.sections?.map((section) => (
-                <GalExpansionPanel
-                  key={section.id}
-                  header={section.title || ''}
-                >
+                <ExpansionPanel key={section.id} header={section.title || ''}>
                   <p>Duration: 2 min</p>
                   <p>{section.description}</p>
                   {section.lessons?.map((lesson) => (
@@ -145,7 +146,7 @@ const ProductPage: React.FC = () => {
                       <p>Type: {lesson.type}</p>
                     </div>
                   ))}
-                </GalExpansionPanel>
+                </ExpansionPanel>
               ))}
           </div>
         </>
