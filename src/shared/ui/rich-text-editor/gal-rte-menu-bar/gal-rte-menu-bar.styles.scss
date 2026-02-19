@@ -44,7 +44,7 @@
     transform 0.1s ease;
 
   &:hover:not(:disabled) {
-    background: $accent-secondary;
+    background: var(--brand-secondary);
     pointer-events: all;
   }
 
@@ -53,8 +53,8 @@
   }
 
   &.is-active {
-    background: color.scale($cool-cosmic-cyan, $lightness: -15%);
-    color: $sea-salt;
+    background: var(--ambient-cyan);
+    color: var(--text-primary);
   }
 
   &:disabled {

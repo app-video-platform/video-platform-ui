@@ -53,7 +53,7 @@ const StarRating: React.FC<StarRatingProps> = ({
               <GalIcon
                 icon={icon}
                 size={small ? 18 : 24}
-                color={getCssVar('--accent-primary')}
+                color={getCssVar('--brand-primary')}
               />
             </button>
           );

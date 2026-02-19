@@ -17,8 +17,8 @@
     padding: $spacing-3 $spacing-4;
     font-size: 14px;
     border-radius: $radius-md;
-    background-color: $bg-elevated;
-    box-shadow: $shadow-md;
+    background-color: var(--surface-1);
+    box-shadow: var(--shadow-e2);
     min-width: 250px;
 
     &__top {

@@ -4,9 +4,9 @@
   width: 800px;
   margin: 50px auto;
   padding: 50px;
-  background: $bg-elevated;
+  background: var(--surface-1);
   border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-e1);
 
   .sign-up-btn {
     margin: $spacing-7 auto 0;

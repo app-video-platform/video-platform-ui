@@ -1,0 +1,36 @@
+$font-heading: 'Bebas Neue', sans-serif;
+$font-body: 'Open Sans', sans-serif;
+$font-mono: 'Roboto Mono', monospace;
+
+// Font sizes (rem-based scale)
+$size-xxl: 4rem; // 64px
+$size-xl: 3rem; // 48px
+$size-h1: 2rem; // ~32px
+$size-h2: 1.5rem; // ~24px
+$size-h3: 1.25rem; // ~20px
+$size-body: 1rem; // ~16px
+$size-small: 0.875rem; // ~14px
+$size-xsmall: 0.688rem; // ~11px
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-heading;
+}
+
+p {
+  line-height: 1.6;
+}
+
+textarea {
+  font-family: $font-body;
+  font-size: $size-small;
+}
+
+button {
+  font-family: $font-body;
+  font-weight: 500;
+}

@@ -14,30 +14,30 @@ import { TypeMeta, LessonType, ProductType, QuestionType } from '..';
 export const LESSON_META: Record<LessonType, TypeMeta> = {
   VIDEO: {
     icon: MdOutlineSlowMotionVideo,
-    color: getCssVar('--stellar-cyan'),
+    color: getCssVar('--brand-secondary'),
   },
   ARTICLE: {
     icon: CiText,
-    color: getCssVar('--aurora-green'),
+    color: getCssVar('--brand-secondary'),
   },
   ASSIGNMENT: {
     icon: MdFilterNone,
-    color: getCssVar('--deep-magenta-pulse'),
+    color: getCssVar('--brand-secondary'),
   },
   QUIZ: {
     icon: MdOutlineQuiz,
-    color: getCssVar('--supernova-orange-pink'),
+    color: getCssVar('--brand-secondary'),
   },
 };
 
 export const PRODUCT_META: Record<ProductType, TypeMeta> = {
   COURSE: {
     icon: MdOutlineSlowMotionVideo,
-    color: getCssVar('--accent-primary'),
+    color: getCssVar('--brand-primary'),
   },
   CONSULTATION: {
     icon: CiText,
-    color: getCssVar('--accent-tertiary'),
+    color: getCssVar('--ambient-cyan'),
   },
 
   DOWNLOAD: {

@@ -1,7 +1,7 @@
 @use '../../../styles/index.scss' as *;
 
 .course-editor-wrapper {
-  border: 1px solid $accent-tertiary;
+  border: 1px solid var(--ambient-cyan);
   border-radius: 4px;
   padding: 0.5rem;
 }
@@ -9,9 +9,9 @@
 .rte-content {
   min-height: 300px;
   padding: 0.5rem;
-  border: 1px solid $accent-secondary;
+  border: 1px solid var(--brand-secondary);
   border-radius: 4px;
-  background: $bg-base;
+  background: var(--surface-0);
 
   .ProseMirror-focused {
     outline: none;

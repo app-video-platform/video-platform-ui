@@ -6,13 +6,13 @@
   justify-content: center;
   gap: 0.5rem;
   padding: $spacing-2 $spacing-4;
-  color: $text-primary;
+  color: var(--text-primary);
   font-weight: bold;
   border: none;
   cursor: pointer;
   transition: all $transition-fast;
   user-select: none;
-  background-color: $neutral-medium;
+  background-color: var(--surface-2);
   min-width: 80px;
   border: 2px solid transparent;
 
@@ -26,43 +26,43 @@
   }
 
   &__primary {
-    background-color: $accent-primary;
-    color: $text-inverse;
+    background-color: var(--brand-primary);
+    color: var(--text-muted);
   }
 
   &__secondary {
-    border-color: $accent-secondary;
+    border-color: var(--brand-secondary);
     background-color: transparent;
-    // color: $text-secondary;
+    // color: var(--text-secondary);
   }
 
   &__tertiary {
-    background-color: $accent-secondary;
+    background-color: var(--brand-secondary);
   }
 
   &__danger {
     width: 100%;
     height: 50px;
     background-color: transparent;
-    border: 1px solid $error;
-    color: $error;
+    border: 1px solid var(--error);
+    color: var(--error);
   }
 
   &__remove {
     border: unset;
     padding: unset;
-    color: $error;
+    color: var(--error);
     background: transparent;
 
     &:hover {
-      color: $error-light;
+      color: var(--error)-light;
     }
   }
 
   &__neutral {
     background-color: unset;
     border: unset;
-    color: $accent-primary-dark;
+    color: var(--brand-primary);
   }
 
   &.loading {
@@ -74,6 +74,12 @@
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    color: $text-secondary;
+    color: var(--text-secondary);
+  }
+
+  &:focus-visible {
+    box-shadow:
+      0 0 0 2px rgba(15, 15, 45, 1),
+      /* offset buffer */ 0 0 0 4px var(--focus-ring);
   }
 }

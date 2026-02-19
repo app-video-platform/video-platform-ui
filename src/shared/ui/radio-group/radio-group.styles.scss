@@ -8,7 +8,7 @@
   .radio-group-label {
     font-size: 12px;
     font-weight: 600;
-    color: $text-secondary;
+    color: var(--text-secondary);
     margin-bottom: 4px;
   }
 
@@ -19,7 +19,7 @@
   }
 
   .radio-group-error {
-    color: $error;
+    color: var(--error);
     font-size: 12px;
     margin-top: $spacing-1;
   }

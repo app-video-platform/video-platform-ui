@@ -3,15 +3,15 @@
 .gal-user-dropdown {
   // .user-profile-button {
   //   padding: 15px;
-  //   background-color: $accent-primary;
+  //   background-color: var(--brand-primary);
   //   border-radius: 50%;
-  //   color: $text-inverse;
+  //   color: var(--text-muted);
   //   font-weight: 700;
   // }
 
   .galactica-nav {
     width: 350px;
-    background: $bg-base;
+    background: var(--surface-0);
     padding: 20px;
     border-radius: 15px;
     margin-top: 20px;

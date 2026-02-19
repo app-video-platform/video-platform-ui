@@ -1,7 +1,7 @@
 @use '../../../styles/index.scss' as *;
 
 .custom-uppy-dashboard .uppy-Dashboard-inner {
-  background-color: $bg-base; // page background
+  background-color: var(--surface-0); // page background
   border-radius: $radius-lg;
   padding: $spacing-5;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

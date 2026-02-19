@@ -30,9 +30,9 @@
   //     border-radius: 50%;
   //     width: 150px;
   //     height: 150px;
-  //     background-color: $bg-base;
-  //     color: $text-primary;
-  //     border: 5px solid $accent-primary;
+  //     background-color: var(--surface-0);
+  //     color: var(--text-primary);
+  //     border: 5px solid var(--brand-primary);
   //     z-index: 1;
   //     display: flex;
   //     align-items: center;
@@ -62,7 +62,7 @@
     // }
 
     // .category-line {
-    //   border-color: $neutral-medium;
+    //   border-color: var(--divider-default);
     //   opacity: 0.5;
     //   margin: $spacing-4 0;
     // }
@@ -105,10 +105,10 @@
       .avatar-container {
         grid-area: 1 / 1 / 3 / 2;
         height: 130px;
-        border: 1px solid $accent-secondary;
+        border: 1px solid var(--brand-secondary);
         border-radius: $radius-md;
         position: relative;
-        background: $bg-base;
+        background: var(--surface-0);
         overflow: hidden; // ⬅️ crops top & bottom of the circle
         isolation: isolate; // keeps blending/filters local (nice but optional)
         display: flex;
@@ -132,21 +132,21 @@
             rgba(59, 201, 219, 0.15) 18%,
             rgba(59, 201, 219, 0) 22%,
 
-            /* Ring 2 */ rgba($accent-secondary, 0.25) 22%,
-            rgba($accent-secondary, 0.1) 30%,
-            rgba($accent-secondary, 0) 35%,
+            /* Ring 2 */ rgba(var(--brand-secondary), 0.25) 22%,
+            rgba(var(--brand-secondary), 0.1) 30%,
+            rgba(var(--brand-secondary), 0) 35%,
 
-            /* Ring 3 */ rgba($accent-primary, 0.2) 35%,
-            rgba($accent-primary, 0.08) 50%,
-            rgba($accent-primary, 0) 53%,
+            /* Ring 3 */ rgba(var(--brand-primary), 0.2) 35%,
+            rgba(var(--brand-primary), 0.08) 50%,
+            rgba(var(--brand-primary), 0) 53%,
 
-            /* Ring 4 */ rgba($accent-tertiary, 0.2) 53%,
-            rgba($accent-tertiary, 0.08) 70%,
-            rgba($accent-tertiary, 0) 75%,
+            /* Ring 4 */ rgba(var(--ambient-cyan), 0.2) 53%,
+            rgba(var(--ambient-cyan), 0.08) 70%,
+            rgba(var(--ambient-cyan), 0) 75%,
 
-            /* Ring 5 */ rgba($bg-surface, 0.2) 76%,
-            rgba($bg-surface, 0.08) 90%,
-            rgba($bg-surface, 0) 98%,
+            /* Ring 5 */ rgba(var(--surface-2), 0.2) 76%,
+            rgba(var(--surface-2), 0.08) 90%,
+            rgba(var(--surface-2), 0) 98%,
 
             /* Background fade */ #151538 100%
           );
@@ -159,12 +159,12 @@
           align-items: center;
           justify-content: center;
           box-shadow:
-            0 0 0.2rem $bg-base,
-            0 0 0.2rem $bg-base,
-            0 0 2rem $accent-primary,
-            0 0 0.8rem $accent-primary,
-            0 0 2.8rem $accent-secondary,
-            inset 0 0 1.3rem $accent-secondary;
+            0 0 0.2rem var(--surface-0),
+            0 0 0.2rem var(--surface-0),
+            0 0 2rem var(--brand-primary),
+            0 0 0.8rem var(--brand-primary),
+            0 0 2.8rem var(--brand-secondary),
+            inset 0 0 1.3rem var(--brand-secondary);
         }
       }
     }

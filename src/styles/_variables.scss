@@ -1,111 +1,179 @@
-@use 'sass:color';
-// ==============================
-// 🎨 GALACTICA Design Tokens
-// ==============================
+:root {
+  /* Base Canvas - Page background	Always */
+  --surface-0: #0f0f2d; /* Near Black */
 
-// --------- GENERAL COLORS -------
-$deep-cosmic-blue: #151538;
-$muted-galactic-purple: #3a2e6f;
-$warm-yellow-orange: #ffbd41;
-$near-black: #0f0f2d;
-$sea-salt: #f8f9fa;
-$french-grey: #c3c0c5;
-$smoky-black: #0b0500;
-$dark-gunmetal: #21252b;
-$jet: #2a2b2e;
-$space-indigo: #1d1d45;
-$cool-cosmic-cyan: #3bc9db;
+  /* Elevated surfaces */
+  // Cards, containers	Often
+  --surface-1: #151538; /* Deep Cosmic Blue */
+  //Hover, interactive	Medium
+  --surface-2: #1d1d45; /* Space Indigo */
 
-$jade: #00a878; // success
-$cornell-red: #bd1e1e; //error
-$orange: #fcab10; // warning
+  /* Borders */
+  --border-subtle: rgba(248, 249, 250, 0.06);
+  --border-strong: rgba(248, 249, 250, 0.12);
 
-// helper colors
-$stellar-cyan: #5be4ff;
-$aurora-green: #7dffb2;
-$supernova-orange-pink: #ff7a6f;
-$deep-magenta-pulse: #d66bff;
+  --text-primary: #f8f9fa; /* Sea Salt */
+  --text-secondary: #c3c0c5; /* French Grey */
+  --text-muted: rgba(248, 249, 250, 0.5);
 
-// --------- REUSABLE VARIABLES -------
+  --brand-primary: #ffbd41; /* Warm Yellow-Orange */
+  --brand-primary-light: #ffd166;
+  --brand-primary-dark: #e6a832;
 
-// --------- COLORS -------
-// Primary palette
-$accent-primary: $warm-yellow-orange;
-$accent-primary-dark: color.scale($accent-primary, $lightness: -25%);
-$accent-primary-light: color.scale($accent-primary, $lightness: 25%);
+  --brand-secondary: #3a2e6f; /* Muted Galactic Purple */
 
-$accent-secondary: $muted-galactic-purple;
-$accent-secondary-dark: color.scale($accent-secondary, $lightness: -25%);
-$accent-secondary-light: color.scale($accent-secondary, $lightness: 25%);
+  --ambient-cyan: #3bc9db;
 
-$accent-tertiary: $cool-cosmic-cyan;
-$accent-tertiary-dark: color.scale($accent-tertiary, $lightness: -25%);
-$accent-tertiary-light: color.scale($accent-tertiary, $lightness: 25%);
+  --success: #00a878;
+  --error: #bd1e1e;
+  --warning: #fcab10;
+  --info: #3bc9db;
 
-// Backgrounds
-$bg-base: $near-black; // primary background
-$bg-elevated: $deep-cosmic-blue; // first elevation level
-$bg-surface: $space-indigo; // second elevation level
+  --divider-subtle: rgba(248, 249, 250, 0.06);
+  --divider-default: rgba(248, 249, 250, 0.1);
+  --divider-strong: rgba(248, 249, 250, 0.16);
 
-// Neutrals
-$neutral-light: $dark-gunmetal; // form backgrounds
-$neutral-medium: $jet; // Borders, dividers
+  /* Disabled states */
+  --text-disabled: rgba(248, 249, 250, 0.35);
+  --surface-disabled: rgba(255, 255, 255, 0.04);
 
-// Accents
-$success: $jade;
-$success-light: color.scale($success, $lightness: 50%);
-$warning: $orange;
-$warning-light: color.scale($warning, $lightness: 50%);
-$error: $cornell-red;
-$error-light: color.scale($error, $lightness: 50%);
+  /* Hover overlays */
+  --overlay-hover: rgba(255, 255, 255, 0.05);
+  --overlay-pressed: rgba(255, 255, 255, 0.08);
 
-// Text
-$text-primary: $sea-salt;
-$text-secondary: $french-grey;
-$text-inverse: $muted-galactic-purple;
+  /* Focus ring */
+  --focus-ring: rgba(255, 189, 65, 0.6);
 
-// ---------- TYPOGRAPHY ----------
+  /* Shadows */
 
-// Font families
-$font-heading: 'Bebas Neue', sans-serif;
-$font-body: 'Open Sans', sans-serif;
-$font-mono: 'Roboto Mono', monospace;
+  --shadow-e1: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-e2: 0 14px 40px rgba(0, 0, 0, 0.45);
+  --shadow-e3: 0 24px 70px rgba(0, 0, 0, 0.6);
+  --shadow-ambient-purple: 0 0 60px rgba(58, 46, 111, 0.18);
+  --shadow-ambient-warm: 0 0 40px rgba(255, 189, 65, 0.25);
+  --shadow-button-primary:
+    0 10px 30px rgba(0, 0, 0, 0.45), 0 0 30px rgba(255, 189, 65, 0.35);
+  --shadow-button-app: 0 6px 18px rgba(0, 0, 0, 0.4);
+  --shadow-inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
 
-// Font sizes (rem-based scale)
-$size-xxl: 4rem; // 64px
-$size-xl: 3rem; // 48px
-$size-h1: 2rem; // ~32px
-$size-h2: 1.5rem; // ~24px
-$size-h3: 1.25rem; // ~20px
-$size-body: 1rem; // ~16px
-$size-small: 0.875rem; // ~14px
-$size-xsmall: 0.688rem; // ~11px
+/*
+Usage Rules Table
 
-// ---------- SPACING & SIZING ----------
+This is where clarity comes.
 
-// 4px baseline spacing system
-$spacing-1: 4px;
-$spacing-2: 8px;
-$spacing-3: 12px;
-$spacing-4: 16px;
-$spacing-5: 24px;
-$spacing-6: 32px;
-$spacing-7: 48px;
-$spacing-8: 64px;
+🟡 Brand Primary (Warm Yellow)
+Usage	Allowed?
+Primary CTA button	✅ Yes
+Hero CTA	✅ Yes
+Icons in navbar	❌ No
+Card backgrounds	❌ No
+Section backgrounds	❌ No
+Inline text highlight	⚠ Rare
 
-// Border radius
-$radius-sm: 6px;
-$radius-md: 12px;
-$radius-lg: 20px;
+This color must feel special.
 
-// Shadows
-$shadow-sm:
-  0 4px 20px rgba(34, 34, 34, 0.35),
-  0 0 30px rgba(83, 68, 145, 0.15);
-$shadow-md: 0 2px 8px color.scale($dark-gunmetal, $lightness: 70%);
-$shadow-lg: 0 4px 16px color.scale($dark-gunmetal, $lightness: 65%);
+🟣 Brand Secondary (Purple)
+Usage	Allowed?
+Glow behind hero	✅ Yes
+Background gradient subtle	✅ Yes
+Buttons	❌ No
+Text blocks	❌ No
 
-// ---------- TRANSITIONS ----------
-$transition-fast: 0.2s ease-in-out;
-$transition-normal: 0.3s ease-in-out;
-$transition-slow: 0.5s ease-in-out;
+Purple is atmosphere, not UI.
+
+🟢 Semantic Colors
+Usage	Allowed?
+Success alert	✅ Yes
+Error form message	✅ Yes
+Decorative glow	❌ No
+Section design accent	❌ No
+
+Semantics must remain functional.
+
+Dividers
+
+Use:
+--divider-subtle for section separation
+--divider-default for card borders
+--divider-strong for interactive outlines
+
+Never use:
+Solid grey borders.
+
+Disabled Text
+
+Use:
+--text-disabled
+
+Never use:
+Brand colors at low opacity for disabled.
+
+Disabled Buttons
+
+Use:
+--surface-disabled
+
+remove glow
+
+reduce text opacity
+
+Never:
+Just reduce whole button opacity to 0.5.
+That looks cheap.
+
+Elevation Shadows (Structural)
+
+These are your main depth layers.
+
+🟢 E1 — Card Surface (default)
+
+Used for:
+Cards, panels, containers.
+
+🟣 E2 — Interactive / Hover
+
+Used for:
+Hover cards, dropdowns, secondary elevation.
+
+🟡 E3 — Floating / Modal
+
+Used for:
+Modals, command palettes, hero CTAs.
+
+Ambient Shadows (Subtle Atmosphere)
+
+These are optional subtle color-tinted shadows.
+
+Used rarely.
+
+Purple ambient
+Use:
+Hero panel
+Special cards
+
+Warm ambient
+Use:
+Primary CTA only.
+
+Inner Highlight (Premium Detail)
+
+Optional but beautiful for dark cards:
+Use on:
+Cards
+Buttons
+Modals
+
+Usage Discipline (Important)
+
+Most UI → shadow-e1
+
+Hover states → shadow-e2
+
+Modals → shadow-e3
+
+Primary CTA → button shadow
+
+Hero special → ambient purple
+
+*/

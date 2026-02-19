@@ -60,7 +60,7 @@ const SidebarNav: React.FC = () => {
         <GalIcon
           icon={isSidebarCollapsed ? HiChevronDoubleRight : HiChevronDoubleLeft}
           size={18}
-          color={getCssVar('--accent-primary')}
+          color={getCssVar('--brand-primary')}
         />
       </button>
     </nav>

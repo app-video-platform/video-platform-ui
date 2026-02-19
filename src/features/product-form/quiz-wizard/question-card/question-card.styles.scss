@@ -1,7 +1,7 @@
 @use '../../../../styles/index.scss' as *;
 
 .question-card {
-  border: 1px solid $accent-secondary;
+  border: 1px solid var(--brand-secondary);
   border-radius: 16px;
   background: transparent;
   box-shadow: 0 1px 2px rgba(198, 198, 198, 0.02);
@@ -10,7 +10,7 @@
 
   .question-index {
     position: absolute;
-    background-color: $bg-elevated;
+    background-color: var(--surface-1);
     padding: 0 $spacing-3;
     top: -10px;
     left: 30px;
@@ -64,7 +64,7 @@
   .answers-label {
     font-size: 12px;
     font-weight: 500;
-    color: $text-secondary;
+    color: var(--text-secondary);
     margin-top: $spacing-4;
   }
 

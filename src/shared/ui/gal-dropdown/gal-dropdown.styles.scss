@@ -10,7 +10,7 @@
     left: 0;
     z-index: 0;
     width: 150px;
-    background-color: $bg-surface;
+    background-color: var(--surface-2);
     border-radius: $radius-md;
     display: flex;
     flex-direction: column;

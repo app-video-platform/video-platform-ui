@@ -1,0 +1,48 @@
+@use './typography' as *;
+@use './variables' as *;
+
+body {
+  font-family: $font-body;
+  color: var(--text-primary);
+  background-image: linear-gradient(
+    145deg,
+    hsl(240deg 50% 12%) 0%,
+    hsl(240deg 47% 13%) 13%,
+    hsl(240deg 45% 15%) 23%,
+    hsl(240deg 43% 16%) 33%,
+    hsl(240deg 42% 17%) 40%,
+    hsl(240deg 41% 18%) 47%,
+    hsl(240deg 41% 19%) 53%,
+    hsl(240deg 41% 19%) 58%,
+    hsl(240deg 42% 18%) 62%,
+    hsl(240deg 43% 17%) 67%,
+    hsl(240deg 43% 17%) 72%,
+    hsl(240deg 44% 16%) 79%,
+    hsl(240deg 45% 15%) 100%
+  );
+  line-height: 1.6;
+}
+
+a,
+Link {
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: all 0.2s ease-in;
+  font-weight: 500;
+  position: relative;
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}

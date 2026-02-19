@@ -2,6 +2,12 @@
 // @import 'mixins';
 // @import 'global';
 
-@forward 'variables';
-@forward 'mixins';
+@forward 'base';
 @forward 'global';
+@forward 'mixins';
+@forward 'radius';
+@forward 'reset';
+@forward 'spacing';
+@forward 'transitions';
+@forward 'typography';
+@forward 'variables';

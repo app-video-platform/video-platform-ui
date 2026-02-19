@@ -10,12 +10,12 @@
   align-items: center;
   justify-content: flex-start;
   gap: $spacing-5;
-  background: rgba($color: $bg-elevated, $alpha: 0.4);
+  background: rgba($color: var(--surface-1), $alpha: 0.4);
   border-radius: $radius-md;
   border: 2px solid transparent;
   background:
-    linear-gradient($bg-surface, $bg-surface) padding-box,
-    linear-gradient(135deg, $bg-base, $accent-secondary) border-box;
+    linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
+    linear-gradient(135deg, var(--surface-0), var(--brand-secondary)) border-box;
 
   .product-summary-header {
     display: flex;
@@ -25,7 +25,7 @@
     &__type-pill {
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba($muted-galactic-purple, 0.6);
+      background: rgba(var(--brand-secondary), 0.6);
       font-size: 12px;
     }
 

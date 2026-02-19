@@ -1,4 +1,4 @@
-@use '../../styles/variables' as *;
+@use '../../styles/index' as *;
 
 .galactica-home-nav {
   display: flex;
@@ -7,11 +7,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 5px 20px;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-e1);
   border: 2px solid transparent;
   background:
-    linear-gradient($bg-surface, $bg-surface) padding-box,
-    linear-gradient(175deg, $bg-base, $accent-secondary) border-box;
+    linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
+    linear-gradient(175deg, var(--surface-0), var(--brand-secondary)) border-box;
 
   .logo-container {
     display: flex;

@@ -9,13 +9,13 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-size: 18px;
-    color: $text-secondary;
+    color: var(--text-secondary);
     margin-bottom: 8px;
   }
 
   &__subtitle {
     font-size: 14px;
-    color: rgba($text-secondary, 0.85);
+    color: rgba(var(--text-secondary), 0.85);
     max-width: 440px;
     margin: 0 auto 32px;
   }
@@ -36,7 +36,7 @@
   cursor: pointer;
   padding: 0;
   text-align: center;
-  color: $text-primary;
+  color: var(--text-primary);
 
   transition:
     transform 0.25s ease,
@@ -56,10 +56,10 @@
     background:
       radial-gradient(circle at 30% 20%, #ffffff22 0, transparent 55%),
       radial-gradient(circle at 70% 80%, #3bc9db33 0, transparent 55%),
-      $bg-elevated;
+      var(--surface-1);
     box-shadow:
-      0 0 30px rgba($accent-secondary, 0.45),
-      0 0 60px rgba($bg-base, 0.8);
+      0 0 30px rgba(var(--brand-secondary), 0.45),
+      0 0 60px rgba(var(--surface-0), 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -89,7 +89,7 @@
 
   &__icon {
     font-size: 32px;
-    filter: drop-shadow(0 0 10px rgba($sea-salt, 0.5));
+    filter: drop-shadow(0 0 10px rgba(var(--text-primary), 0.5));
   }
 
   &__label-block {
@@ -106,7 +106,7 @@
 
   &__description {
     font-size: 12px;
-    color: rgba($french-grey, 0.8);
+    color: rgba(var(--text-secondary), 0.8);
   }
 
   &:hover {
@@ -115,8 +115,8 @@
 
     .product-type-option__orb {
       box-shadow:
-        0 0 40px rgba($muted-galactic-purple, 0.7),
-        0 0 80px rgba($warm-yellow-orange, 0.35);
+        0 0 40px rgba(var(--brand-secondary), 0.7),
+        0 0 80px rgba(var(--brand-primary), 0.35);
       transform: scale(1.04);
     }
   }
@@ -124,17 +124,17 @@
   &--selected {
     .product-type-option__orb {
       box-shadow:
-        0 0 45px rgba($warm-yellow-orange, 0.85),
-        0 0 100px rgba($muted-galactic-purple, 0.8);
+        0 0 45px rgba(var(--brand-primary), 0.85),
+        0 0 100px rgba(var(--brand-secondary), 0.8);
       transform: scale(1.08);
       background:
         radial-gradient(circle at 20% 20%, #ffbd4133 0, transparent 55%),
         radial-gradient(circle at 80% 80%, #3bc9db44 0, transparent 55%),
-        $deep-cosmic-blue;
+        var(--surface-1);
     }
 
     .product-type-option__label {
-      color: $warm-yellow-orange;
+      color: var(--brand-primary);
     }
   }
 }

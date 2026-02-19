@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $accent-secondary;
+  background-color: var(--brand-secondary);
   border-radius: 50%;
 
   &__large {

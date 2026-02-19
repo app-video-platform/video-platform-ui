@@ -2,7 +2,7 @@
 
 .section-editor {
   margin-bottom: $spacing-8;
-  // background-color: $bg-elevated;
+  // background-color: var(--surface-1);
   padding: 0 $spacing-5 $spacing-5;
   border-radius: $radius-md;
   position: relative;
@@ -17,13 +17,13 @@
     .divider-title {
       font-size: 14px;
       font-family: $font-heading;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     .divider-line {
       height: 1px;
       flex: 1;
-      background-color: $text-secondary;
+      background-color: var(--text-secondary);
     }
   }
 

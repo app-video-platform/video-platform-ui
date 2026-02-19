@@ -135,9 +135,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
                   icon={tab.icon}
                   size={16}
                   color={getCssVar(
-                    activeTab === tab.id
-                      ? '--accent-primary'
-                      : '--text-primary',
+                    activeTab === tab.id ? '--brand-primary' : '--text-primary',
                   )}
                 />
                 <span>{tab.label}</span>

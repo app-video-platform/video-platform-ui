@@ -1,7 +1,7 @@
 @use '../../../../styles/index.scss' as *;
 
 .lesson-editor {
-  background-color: $bg-elevated;
+  background-color: var(--surface-1);
   border-radius: 10px;
   padding: 30px;
   margin-bottom: 10px;

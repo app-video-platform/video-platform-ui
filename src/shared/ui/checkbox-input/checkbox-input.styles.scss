@@ -30,7 +30,7 @@
     width: 18px;
     height: 18px;
     border-radius: 3px;
-    border: 2px solid $text-secondary;
+    border: 2px solid var(--text-secondary);
     position: relative;
     flex-shrink: 0;
     transition:
@@ -40,21 +40,21 @@
 
   // When checked
   &.checked .checkbox-box {
-    border-color: $accent-primary;
-    box-shadow: 0 0 10px rgba($accent-primary, 0.5);
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 10px rgba(var(--brand-primary), 0.5);
 
     &::after {
       content: '✓';
       position: absolute;
       top: -6px;
       left: 2px;
-      color: $accent-primary;
+      color: var(--brand-primary);
     }
   }
 
   .checkbox-label {
     font-size: 14px;
-    color: $text-primary;
+    color: var(--text-primary);
     font-weight: 500;
   }
 }

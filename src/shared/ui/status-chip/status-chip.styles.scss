@@ -1,26 +1,26 @@
-@use '../../../styles/variables' as *;
+@use '../../../styles/index' as *;
 
 .status-chip {
   padding: $spacing-2;
   display: flex;
-  background-color: $bg-elevated;
+  background-color: var(--surface-1);
   border-radius: $radius-md;
   text-transform: uppercase;
   font-size: 12px;
   width: 100px;
   font-weight: 700;
-  color: $text-secondary;
+  color: var(--text-secondary);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 35px;
 
   &__draft {
-    background-color: $accent-secondary;
+    background-color: var(--brand-secondary);
   }
 
   &__published {
-    color: $text-primary;
-    background-color: $success;
+    color: var(--text-primary);
+    background-color: var(--success);
   }
 }
