@@ -48,7 +48,7 @@ const AppRouter: React.FC = () => {
       />
 
       {/* /app englobes the whole app part (public + protected routes) */}
-      <Route path="/app" element={<AppLayout />}>
+      <Route path="/" element={<AppLayout />}>
         {/* Public routes under /app */}
         <Route path="explore" element={<ExplorePage />} />
         <Route path="explore/search" element={<SearchResultsPage />} />

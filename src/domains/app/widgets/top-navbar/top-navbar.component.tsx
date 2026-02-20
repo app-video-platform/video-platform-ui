@@ -68,14 +68,14 @@ const TopNavbar: React.FC = () => {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/auth/login')}
           >
             Log In
           </Button>
           <Button
             type="button"
             variant="primary"
-            onClick={() => navigate('/signup')}
+            onClick={() => navigate('/auth/signup')}
           >
             Register
           </Button>
