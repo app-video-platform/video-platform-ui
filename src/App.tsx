@@ -1,190 +1,42 @@
 import React from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
 import RoutesDev from './devtools/__routes-dev';
-import { About, Contact, Home, Pricing } from 'domains/marketing/pages';
-import {
-  EmailSent,
-  ForgotPassword,
-  SignIn,
-  SignUp,
-  VerifyEmail,
-} from 'domains/auth/pages';
-import {
-  AdminPage,
-  AllProductsTab,
-  AppLayout,
-  Cart,
-  ConsultationTab,
-  CoursesTab,
-  CreatorDashboard,
-  DownloadPackagesTab,
-  ExplorePage,
-  GalacticaHome,
-  LibraryPage,
-  MarketingPage,
-  Onboarding,
-  ProductForm,
-  ProductPage,
-  ProductsList,
-  SalesPage,
-  SearchResultsPage,
-  SettingsPage,
-  StorefrontPage,
-  UserPagePreview,
-  WishlistTab,
-} from 'domains/app/pages';
 import { DevDashboard, NotFoundPage, UnauthorizedPage } from '@shared/pages';
-import { AppInitializer, ProtectedRoute } from 'core/providers';
-import { UserRole } from 'core/api/models';
-import { selectAuthUser } from 'core/store/auth-store';
-import { Navigation } from 'domains/marketing/widgets/nav';
+import { AppInitializer } from 'core/providers';
+import { AppRouter } from '@domains/app/routes';
+import { AuthRouter } from '@domains/auth/routes';
+import { MarketingRouter } from '@domains/marketing/routes';
 
-const App = () => {
-  const user = useSelector(selectAuthUser);
+const App = () => (
+  <AppInitializer>
+    <Toaster position="top-center" richColors closeButton />
 
-  return (
-    <AppInitializer>
-      <Toaster position="top-center" richColors closeButton />
-      <Routes>
-        <Route path="/" element={<Navigation />}>
-          <Route index element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path="contact" element={<Contact />} />
-          <Route path="pricing" element={<Pricing />} />
-        </Route>
-        <Route path="signup" element={<SignUp />} />
-        <Route path="login" element={<SignIn />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/email-sent" element={<EmailSent />} />
-        <Route path="*" element={<NotFoundPage />} />
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/dev-dashboard" element={<DevDashboard />} />
+    <Routes>
+      {/* App domain */}
+      <Route path="/app/*" element={<AppRouter />} />
+      {/* Onboarding (root) is defined inside AppRouter as absolute /onboarding */}
+      <Route path="/onboarding" element={<AppRouter />} />
 
-        {process.env.NODE_ENV === 'development' && (
-          <Route path="__routes-dev" element={<RoutesDev />} />
-        )}
-        {/* <Route path="onboarding" element={<Onboarding />} /> */}
+      {/* Auth domain */}
+      <Route path="/auth/*" element={<AuthRouter />} />
 
-        {/* Public storefront and explore */}
-        {/* <Route path="store/:creatorId" element={<StorefrontPage />} />
-        <Route path="app/explore" element={<ExplorePage />} />
-        <Route path="app/explore/search" element={<SearchResultsPage />} />
-        <Route path="product/:id/:type" element={<ProductPage />} /> */}
+      {/* Shared/system routes */}
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <Route path="/dev-dashboard" element={<DevDashboard />} />
 
-        <Route
-          path="onboarding"
-          element={
-            <ProtectedRoute
-              allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}
-            >
-              <Onboarding />
-            </ProtectedRoute>
-          }
-        />
+      {process.env.NODE_ENV === 'development' && (
+        <Route path="/__routes-dev" element={<RoutesDev />} />
+      )}
 
-        {/* <Route path="onboarding" element={<Onboarding />} /> */}
+      {/* Marketing domain */}
+      <Route path="/*" element={<MarketingRouter />} />
 
-        {/* /app englobes the whole app part of the project (restricted + visitors allowed) */}
-        <Route path="app/" element={<AppLayout />}>
-          {/* These are a series of routes under /app which are not protected (allowed for visitors as well) */}
-          <Route path="explore" element={<ExplorePage />} />
-          <Route path="explore/search" element={<SearchResultsPage />} />
-          <Route path="product/:id/:type" element={<ProductPage />} />
-          <Route path="store/:creatorId" element={<StorefrontPage />} />
-
-          {/* Role-based home: creators see dashboard, users see library */}
-          <Route
-            element={
-              <ProtectedRoute
-                allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}
-              >
-                <Outlet />
-              </ProtectedRoute>
-            }
-          >
-            <Route
-              index
-              element={
-                user?.roles.includes(UserRole.CREATOR) ? (
-                  <CreatorDashboard />
-                ) : user?.roles.includes(UserRole.ADMIN) ? (
-                  <AdminPage />
-                ) : (
-                  <GalacticaHome />
-                )
-              }
-            />
-            {/* Creator-only product management */}
-            <Route
-              path="products/"
-              element={
-                <ProtectedRoute
-                  allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}
-                >
-                  {/* <ProductsLayout /> */}
-                  <Outlet />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<ProductsList />} />
-              <Route path="create" element={<ProductForm />} />
-              <Route path="edit/:type/:id" element={<ProductForm />} />
-            </Route>
-            <Route
-              path="sales"
-              element={
-                <ProtectedRoute
-                  allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}
-                >
-                  <SalesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="marketing"
-              element={
-                <ProtectedRoute
-                  allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}
-                >
-                  <MarketingPage />
-                </ProtectedRoute>
-              }
-            />
-            {/* User-only library */}
-            <Route
-              path="library"
-              element={
-                <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
-                  <LibraryPage />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="all-products" element={<AllProductsTab />} />
-              <Route path="my-courses" element={<CoursesTab />} />
-              <Route
-                path="my-download-packages"
-                element={<DownloadPackagesTab />}
-              />
-              <Route path="my-consultation" element={<ConsultationTab />} />
-              <Route path="my-wishlist" element={<WishlistTab />} />
-            </Route>
-            <Route path="settings" element={<SettingsPage />} />
-
-            <Route path="my-page-preview" element={<UserPagePreview />} />
-
-            <Route path="cart" element={<Cart />} />
-
-            {/* Fallback inside /app */}
-            <Route path="*" element={<Navigate to="/app" replace />} />
-          </Route>
-        </Route>
-      </Routes>
-    </AppInitializer>
-  );
-};
+      {/* Fallback */}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  </AppInitializer>
+);
 
 export default App;
