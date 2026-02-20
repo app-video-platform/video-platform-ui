@@ -18,12 +18,23 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.mdx'],
     plugins: [
-      new TsconfigPathsPlugin({ configFile: path.resolve(__dirname, 'tsconfig.json') }),
-    ]
+      new TsconfigPathsPlugin({
+        configFile: path.resolve(__dirname, 'tsconfig.json'),
+      }),
+    ],
   },
   devServer: {
     historyApiFallback: true,
-    static: './dist',
+    static: [
+      {
+        directory: path.resolve(__dirname, 'public'),
+        publicPath: '/',
+      },
+      {
+        directory: path.resolve(__dirname, 'dist'),
+        publicPath: '/',
+      },
+    ],
   },
   module: {
     rules: [
@@ -71,13 +82,13 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.REACT_APP_BASE_PATH': JSON.stringify(
-        process.env.REACT_APP_BASE_PATH
+        process.env.REACT_APP_BASE_PATH,
       ),
       'process.env.REACT_APP_GOOGLE_CLIENT_ID': JSON.stringify(
-        process.env.REACT_APP_GOOGLE_CLIENT_ID
+        process.env.REACT_APP_GOOGLE_CLIENT_ID,
       ),
       'process.env.REACT_APP_USE_MOCKS': JSON.stringify(
-        process.env.REACT_APP_USE_MOCKS
+        process.env.REACT_APP_USE_MOCKS,
       ),
       'process.env.PUBLIC_URL': JSON.stringify(''),
     }),

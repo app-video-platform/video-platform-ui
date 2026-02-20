@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,18 +16,29 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "paths": {
-      "@api/*": ["api/*"],
-      "@components": ["components/index.ts"],
-      "@components/*": ["components/*"],
-      "@features/*": ["features/*"],
-      "@pages/*": ["pages/*"],
+      "@api/constants": ["core/constants/index.ts"],
+      "@api/constants/*": ["core/constants/*"],
+      "@api/providers": ["core/providers/index.ts"],
+      "@api/providers/*": ["core/providers/*"],
+      "@api/*": ["core/api/*"],
+      "@core/*": ["core/*"],
+      "@domains/*": ["domains/*"],
+      "@components": ["domains/app/components/index.ts"],
+      "@components/*": ["domains/app/components/*"],
+      "@features/*": ["domains/app/features/*"],
+      "@pages/*": [
+        "domains/app/pages/*",
+        "domains/auth/pages/*",
+        "domains/marketing/pages/*",
+        "shared/pages/*"
+      ],
       "@shared/*": ["shared/*"],
-      "@store/*": ["store/*"],
-      "@widgets/*": ["widgets/*"]
+      "@store/*": ["core/store/*"],
+      "@widgets/*": ["domains/app/widgets/*", "domains/marketing/widgets/*"],
+      "core/*": ["core/*"],
+      "domains/*": ["domains/*"],
+      "shared/*": ["shared/*"]
     }
   },
-  "include": [
-    "src",
-    "src/global.d.ts"
-  ]
+  "include": ["src", "src/global.d.ts"]
 }

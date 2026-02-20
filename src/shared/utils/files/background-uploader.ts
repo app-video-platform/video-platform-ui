@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-import { CourseProductSection } from '@api/models';
+import { CourseProductSection } from 'core/api/models';
 import { uploadFileToSection } from './upload-file';
 
 interface IFilesWithSection {

@@ -4,14 +4,14 @@ import { useSelector } from 'react-redux';
 import { Toaster } from 'sonner';
 
 import RoutesDev from './devtools/__routes-dev';
-import { About, Contact, Home, Pricing } from '@pages/marketing-site';
+import { About, Contact, Home, Pricing } from 'domains/marketing/pages';
 import {
   EmailSent,
   ForgotPassword,
   SignIn,
   SignUp,
   VerifyEmail,
-} from '@pages/auth';
+} from 'domains/auth/pages';
 import {
   AdminPage,
   AllProductsTab,
@@ -35,12 +35,12 @@ import {
   StorefrontPage,
   UserPagePreview,
   WishlistTab,
-} from '@pages/app';
-import { DevDashboard, NotFoundPage, UnauthorizedPage } from '@pages/shared';
-import { AppInitializer, ProtectedRoute } from '@api/providers';
-import { UserRole } from '@api/models';
-import { selectAuthUser } from '@store/auth-store';
-import { Navigation } from '@widgets/nav';
+} from 'domains/app/pages';
+import { DevDashboard, NotFoundPage, UnauthorizedPage } from '@shared/pages';
+import { AppInitializer, ProtectedRoute } from 'core/providers';
+import { UserRole } from 'core/api/models';
+import { selectAuthUser } from 'core/store/auth-store';
+import { Navigation } from 'domains/marketing/widgets/nav';
 
 const App = () => {
   const user = useSelector(selectAuthUser);

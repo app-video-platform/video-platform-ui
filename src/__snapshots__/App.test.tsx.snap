@@ -2,6 +2,13 @@
 
 exports[`App Component matches snapshot after navigation 1`] = `
 <div>
+  <section
+    aria-atomic="false"
+    aria-label="Notifications alt+T"
+    aria-live="polite"
+    aria-relevant="additions text"
+    tabindex="-1"
+  />
   <nav
     class="website-navbar"
   >
@@ -102,7 +109,7 @@ exports[`App Component matches snapshot after navigation 1`] = `
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
         </p>
         <button
-          class="vp-btn vp-btn__primary vp-btn__square hero-cta"
+          class="vp-btn vp-btn__marketing-primary vp-btn__square hero-cta"
           type="button"
         >
           Launch Now

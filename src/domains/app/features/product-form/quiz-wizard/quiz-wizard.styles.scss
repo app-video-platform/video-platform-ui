@@ -1,0 +1,33 @@
+@use '../../../../../styles/index.scss' as *;
+
+.quiz-wizard {
+  // max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  gap: 1.5rem;
+
+  .scores-row {
+    display: inline-flex;
+    gap: $spacing-4;
+
+    .score-input {
+      width: 200px;
+    }
+  }
+
+  .score-radios {
+    display: inline-flex;
+    flex-direction: row;
+    width: 100%;
+
+    .radio {
+      width: 50%;
+    }
+  }
+
+  .questions {
+    display: grid;
+    gap: $spacing-4;
+  }
+}

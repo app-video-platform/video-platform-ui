@@ -1,0 +1,15 @@
+@use '../../../../../styles/index.scss' as *;
+
+.basic-info {
+  padding: 0 $spacing-2;
+
+  .product-type-selectors {
+    margin: $spacing-5 0;
+
+    .type-selectors-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: $spacing-1;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ProductStatus } from '@api/models';
+import { ProductStatus } from 'core/api/models';
 
 import './status-chip.styles.scss';
 

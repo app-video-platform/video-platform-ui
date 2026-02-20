@@ -2,7 +2,7 @@ import {
   getPresignedUrlAPI,
   uploadToPresignedUrl,
   confirmFileUploadAPI,
-} from '@api/services';
+} from 'core/api/services';
 
 export const uploadFileToSection = async (sectionId: string, file: File) => {
   try {

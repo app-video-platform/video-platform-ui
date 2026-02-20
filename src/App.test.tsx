@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 import App from './App';
-import { UserRole } from '@api/models';
+import { UserRole } from 'core/api/models';
 
 // Define a dummy thunk middleware with minimal typing (using any to bypass type conflicts)
 const dummyThunk =

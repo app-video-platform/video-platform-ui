@@ -6,6 +6,8 @@ import './button.styles.scss';
 export type ButtonVariant =
   | 'primary'
   | 'secondary'
+  | 'marketing-primary'
+  | 'marketing-secondary'
   | 'tertiary'
   | 'outline'
   | 'danger'

@@ -1,0 +1,28 @@
+@use '../../../../../styles/index.scss' as *;
+
+.social-row {
+  display: inline-flex;
+  width: 100%;
+  align-items: flex-end;
+
+  &.margin {
+    margin-top: $spacing-4;
+  }
+
+  .social-link {
+    width: 350px;
+
+    input {
+      text-align: right;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  .social-link-input {
+    input {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+}

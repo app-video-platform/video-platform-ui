@@ -1,4 +1,4 @@
-import { UserRole } from '@api/models';
+import { UserRole } from 'core/api/models';
 
 export const mockInitialState = {
   auth: {
