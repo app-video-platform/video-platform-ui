@@ -2,9 +2,9 @@ import React from 'react';
 
 import { Input, Button, Textarea, CheckboxInput } from '@shared/ui';
 
-import './gal-contact-form.styles.scss';
+import './contact-form.styles.scss';
 
-const GalContactForm: React.FC = () => {
+const ContactForm: React.FC = () => {
   const [formData, setFormData] = React.useState({
     firstName: '',
     lastName: '',
@@ -87,4 +87,4 @@ const GalContactForm: React.FC = () => {
   );
 };
 
-export default GalContactForm;
+export default ContactForm;

@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 // or '@storybook/react-vite' if using Vite
-import GalContactForm from './gal-contact-form.component';
+import ContactForm from './contact-form.component';
 
-const meta: Meta<typeof GalContactForm> = {
-  title: 'Components/GalContactForm',
-  component: GalContactForm,
+const meta: Meta<typeof ContactForm> = {
+  title: 'Components/ContactForm',
+  component: ContactForm,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -18,16 +18,16 @@ const meta: Meta<typeof GalContactForm> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof GalContactForm>;
+type Story = StoryObj<typeof ContactForm>;
 
 export const Default: Story = {
-  render: () => <GalContactForm />,
+  render: () => <ContactForm />,
 };
 
 export const Prefilled: Story = {
   render: () => (
     <div style={{ maxWidth: 600 }}>
-      <GalContactForm />
+      <ContactForm />
     </div>
   ),
   parameters: {

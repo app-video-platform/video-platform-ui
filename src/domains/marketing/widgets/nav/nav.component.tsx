@@ -1,15 +1,10 @@
 import React from 'react';
-import { Fragment } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import { Button } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
-import {
-  GalNavDropdown,
-  GalUserDropdown,
-  GalFooter,
-} from 'domains/app/components';
+import { GalNavDropdown, GalUserDropdown } from 'domains/app/components';
 
 import './nav.styles.scss';
 
@@ -22,59 +17,55 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <Fragment>
-      <nav className="website-navbar">
-        <div className="navbar-content">
-          <div className="logo-container"></div>
-          <ul className="nav-link-list">
-            <li>
-              <Link to={'/'}>Home</Link>
-            </li>
-            <li>
-              <Link to={'/about'}>About</Link>
-            </li>
-            <li>
-              <Link to={'/pricing'}>Pricing</Link>
-            </li>
-            <GalNavDropdown />
+    <nav className="website-navbar">
+      <div className="navbar-content">
+        <div className="logo-container"></div>
+        <ul className="nav-link-list">
+          <li>
+            <Link to={'/'}>Home</Link>
+          </li>
+          <li>
+            <Link to={'/about'}>About</Link>
+          </li>
+          <li>
+            <Link to={'/pricing'}>Pricing</Link>
+          </li>
+          <GalNavDropdown />
 
-            <li>
-              <Link to={'/contact'}>Contact Us</Link>
-            </li>
+          <li>
+            <Link to={'/contact'}>Contact Us</Link>
+          </li>
+        </ul>
+        <div className="user-buttons">
+          <ul className="nav-link-list">
+            {user ? (
+              <GalUserDropdown />
+            ) : (
+              <ul className="nav-link-list">
+                <li>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => handleRedirect('/signin')}
+                  >
+                    Sign In
+                  </Button>
+                </li>
+                <li>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => handleRedirect('/signup')}
+                  >
+                    Register
+                  </Button>
+                </li>
+              </ul>
+            )}
           </ul>
-          <div className="user-buttons">
-            <ul className="nav-link-list">
-              {user ? (
-                <GalUserDropdown />
-              ) : (
-                <ul className="nav-link-list">
-                  <li>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => handleRedirect('/signin')}
-                    >
-                      Sign In
-                    </Button>
-                  </li>
-                  <li>
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={() => handleRedirect('/signup')}
-                    >
-                      Register
-                    </Button>
-                  </li>
-                </ul>
-              )}
-            </ul>
-          </div>
         </div>
-      </nav>
-      <Outlet />
-      <GalFooter />
-    </Fragment>
+      </div>
+    </nav>
   );
 };
 

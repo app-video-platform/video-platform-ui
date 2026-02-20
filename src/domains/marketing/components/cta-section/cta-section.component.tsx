@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@shared/ui';
 
-import './gal-cta-section.styles.scss';
+import './cta-section.styles.scss';
 
-interface GalCtaSectionProps {
+interface CtaSectionProps {
   headerText: string;
   descriptionText: string;
 }
 
-const GalCtaSection: React.FC<GalCtaSectionProps> = ({
+const CtaSection: React.FC<CtaSectionProps> = ({
   headerText,
   descriptionText,
 }) => {
@@ -44,4 +44,4 @@ const GalCtaSection: React.FC<GalCtaSectionProps> = ({
   );
 };
 
-export default GalCtaSection;
+export default CtaSection;

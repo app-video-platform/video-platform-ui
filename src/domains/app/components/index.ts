@@ -1,7 +1,4 @@
 export * from './gal-box-selector';
-export * from './gal-contact-form';
-export * from './gal-cta-section';
-export * from './gal-footer';
 export * from './gal-google-sign-in-button';
 export * from './gal-location-search';
 export * from './gal-nav-dropdown';

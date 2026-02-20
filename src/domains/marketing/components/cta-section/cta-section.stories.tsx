@@ -2,11 +2,11 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 // or '@storybook/react-vite' if using Vite
 import { MemoryRouter } from 'react-router-dom';
-import GalCtaSection from './gal-cta-section.component';
+import CtaSection from './cta-section.component';
 
-const meta: Meta<typeof GalCtaSection> = {
-  title: 'Components/GalCtaSection',
-  component: GalCtaSection,
+const meta: Meta<typeof CtaSection> = {
+  title: 'Components/CtaSection',
+  component: CtaSection,
   tags: ['autodocs'],
   decorators: [
     (Story) => (
@@ -36,7 +36,7 @@ const meta: Meta<typeof GalCtaSection> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof GalCtaSection>;
+type Story = StoryObj<typeof CtaSection>;
 
 export const Default: Story = {};
 

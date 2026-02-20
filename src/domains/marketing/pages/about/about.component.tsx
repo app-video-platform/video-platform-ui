@@ -2,7 +2,7 @@ import React from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
 
 import { GalIcon } from '@shared/ui';
-import { GalCtaSection } from 'domains/app/components';
+import { CtaSection } from '@domains/marketing/components';
 
 import './about.styles.scss';
 
@@ -108,7 +108,7 @@ const About: React.FC = () => (
       </div>
     </section>
 
-    <GalCtaSection
+    <CtaSection
       headerText="Start building with us"
       descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
       Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor."

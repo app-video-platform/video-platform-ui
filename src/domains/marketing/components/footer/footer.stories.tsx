@@ -2,11 +2,11 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 // or '@storybook/react-vite' if using Vite
 import { MemoryRouter } from 'react-router-dom';
-import GalFooter from './gal-footer.component';
+import Footer from './footer.component';
 
-const meta: Meta<typeof GalFooter> = {
-  title: 'Components/GalFooter',
-  component: GalFooter,
+const meta: Meta<typeof Footer> = {
+  title: 'Components/Footer',
+  component: Footer,
   tags: ['autodocs'],
   decorators: [
     (Story) => (
@@ -29,7 +29,7 @@ const meta: Meta<typeof GalFooter> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof GalFooter>;
+type Story = StoryObj<typeof Footer>;
 
 export const Default: Story = {};
 
@@ -37,7 +37,7 @@ export const DarkModePreview: Story = {
   render: () => (
     <div style={{ background: '#1c1c1c', color: '#fff', paddingTop: '2rem' }}>
       <MemoryRouter>
-        <GalFooter />
+        <Footer />
       </MemoryRouter>
     </div>
   ),

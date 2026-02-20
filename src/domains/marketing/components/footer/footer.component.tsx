@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import './gal-footer.styles.scss';
+import './footer.styles.scss';
 
-const GalFooter: React.FC = () => (
+const Footer: React.FC = () => (
   <div className="gal-footer">
     <div className="footer-content">
       <div className="logo-container"></div>
@@ -76,4 +76,4 @@ const GalFooter: React.FC = () => (
   </div>
 );
 
-export default GalFooter;
+export default Footer;

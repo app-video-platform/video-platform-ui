@@ -1,9 +1,13 @@
+@use '../../../../styles/index.scss' as *;
+
 .website-navbar {
   width: 100%;
-  // max-width: 1140px;
+  max-width: $bp-desktop;
   height: 80px;
-  // background: aliceblue;
+  justify-self: center;
   padding: 0 20px;
+  margin: auto;
+  position: absolute;
 
   .navbar-content {
     display: flex;
@@ -12,18 +16,18 @@
     max-width: 1480px;
     margin: auto;
     height: 100%;
+
+    .logo-container {
+      width: 150px;
+      background-color: aquamarine;
+      height: 50px;
+    }
+
+    .nav-link-list {
+      display: flex;
+      list-style: none;
+      gap: 30px;
+      font-weight: 600;
+    }
   }
-}
-
-.logo-container {
-  width: 150px;
-  background-color: aquamarine;
-  height: 50px;
-}
-
-.nav-link-list {
-  display: flex;
-  list-style: none;
-  gap: 30px;
-  font-weight: 600;
 }

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
+import { MarketingLayout } from '../layout';
 import { About, Home, Pricing, Contact } from '../pages';
-import { Navigation } from '../widgets';
 
 const MarketingRouter: React.FC = () => (
   <Routes>
-    <Route path="/" element={<Navigation />}>
+    <Route path="/" element={<MarketingLayout />}>
       <Route index element={<Home />} />
       <Route path="about" element={<About />} />
       <Route path="pricing" element={<Pricing />} />
