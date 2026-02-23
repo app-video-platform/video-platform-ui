@@ -26,7 +26,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // 1) If we know the user is explicitly not logged in, redirect them now
   if (isUserLoggedIn === false && !authLoading) {
-    return <Navigate to="/signin" replace />;
+    return <Navigate to="/auth/login" replace />;
   }
 
   // 2) If we know they _are_ logged in and we know their roles, but none match, redirect
