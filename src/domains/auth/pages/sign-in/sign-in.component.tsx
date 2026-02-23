@@ -94,7 +94,7 @@ const SignIn: React.FC = () => {
         <div className="forgot-password-button-container">
           <button
             className="forgot-password-btn"
-            onClick={() => navigate('/forgot-password')}
+            onClick={() => navigate('/auth/forgot-password')}
           >
             I forgot my password
           </button>

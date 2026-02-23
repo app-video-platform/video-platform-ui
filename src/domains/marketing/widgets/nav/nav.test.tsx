@@ -82,22 +82,22 @@ describe('Navigation component', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('calls navigate with "/signup" when Register button is clicked', () => {
+  it('calls navigate with "/auth/signup" when Register button is clicked', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
     render(<Navigation />);
 
     const registerButton = screen.getByRole('button', { name: /Register/i });
     fireEvent.click(registerButton);
-    expect(mockNavigate).toHaveBeenCalledWith('/signup');
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/signup');
   });
 
-  it('calls navigate with "/signin" when Sign In button is clicked', () => {
+  it('calls navigate with "/auth/login" when Sign In button is clicked', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
     render(<Navigation />);
 
     const signInButton = screen.getByRole('button', { name: /Sign In/i });
     fireEvent.click(signInButton);
-    expect(mockNavigate).toHaveBeenCalledWith('/signin');
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/login');
   });
 
   it('renders the Outlet and GalFooter component', () => {

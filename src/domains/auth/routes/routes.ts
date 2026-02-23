@@ -1,7 +1,7 @@
 export const authRoutes = {
-  signup: '/signup',
-  login: '/login',
-  verifyEmail: '/verify-email',
-  emailSent: '/email-sent',
-  forgotPassword: '/forgot-password',
+  signup: '/auth/signup',
+  login: '/auth/login',
+  verifyEmail: '/auth/verify-email',
+  emailSent: '/auth/email-sent',
+  forgotPassword: '/auth/forgot-password',
 } as const;

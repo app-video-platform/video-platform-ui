@@ -12,7 +12,7 @@ const Navigation: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
 
-  const handleRedirect = (url: '/signup' | '/signin') => {
+  const handleRedirect = (url: '/auth/signup' | '/auth/login') => {
     navigate(url);
   };
 
@@ -46,7 +46,7 @@ const Navigation: React.FC = () => {
                   <Button
                     type="button"
                     variant="secondary"
-                    onClick={() => handleRedirect('/signin')}
+                    onClick={() => handleRedirect('/auth/login')}
                   >
                     Sign In
                   </Button>
@@ -55,7 +55,7 @@ const Navigation: React.FC = () => {
                   <Button
                     type="button"
                     variant="primary"
-                    onClick={() => handleRedirect('/signup')}
+                    onClick={() => handleRedirect('/auth/signup')}
                   >
                     Register
                   </Button>

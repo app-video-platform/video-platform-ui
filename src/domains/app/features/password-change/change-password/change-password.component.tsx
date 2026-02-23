@@ -21,7 +21,7 @@ const ChangePassword: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handlePasswordChange = () => {
-    navigate('/signin');
+    navigate('/auth/login');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -60,7 +60,7 @@ describe('SignUp Component', () => {
   //   });
   // });
 
-  test('submits the form successfully and navigates to /email-sent', async () => {
+  test('submits the form successfully and navigates to /auth/email-sent', async () => {
     // Override store.dispatch to simulate a successful signupUser thunk
     const mockDispatch = jest.fn(() => ({
       unwrap: () => Promise.resolve({}),
@@ -92,7 +92,7 @@ describe('SignUp Component', () => {
 
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalled();
-      expect(mockNavigate).toHaveBeenCalledWith('/email-sent');
+      expect(mockNavigate).toHaveBeenCalledWith('/auth/email-sent');
     });
   });
 });

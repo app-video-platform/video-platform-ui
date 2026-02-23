@@ -38,7 +38,7 @@ const VerifyEmail: React.FC = () => {
     error: <p>Invalid verification link. Please check your email again.</p>,
     success: (
       <p>
-        Email verified! You can now <a href="/login">log in</a>.
+        Email verified! You can now <a href="/auth/login">log in</a>.
       </p>
     ),
     expired: (
@@ -49,7 +49,7 @@ const VerifyEmail: React.FC = () => {
   };
 
   // if (status === 'loading') { return <p>Verifying your email...</p>; }
-  // if (status === 'success') { return <p>Email verified! You can now <a href="/login">log in</a>.</p>; }
+  // if (status === 'success') { return <p>Email verified! You can now <a href="/auth/login">log in</a>.</p>; }
   // if (status === 'expired') { return <p>This link has expired. <a href="/resend-verification">Resend email?</a></p>; }
   return (
     <div className="verify-email-box">{status ? messages[status] : null}</div>

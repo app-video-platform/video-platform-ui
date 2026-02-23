@@ -74,7 +74,7 @@ const SignUp: React.FC = () => {
       dispatch(signupUser(registerData))
         .unwrap() // unwrap() turns the thunk result into a "normal" promise
         .then(() => {
-          navigate('/email-sent'); // example redirect (requires useNavigate)
+          navigate('/auth/email-sent'); // example redirect (requires useNavigate)
         });
     }
   };
