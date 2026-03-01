@@ -10,6 +10,15 @@ export type AbstractProduct =
   | CourseProduct
   | ConsultationProduct;
 
+export interface ProductResponseDetails {
+  sections?: AbstractProductBase['sections'];
+  consultationDetails?: AbstractProductBase['consultationDetails'];
+}
+
+export type AbstractProductApiResponse = AbstractProduct & {
+  details?: ProductResponseDetails | null;
+};
+
 export type ProductType = 'COURSE' | 'DOWNLOAD' | 'CONSULTATION';
 
 export type ProductStatus = 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
