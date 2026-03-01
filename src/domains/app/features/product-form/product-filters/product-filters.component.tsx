@@ -10,7 +10,13 @@ import { SelectOption } from '@shared/ui';
 type StatusFilter = 'all' | ProductStatus;
 type TypeFilter = 'all' | ProductType;
 type PriceFilter = 'all' | 'free' | 'paid';
-type SortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc';
+type SortOption =
+  | 'date-desc'
+  | 'date-asc'
+  | 'updated-desc'
+  | 'updated-asc'
+  | 'name-asc'
+  | 'name-desc';
 
 export interface ProductFilterForm {
   search: string;
@@ -52,6 +58,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   const SORT_OPTIONS: SelectOption[] = [
     { label: 'Newest first', value: 'date-desc' },
     { label: 'Oldest first', value: 'date-asc' },
+    { label: 'Newest updated first', value: 'updated-desc' },
+    { label: 'Oldest updated first', value: 'updated-asc' },
     { label: 'Name A → Z', value: 'name-asc' },
     { label: 'Name Z → A', value: 'name-desc' },
   ];

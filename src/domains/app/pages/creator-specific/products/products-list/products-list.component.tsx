@@ -81,19 +81,31 @@ const ProductsList: React.FC = () => {
       return matchesSearch && matchesStatus && matchesType && matchesPrice;
     });
 
-    // 🔽 Sorting
-    const getTime = (product: AbstractProduct) => {
-      // adjust this field name to whatever you actually have: createdAt / updatedAt / publishedAt, etc.
-      const value = product.createdAt;
-      return value ? new Date(value).getTime() : 0;
+    const parseTimestamp = (value?: Date | string | null) => {
+      if (!value) {
+        return 0;
+      }
+      const timestamp =
+        value instanceof Date ? value.getTime() : new Date(value).getTime();
+      return Number.isNaN(timestamp) ? 0 : timestamp;
     };
 
+    const getCreatedTime = (product: AbstractProduct) =>
+      parseTimestamp(product.createdAt);
+    const getUpdatedTime = (product: AbstractProduct) =>
+      parseTimestamp(product.updatedAt ?? product.createdAt);
+
+    // 🔽 Sorting
     return filtered.sort((a, b) => {
       switch (sort) {
         case 'date-asc':
-          return getTime(a) - getTime(b);
+          return getCreatedTime(a) - getCreatedTime(b);
         case 'date-desc':
-          return getTime(b) - getTime(a);
+          return getCreatedTime(b) - getCreatedTime(a);
+        case 'updated-asc':
+          return getUpdatedTime(a) - getUpdatedTime(b);
+        case 'updated-desc':
+          return getUpdatedTime(b) - getUpdatedTime(a);
         case 'name-asc':
           return (a.name ?? '').localeCompare(b.name ?? '');
         case 'name-desc':
