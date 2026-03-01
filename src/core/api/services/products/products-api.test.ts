@@ -221,6 +221,46 @@ describe('Products API', () => {
       );
     });
 
+    it('normalizes nested details.sections in getProductByProductIdAPI', async () => {
+      const p = {
+        id: 'p1',
+        type: 'COURSE',
+        details: {
+          sections: [{ id: 's1', title: 'Section 1' }],
+        },
+      };
+      mockedHttpClient.get.mockResolvedValueOnce({ data: p });
+
+      await expect(
+        getProductByProductIdAPI('p1', 'COURSE' as any),
+      ).resolves.toMatchObject({
+        id: 'p1',
+        type: 'COURSE',
+        sections: [{ id: 's1', title: 'Section 1' }],
+      });
+    });
+
+    it('normalizes nested details.sections in getAllProductsByUserIdAPI', async () => {
+      const list = [
+        {
+          id: 'p1',
+          type: 'COURSE',
+          details: {
+            sections: [{ id: 's1' }],
+          },
+        },
+      ];
+      mockedHttpClient.get.mockResolvedValueOnce({ data: list });
+
+      await expect(getAllProductsByUserIdAPI('u1')).resolves.toMatchObject([
+        {
+          id: 'p1',
+          type: 'COURSE',
+          sections: [{ id: 's1' }],
+        },
+      ]);
+    });
+
     it('getAllProductsMinimalAPI GETs min list', async () => {
       const arr = [{ id: 'm1' }];
       mockedHttpClient.get.mockResolvedValueOnce({ data: arr });
