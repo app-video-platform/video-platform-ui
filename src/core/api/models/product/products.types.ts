@@ -10,14 +10,36 @@ export type AbstractProduct =
   | CourseProduct
   | ConsultationProduct;
 
-export interface ProductResponseDetails {
-  sections?: AbstractProductBase['sections'];
-  consultationDetails?: AbstractProductBase['consultationDetails'];
+export interface CourseProductResponseDetails {
+  sections?: CourseProduct['sections'];
 }
 
-export type AbstractProductApiResponse = AbstractProduct & {
-  details?: ProductResponseDetails | null;
+export interface DownloadProductResponseDetails {
+  sections?: DownloadProduct['sections'];
+}
+
+export type ConsultationProductResponseDetails =
+  | ConsultationProduct['consultationDetails']
+  | {
+      consultationDetails?: ConsultationProduct['consultationDetails'];
+    };
+
+export type CourseProductApiResponse = CourseProduct & {
+  details?: CourseProductResponseDetails | null;
 };
+
+export type DownloadProductApiResponse = DownloadProduct & {
+  details?: DownloadProductResponseDetails | null;
+};
+
+export type ConsultationProductApiResponse = ConsultationProduct & {
+  details?: ConsultationProductResponseDetails | null;
+};
+
+export type AbstractProductApiResponse =
+  | CourseProductApiResponse
+  | DownloadProductApiResponse
+  | ConsultationProductApiResponse;
 
 export type ProductType = 'COURSE' | 'DOWNLOAD' | 'CONSULTATION';
 

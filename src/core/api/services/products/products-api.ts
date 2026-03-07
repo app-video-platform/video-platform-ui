@@ -29,38 +29,48 @@ import {
 const normalizeProductResponse = (
   product: AbstractProductApiResponse,
 ): AbstractProduct => {
-  const details = product?.details;
+  switch (product.type) {
+  case 'COURSE':
+  case 'DOWNLOAD': {
+    const hasTopLevelSections =
+      Array.isArray(product.sections) && product.sections.length > 0;
+    const detailsSections = product.details?.sections;
 
-  if (!details) {
+    if (!hasTopLevelSections && Array.isArray(detailsSections)) {
+      return {
+        ...product,
+        sections: detailsSections,
+      };
+    }
+
     return product;
   }
 
-  const normalizedProduct: AbstractProductApiResponse = {
-    ...product,
-  };
-  const hasTopLevelSections =
-    Array.isArray(normalizedProduct.sections) &&
-    normalizedProduct.sections.length > 0;
+  case 'CONSULTATION': {
+    const details =
+      product.details as
+        | { consultationDetails?: AbstractProduct['consultationDetails'] }
+        | AbstractProduct['consultationDetails']
+        | null
+        | undefined;
+    const detailsConsultation =
+      details && typeof details === 'object' && 'consultationDetails' in details
+        ? details.consultationDetails
+        : (details as AbstractProduct['consultationDetails'] | undefined);
 
-  if (
-    (normalizedProduct.type === 'COURSE' ||
-      normalizedProduct.type === 'DOWNLOAD') &&
-    !hasTopLevelSections &&
-    Array.isArray(details.sections)
-  ) {
-    normalizedProduct.sections = details.sections;
+    if (!product.consultationDetails && detailsConsultation) {
+      return {
+        ...product,
+        consultationDetails: detailsConsultation,
+      };
+    }
+
+    return product;
   }
 
-  if (
-    normalizedProduct.type === 'CONSULTATION' &&
-    !normalizedProduct.consultationDetails &&
-    details.consultationDetails
-  ) {
-    normalizedProduct.consultationDetails = normalizedProduct
-      .details?.consultationDetails as AbstractProductApiResponse['consultationDetails'];
+  default:
+    return product;
   }
-
-  return normalizedProduct;
 };
 
 export const createProductAPI = async (payload: CreateProductPayload) => {

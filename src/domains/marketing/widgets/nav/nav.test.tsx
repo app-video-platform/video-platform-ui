@@ -17,17 +17,18 @@ jest.mock('react-router-dom', () => ({
   ),
 }));
 
-// Mock child components
-jest.mock(
-  '@components/gal-user-dropdown/gal-user-dropdown.component.tsx',
-  () => {
-    const MockUserProfile = () => (
-      <div data-testid="user-profile-dropdown">GalUserDropdown</div>
-    );
-    MockUserProfile.displayName = 'GalUserDropdown';
-    return MockUserProfile;
-  },
-);
+// Mock child components from the same module Navigation imports
+jest.mock('domains/app/components', () => ({
+  __esModule: true,
+  GalNavDropdown: () => (
+    <li data-testid="gal-nav-dropdown">
+      <button>Galactica App</button>
+    </li>
+  ),
+  GalUserDropdown: () => (
+    <div data-testid="user-profile-dropdown">GalUserDropdown</div>
+  ),
+}));
 
 describe('Navigation component', () => {
   let mockNavigate: jest.Mock;
@@ -94,9 +95,10 @@ describe('Navigation component', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/auth/login');
   });
 
-  it('renders website navbar container', () => {
+  it('renders the GalNavDropdown component in the nav links', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
-    const { container } = render(<Navigation />);
-    expect(container.querySelector('.website-navbar')).toBeInTheDocument();
+    render(<Navigation />);
+
+    expect(screen.getByTestId('gal-nav-dropdown')).toBeInTheDocument();
   });
 });

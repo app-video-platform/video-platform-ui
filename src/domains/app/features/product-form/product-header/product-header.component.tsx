@@ -16,6 +16,7 @@ import './product-header.styles.scss';
 
 interface ProductHeaderProps extends React.BaseHTMLAttributes<HTMLDivElement> {
   formData: ProductDraft;
+  isEditMode: boolean;
   showRestOfForm: boolean;
   hasHeroCollapsed: boolean;
   headerRef: React.Ref<HTMLDivElement> | undefined;
@@ -23,6 +24,7 @@ interface ProductHeaderProps extends React.BaseHTMLAttributes<HTMLDivElement> {
 
 const ProductHeader: React.FC<ProductHeaderProps> = ({
   formData,
+  isEditMode,
   showRestOfForm,
   hasHeroCollapsed,
   headerRef,
@@ -62,7 +64,7 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
   });
   return (
     <div className="product-header" ref={headerRef}>
-      <h1>Create New Product</h1>
+      <h1>{isEditMode ? 'EDIT PRODUCT' : 'CREATE NEW PRODUCT'}</h1>
       {showRestOfForm && (
         <>
           <div
