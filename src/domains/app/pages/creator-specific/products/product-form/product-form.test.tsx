@@ -43,6 +43,7 @@ jest.mock('@shared/ui', () => ({
 // ── 2) Mock app features barrel used by ProductForm ──────────────────────
 const mockUseProductFormFacade = jest.fn();
 const mockUseProductFormAnimation = jest.fn();
+const mockProductHeader = jest.fn();
 
 jest.mock('domains/app/features/product-form', () => ({
   __esModule: true,
@@ -120,7 +121,10 @@ jest.mock('domains/app/features/product-form', () => ({
   // runtime placeholders for types (not actually used at runtime)
   BuilderTab: {} as any,
   SectionDraft: {} as any,
-  ProductHeader: () => <div data-testid="product-header">ProductHeader</div>,
+  ProductHeader: (props: any) => {
+    mockProductHeader(props);
+    return <div data-testid="product-header">ProductHeader</div>;
+  },
   PriceSelector: ({ price }: { price: number }) => (
     <div data-testid="price-selector">
       PriceSelector (price: {String(price)})
@@ -149,6 +153,7 @@ afterEach(() => {
 
 const makeFacadeState = (overrides: Partial<any> = {}) => ({
   user: { id: 'user-123' },
+  isEditMode: false,
   formData: {
     id: 'prod-1',
     name: 'My Product',
@@ -183,6 +188,20 @@ describe('<ProductForm />', () => {
     expect(
       screen.getByText('You must be logged in to create a product.'),
     ).toBeInTheDocument();
+  });
+
+  it('passes isEditMode from facade to ProductHeader', () => {
+    mockUseProductFormFacade.mockReturnValue(
+      makeFacadeState({ isEditMode: true }),
+    );
+
+    render(<ProductForm />);
+
+    expect(mockProductHeader).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isEditMode: true,
+      }),
+    );
   });
 
   it('shows step-one hero when user is present but showRestOfForm is false', () => {
