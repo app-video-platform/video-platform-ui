@@ -3,7 +3,7 @@
 /// <reference types="@testing-library/jest-dom" />
 
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
@@ -78,7 +78,7 @@ describe('App Component', () => {
     //   });
   });
 
-  test('matches snapshot after navigation', async () => {
+  test('renders marketing layout shell on root route', async () => {
     const store = mockStore(initialState);
 
     const { container } = render(
@@ -89,10 +89,9 @@ describe('App Component', () => {
       </Provider>,
     );
 
-    // await waitFor(() => {
-    //   expect(screen.getByText(/user dashboard/i)).toBeInTheDocument();
-    // });
-
-    expect(container).toMatchSnapshot();
+    expect(container.querySelector('.site-layout')).toBeInTheDocument();
+    expect(container.querySelector('.website-navbar')).toBeInTheDocument();
+    expect(container.querySelector('.landing-page')).toBeInTheDocument();
+    expect(screen.getByText(/create courses that inspire/i)).toBeInTheDocument();
   });
 });
