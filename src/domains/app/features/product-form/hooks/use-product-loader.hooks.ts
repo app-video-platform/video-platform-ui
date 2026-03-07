@@ -59,10 +59,9 @@ export const useProductLoader = ({
             sections: product.sections || [],
           };
         } else if (product.type === 'CONSULTATION') {
-          const consultationDetails = product.consultationDetails;
           newData = {
             ...baseData,
-            consultationDetails,
+            consultationDetails: product.consultationDetails,
           };
         }
 

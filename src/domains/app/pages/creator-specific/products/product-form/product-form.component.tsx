@@ -28,6 +28,7 @@ export interface FormErrors {
 const ProductForm: React.FC = () => {
   const {
     user,
+    isEditMode,
     formData,
     setFormData,
     setField,
@@ -73,6 +74,7 @@ const ProductForm: React.FC = () => {
     <div ref={container}>
       <ProductHeader
         formData={formData}
+        isEditMode={isEditMode}
         hasHeroCollapsed={hasHeroCollapsed}
         showRestOfForm={showRestOfForm}
         headerRef={undefined}

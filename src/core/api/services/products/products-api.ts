@@ -20,21 +20,69 @@ import {
 import {
   CreateProductPayload,
   AbstractProduct,
+  AbstractProductApiResponse,
   ProductType,
   CourseLesson,
   LessonCreate,
 } from 'core/api/models';
 
+const normalizeProductResponse = (
+  product: AbstractProductApiResponse,
+): AbstractProduct => {
+  switch (product.type) {
+  case 'COURSE':
+  case 'DOWNLOAD': {
+    const hasTopLevelSections =
+      Array.isArray(product.sections) && product.sections.length > 0;
+    const detailsSections = product.details?.sections;
+
+    if (!hasTopLevelSections && Array.isArray(detailsSections)) {
+      return {
+        ...product,
+        sections: detailsSections,
+      };
+    }
+
+    return product;
+  }
+
+  case 'CONSULTATION': {
+    const details =
+      product.details as
+        | { consultationDetails?: AbstractProduct['consultationDetails'] }
+        | AbstractProduct['consultationDetails']
+        | null
+        | undefined;
+    const detailsConsultation =
+      details && typeof details === 'object' && 'consultationDetails' in details
+        ? details.consultationDetails
+        : (details as AbstractProduct['consultationDetails'] | undefined);
+
+    if (!product.consultationDetails && detailsConsultation) {
+      return {
+        ...product,
+        consultationDetails: detailsConsultation,
+      };
+    }
+
+    return product;
+  }
+
+  default:
+    return product;
+  }
+};
+
 export const createProductAPI = async (payload: CreateProductPayload) => {
   try {
-    const response = await httpClient.post<AbstractProduct>(
+    const response = await httpClient.post<AbstractProductApiResponse>(
       'api/products',
       payload,
       {
         withCredentials: true,
       },
     );
-    return response.data;
+    return normalizeProductResponse(response.data);
   } catch (error) {
     console.error('Error creating product:', error);
     throw error;
@@ -43,14 +91,14 @@ export const createProductAPI = async (payload: CreateProductPayload) => {
 
 export const updateProductDetailsAPI = async (payload: AbstractProductBase) => {
   try {
-    const response = await httpClient.put<AbstractProduct>(
+    const response = await httpClient.put<AbstractProductApiResponse>(
       'api/products',
       payload,
       {
         withCredentials: true,
       },
     );
-    return response.data;
+    return normalizeProductResponse(response.data);
   } catch (error) {
     console.error('Error updating product:', error);
     throw error;
@@ -161,10 +209,10 @@ export const deleteLessonAPI = async (payload: IRemoveItemPayload) => {
 
 export const getAllProductsByUserIdAPI = async (userId: string) => {
   try {
-    const response = await httpClient.get<AbstractProduct[]>(
+    const response = await httpClient.get<AbstractProductApiResponse[]>(
       'api/products?userId=' + userId,
     );
-    return response.data;
+    return response.data.map(normalizeProductResponse);
   } catch (error) {
     console.error('Error getting all products by user id:', error);
     throw error;
@@ -176,10 +224,10 @@ export const getProductByProductIdAPI = async (
   productType: ProductType,
 ) => {
   try {
-    const response = await httpClient.get<AbstractProduct>(
+    const response = await httpClient.get<AbstractProductApiResponse>(
       `api/products/getProduct?productId=${productId}&type=${productType}`,
     );
-    return response.data;
+    return normalizeProductResponse(response.data);
   } catch (error) {
     console.error(`Error retrieving product with id ${productId}:`, error);
     throw error;
