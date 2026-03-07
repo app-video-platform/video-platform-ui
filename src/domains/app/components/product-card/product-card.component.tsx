@@ -17,6 +17,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigate = useNavigate();
   const imgSrc = product.imageUrl ? product.imageUrl : placeholderImage;
 
+  const parseProductDate = (value?: Date | string | null) => {
+    if (!value) {
+      return null;
+    }
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const lastUpdatedDate =
+    parseProductDate(product.updatedAt ?? product.createdAt) ?? new Date();
+
   const handlePublishProduct = () => {
     // eslint-disable-next-line no-console
     console.log('Want to publish it?');
@@ -37,8 +48,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
           <div className="status-wrapper">
             <span className="last-update">
-              Last update:{' '}
-              {format(product.createdAt ?? new Date(), 'EEE, do MMM')}
+              Last update: {format(lastUpdatedDate, 'EEE, do MMM')}
             </span>
             <StatusChip status={product.status ?? 'DRAFT'} />
           </div>
