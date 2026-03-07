@@ -1,6 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 
-import { ProductType, AppDispatch } from 'core/api/models';
+import {
+  ProductType,
+  AppDispatch,
+  AbstractProductApiResponse,
+} from 'core/api/models';
 import { getProductByProductId } from 'core/store/product-store';
 import { ProductDraft, FormErrors } from '../models/product-form';
 import { getAutosaveSnapshot } from '../utils/form-data-mapper.utils';
@@ -43,6 +47,22 @@ export const useProductLoader = ({
     )
       .unwrap()
       .then((product) => {
+        const productResponse = product as AbstractProductApiResponse;
+        const nestedDetails = productResponse.details;
+
+        const topLevelSections = Array.isArray(product.sections)
+          ? product.sections
+          : [];
+        const nestedSectionsCandidate = nestedDetails?.sections;
+        const nestedSections = Array.isArray(nestedSectionsCandidate)
+          ? nestedSectionsCandidate
+          : [];
+        const resolvedSections =
+          topLevelSections.length > 0 ? topLevelSections : nestedSections;
+
+        const resolvedConsultationDetails =
+          product.consultationDetails ?? nestedDetails?.consultationDetails;
+
         const baseData = {
           id: product.id ?? '',
           name: product.name ?? '',
@@ -56,13 +76,12 @@ export const useProductLoader = ({
         if (product.type === 'COURSE' || product.type === 'DOWNLOAD') {
           newData = {
             ...baseData,
-            sections: product.sections || [],
+            sections: resolvedSections,
           };
         } else if (product.type === 'CONSULTATION') {
-          const consultationDetails = product.consultationDetails;
           newData = {
             ...baseData,
-            consultationDetails,
+            consultationDetails: resolvedConsultationDetails,
           };
         }
 
