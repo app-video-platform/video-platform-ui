@@ -29,12 +29,6 @@ jest.mock(
   },
 );
 
-jest.mock('@components/gal-footer/gal-footer.component', () => {
-  const MockFooter = () => <footer data-testid="footer">GalFooter</footer>;
-  MockFooter.displayName = 'GalFooter';
-  return MockFooter;
-});
-
 describe('Navigation component', () => {
   let mockNavigate: jest.Mock;
 
@@ -100,10 +94,9 @@ describe('Navigation component', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/auth/login');
   });
 
-  it('renders the Outlet and GalFooter component', () => {
+  it('renders website navbar container', () => {
     (useSelector as unknown as jest.Mock).mockReturnValue(null);
-    render(<Navigation />);
-
-    expect(screen.getByTestId('footer')).toBeInTheDocument();
+    const { container } = render(<Navigation />);
+    expect(container.querySelector('.website-navbar')).toBeInTheDocument();
   });
 });
