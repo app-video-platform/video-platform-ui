@@ -16,6 +16,7 @@ import {
   CANCELATION_POLICIES,
   CancelationPolicyId,
 } from 'core/enums';
+import { MEETING_METHODS } from 'core/constants';
 import { ConsultationDetails } from 'core/api/models';
 import { ProductDraft } from '../models';
 
@@ -37,6 +38,10 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
   );
 
   useEffect(() => {
+    if (formData.consultationDetails) {
+      return;
+    }
+
     const consDetails: ConsultationDetails = {
       bufferAfterMinutes: 10,
       bufferBeforeMinutes: 10,
@@ -51,7 +56,7 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
     };
     const newData = { ...formData, consultationDetails: consDetails };
     setFormData(newData);
-  }, []);
+  }, [defaultPolicy?.id, formData, setFormData]);
 
   const TIME_OPTIONS: SelectOption[] = Array.from(
     { length: (120 - 20) / 5 + 1 },
@@ -65,10 +70,10 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
   );
 
   const MEETING_METHOD_OPTIONS: SelectOption[] = Object.entries(
-    MeetingMethods,
-  ).map(([key, value]) => ({
-    value: key, // 'ZOOM', 'GOOGLE', etc.
-    label: value, // 'Zoom', 'Google Meet', etc.
+    MEETING_METHODS,
+  ).map(([value, label]) => ({
+    value,
+    label,
   }));
 
   const handleFormChange = (field: string, value: string | number) => {
@@ -79,12 +84,11 @@ const ConsultationDetailsSection: React.FC<ConsultationDetailsProps> = ({
   };
 
   const handleCancellationPolicyChange = (policyId: string) => {
-    const policy = CANCELATION_POLICIES.find((p) => p.id === policyId);
     const newData = {
       ...formData,
       consultationDetails: {
         ...formData.consultationDetails,
-        cancelationPolicy: policy,
+        cancellationPolicy: policyId,
       },
     };
     setFormData(newData);

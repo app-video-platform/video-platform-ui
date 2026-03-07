@@ -30,37 +30,46 @@ const normalizeProductResponse = (
   product: AbstractProductApiResponse,
 ): AbstractProduct => {
   switch (product.type) {
-    case 'COURSE':
-    case 'DOWNLOAD': {
-      const hasTopLevelSections =
-        Array.isArray(product.sections) && product.sections.length > 0;
-      const detailsSections = product.details?.sections;
+  case 'COURSE':
+  case 'DOWNLOAD': {
+    const hasTopLevelSections =
+      Array.isArray(product.sections) && product.sections.length > 0;
+    const detailsSections = product.details?.sections;
 
-      if (!hasTopLevelSections && Array.isArray(detailsSections)) {
-        return {
-          ...product,
-          sections: detailsSections,
-        };
-      }
-
-      return product;
+    if (!hasTopLevelSections && Array.isArray(detailsSections)) {
+      return {
+        ...product,
+        sections: detailsSections,
+      };
     }
 
-    case 'CONSULTATION': {
-      const detailsConsultation = product.details?.consultationDetails;
+    return product;
+  }
 
-      if (!product.consultationDetails && detailsConsultation) {
-        return {
-          ...product,
-          consultationDetails: detailsConsultation,
-        };
-      }
+  case 'CONSULTATION': {
+    const details =
+      product.details as
+        | { consultationDetails?: AbstractProduct['consultationDetails'] }
+        | AbstractProduct['consultationDetails']
+        | null
+        | undefined;
+    const detailsConsultation =
+      details && typeof details === 'object' && 'consultationDetails' in details
+        ? details.consultationDetails
+        : (details as AbstractProduct['consultationDetails'] | undefined);
 
-      return product;
+    if (!product.consultationDetails && detailsConsultation) {
+      return {
+        ...product,
+        consultationDetails: detailsConsultation,
+      };
     }
 
-    default:
-      return product;
+    return product;
+  }
+
+  default:
+    return product;
   }
 };
 

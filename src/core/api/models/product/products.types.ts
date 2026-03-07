@@ -18,9 +18,11 @@ export interface DownloadProductResponseDetails {
   sections?: DownloadProduct['sections'];
 }
 
-export interface ConsultationProductResponseDetails {
-  consultationDetails?: ConsultationProduct['consultationDetails'];
-}
+export type ConsultationProductResponseDetails =
+  | ConsultationProduct['consultationDetails']
+  | {
+      consultationDetails?: ConsultationProduct['consultationDetails'];
+    };
 
 export type CourseProductApiResponse = CourseProduct & {
   details?: CourseProductResponseDetails | null;

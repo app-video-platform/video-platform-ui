@@ -286,6 +286,29 @@ describe('Products API', () => {
       });
     });
 
+    it('normalizes consultation details from direct details in getProductByProductIdAPI', async () => {
+      const p = {
+        id: 'p1',
+        type: 'CONSULTATION',
+        details: {
+          durationMinutes: 60,
+          meetingMethod: 'GOOGLE_MEET',
+        },
+      };
+      mockedHttpClient.get.mockResolvedValueOnce({ data: p });
+
+      await expect(
+        getProductByProductIdAPI('p1', 'CONSULTATION' as any),
+      ).resolves.toMatchObject({
+        id: 'p1',
+        type: 'CONSULTATION',
+        consultationDetails: {
+          durationMinutes: 60,
+          meetingMethod: 'GOOGLE_MEET',
+        },
+      });
+    });
+
     it('normalizes nested details.consultationDetails in getAllProductsByUserIdAPI', async () => {
       const list = [
         {
@@ -306,6 +329,31 @@ describe('Products API', () => {
           type: 'CONSULTATION',
           consultationDetails: {
             durationMinutes: 45,
+          },
+        },
+      ]);
+    });
+
+    it('normalizes consultation details from direct details in getAllProductsByUserIdAPI', async () => {
+      const list = [
+        {
+          id: 'p1',
+          type: 'CONSULTATION',
+          details: {
+            durationMinutes: 45,
+            meetingMethod: 'ZOOM',
+          },
+        },
+      ];
+      mockedHttpClient.get.mockResolvedValueOnce({ data: list });
+
+      await expect(getAllProductsByUserIdAPI('u1')).resolves.toMatchObject([
+        {
+          id: 'p1',
+          type: 'CONSULTATION',
+          consultationDetails: {
+            durationMinutes: 45,
+            meetingMethod: 'ZOOM',
           },
         },
       ]);
