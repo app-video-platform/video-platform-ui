@@ -121,7 +121,11 @@ const ProductForm: React.FC = () => {
 
             <div className="product-create-section">
               {activeTab === 'basics' && (
-                <BasicInfo formData={formData} setField={setField} />
+                <BasicInfo
+                  formData={formData}
+                  setField={setField}
+                  showOnlyCurrentType={isEditMode}
+                />
               )}
 
               {activeTab === 'pricing' && (
