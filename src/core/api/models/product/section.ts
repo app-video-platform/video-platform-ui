@@ -1,36 +1,43 @@
 import { FileDownloadProductResponse } from '../files/file-download-product';
 import { CourseLesson } from './lesson';
 
-export interface CourseProductSection {
+export interface ProductSection {
   id?: string;
   title: string;
   description?: string;
   productId?: string;
   position: number;
   lessons?: CourseLesson[];
-}
-
-export interface DownloadSection {
-  id?: string;
-  title: string;
-  description?: string;
-  position: number;
   files?: FileDownloadProductResponse[];
 }
 
-export interface CourseSectionCreateRequest {
+export type CourseProductSection = ProductSection;
+export type DownloadSection = ProductSection;
+
+export interface ProductSectionCreateRequest {
   title: string;
   productId: string;
-  userId: string;
+  userId?: string;
   description?: string;
   position?: number;
 }
 
-export interface CourseSectionUpdateRequest {
-  id: string;
-  userId: string;
+export interface ProductSectionUpdateRequest {
+  id?: string;
+  sectionId?: string;
+  userId?: string;
   productId: string;
   title?: string;
   description?: string;
   position?: number;
 }
+
+export interface RemoveSectionPayload {
+  productId: string;
+  sectionId?: string;
+  id?: string;
+  userId?: string;
+}
+
+export type CourseSectionCreateRequest = ProductSectionCreateRequest;
+export type CourseSectionUpdateRequest = ProductSectionUpdateRequest;

@@ -10,6 +10,7 @@ export interface CourseLesson {
   content?: string;
   position?: number;
   quiz?: QuizDraft;
+  productId?: string;
   sectionId: string;
   description: string;
   userId?: string;
@@ -19,11 +20,20 @@ export interface LessonCreate {
   title: string;
   type: LessonType;
   sectionId: string;
-  userId: string;
+  productId: string;
+  userId?: string;
   videoUrl?: string;
   content?: string;
   description: string;
   position?: number;
+}
+
+export interface RemoveLessonPayload {
+  productId: string;
+  sectionId: string;
+  lessonId?: string;
+  id?: string;
+  userId?: string;
 }
 
 export interface QuizLesson extends CourseLesson {

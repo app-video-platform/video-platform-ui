@@ -8,7 +8,7 @@ import { GalIcon, Button } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
 import {
   selectTopThreeProducts,
-  getAllProductsByUserId,
+  getProductSummariesByOwner,
 } from 'core/store/product-store';
 import { AppDispatch } from 'core/api/models';
 
@@ -22,9 +22,9 @@ const CreatorDashboard: React.FC = () => {
 
   useEffect(() => {
     if (user && user.id) {
-      dispatch(getAllProductsByUserId(user?.id));
+      dispatch(getProductSummariesByOwner(user.id));
     }
-  }, [user]);
+  }, [dispatch, user]);
 
   return (
     <div className="user-dashboard-container">

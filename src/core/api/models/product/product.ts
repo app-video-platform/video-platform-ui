@@ -49,9 +49,13 @@ export interface ConsultationDetails {
 
 export interface ProductMinimised {
   id?: string;
+  title?: string;
   name?: string;
+  description?: string;
   type?: ProductType;
   price?: number | 'free';
+  status?: ProductStatus;
+  imageUrl?: string;
   createdById?: string;
   createdByName?: string;
   createdByTitle?: string;

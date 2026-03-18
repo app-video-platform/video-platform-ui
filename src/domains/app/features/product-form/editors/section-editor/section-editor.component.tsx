@@ -1,14 +1,13 @@
 /* eslint-disable indent */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PiRectangleDashed } from 'react-icons/pi';
 
 import CourseLessons from '../../course-lessons/course-lessons.component';
 import {
-  CourseLesson,
   CourseProductSection,
-  CourseSectionCreateRequest,
-  IRemoveItemPayload,
+  FileDownloadProductResponse,
+  ProductSectionCreateRequest,
   ProductType,
   AppDispatch,
 } from 'core/api/models';
@@ -20,7 +19,12 @@ import {
   Textarea,
 } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
-import { deleteSection, createSection } from 'core/store/product-store';
+import {
+  createProductSection,
+  deleteDownloadSectionFile,
+  deleteProductSection,
+  uploadDownloadSectionFile,
+} from 'core/store/product-store';
 import { EditableTitle } from '../editable-title';
 import { getCssVar } from '@shared/utils';
 import { SectionDraft } from 'domains/app/features/product-form/models';
@@ -52,7 +56,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector(selectAuthUser);
-  const [files, setFiles] = useState<File[]>([]);
+  const uploadedFileSignaturesRef = useRef(new Set<string>());
 
   const { isAutosaving, lastSavedAt } = useSectionAutosave({
     section,
@@ -84,12 +88,12 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     }
 
     if (section.id) {
-      const removeSectionPayload: IRemoveItemPayload = {
-        id: section.id,
-        userId: user.id,
-      };
-
-      dispatch(deleteSection(removeSectionPayload))
+      dispatch(
+        deleteProductSection({
+          productId,
+          sectionId: section.id,
+        }),
+      )
         .unwrap()
         .then(() => onRemove(index));
     } else {
@@ -111,15 +115,14 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       return;
     }
 
-    const newSection: CourseSectionCreateRequest = {
+    const newSection: ProductSectionCreateRequest = {
       title: section.title,
       description: section.description,
       position: index,
       productId,
-      userId: user.id,
     };
 
-    dispatch(createSection(newSection))
+    dispatch(createProductSection(newSection))
       .unwrap()
       .then((createdSection: CourseProductSection) => {
         const normalized: SectionDraft = {
@@ -128,18 +131,77 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           description: createdSection.description ?? '',
           position: createdSection.position,
           lessons: createdSection.lessons ?? [],
-          // files: createdSection.files ?? [],
+          files: createdSection.files ?? [],
         };
         onChange(index, normalized);
       });
   };
 
   const handleFilesChange = (filesFromUploader: File[]) => {
-    setFiles(filesFromUploader);
-    // updateSection({ files: filesFromUploader });
+    if (productType !== 'DOWNLOAD' || !section.id) {
+      return;
+    }
+
+    const getSignature = (file: File) =>
+      `${file.name}:${file.size}:${file.lastModified}`;
+
+    filesFromUploader.forEach((file) => {
+      const signature = getSignature(file);
+
+      if (uploadedFileSignaturesRef.current.has(signature)) {
+        return;
+      }
+
+      uploadedFileSignaturesRef.current.add(signature);
+
+      dispatch(
+        uploadDownloadSectionFile({
+          productId,
+          sectionId: section.id ?? '',
+          file,
+        }),
+      )
+        .unwrap()
+        .then(({ file: uploadedFile }) => {
+          const existingFiles = section.files ?? [];
+          const alreadyExists = existingFiles.some(
+            (existing) => existing.id === uploadedFile.id,
+          );
+
+          if (!alreadyExists) {
+            updateSection({
+              files: [...existingFiles, uploadedFile],
+            });
+          }
+        })
+        .catch((error) => {
+          uploadedFileSignaturesRef.current.delete(signature);
+          console.error('Failed to upload download section file:', error);
+        });
+    });
   };
 
-  const handleLessonsChange = (lessons: CourseLesson[]) => {
+  const handleRemoveUploadedFile = (fileId?: string) => {
+    if (!fileId || productType !== 'DOWNLOAD' || !section.id) {
+      return;
+    }
+
+    dispatch(
+      deleteDownloadSectionFile({
+        productId,
+        sectionId: section.id,
+        fileId,
+      }),
+    )
+      .unwrap()
+      .then(() => {
+        updateSection({
+          files: (section.files ?? []).filter((file) => file.id !== fileId),
+        });
+      });
+  };
+
+  const handleLessonsChange = (lessons: CourseProductSection['lessons']) => {
     updateSection({ lessons });
   };
 
@@ -199,6 +261,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
                 <div className="course-specific-fields">
                   <CourseLessons
                     key={section.id}
+                    productId={productId}
                     sectionId={section.id}
                     lessons={(section as CourseProductSection).lessons || []}
                     onLessonsChange={handleLessonsChange}
@@ -209,6 +272,27 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
               return (
                 <div className="download-specific-fields">
                   <GalUppyFileUploader onFilesChange={handleFilesChange} />
+                  {(section.files ?? []).length > 0 && (
+                    <div className="download-uploaded-files">
+                      {(section.files ?? []).map(
+                        (file: FileDownloadProductResponse) => (
+                          <div key={file.id ?? file.fileName} className="lesson-line">
+                            <div>
+                              <h3>{file.fileName}</h3>
+                              <p>{file.fileType ?? 'Unknown file type'}</p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="remove"
+                              onClick={() => handleRemoveUploadedFile(file.id)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  )}
                 </div>
               );
 

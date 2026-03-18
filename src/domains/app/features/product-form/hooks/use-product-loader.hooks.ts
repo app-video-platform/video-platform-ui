@@ -1,14 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 
-import { ProductType, AppDispatch } from 'core/api/models';
-import { getProductByProductId } from 'core/store/product-store';
+import { AbstractProduct, AppDispatch } from 'core/api/models';
+import { getProductById } from 'core/store/product-store';
 import { ProductDraft, FormErrors } from '../models/product-form';
 import { getAutosaveSnapshot } from '../utils/form-data-mapper.utils';
 
 interface UseProductLoaderParams {
   isEditMode: boolean;
   id?: string;
-  type: ProductType;
   dispatch: AppDispatch;
   // eslint-disable-next-line no-unused-vars
   setFormData: (data: ProductDraft) => void;
@@ -16,16 +15,18 @@ interface UseProductLoaderParams {
   setErrors: (errors: FormErrors) => void;
   // eslint-disable-next-line no-unused-vars
   setShowRestOfForm: (value: boolean) => void;
+  // eslint-disable-next-line no-unused-vars
+  onProductLoaded?: (product: AbstractProduct) => void;
 }
 
 export const useProductLoader = ({
   isEditMode,
   id,
-  type,
   dispatch,
   setFormData,
   setErrors,
   setShowRestOfForm,
+  onProductLoaded,
 }: UseProductLoaderParams) => {
   const lastSavedSnapshot = useRef<Partial<ProductDraft> | null>(null);
   const [, setLastSavedAt] = useState<Date | null>(null); // you can also lift this up if needed
@@ -35,19 +36,14 @@ export const useProductLoader = ({
       return;
     }
 
-    dispatch(
-      getProductByProductId({
-        productId: id,
-        productType: type,
-      }),
-    )
+    dispatch(getProductById({ productId: id }))
       .unwrap()
       .then((product) => {
         const baseData = {
           id: product.id ?? '',
           name: product.name ?? '',
           description: product.description ?? '',
-          type: product.type ?? ('COURSE' as ProductType),
+          type: product.type ?? 'COURSE',
           price: product.price ?? 'free',
         };
 
@@ -69,6 +65,7 @@ export const useProductLoader = ({
         lastSavedSnapshot.current = getAutosaveSnapshot(newData);
         setLastSavedAt(new Date());
         setShowRestOfForm(true);
+        onProductLoaded?.(product);
       })
       .catch((error) => {
         // eslint-disable-next-line no-console
@@ -79,10 +76,10 @@ export const useProductLoader = ({
     dispatch,
     id,
     isEditMode,
-    type,
     setFormData,
     setErrors,
     setShowRestOfForm,
+    onProductLoaded,
   ]);
 
   return { lastSavedSnapshot };

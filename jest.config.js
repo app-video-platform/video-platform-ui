@@ -15,13 +15,13 @@ module.exports = {
 
   // Defines transformations for your source files
   transform: {
-    '^.+\\.(ts|tsx|mjs|js|jsx)$': 'ts-jest', // Transforms TypeScript and ESM modules
-    '^.+\\.(js|jsx)$': 'babel-jest', // Also explicitly uses Babel for JS/JSX files
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(js|jsx|mjs)$': 'babel-jest',
   },
 
   // Tells Jest explicitly which node_modules need transformation
   transformIgnorePatterns: [
-    '/node_modules/(?!(axios|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error|react-icons|pretty-bytes)/)',
+    '/node_modules/(?!(axios|@testing-library|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error|react-icons|pretty-bytes|aria-query|dom-accessibility-api)/)',
   ],
 
   // File extensions Jest recognizes during module resolution

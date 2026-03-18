@@ -14,6 +14,8 @@ import {
   deleteLessonAPI,
   getAllProductsByUserIdAPI,
   getProductByProductIdAPI,
+  getProductByIdAPI,
+  getProductsByOwnerAPI,
   getAllProductsMinimalAPI,
   fetchProducts,
   getAllProductsMinimalByUserAPI,
@@ -21,6 +23,7 @@ import {
   getPresignedUrlAPI,
   uploadToPresignedUrl,
   confirmFileUploadAPI,
+  uploadDownloadSectionFileAPI,
 } from './products-api';
 
 jest.mock('../../http-client');
@@ -72,14 +75,14 @@ describe('Products API', () => {
   });
 
   describe('updateProductDetailsAPI', () => {
-    it('PUTs payload with withCredentials:true and returns data', async () => {
+    it('PATCHes payload with withCredentials:true and returns data', async () => {
       const payload = { id: 'p1', title: 'New' } as any;
       const resp = { ...payload };
-      mockedHttpClient.put.mockResolvedValueOnce({ data: resp });
+      mockedHttpClient.patch.mockResolvedValueOnce({ data: resp });
 
       await expect(updateProductDetailsAPI(payload)).resolves.toEqual(resp);
-      expect(mockedHttpClient.put).toHaveBeenCalledWith(
-        'api/products',
+      expect(mockedHttpClient.patch).toHaveBeenCalledWith(
+        'api/products/p1',
         payload,
         { withCredentials: true },
       );
@@ -87,7 +90,7 @@ describe('Products API', () => {
 
     it('rethrows and logs on error', async () => {
       const err = new Error('update failed');
-      mockedHttpClient.put.mockRejectedValueOnce(err);
+      mockedHttpClient.patch.mockRejectedValueOnce(err);
 
       await expect(updateProductDetailsAPI({} as any)).rejects.toThrow(
         'update failed',
@@ -97,13 +100,13 @@ describe('Products API', () => {
   });
 
   describe('deleteProductAPI', () => {
-    it('DELETEs with composed query and returns data', async () => {
+    it('DELETEs the canonical product resource and returns the deleted id', async () => {
       const payload = { userId: 'u1', productType: 'COURSE', id: 'p1' } as any;
       mockedHttpClient.delete.mockResolvedValueOnce({ data: 'ok' });
 
-      await expect(deleteProductAPI(payload)).resolves.toEqual('ok');
+      await expect(deleteProductAPI(payload)).resolves.toEqual('p1');
       expect(mockedHttpClient.delete).toHaveBeenCalledWith(
-        'api/products?userId=u1&productType=COURSE&id=p1',
+        'api/products/p1',
       );
     });
 
@@ -124,76 +127,115 @@ describe('Products API', () => {
 
   describe('Sections', () => {
     it('createSectionAPI posts with withCredentials:true', async () => {
-      const payload = { courseId: 'c1', title: 'S1' } as any;
-      const resp = { id: 's1' };
+      const payload = { productId: 'p1', title: 'S1', position: 2 } as any;
+      const resp = { id: 's1', productId: 'p1', title: 'S1', position: 2 };
       mockedHttpClient.post.mockResolvedValueOnce({ data: resp });
 
       await expect(createSectionAPI(payload)).resolves.toEqual(resp);
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
-        'api/products/course/section',
-        payload,
+        'api/products/p1/sections',
+        {
+          title: 'S1',
+          description: undefined,
+          position: 2,
+        },
         { withCredentials: true },
       );
     });
 
-    it('updateSectionDetailsAPI puts with withCredentials:true', async () => {
-      const payload = { id: 's1', title: 'Renamed' } as any;
-      mockedHttpClient.put.mockResolvedValueOnce({ data: 'ok' });
+    it('updateSectionDetailsAPI patches the canonical section endpoint', async () => {
+      const payload = { productId: 'p1', sectionId: 's1', title: 'Renamed' } as any;
+      const resp = { id: 's1', productId: 'p1', title: 'Renamed' };
+      mockedHttpClient.patch.mockResolvedValueOnce({ data: resp });
 
-      await expect(updateSectionDetailsAPI(payload)).resolves.toEqual('ok');
-      expect(mockedHttpClient.put).toHaveBeenCalledWith(
-        'api/products/course/section',
-        payload,
+      await expect(updateSectionDetailsAPI(payload)).resolves.toEqual(resp);
+      expect(mockedHttpClient.patch).toHaveBeenCalledWith(
+        'api/products/p1/sections/s1',
+        {
+          title: 'Renamed',
+          description: undefined,
+          position: undefined,
+        },
         { withCredentials: true },
       );
     });
 
-    it('deleteSectionAPI deletes with correct query', async () => {
+    it('deleteSectionAPI deletes the canonical section resource', async () => {
       mockedHttpClient.delete.mockResolvedValueOnce({ data: 'ok' });
 
       await expect(
-        deleteSectionAPI({ userId: 'u1', id: 's1' } as any),
-      ).resolves.toEqual('ok');
+        deleteSectionAPI({ productId: 'p1', sectionId: 's1' } as any),
+      ).resolves.toEqual('s1');
       expect(mockedHttpClient.delete).toHaveBeenCalledWith(
-        'api/products/course/section?userId=u1&id=s1',
+        'api/products/p1/sections/s1',
       );
     });
   });
 
   describe('Lessons', () => {
     it('createLessonAPI posts with withCredentials:true', async () => {
-      const payload = { sectionId: 's1', title: 'L1' } as any;
-      const resp = { id: 'l1' };
+      const payload = {
+        productId: 'p1',
+        sectionId: 's1',
+        title: 'L1',
+        type: 'VIDEO',
+        description: '',
+      } as any;
+      const resp = { id: 'l1', productId: 'p1', sectionId: 's1' };
       mockedHttpClient.post.mockResolvedValueOnce({ data: resp });
 
       await expect(createLessonAPI(payload)).resolves.toEqual(resp);
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
-        'api/products/course/section/lesson',
-        payload,
+        'api/products/p1/sections/s1/lessons',
+        {
+          title: 'L1',
+          type: 'VIDEO',
+          videoUrl: undefined,
+          content: undefined,
+          description: '',
+          position: undefined,
+        },
         { withCredentials: true },
       );
     });
 
-    it('updateLessonDetailsAPI puts with withCredentials:true', async () => {
-      const payload = { id: 'l1', title: 'New' } as any;
-      mockedHttpClient.put.mockResolvedValueOnce({ data: 'ok' });
+    it('updateLessonDetailsAPI patches the canonical lesson resource', async () => {
+      const payload = {
+        id: 'l1',
+        productId: 'p1',
+        sectionId: 's1',
+        title: 'New',
+      } as any;
+      const resp = { ...payload };
+      mockedHttpClient.patch.mockResolvedValueOnce({ data: resp });
 
-      await expect(updateLessonDetailsAPI(payload)).resolves.toEqual('ok');
-      expect(mockedHttpClient.put).toHaveBeenCalledWith(
-        'api/products/course/section/lesson',
-        payload,
+      await expect(updateLessonDetailsAPI(payload)).resolves.toEqual(resp);
+      expect(mockedHttpClient.patch).toHaveBeenCalledWith(
+        'api/products/p1/sections/s1/lessons/l1',
+        {
+          title: 'New',
+          type: undefined,
+          videoUrl: undefined,
+          content: undefined,
+          description: undefined,
+          position: undefined,
+        },
         { withCredentials: true },
       );
     });
 
-    it('deleteLessonAPI deletes with correct query', async () => {
+    it('deleteLessonAPI deletes the canonical lesson resource', async () => {
       mockedHttpClient.delete.mockResolvedValueOnce({ data: 'ok' });
 
       await expect(
-        deleteLessonAPI({ userId: 'u1', id: 'l1' } as any),
-      ).resolves.toEqual('ok');
+        deleteLessonAPI({
+          productId: 'p1',
+          sectionId: 's1',
+          lessonId: 'l1',
+        } as any),
+      ).resolves.toEqual('l1');
       expect(mockedHttpClient.delete).toHaveBeenCalledWith(
-        'api/products/course/section/lesson?userId=u1&id=l1',
+        'api/products/p1/sections/s1/lessons/l1',
       );
     });
   });
@@ -209,16 +251,24 @@ describe('Products API', () => {
       );
     });
 
-    it('getProductByProductIdAPI GETs with productId & type', async () => {
+    it('getProductByIdAPI GETs with product id only', async () => {
+      const p = { id: 'p1' };
+      mockedHttpClient.get.mockResolvedValueOnce({ data: p });
+
+      await expect(getProductByIdAPI('p1')).resolves.toEqual(p);
+      expect(mockedHttpClient.get).toHaveBeenCalledWith(
+        'api/products/p1',
+      );
+    });
+
+    it('getProductByProductIdAPI delegates to the id-only endpoint', async () => {
       const p = { id: 'p1' };
       mockedHttpClient.get.mockResolvedValueOnce({ data: p });
 
       await expect(
         getProductByProductIdAPI('p1', 'COURSE' as any),
       ).resolves.toEqual(p);
-      expect(mockedHttpClient.get).toHaveBeenCalledWith(
-        'api/products/getProduct?productId=p1&type=COURSE',
-      );
+      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/products/p1');
     });
 
     it('normalizes nested details.sections in getProductByProductIdAPI', async () => {
@@ -413,6 +463,18 @@ describe('Products API', () => {
         'api/products/get-all-products-min?userId=u1',
       );
     });
+
+    it('getProductsByOwnerAPI GETs summary cards by owner id', async () => {
+      const arr = [{ id: 'm1', title: 'Summary name' }];
+      mockedHttpClient.get.mockResolvedValueOnce({ data: arr });
+
+      await expect(getProductsByOwnerAPI('u1')).resolves.toEqual([
+        { id: 'm1', title: 'Summary name', name: 'Summary name' },
+      ]);
+      expect(mockedHttpClient.get).toHaveBeenCalledWith(
+        'api/products?ownerId=u1',
+      );
+    });
   });
 
   describe('Media & files', () => {
@@ -427,7 +489,7 @@ describe('Products API', () => {
       );
     });
 
-    it('getPresignedUrlAPI GETs with params', async () => {
+    it('getPresignedUrlAPI GETs with canonical product/section params', async () => {
       const data = {
         fileId: 'f1',
         presignedUrl: 'https://s3/presigned',
@@ -436,13 +498,13 @@ describe('Products API', () => {
       };
       mockedHttpClient.get.mockResolvedValueOnce({ data });
 
-      await expect(getPresignedUrlAPI('s1', 'doc.pdf')).resolves.toEqual(data);
+      await expect(getPresignedUrlAPI('p1', 's1', 'doc.pdf')).resolves.toEqual(
+        data,
+      );
       expect(mockedHttpClient.get).toHaveBeenCalledWith(
-        '/api/files/presigned-url',
+        '/api/products/p1/sections/s1/files/presigned-url',
         {
           params: {
-            sectionId: 's1',
-            folderType: 'DOWNLOAD_SECTION_FILES',
             filename: 'doc.pdf',
           },
         },
@@ -487,11 +549,11 @@ describe('Products API', () => {
         const serverResp = { fileId: 'f1', url: 'https://cdn/doc.pdf' };
         mockedHttpClient.post.mockResolvedValueOnce({ data: serverResp });
 
-        await expect(confirmFileUploadAPI(payload)).resolves.toEqual(
+        await expect(confirmFileUploadAPI('p1', 's1', payload)).resolves.toEqual(
           serverResp,
         );
         expect(mockedHttpClient.post).toHaveBeenCalledWith(
-          '/api/files/confirm-upload',
+          '/api/products/p1/sections/s1/files/confirm-upload',
           payload,
           {
             withCredentials: true,
@@ -505,7 +567,7 @@ describe('Products API', () => {
         const err = new Error('confirm failed');
         mockedHttpClient.post.mockRejectedValueOnce(err);
 
-        await expect(confirmFileUploadAPI({} as any)).rejects.toThrow(
+        await expect(confirmFileUploadAPI('p1', 's1', {} as any)).rejects.toThrow(
           'confirm failed',
         );
         // ensure header still present (empty string)
@@ -515,6 +577,42 @@ describe('Products API', () => {
           withCredentials: true,
         });
         expect(errorLogSpy).toHaveBeenCalled();
+      });
+    });
+
+    it('uploadDownloadSectionFileAPI runs presign, upload and confirm in order', async () => {
+      mockedGetCookie.mockReturnValue('csrf123');
+      mockedHttpClient.get.mockResolvedValueOnce({
+        data: {
+          fileId: 'temp',
+          presignedUrl: 'https://s3/presigned',
+          key: 'uploads/doc.pdf',
+          fileUrl: 'https://cdn/doc.pdf',
+        },
+      });
+      mockedHttpClient.post.mockResolvedValueOnce({
+        data: {
+          fileId: 'f1',
+          fileName: 'doc.pdf',
+          url: 'https://cdn/doc.pdf',
+        },
+      });
+      (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
+
+      const file = new File(['data'], 'doc.pdf', { type: 'application/pdf' });
+
+      await expect(
+        uploadDownloadSectionFileAPI({
+          productId: 'p1',
+          sectionId: 's1',
+          file,
+        }),
+      ).resolves.toEqual({
+        id: 'f1',
+        fileName: 'doc.pdf',
+        size: file.size,
+        fileType: file.type,
+        url: 'https://cdn/doc.pdf',
       });
     });
   });
@@ -532,7 +630,7 @@ describe('Products API', () => {
       const err = new Error('net');
       mockedHttpClient.get.mockRejectedValueOnce(err);
 
-      await expect(getPresignedUrlAPI('s', 'f')).rejects.toThrow('net');
+      await expect(getPresignedUrlAPI('p', 's', 'f')).rejects.toThrow('net');
       expect(errorLogSpy).toHaveBeenCalled();
     });
   });

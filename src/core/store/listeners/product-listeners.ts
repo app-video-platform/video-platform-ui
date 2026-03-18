@@ -1,12 +1,12 @@
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import {
-  createCourseProduct,
+  createProduct,
   addImageToProduct,
-  updateCourseProductDetails,
-  createSection,
-  updateSectionDetails,
-  createLesson,
-  updateLessonDetails,
+  updateProductDetails,
+  createProductSection,
+  updateProductSection,
+  createCourseLesson,
+  updateCourseLesson,
 } from '../product-store/product.slice';
 import { addNotification } from '../notifications/notifications.slice';
 
@@ -14,7 +14,7 @@ export const setupProductListeners = (
   listenerMiddleware: ReturnType<typeof createListenerMiddleware>
 ) => {
   listenerMiddleware.startListening({
-    actionCreator: createCourseProduct.fulfilled,
+    actionCreator: createProduct.fulfilled,
     effect: async (action, listenerApi) => {
       const { name } = action.payload;
       listenerApi.dispatch(
@@ -41,7 +41,7 @@ export const setupProductListeners = (
   });
 
   listenerMiddleware.startListening({
-    actionCreator: updateCourseProductDetails.fulfilled,
+    actionCreator: updateProductDetails.fulfilled,
     effect: async (action, listenerApi) => {
       const { name } = action.payload;
       listenerApi.dispatch(
@@ -55,7 +55,7 @@ export const setupProductListeners = (
   });
 
   listenerMiddleware.startListening({
-    actionCreator: createSection.fulfilled,
+    actionCreator: createProductSection.fulfilled,
     effect: async (action, listenerApi) => {
       const { title } = action.payload;
       listenerApi.dispatch(
@@ -69,11 +69,11 @@ export const setupProductListeners = (
   });
 
   listenerMiddleware.startListening({
-    actionCreator: updateSectionDetails.fulfilled,
+    actionCreator: updateProductSection.fulfilled,
     effect: async (action, listenerApi) => {
       listenerApi.dispatch(
         addNotification({
-          message: action.payload,
+          message: `Section ${action.payload.title} updated successfully!`,
           type: 'SUCCESS',
           title: 'Section Updated',
         })
@@ -82,7 +82,7 @@ export const setupProductListeners = (
   });
 
   listenerMiddleware.startListening({
-    actionCreator: createLesson.fulfilled,
+    actionCreator: createCourseLesson.fulfilled,
     effect: async (action, listenerApi) => {
       const { title } = action.payload;
       listenerApi.dispatch(
@@ -96,11 +96,11 @@ export const setupProductListeners = (
   });
 
   listenerMiddleware.startListening({
-    actionCreator: updateLessonDetails.fulfilled,
+    actionCreator: updateCourseLesson.fulfilled,
     effect: async (action, listenerApi) => {
       listenerApi.dispatch(
         addNotification({
-          message: action.payload,
+          message: `Lesson ${action.payload.title} updated successfully!`,
           type: 'SUCCESS',
           title: 'Lesson Updated',
         })

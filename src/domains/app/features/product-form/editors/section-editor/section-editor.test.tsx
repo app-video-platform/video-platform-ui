@@ -29,10 +29,15 @@ import { selectAuthUser } from 'core/store/auth-store';
 
 jest.mock('@store/product-store', () => ({
   __esModule: true,
-  createSection: jest.fn(),
-  deleteSection: jest.fn(),
+  createProductSection: jest.fn(),
+  deleteProductSection: jest.fn(),
+  uploadDownloadSectionFile: jest.fn(),
+  deleteDownloadSectionFile: jest.fn(),
 }));
-import { createSection, deleteSection } from 'core/store/product-store';
+import {
+  createProductSection,
+  deleteProductSection,
+} from 'core/store/product-store';
 
 // ── 3) MOCK shared UI barrel used by SectionEditor ─────────────────
 jest.mock('@shared/ui', () => ({
@@ -166,11 +171,11 @@ describe('<SectionEditor />', () => {
   const mockedUseSelector = useSelector as jest.MockedFunction<
     typeof useSelector
   >;
-  const mockedCreateSection = createSection as jest.MockedFunction<
-    typeof createSection
+  const mockedCreateSection = createProductSection as jest.MockedFunction<
+    typeof createProductSection
   >;
-  const mockedDeleteSection = deleteSection as jest.MockedFunction<
-    typeof deleteSection
+  const mockedDeleteSection = deleteProductSection as jest.MockedFunction<
+    typeof deleteProductSection
   >;
 
   let fakeDispatch: jest.Mock<any, any>;
@@ -273,8 +278,8 @@ describe('<SectionEditor />', () => {
     });
 
     expect(mockedDeleteSection).toHaveBeenCalledWith({
-      id: 'to-remove',
-      userId: 'user-123',
+      productId: 'pid-1',
+      sectionId: 'to-remove',
     });
     expect(fakeDispatch).toHaveBeenCalledWith(fakeThunk);
 

@@ -5,14 +5,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { selectAuthUser } from 'core/store/auth-store';
 import {
-  selectAllProducts,
+  getProductSummariesByOwner,
+  selectProductSummaries,
   selectProductsLoading,
   selectProductsError,
-  getAllProductsByUserId,
 } from 'core/store/product-store';
 import { ProductCard } from 'domains/app/components';
 import { Button } from '@shared/ui';
-import { AbstractProduct, AppDispatch } from 'core/api/models';
+import { AppDispatch, ProductMinimised } from 'core/api/models';
 import {
   ProductFilters,
   ProductFilterForm,
@@ -24,14 +24,14 @@ const ProductsList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const products = useSelector(selectAllProducts);
+  const products = useSelector(selectProductSummaries);
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
   const user = useSelector(selectAuthUser);
 
   useEffect(() => {
     if (user && user.id) {
-      dispatch(getAllProductsByUserId(user.id));
+      dispatch(getProductSummariesByOwner(user.id));
     }
   }, [dispatch, user]);
 
@@ -65,10 +65,12 @@ const ProductsList: React.FC = () => {
     const filtered = products.filter((p) => {
       const matchesSearch =
         term === '' ||
-        (p.name && p.name.toLowerCase().includes(term)) ||
+        ((p.name ?? p.title) &&
+          (p.name ?? p.title)?.toLowerCase().includes(term)) ||
         (p.description && p.description.toLowerCase().includes(term));
 
-      const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+      const matchesStatus =
+        statusFilter === 'all' || !p.status || p.status === statusFilter;
 
       const matchesType = typeFilter === 'all' || p.type === typeFilter;
 
@@ -90,9 +92,9 @@ const ProductsList: React.FC = () => {
       return Number.isNaN(timestamp) ? 0 : timestamp;
     };
 
-    const getCreatedTime = (product: AbstractProduct) =>
+    const getCreatedTime = (product: ProductMinimised) =>
       parseTimestamp(product.createdAt);
-    const getUpdatedTime = (product: AbstractProduct) =>
+    const getUpdatedTime = (product: ProductMinimised) =>
       parseTimestamp(product.updatedAt ?? product.createdAt);
 
     // 🔽 Sorting
@@ -107,9 +109,13 @@ const ProductsList: React.FC = () => {
         case 'updated-desc':
           return getUpdatedTime(b) - getUpdatedTime(a);
         case 'name-asc':
-          return (a.name ?? '').localeCompare(b.name ?? '');
+          return (a.name ?? a.title ?? '').localeCompare(
+            b.name ?? b.title ?? '',
+          );
         case 'name-desc':
-          return (b.name ?? '').localeCompare(a.name ?? '');
+          return (b.name ?? b.title ?? '').localeCompare(
+            a.name ?? a.title ?? '',
+          );
         default:
           return 0;
       }

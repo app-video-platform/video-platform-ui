@@ -15,6 +15,7 @@ interface GalProductCardProps {
 
 const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
   const navigate = useNavigate();
+  const productName = product.name ?? product.title ?? 'Untitled product';
   // If product.image is missing or empty, use the placeholder
   // const imageUrl =
   //   product.image && product.image.trim() !== ''
@@ -30,15 +31,15 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
       />
       <div className="product-card-details">
         <div className="last-updated-line">
-          <span>
-            {/* {product.updatedAt.toLocaleString('en-GB', {
+        <span>
+          {/* {product.updatedAt.toLocaleString('en-GB', {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
             })} */}
           </span>
         </div>
-        <h3>{product.name}</h3>
+        <h3>{productName}</h3>
         <div className="type-and-price-line">
           <span>{product.type?.toLowerCase()}</span>
           <span>
@@ -50,7 +51,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
       <Button
         type="button"
         variant="secondary"
-        onClick={() => navigate(`/app/product/${product.id}/${product.type}`)}
+        onClick={() => navigate(`/app/product/${product.id}`)}
       >
         View Product
       </Button>

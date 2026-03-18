@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { ProductType, AppDispatch } from 'core/api/models';
+import { AppDispatch } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import { UseProductFormFacadeResult } from '../models/product-form';
 import { useProductAutosave } from './use-product-autosave.hook';
@@ -15,6 +15,7 @@ import {
 
 export const useProductFormFacade = (): UseProductFormFacadeResult => {
   const { type, id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
   const isEditMode = Boolean(id);
@@ -40,11 +41,15 @@ export const useProductFormFacade = (): UseProductFormFacadeResult => {
   useProductLoader({
     isEditMode,
     id,
-    type: type as ProductType,
     dispatch,
     setFormData,
     setErrors,
     setShowRestOfForm,
+    onProductLoaded: (product) => {
+      if (type && product.type !== type) {
+        navigate(`/app/products/edit/${product.id}`, { replace: true });
+      }
+    },
   });
 
   // 3) autosave

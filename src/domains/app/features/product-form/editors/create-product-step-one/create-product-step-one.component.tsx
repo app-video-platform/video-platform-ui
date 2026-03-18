@@ -11,7 +11,7 @@ import {
 } from 'core/api/models';
 import { Button, GalIcon, Input } from '@shared/ui';
 import { FormErrors } from 'domains/app/pages';
-import { createCourseProduct } from 'core/store/product-store';
+import { createProduct } from 'core/store/product-store';
 import { ProductTypeSelector } from 'domains/app/features/product-form/product-type-selector';
 import { getCssVar } from '@shared/utils';
 import { ProductDraft } from 'domains/app/features/product-form/models';
@@ -58,7 +58,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
     };
 
     setTimeout(() => {
-      dispatch(createCourseProduct(newProductPayload))
+      dispatch(createProduct(newProductPayload))
         .unwrap()
         .then((data) => {
           if (data) {
@@ -73,7 +73,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
         })
         .catch((error) => {
           // eslint-disable-next-line no-console
-          console.error('Error creating course product:', error);
+          console.error('Error creating product:', error);
         })
         .finally(() => {
           setShowLoadingRestOfForm(false);
