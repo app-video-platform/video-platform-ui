@@ -56,7 +56,9 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector(selectAuthUser);
+  const latestSectionRef = useRef(section);
   const uploadedFileSignaturesRef = useRef(new Set<string>());
+  const uploadedFileSignatureByIdRef = useRef(new Map<string, string>());
 
   const { isAutosaving, lastSavedAt } = useSectionAutosave({
     section,
@@ -74,12 +76,21 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     }
   }, [section]);
 
-  const updateSection = (patch: Partial<SectionDraft>) => {
-    const next: SectionDraft = {
-      ...section,
-      ...patch,
-    };
+  useEffect(() => {
+    latestSectionRef.current = section;
+  }, [section]);
+
+  const applySectionUpdate = (updater: (current: SectionDraft) => SectionDraft) => {
+    const next = updater(latestSectionRef.current);
+    latestSectionRef.current = next;
     onChange(index, next);
+  };
+
+  const updateSection = (patch: Partial<SectionDraft>) => {
+    applySectionUpdate((current) => ({
+      ...current,
+      ...patch,
+    }));
   };
 
   const handleRemove = () => {
@@ -133,6 +144,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           lessons: createdSection.lessons ?? [],
           files: createdSection.files ?? [],
         };
+        latestSectionRef.current = normalized;
         onChange(index, normalized);
       });
   };
@@ -163,16 +175,25 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       )
         .unwrap()
         .then(({ file: uploadedFile }) => {
-          const existingFiles = section.files ?? [];
-          const alreadyExists = existingFiles.some(
-            (existing) => existing.id === uploadedFile.id,
-          );
-
-          if (!alreadyExists) {
-            updateSection({
-              files: [...existingFiles, uploadedFile],
-            });
+          if (uploadedFile.id) {
+            uploadedFileSignatureByIdRef.current.set(uploadedFile.id, signature);
           }
+
+          applySectionUpdate((current) => {
+            const existingFiles = current.files ?? [];
+            const alreadyExists = existingFiles.some(
+              (existing) => existing.id === uploadedFile.id,
+            );
+
+            if (alreadyExists) {
+              return current;
+            }
+
+            return {
+              ...current,
+              files: [...existingFiles, uploadedFile],
+            };
+          });
         })
         .catch((error) => {
           uploadedFileSignaturesRef.current.delete(signature);
@@ -195,9 +216,16 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
     )
       .unwrap()
       .then(() => {
-        updateSection({
-          files: (section.files ?? []).filter((file) => file.id !== fileId),
-        });
+        const signature = uploadedFileSignatureByIdRef.current.get(fileId);
+        if (signature) {
+          uploadedFileSignaturesRef.current.delete(signature);
+          uploadedFileSignatureByIdRef.current.delete(fileId);
+        }
+
+        applySectionUpdate((current) => ({
+          ...current,
+          files: (current.files ?? []).filter((file) => file.id !== fileId),
+        }));
       });
   };
 

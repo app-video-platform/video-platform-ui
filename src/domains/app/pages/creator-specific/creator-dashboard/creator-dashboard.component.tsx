@@ -7,6 +7,7 @@ import { GalProductCard } from 'domains/app/components';
 import { GalIcon, Button } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
 import {
+  getAllProductsByUserId,
   selectTopThreeProducts,
   getProductSummariesByOwner,
 } from 'core/store/product-store';
@@ -23,6 +24,7 @@ const CreatorDashboard: React.FC = () => {
   useEffect(() => {
     if (user && user.id) {
       dispatch(getProductSummariesByOwner(user.id));
+      dispatch(getAllProductsByUserId(user.id));
     }
   }, [dispatch, user]);
 
