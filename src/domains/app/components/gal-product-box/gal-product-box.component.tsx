@@ -31,8 +31,8 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
       />
       <div className="product-card-details">
         <div className="last-updated-line">
-        <span>
-          {/* {product.updatedAt.toLocaleString('en-GB', {
+          <span>
+            {/* {product.updatedAt.toLocaleString('en-GB', {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
