@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 import { selectAuthUser } from 'core/store/auth-store';
-import { updateCourseProductDetails } from 'core/store/product-store';
+import { updateProductDetails } from 'core/store/product-store';
 import { ProductDraft } from '../models/product-form';
 import {
   getAutosaveSnapshot,
@@ -59,7 +59,7 @@ export const useProductAutosave = ({
       try {
         const productData = mapFormDataToProductPayload(formData, user);
 
-        dispatch(updateCourseProductDetails(productData))
+        dispatch(updateProductDetails(productData))
           .unwrap()
           .then(() => {
             lastSavedSnapshot.current = currentSnapshot;

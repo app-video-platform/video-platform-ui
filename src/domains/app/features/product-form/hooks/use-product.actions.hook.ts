@@ -2,7 +2,7 @@
 import { IRemoveProductPayload, AppDispatch } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import {
-  updateCourseProductDetails,
+  updateProductDetails,
   deleteProduct,
 } from 'core/store/product-store';
 import { ProductDraft, FormErrors } from '../models/product-form';
@@ -38,17 +38,17 @@ export const useProductActions = ({
 
     const productData = mapFormDataToProductPayload(formData, user);
 
-    dispatch(updateCourseProductDetails(productData))
+    dispatch(updateProductDetails(productData))
       .unwrap()
       .then((data) => {
         if (data) {
-          window.alert('Course product updated successfully!');
+          window.alert('Product updated successfully!');
         }
       })
       .catch((error) => {
         console.error('Error updating course product:', error);
         setErrors({
-          api: 'Failed to update course product. Please try again.',
+          api: 'Failed to update product. Please try again.',
         });
       })
       .finally(() => {

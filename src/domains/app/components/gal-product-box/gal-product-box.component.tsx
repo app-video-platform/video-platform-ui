@@ -15,6 +15,7 @@ interface GalProductCardProps {
 
 const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
   const navigate = useNavigate();
+  const productName = product.title ?? 'Untitled product';
   // If product.image is missing or empty, use the placeholder
   // const imageUrl =
   //   product.image && product.image.trim() !== ''
@@ -25,7 +26,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
     <div className="product-card">
       <img
         src={placeholderImage}
-        alt={product.name}
+        alt={productName}
         className="product-card-image"
       />
       <div className="product-card-details">
@@ -38,7 +39,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
             })} */}
           </span>
         </div>
-        <h3>{product.name}</h3>
+        <h3>{productName}</h3>
         <div className="type-and-price-line">
           <span>{product.type?.toLowerCase()}</span>
           <span>
@@ -50,7 +51,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
       <Button
         type="button"
         variant="secondary"
-        onClick={() => navigate(`/app/product/${product.id}/${product.type}`)}
+        onClick={() => navigate(`/app/product/${product.id}`)}
       >
         View Product
       </Button>

@@ -36,17 +36,18 @@ const WishlistTab: React.FC = () => {
       {wishlistProducts && wishlistProducts.length > 0 ? (
         wishlistProducts.map((prod) => {
           const inCart = cartIds.has(prod.id);
+          const productTitle = prod.title ?? 'Untitled product';
 
           return (
             <div key={prod.id} className="wishlist-product-card">
               <img
                 src={placeholderImage}
-                alt={prod.name}
+                alt={productTitle}
                 className="product-card-image"
                 height={'150'}
               />
               <div className="wishlist-product-details">
-                <h3>{prod.name}</h3>
+                <h3>{productTitle}</h3>
                 <p>
                   By {prod.createdByName} <span>{prod.createdByTitle}</span>
                 </p>

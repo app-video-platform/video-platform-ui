@@ -75,6 +75,7 @@ describe('<CourseLessons />', () => {
   });
 
   const sectionId = 'section-abc';
+  const productId = 'product-abc';
 
   function makeLessons(count: number): any[] {
     return Array.from({ length: count }).map((_, i) => ({
@@ -89,6 +90,7 @@ describe('<CourseLessons />', () => {
 
     render(
       <CourseLessons
+        productId={productId}
         sectionId={sectionId}
         lessons={[]}
         onLessonsChange={onLessonsChange}
@@ -108,6 +110,7 @@ describe('<CourseLessons />', () => {
 
     render(
       <CourseLessons
+        productId={productId}
         sectionId={sectionId}
         lessons={initialLessons}
         onLessonsChange={onLessonsChange}
@@ -130,6 +133,7 @@ describe('<CourseLessons />', () => {
 
     render(
       <CourseLessons
+        productId={productId}
         sectionId={sectionId}
         lessons={initialLessons}
         onLessonsChange={onLessonsChange}
@@ -161,6 +165,7 @@ describe('<CourseLessons />', () => {
 
     render(
       <CourseLessons
+        productId={productId}
         sectionId={sectionId}
         lessons={initialLessons}
         onLessonsChange={onLessonsChange}
@@ -189,6 +194,7 @@ describe('<CourseLessons />', () => {
 
     const { rerender } = render(
       <CourseLessons
+        productId={productId}
         sectionId={sectionId}
         lessons={makeLessons(1)}
         onLessonsChange={onLessonsChange}
@@ -202,6 +208,7 @@ describe('<CourseLessons />', () => {
     // Rerender with 4 lessons
     rerender(
       <CourseLessons
+        productId={productId}
         sectionId={sectionId}
         lessons={makeLessons(4)}
         onLessonsChange={onLessonsChange}

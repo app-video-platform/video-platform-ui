@@ -84,7 +84,7 @@ const SmartSearch: React.FC = () => {
         break;
       case 'Enter': {
         e.preventDefault();
-        const pick = suggestions[highlight]?.name ?? rawQuery;
+        const pick = suggestions[highlight]?.title ?? rawQuery;
         navigate(`/app/explore/search?term=${encodeURIComponent(pick)}`);
         setOpen(false);
         break;
@@ -116,7 +116,7 @@ const SmartSearch: React.FC = () => {
             <li className="autocomplete-message">No suggestions</li>
           )}
           {suggestions.map((s, idx) => {
-            const titleValue = s.name ?? '';
+            const titleValue = s.title ?? '';
             const titleLower = titleValue.toLowerCase();
             const termLower = debouncedQuery.toLowerCase();
             const start = titleLower.indexOf(termLower);
@@ -139,7 +139,7 @@ const SmartSearch: React.FC = () => {
                     {titleValue.slice(end)}
                   </>
                 ) : (
-                  s.name
+                  titleValue
                 )}
               </li>
             );

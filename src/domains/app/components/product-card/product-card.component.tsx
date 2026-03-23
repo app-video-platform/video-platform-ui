@@ -2,20 +2,26 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
-import { AbstractProduct } from 'core/api/models';
+import { AbstractProduct, ProductMinimised } from 'core/api/models';
 import { Button, StatusChip } from '@shared/ui';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../../assets/image-placeholder.png');
 
 import './product-card.styles.scss';
 
+type ProductCardProduct = (AbstractProduct | ProductMinimised) & {
+  name?: string;
+  title?: string;
+};
+
 interface ProductCardProps {
-  product: AbstractProduct;
+  product: ProductCardProduct;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigate = useNavigate();
   const imgSrc = product.imageUrl ? product.imageUrl : placeholderImage;
+  const productName = product.name ?? product.title ?? 'Untitled product';
 
   const parseProductDate = (value?: Date | string | null) => {
     if (!value) {
@@ -34,16 +40,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   const handleGoToEdit = () => {
-    navigate(`edit/${product.type}/${product.id}`);
+    navigate(`edit/${product.id}`);
   };
 
   return (
     <div className="product-card">
-      <img src={imgSrc} alt={product.name} className="product-card-image" />
+      <img src={imgSrc} alt={productName} className="product-card-image" />
       <div className="product-card-details">
         <div className="product-card-header">
           <div>
-            <h2>{product.name}</h2>
+            <h2>{productName}</h2>
             <p className="product-type">{product.type}</p>
           </div>
           <div className="status-wrapper">

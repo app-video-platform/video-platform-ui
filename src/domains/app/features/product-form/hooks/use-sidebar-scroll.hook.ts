@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { CourseProductSection, CourseLesson } from 'core/api/models';
+import { ProductSection, CourseLesson } from 'core/api/models';
 import { BuilderSectionNavItem } from '../builder-sidebar';
 import { ProductDraft } from '../models/product-form';
 
@@ -17,7 +17,7 @@ export const useSidebarSections = (
         id: section.id,
         title: section.title,
         position: idx + 1,
-        lessons: ((section as CourseProductSection).lessons || []).map(
+        lessons: ((section as ProductSection).lessons || []).map(
           (lesson: CourseLesson, index) => ({
             id: lesson.id ?? index.toString(),
             title: lesson.title ?? '',
