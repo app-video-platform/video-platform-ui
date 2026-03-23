@@ -2,7 +2,7 @@ import { IconType } from 'react-icons';
 import { ConnectedCalendar } from '../calendars/connected-calendar';
 import { MeetingMethod } from './meeting-method.types';
 import { ProductType, ProductStatus } from './products.types';
-import { CourseProductSection, DownloadSection } from './section';
+import { ProductSection } from './section';
 
 export interface AbstractProductBase {
   id: string;
@@ -15,19 +15,19 @@ export interface AbstractProductBase {
   createdAt?: Date;
   updatedAt?: Date;
   imageUrl?: string;
-  sections?: any[];
+  sections?: ProductSection[];
   consultationDetails?: ConsultationDetails;
 }
 
 export interface DownloadProduct extends AbstractProductBase {
   type: 'DOWNLOAD';
-  sections?: DownloadSection[];
+  sections?: ProductSection[];
 }
 
 // ----- Course product (request)
 export interface CourseProduct extends AbstractProductBase {
   type: 'COURSE';
-  sections?: CourseProductSection[];
+  sections?: ProductSection[];
 }
 
 export interface ConsultationProduct extends AbstractProductBase {
@@ -50,7 +50,6 @@ export interface ConsultationDetails {
 export interface ProductMinimised {
   id?: string;
   title?: string;
-  name?: string;
   description?: string;
   type?: ProductType;
   price?: number | 'free';

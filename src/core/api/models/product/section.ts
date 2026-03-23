@@ -11,21 +11,15 @@ export interface ProductSection {
   files?: FileDownloadProductResponse[];
 }
 
-export type CourseProductSection = ProductSection;
-export type DownloadSection = ProductSection;
-
 export interface ProductSectionCreateRequest {
   title: string;
   productId: string;
-  userId?: string;
   description?: string;
   position?: number;
 }
 
 export interface ProductSectionUpdateRequest {
-  id?: string;
-  sectionId?: string;
-  userId?: string;
+  sectionId: string;
   productId: string;
   title?: string;
   description?: string;
@@ -34,10 +28,5 @@ export interface ProductSectionUpdateRequest {
 
 export interface RemoveSectionPayload {
   productId: string;
-  sectionId?: string;
-  id?: string;
-  userId?: string;
+  sectionId: string;
 }
-
-export type CourseSectionCreateRequest = ProductSectionCreateRequest;
-export type CourseSectionUpdateRequest = ProductSectionUpdateRequest;

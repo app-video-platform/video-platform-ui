@@ -468,9 +468,7 @@ describe('Products API', () => {
       const arr = [{ id: 'm1', title: 'Summary name' }];
       mockedHttpClient.get.mockResolvedValueOnce({ data: arr });
 
-      await expect(getProductsByOwnerAPI('u1')).resolves.toEqual([
-        { id: 'm1', title: 'Summary name', name: 'Summary name' },
-      ]);
+      await expect(getProductsByOwnerAPI('u1')).resolves.toEqual(arr);
       expect(mockedHttpClient.get).toHaveBeenCalledWith(
         'api/products?ownerId=u1',
       );

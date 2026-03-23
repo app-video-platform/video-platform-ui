@@ -53,13 +53,11 @@ export const updateLessonDetailsAPI = async (payload: CourseLesson) => {
 };
 
 export const deleteLessonAPI = async (payload: RemoveLessonPayload) => {
-  const lessonId = payload.lessonId ?? payload.id ?? '';
-
   try {
     await httpClient.delete(
-      `api/products/${payload.productId}/sections/${payload.sectionId}/lessons/${lessonId}`,
+      `api/products/${payload.productId}/sections/${payload.sectionId}/lessons/${payload.lessonId}`,
     );
-    return lessonId;
+    return payload.lessonId;
   } catch (error) {
     console.error('Error deleting lesson:', error);
     throw error;

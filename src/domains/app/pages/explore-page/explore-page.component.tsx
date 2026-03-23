@@ -93,12 +93,13 @@ const ExplorePage: React.FC = () => {
           <div className="products-list">
             {products?.map((product, idx) => {
               const wished = wishlistIds.has(product.id);
+              const productName = product.title ?? 'Untitled product';
 
               return (
                 <div key={idx} className="product-card">
                   <img
                     src={placeholderImage}
-                    alt={product.name}
+                    alt={productName}
                     className="product-card-image"
                   />
 
@@ -132,7 +133,7 @@ const ExplorePage: React.FC = () => {
                           )}
                       </span>
                     </div>
-                    <h3>{product.name}</h3>
+                    <h3>{productName}</h3>
                     <div className="type-and-price-line">
                       <span>{product.type?.toLowerCase()}</span>
                       <span>

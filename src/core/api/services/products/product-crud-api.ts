@@ -5,13 +5,12 @@ import {
   AbstractProductApiResponse,
   AbstractProductBase,
   CreateProductPayload,
-  IRemoveProductPayload,
   ProductMinimised,
 } from 'core/api/models';
 import {
   normalizeProductResponse,
   normalizeProductSummary,
-} from './product-normalizers';
+} from './utils/product-normalizers.util';
 
 export interface SearchResponse<T> {
   content: T[];
@@ -131,9 +130,11 @@ export const getProductByIdAPI = async (productId: string) => {
 
 export const getProductByProductIdAPI = async (
   productId: string,
-  // kept only for compatibility with older call sites/tests
-  _productType?: string,
-) => getProductByIdAPI(productId);
+  productType?: string,
+) => {
+  void productType;
+  return getProductByIdAPI(productId);
+};
 
 export const getAllProductsMinimalAPI = async () => {
   try {

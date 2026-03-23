@@ -53,7 +53,4 @@ export const normalizeProductResponse = (
 
 export const normalizeProductSummary = (
   product: ProductMinimised,
-): ProductMinimised => ({
-  ...product,
-  name: product.name ?? product.title,
-});
+): ProductMinimised => product;

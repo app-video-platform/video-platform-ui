@@ -97,7 +97,6 @@ export function setupMocks(client: AxiosInstance) {
           type: 'COURSE' as ProductType,
           id: 'mocked-course-product-id-1',
           title: 'Mocked Course Product 1',
-          name: 'Mocked Course Product 1',
           description: 'This is a mocked course product description.',
           status: 'DRAFT',
           price: 'free',
@@ -111,7 +110,6 @@ export function setupMocks(client: AxiosInstance) {
           type: 'DOWNLOAD' as ProductType,
           id: 'mocked-download-product-id-1',
           title: 'Mocked Download Product 1',
-          name: 'Mocked Download Product 1',
           description: 'This is a mocked download product description.',
           status: 'DRAFT',
           price: 50,
@@ -455,7 +453,6 @@ export function setupMocks(client: AxiosInstance) {
         userId: 'mocked-user-id',
         sections: [
           {
-            userId: 'mocked-user-id',
             id: 'mocked-section-id-1',
             title: 'Mocked Section 1',
             description: 'This is a mocked section description.',
@@ -477,7 +474,7 @@ export function setupMocks(client: AxiosInstance) {
                 content: 'This is some mocked content for lesson 2.',
               },
             ],
-          } as ProductSectionUpdateRequest,
+          },
         ],
       },
       {
@@ -534,7 +531,7 @@ export function setupMocks(client: AxiosInstance) {
     // Generate some fake products matching the term
     const all: ProductMinimised[] = Array.from({ length: size }, (_, i) => ({
       id: `mock-${term}-${page * size + i}`,
-      name: `${term || 'Product'} ${page * size + i + 1}`,
+      title: `${term || 'Product'} ${page * size + i + 1}`,
       type: 'COURSE',
       price: i % 2 === 0 ? 'free' : 9.99,
       createdById: 'mocked-user-id',
@@ -576,7 +573,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'COURSE' as ProductType,
       id: 'mocked-course-product-id-1',
-      name: 'Mocked Course Product 1',
+      title: 'Mocked Course Product 1',
       price: 'free',
       createdById: 'mocked-user-id',
       createdByName: 'Aleb Mocked',
@@ -587,7 +584,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'DOWNLOAD' as ProductType,
       id: 'mocked-course-product-id-2',
-      name: 'Mocked Download Product 1',
+      title: 'Mocked Download Product 1',
       price: 120,
       createdById: 'mocked-user-id',
       createdByName: 'Aleb Mocked',
@@ -598,7 +595,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'COURSE' as ProductType,
       id: 'mocked-course-product-id-3',
-      name: 'Mocked Course Product 2',
+      title: 'Mocked Course Product 2',
       price: 'free',
       createdById: 'mocked-user-id-2',
       createdByName: 'Tomi',
@@ -609,7 +606,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'CONSULTATION' as ProductType,
       id: 'mocked-course-product-id-4',
-      name: 'Mocked Consultation Product 1',
+      title: 'Mocked Consultation Product 1',
       price: 780,
       createdById: 'mocked-user-id-3',
       createdByName: 'Janos',

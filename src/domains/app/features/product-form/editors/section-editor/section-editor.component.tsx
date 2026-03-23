@@ -5,9 +5,9 @@ import { PiRectangleDashed } from 'react-icons/pi';
 
 import CourseLessons from '../../course-lessons/course-lessons.component';
 import {
-  CourseProductSection,
   FileDownloadProductResponse,
   ProductSectionCreateRequest,
+  ProductSection,
   ProductType,
   AppDispatch,
 } from 'core/api/models';
@@ -135,7 +135,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
 
     dispatch(createProductSection(newSection))
       .unwrap()
-      .then((createdSection: CourseProductSection) => {
+      .then((createdSection: ProductSection) => {
         const normalized: SectionDraft = {
           id: createdSection.id ?? '',
           title: createdSection.title ?? '',
@@ -229,7 +229,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       });
   };
 
-  const handleLessonsChange = (lessons: CourseProductSection['lessons']) => {
+  const handleLessonsChange = (lessons: ProductSection['lessons']) => {
     updateSection({ lessons });
   };
 
@@ -291,7 +291,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
                     key={section.id}
                     productId={productId}
                     sectionId={section.id}
-                    lessons={(section as CourseProductSection).lessons || []}
+                    lessons={(section as ProductSection).lessons || []}
                     onLessonsChange={handleLessonsChange}
                   />
                 </div>

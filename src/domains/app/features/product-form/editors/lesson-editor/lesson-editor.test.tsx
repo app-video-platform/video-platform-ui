@@ -231,7 +231,6 @@ describe('<LessonEditor />', () => {
     type: 'VIDEO' as LessonType,
     sectionId: 'sec-1',
     position: 1,
-    userId: 'user-123',
   };
 
   beforeEach(() => {

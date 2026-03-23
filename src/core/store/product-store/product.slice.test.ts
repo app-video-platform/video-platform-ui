@@ -26,10 +26,10 @@ describe('product slice', () => {
       makeState(),
       getProductSummariesByOwner.fulfilled(
         [
-          { id: 'p1', name: 'Low', price: 10, type: 'COURSE' },
-          { id: 'p2', name: 'High', price: 90, type: 'DOWNLOAD' },
-          { id: 'p3', name: 'Free', price: 'free', type: 'COURSE' },
-          { id: 'p4', name: 'Mid', price: 45, type: 'CONSULTATION' },
+          { id: 'p1', title: 'Low', price: 10, type: 'COURSE' },
+          { id: 'p2', title: 'High', price: 90, type: 'DOWNLOAD' },
+          { id: 'p3', title: 'Free', price: 'free', type: 'COURSE' },
+          { id: 'p4', title: 'Mid', price: 45, type: 'CONSULTATION' },
         ],
         'req-1',
         'owner-1',
@@ -61,8 +61,8 @@ describe('product slice', () => {
         { id: 'p2', name: 'Delete me', type: 'DOWNLOAD' },
       ],
       productSummaries: [
-        { id: 'p1', name: 'Keep', price: 10 },
-        { id: 'p2', name: 'Delete me', price: 20 },
+        { id: 'p1', title: 'Keep', price: 10 },
+        { id: 'p2', title: 'Delete me', price: 20 },
       ],
       currentProduct: { id: 'p2', name: 'Delete me', type: 'DOWNLOAD' },
     } as any;

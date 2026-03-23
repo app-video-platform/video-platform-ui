@@ -35,9 +35,11 @@ import {
 
 jest.mock('domains/app/components', () => ({
   __esModule: true,
-  GalProductCard: ({ product }: { product: { name?: string; id?: string } }) => (
-    <div data-testid="product-card">{product.name ?? product.id}</div>
-  ),
+  GalProductCard: ({
+    product,
+  }: {
+    product: { title?: string; id?: string };
+  }) => <div data-testid="product-card">{product.title ?? product.id}</div>,
 }));
 
 jest.mock('@shared/ui', () => ({
@@ -91,8 +93,8 @@ describe('<CreatorDashboard />', () => {
       }
       if (selector === selectTopThreeProducts) {
         return [
-          { id: 'p1', name: 'Product 1', price: 10 },
-          { id: 'p2', name: 'Product 2', price: 20 },
+          { id: 'p1', title: 'Product 1', price: 10 },
+          { id: 'p2', title: 'Product 2', price: 20 },
         ];
       }
       return undefined;

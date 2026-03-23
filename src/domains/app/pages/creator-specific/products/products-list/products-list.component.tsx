@@ -65,8 +65,7 @@ const ProductsList: React.FC = () => {
     const filtered = products.filter((p) => {
       const matchesSearch =
         term === '' ||
-        ((p.name ?? p.title) &&
-          (p.name ?? p.title)?.toLowerCase().includes(term)) ||
+        (p.title && p.title.toLowerCase().includes(term)) ||
         (p.description && p.description.toLowerCase().includes(term));
 
       const matchesStatus =
@@ -109,13 +108,9 @@ const ProductsList: React.FC = () => {
         case 'updated-desc':
           return getUpdatedTime(b) - getUpdatedTime(a);
         case 'name-asc':
-          return (a.name ?? a.title ?? '').localeCompare(
-            b.name ?? b.title ?? '',
-          );
+          return (a.title ?? '').localeCompare(b.title ?? '');
         case 'name-desc':
-          return (b.name ?? b.title ?? '').localeCompare(
-            a.name ?? a.title ?? '',
-          );
+          return (b.title ?? '').localeCompare(a.title ?? '');
         default:
           return 0;
       }

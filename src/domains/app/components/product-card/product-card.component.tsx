@@ -9,15 +9,19 @@ const placeholderImage = require('../../../../assets/image-placeholder.png');
 
 import './product-card.styles.scss';
 
+type ProductCardProduct = (AbstractProduct | ProductMinimised) & {
+  name?: string;
+  title?: string;
+};
+
 interface ProductCardProps {
-  product: AbstractProduct | ProductMinimised;
+  product: ProductCardProduct;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigate = useNavigate();
   const imgSrc = product.imageUrl ? product.imageUrl : placeholderImage;
-  const productTitle = 'title' in product ? product.title : undefined;
-  const productName = product.name ?? productTitle ?? 'Untitled product';
+  const productName = product.name ?? product.title ?? 'Untitled product';
 
   const parseProductDate = (value?: Date | string | null) => {
     if (!value) {
@@ -52,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span className="last-update">
               Last update: {format(lastUpdatedDate, 'EEE, do MMM')}
             </span>
-            {product.status && <StatusChip status={product.status} />}
+            <StatusChip status={product.status ?? 'DRAFT'} />
           </div>
         </div>
 

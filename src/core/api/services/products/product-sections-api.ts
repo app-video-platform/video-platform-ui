@@ -7,9 +7,6 @@ import {
   RemoveSectionPayload,
 } from 'core/api/models';
 
-const getSectionId = (payload: ProductSectionUpdateRequest | RemoveSectionPayload) =>
-  payload.sectionId ?? payload.id ?? '';
-
 export const createSectionAPI = async (
   payload: ProductSectionCreateRequest,
 ) => {
@@ -37,7 +34,7 @@ export const updateSectionDetailsAPI = async (
 ) => {
   try {
     const response = await httpClient.patch<ProductSection>(
-      `api/products/${payload.productId}/sections/${getSectionId(payload)}`,
+      `api/products/${payload.productId}/sections/${payload.sectionId}`,
       {
         title: payload.title,
         description: payload.description,
@@ -55,13 +52,11 @@ export const updateSectionDetailsAPI = async (
 };
 
 export const deleteSectionAPI = async (payload: RemoveSectionPayload) => {
-  const sectionId = getSectionId(payload);
-
   try {
     await httpClient.delete(
-      `api/products/${payload.productId}/sections/${sectionId}`,
+      `api/products/${payload.productId}/sections/${payload.sectionId}`,
     );
-    return sectionId;
+    return payload.sectionId;
   } catch (error) {
     console.error('Error deleting section:', error);
     throw error;
