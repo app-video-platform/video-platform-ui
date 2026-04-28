@@ -1,0 +1,50 @@
+@use '../../../../../styles/index.scss' as *;
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  // gap: $spacing-4;
+  align-items: center;
+
+  &__left {
+    align-items: flex-start;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-6;
+
+    .title {
+      font-size: $size-xl;
+    }
+
+    .title-line {
+      width: 100px;
+      height: 1px;
+
+      &__left {
+        clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 20% 100%, 0% 50%);
+        background: linear-gradient(
+          -90deg,
+          rgba(#f8f9fa, 0.8) 0%,
+          rgba(#f8f9fa, 0) 100%
+        );
+      }
+
+      &__right {
+        clip-path: polygon(0% 0%, 80% 0%, 100% 50%, 80% 100%, 0% 100%);
+        background: linear-gradient(
+          90deg,
+          rgba(#f8f9fa, 0.8) 0%,
+          rgba(#f8f9fa, 0) 100%
+        );
+      }
+    }
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+  }
+}

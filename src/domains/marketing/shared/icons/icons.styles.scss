@@ -1,0 +1,8 @@
+.vp-svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+
+  &--glow {
+    filter: drop-shadow(0 0 8px rgba(59, 201, 219, 0.35));
+  }
+}

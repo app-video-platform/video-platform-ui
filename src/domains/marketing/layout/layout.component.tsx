@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-import { Footer } from '../components';
+import { Footer } from '../shared';
 import { Navigation } from '../widgets';
 
 import './layout.styles.scss';
