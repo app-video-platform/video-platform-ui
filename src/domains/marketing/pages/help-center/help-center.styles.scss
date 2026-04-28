@@ -1,0 +1,119 @@
+@use '../../../../styles/index.scss' as *;
+
+.help-center-page {
+  width: min(1100px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: $spacing-8 0;
+
+  h1,
+  h2 {
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .help-hero {
+    text-align: center;
+    margin-bottom: $spacing-8;
+
+    h1 {
+      font-size: clamp(42px, 6vw, 72px);
+      margin-bottom: $spacing-3;
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin-bottom: $spacing-5;
+    }
+  }
+
+  .help-search {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* CATEGORIES */
+  .help-categories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-4;
+    margin-bottom: $spacing-8;
+  }
+
+  .help-category-card {
+    padding: $spacing-5;
+    border-radius: $radius-lg;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-e1);
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-e2);
+      border-color: var(--border-strong);
+    }
+
+    h3 {
+      margin-bottom: $spacing-2;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: $size-small;
+    }
+  }
+
+  /* POPULAR */
+  .help-popular {
+    margin-bottom: $spacing-8;
+
+    h2 {
+      margin-bottom: $spacing-4;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        padding: $spacing-3;
+        border-bottom: 1px solid var(--divider-subtle);
+        color: var(--text-secondary);
+        cursor: pointer;
+
+        &:hover {
+          color: var(--text-primary);
+        }
+      }
+    }
+  }
+
+  /* FAQ */
+  .help-faq {
+    margin-bottom: $spacing-8;
+
+    h2 {
+      margin-bottom: $spacing-4;
+    }
+  }
+
+  /* CTA */
+  .help-cta {
+    text-align: center;
+
+    p {
+      color: var(--text-secondary);
+      margin-bottom: $spacing-4;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .help-center-page {
+    .help-categories {
+      grid-template-columns: 1fr;
+    }
+  }
+}

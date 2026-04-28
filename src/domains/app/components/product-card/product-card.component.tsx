@@ -38,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="product-card">
+    <div className="vp-product-card">
       <img src={imgSrc} alt={product.name} className="product-card-image" />
       <div className="product-card-details">
         <div className="product-card-header">

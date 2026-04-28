@@ -1,0 +1,164 @@
+@use '../../../../../styles/index.scss' as *;
+
+.features-section-wrapper {
+  position: relative;
+
+  .features-img-wrapper {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    pointer-events: none;
+
+    img {
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      transform-origin: 50% 50%;
+    }
+  }
+
+  .features-content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-6;
+    margin-top: $spacing-8;
+
+    &.is-revealing .feature {
+      transition: none !important;
+    }
+
+    .feature {
+      // Make each row a “module button”
+      appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-4;
+      text-align: left;
+      width: 520px; // keeps it tight like screenshot; adjust if needed
+      position: relative;
+      isolation: isolate;
+
+      transition:
+        transform 260ms ease,
+        opacity 260ms ease,
+        filter 260ms ease;
+
+      // cinematic rail that appears on hover/focus
+      .feature-rail {
+        position: absolute;
+        left: -18px;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        border-radius: 999px;
+        opacity: 0;
+        transform: scaleY(0.8);
+        pointer-events: none;
+
+        background: linear-gradient(
+          to bottom,
+          rgba(58, 201, 219, 0),
+          rgba(58, 201, 219, 0.55),
+          rgba(255, 189, 65, 0.35),
+          rgba(58, 201, 219, 0)
+        );
+        filter: blur(0.2px) drop-shadow(0 0 12px rgba(58, 201, 219, 0.18));
+        transition:
+          opacity 260ms ease,
+          transform 260ms ease;
+      }
+
+      .feature-img {
+        height: fit-content;
+        flex: 0 0 auto;
+        transform: translateZ(0);
+        transition:
+          transform 260ms ease,
+          filter 260ms ease;
+        will-change: transform, filter;
+      }
+
+      .feature-content-wrapper {
+        display: flex;
+        flex-direction: column;
+
+        .feature-title {
+          font-family: $font-body;
+          transition: filter 260ms ease;
+          color: var(--text-primary);
+        }
+
+        .feature-text {
+          color: var(--text-secondary);
+          transition: opacity 260ms ease;
+        }
+      }
+
+      .feature-arrow {
+        margin-left: auto;
+        opacity: 0;
+        transform: translateX(-6px);
+        transition:
+          opacity 260ms ease,
+          transform 260ms ease;
+        color: var(--text-secondary);
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:hover,
+      &:focus-visible {
+        transform: translateY(-6px);
+        filter: saturate(1.03);
+
+        .feature-rail {
+          opacity: 1;
+          transform: scaleY(1);
+        }
+
+        .feature-img {
+          transform: translateY(-2px) scale(1.04);
+          filter: drop-shadow(0 14px 22px rgba(58, 201, 219, 0.14))
+            drop-shadow(0 16px 36px rgba(58, 46, 111, 0.18))
+            drop-shadow(0 14px 30px rgba(255, 189, 65, 0.1));
+        }
+
+        .feature-title {
+          filter: drop-shadow(0 12px 26px rgba(255, 189, 65, 0.08));
+        }
+
+        .feature-text {
+          opacity: 0.95;
+        }
+
+        .feature-arrow {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      &:focus-visible {
+        outline: none;
+      }
+
+      // Focus mode (dim siblings)
+      &.is-dimmed {
+        opacity: 0.38;
+        filter: saturate(0.9);
+        transform: translateY(0);
+      }
+
+      &.is-active {
+        opacity: 1;
+      }
+    }
+  }
+}

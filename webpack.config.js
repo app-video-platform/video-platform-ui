@@ -52,12 +52,21 @@ module.exports = {
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.(png|jpe?g|gif|svg)$/i,
+        test: /\.(png|jpe?g|gif)$/i,
         type: 'asset/resource',
       },
       {
         test: /\.md$/,
         use: 'raw-loader',
+      },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: '@svgr/webpack',
+            options: { exportType: 'named' }, // enables { ReactComponent as ... }
+          },
+        ],
       },
       {
         test: /\.mdx?$/,

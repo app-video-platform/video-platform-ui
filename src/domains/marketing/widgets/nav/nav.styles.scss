@@ -1,22 +1,21 @@
 @use '../../../../styles/index.scss' as *;
 
 .website-navbar {
-  width: 100%;
-  max-width: $bp-desktop;
-  height: 80px;
-  justify-self: center;
-  padding: 0 20px;
-  margin: auto;
   position: absolute;
-  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 10;
 
   .navbar-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1480px;
-    margin: auto;
+    max-width: $bp-desktop;
+    margin: 0 auto;
+    padding: 0 20px;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     .logo-container {
       width: 150px;
@@ -29,6 +28,10 @@
       list-style: none;
       gap: 30px;
       font-weight: 600;
+
+      .dashboard-link {
+        font-size: 14px;
+      }
     }
   }
 }

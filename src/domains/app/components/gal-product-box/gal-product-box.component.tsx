@@ -22,7 +22,7 @@ const GalProductCard: React.FC<GalProductCardProps> = ({ product }) => {
   //     : placeholderImage;
 
   return (
-    <div className="product-card">
+    <div className="gal-product-box">
       <img
         src={placeholderImage}
         alt={product.name}
