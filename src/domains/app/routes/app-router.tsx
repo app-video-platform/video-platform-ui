@@ -28,7 +28,7 @@ import {
 } from '../pages';
 import { selectAuthUser } from '@core/store';
 import { ProtectedRoute } from '@core/providers';
-import { UserRole } from '@core/api';
+import { getPrimaryRole, UserRole } from '@core/api';
 
 const AppRouter: React.FC = () => {
   const user = useSelector(selectAuthUser);
@@ -69,10 +69,10 @@ const AppRouter: React.FC = () => {
           <Route
             index
             element={
-              user?.roles.includes(UserRole.CREATOR) ? (
-                <CreatorDashboard />
-              ) : user?.roles.includes(UserRole.ADMIN) ? (
+              getPrimaryRole(user?.roles) === UserRole.ADMIN ? (
                 <AdminPage />
+              ) : getPrimaryRole(user?.roles) === UserRole.CREATOR ? (
+                <CreatorDashboard />
               ) : (
                 <GalacticaHome />
               )

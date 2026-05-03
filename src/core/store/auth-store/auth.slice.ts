@@ -6,7 +6,6 @@ import {
   RegisterRequest,
   UpdateUserRequest,
   User,
-  UserRole,
 } from 'core/api/models';
 import {
   registerUser,
@@ -159,12 +158,6 @@ const authSlice = createSlice({
 
       state.isUserLoggedIn = true;
     },
-
-    changeUserRole: (state, action: PayloadAction<UserRole>) => {
-      if (state.user) {
-        state.user.roles = [action.payload];
-      }
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -260,6 +253,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setUserProfile, resetOnboarding, changeUserRole } =
-  authSlice.actions;
+export const { logout, setUserProfile, resetOnboarding } = authSlice.actions;
 export default authSlice.reducer;

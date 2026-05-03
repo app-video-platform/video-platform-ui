@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { UserRole, AppDispatch } from 'core/api/models';
+import { AppDispatch, getPrimaryRole } from 'core/api/models';
 import { GalDropdown, UserAvatar } from '@shared/ui';
 import {
   selectAuthUser,
-  changeUserRole,
   logout,
   logoutUser,
 } from 'core/store/auth-store';
@@ -18,25 +17,6 @@ const GalUserDropdown: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-
-  const userRole =
-    user && user.roles && Object.keys(user.roles).length > 0
-      ? user.roles[0]
-      : UserRole.USER;
-  const [selectedRole, setSelectedRole] = useState<UserRole>(userRole);
-
-  useEffect(() => {
-    const newUserRole =
-      user && user.roles && Object.keys(user.roles).length > 0
-        ? user.roles[0]
-        : UserRole.USER;
-    setSelectedRole(newUserRole);
-  }, [user?.roles]);
-
-  const handleClick = (role: UserRole) => {
-    setSelectedRole(role);
-    dispatch(changeUserRole(role));
-  };
 
   // Log the user out
   const handleLogout = () => {
@@ -87,20 +67,7 @@ const GalUserDropdown: React.FC = () => {
               <span>{user.email}</span>
             </div>
             <div className="dropdown-item">
-              <span>Role: {selectedRole}</span>
-              <div className="role-selector">
-                {Object.values(UserRole).map((roleValue) => (
-                  <button
-                    key={roleValue}
-                    className={`role-button ${
-                      selectedRole === roleValue ? 'selected' : ''
-                    }`}
-                    onClick={() => handleClick(roleValue)}
-                  >
-                    {roleValue}
-                  </button>
-                ))}
-              </div>
+              <span>Role: {getPrimaryRole(user.roles)}</span>
             </div>
             <div className="dropdown-item dev-items">
               <Link to="/dev-dashboard">Dev Dashboard</Link>
