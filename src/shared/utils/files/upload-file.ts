@@ -1,31 +1,18 @@
 import {
-  getPresignedUrlAPI,
-  uploadToPresignedUrl,
-  confirmFileUploadAPI,
+  uploadDownloadSectionFileAPI,
 } from 'core/api/services';
 
-export const uploadFileToSection = async (sectionId: string, file: File) => {
+export const uploadFileToSection = async (
+  productId: string,
+  sectionId: string,
+  file: File,
+) => {
   try {
-    // Step 1: Get presigned URL from your backend
-    const { presignedUrl, key, fileUrl } = await getPresignedUrlAPI(
+    return await uploadDownloadSectionFileAPI({
+      productId,
       sectionId,
-      file.name,
-    );
-
-    // Step 2: Upload to storage using the presigned URL
-    await uploadToPresignedUrl(presignedUrl, file);
-
-    // Step 3: Confirm the upload with your backend
-    const result = await confirmFileUploadAPI({
-      sectionId,
-      key,
-      fileUrl,
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
+      file,
     });
-
-    return result;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('uploadFileToSection failed:', error);

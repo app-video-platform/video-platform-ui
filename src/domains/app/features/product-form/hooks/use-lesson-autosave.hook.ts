@@ -7,6 +7,7 @@ import { CourseLesson, AppDispatch } from 'core/api/models';
 
 interface UseLessonAutosaveParams {
   lesson: CourseLesson;
+  productId: string;
   sectionId: string;
   user: ReturnType<typeof selectAuthUser> | null;
   dispatch: AppDispatch;
@@ -14,6 +15,7 @@ interface UseLessonAutosaveParams {
 
 export const useLessonAutosave = ({
   lesson,
+  productId,
   user,
   sectionId,
   dispatch,
@@ -49,9 +51,9 @@ export const useLessonAutosave = ({
         const updateLessonPayload: CourseLesson = {
           ...lesson,
           id: lesson.id,
-          sectionId, // Assuming lesson has a sectionId
-          position: lesson.position, //Assuming position is based on the index
-          userId: user.id, // User ID from the auth state
+          productId,
+          sectionId,
+          position: lesson.position,
         };
 
         dispatch(updateLessonDetails(updateLessonPayload))
@@ -73,7 +75,7 @@ export const useLessonAutosave = ({
     }, 2000);
 
     return () => window.clearTimeout(timeoutId);
-  }, [lesson, user, sectionId, dispatch]);
+  }, [lesson, productId, user, sectionId, dispatch]);
 
   return { isAutosaving, lastSavedAt };
 };

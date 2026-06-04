@@ -26,6 +26,7 @@ const ExpansionPanel: React.FC<ExpansionPanelProps> = ({
   hideToggle = false,
   className,
   onPanelToggle,
+  ...divProps
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(defaultExpanded);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -42,7 +43,10 @@ const ExpansionPanel: React.FC<ExpansionPanelProps> = ({
   };
 
   return (
-    <div className={clsx('expansion-panel', className, { disabled })}>
+    <div
+      {...divProps}
+      className={clsx('expansion-panel', className, { disabled })}
+    >
       <header className="expansion-panel-header">
         <div className="panel-header-content">{header}</div>
         {!hideToggle && (

@@ -16,12 +16,14 @@ import {
 import {
   CourseLesson,
   LessonCreate,
-  IRemoveItemPayload,
   LessonType,
   AppDispatch,
 } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
-import { createLesson, deleteLesson } from 'core/store/product-store';
+import {
+  createCourseLesson,
+  deleteCourseLesson,
+} from 'core/store/product-store';
 import { EditableTitle } from '../editable-title';
 import { LESSON_META } from 'core/constants';
 import { useLessonAutosave } from 'domains/app/features/product-form/hooks';
@@ -31,6 +33,7 @@ import './lesson-editor.styles.scss';
 interface LessonEditorProps {
   lesson: CourseLesson;
   index: number;
+  productId: string;
   sectionId: string;
   // eslint-disable-next-line no-unused-vars
   removeLessonFromList: (index: number) => void;
@@ -41,6 +44,7 @@ interface LessonEditorProps {
 const LessonEditor: React.FC<LessonEditorProps> = ({
   lesson,
   index,
+  productId,
   sectionId,
   removeLessonFromList,
   onChange,
@@ -57,6 +61,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
 
   const { isAutosaving, lastSavedAt } = useLessonAutosave({
     lesson,
+    productId,
     user,
     sectionId,
     dispatch,
@@ -102,15 +107,19 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       title: lesson.title,
       type: lesson.type, //Default to VIDEO if not specified
       description: lesson.description ?? '',
-      position: index + 1, // Assuming position is based on the index
-      sectionId: sectionId, // Assuming lesson has a sectionId
-      userId: user.id, // User ID from the auth state
+      position: index + 1,
+      productId,
+      sectionId,
     };
 
-    dispatch(createLesson(createLessonPayload))
+    dispatch(createCourseLesson(createLessonPayload))
       .unwrap()
       .then((response) => {
-        updateLesson({ id: response.id });
+        updateLesson({
+          ...response,
+          productId,
+          sectionId: response.sectionId ?? sectionId,
+        });
         setIsLessonCreated(true);
       });
   };
@@ -125,12 +134,13 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       return;
     }
     if (lesson.id) {
-      const removeLessonPayload: IRemoveItemPayload = {
-        id: lesson.id, //Use the ID from formData
-        userId: user.id, // Ensure user ID is available
-      };
-
-      dispatch(deleteLesson(removeLessonPayload))
+      dispatch(
+        deleteCourseLesson({
+          productId,
+          sectionId,
+          lessonId: lesson.id,
+        }),
+      )
         .unwrap()
         .then(() => {
           console.info('Lesson deleted successfully');

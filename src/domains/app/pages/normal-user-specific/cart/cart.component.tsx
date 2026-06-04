@@ -49,16 +49,17 @@ const Cart: React.FC = () => {
               <div className="cart-products-list">
                 {cartProducts.map((prod) => {
                   const isInWishlist = wishlistIds.has(prod.id);
+                  const productTitle = prod.title ?? 'Untitled product';
 
                   return (
                     <div key={prod.id} className="cart-product">
                       <img
                         src={placeholderImage}
-                        alt={prod.name}
+                        alt={productTitle}
                         className="product-card-image"
                       />
                       <div className="cart-product-details">
-                        <h3>{prod.name}</h3>
+                        <h3>{productTitle}</h3>
                         <p>By {prod.createdByName}</p>
                         <p>4.7 ⭐⭐⭐⭐⭐ (32,025 ratings)</p>
                       </div>

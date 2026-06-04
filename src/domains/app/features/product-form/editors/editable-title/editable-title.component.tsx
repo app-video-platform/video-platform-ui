@@ -23,23 +23,23 @@ const EditableTitle: React.FC<EditableTitleProps> = ({
   const lastPropValueRef = useRef<string>(value);
   const [isFocused, setFocused] = useState(false);
 
-  // Initialize / update text ONLY when the prop value changes from outside
   useEffect(() => {
     if (!ref.current) {
       return;
     }
 
-    if (value !== lastPropValueRef.current) {
-      ref.current.innerText = value;
-      lastPropValueRef.current = value;
+    if (ref.current.textContent !== value) {
+      ref.current.textContent = value;
     }
+
+    lastPropValueRef.current = value;
   }, [value]);
 
   const handleBlur = () => {
     if (!ref.current) {
       return;
     }
-    const text = ref.current.innerText;
+    const text = ref.current.textContent ?? '';
     lastPropValueRef.current = text;
     onChange(text);
   };

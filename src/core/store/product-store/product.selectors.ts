@@ -3,6 +3,8 @@ import { createSelector } from '@reduxjs/toolkit';
 import { ProductType, RootState } from 'core/api/models';
 
 export const selectAllProducts = (state: RootState) => state.products.products;
+export const selectProductSummaries = (state: RootState) =>
+  state.products.productSummaries;
 
 export const selectProductsLoading = (state: RootState) =>
   state.products.loading;
@@ -17,7 +19,7 @@ export const selectProductsByType = (productType: ProductType) =>
   );
 
 export const selectTopThreeProducts = createSelector(
-  selectAllProducts,
+  selectProductSummaries,
   (products) => {
     if (!products) {
       return [];

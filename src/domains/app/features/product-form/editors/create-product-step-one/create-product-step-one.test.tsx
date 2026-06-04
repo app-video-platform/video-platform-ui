@@ -19,12 +19,12 @@ jest.mock('react-redux', () => ({
 }));
 import { useDispatch } from 'react-redux';
 
-// ── 2) MOCK createCourseProduct async thunk (UPDATED PATH) ──────────────────
+// ── 2) MOCK createProduct async thunk ───────────────────────────────────────
 jest.mock('@store/product-store', () => ({
   __esModule: true,
-  createCourseProduct: jest.fn(),
+  createProduct: jest.fn(),
 }));
-import { createCourseProduct } from 'core/store/product-store';
+import { createProduct } from 'core/store/product-store';
 
 // ── 3) MOCK child components ────────────────────────────────────────────────
 
@@ -131,8 +131,8 @@ describe('<CreateProductStepOne />', () => {
   const mockedUseDispatch = useDispatch as jest.MockedFunction<
     typeof useDispatch
   >;
-  const mockedCreateCourse = createCourseProduct as jest.MockedFunction<
-    typeof createCourseProduct
+  const mockedCreateProduct = createProduct as jest.MockedFunction<
+    typeof createProduct
   >;
 
   let fakeDispatch: jest.Mock<any, any>;
@@ -162,7 +162,7 @@ describe('<CreateProductStepOne />', () => {
         }),
     }));
     mockedUseDispatch.mockReturnValue(fakeDispatch as any);
-    mockedCreateCourse.mockReset();
+    mockedCreateProduct.mockReset();
 
     setFieldMock = jest.fn();
     setShowLoadingMock = jest.fn();
@@ -239,11 +239,11 @@ describe('<CreateProductStepOne />', () => {
     expect(continueBtn).toBeEnabled();
   });
 
-  it('clicking Continue sets loading state and dispatches createCourseProduct, then sets fields and rest-of-form', async () => {
+  it('clicking Continue sets loading state and dispatches createProduct, then sets fields and rest-of-form', async () => {
     jest.useFakeTimers();
 
     const fakeThunkSymbol = Symbol('fakeThunk');
-    mockedCreateCourse.mockReturnValue(fakeThunkSymbol as any);
+    mockedCreateProduct.mockReturnValue(fakeThunkSymbol as any);
 
     fakeDispatch.mockImplementation((action) => {
       expect(action).toBe(fakeThunkSymbol);
@@ -290,8 +290,8 @@ describe('<CreateProductStepOne />', () => {
       jest.advanceTimersByTime(500);
     });
 
-    // createCourseProduct called with correct payload (no description, status 'DRAFT')
-    expect(mockedCreateCourse).toHaveBeenCalledWith({
+    // createProduct called with correct payload (no description, status 'DRAFT')
+    expect(mockedCreateProduct).toHaveBeenCalledWith({
       name: 'Test Course',
       type: 'COURSE',
       userId: 'user-1',
@@ -314,7 +314,7 @@ describe('<CreateProductStepOne />', () => {
     jest.useRealTimers();
   });
 
-  it('does NOT call createCourseProduct if name is empty', () => {
+  it('does NOT call createProduct if name is empty', () => {
     const emptyNameFormData: ProductDraft = {
       ...baseFormData,
       name: '',
@@ -339,6 +339,6 @@ describe('<CreateProductStepOne />', () => {
 
     // Even if user clicks, handler early-returns
     fireEvent.click(continueBtn);
-    expect(mockedCreateCourse).not.toHaveBeenCalled();
+    expect(mockedCreateProduct).not.toHaveBeenCalled();
   });
 });
