@@ -22,7 +22,7 @@ export interface User {
 }
 
 export enum UserRole {
-  USER = 'User',
-  CREATOR = 'Creator',
-  ADMIN = 'Admin',
+  USER = 'USER',
+  CREATOR = 'CREATOR',
+  ADMIN = 'ADMIN',
 }

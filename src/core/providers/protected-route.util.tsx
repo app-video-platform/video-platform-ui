@@ -9,6 +9,7 @@ import {
   selectAuthUser,
 } from 'core/store/auth-store';
 import { UserRole } from '../api/models/user/user';
+import { hasAnyRole } from '../api/models/user/role-utils';
 import { GalSpinner } from '@shared/ui';
 
 interface ProtectedRouteProps {
@@ -30,8 +31,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // 2) If we know they _are_ logged in and we know their roles, but none match, redirect
-  const hasRole = user?.roles?.some((r) => allowedRoles.includes(r));
-  if (isUserLoggedIn && !authLoading && !hasRole) {
+  const hasAllowedRole = hasAnyRole(user?.roles, allowedRoles);
+  if (isUserLoggedIn && !authLoading && !hasAllowedRole) {
     return <Navigate to="/unauthorized" replace />;
   }
 
