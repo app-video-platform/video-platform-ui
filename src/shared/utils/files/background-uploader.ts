@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-import { CourseProductSection } from 'core/api/models';
+import { ProductSection } from 'core/api/models';
 import { uploadFileToSection } from './upload-file';
 
 interface IFilesWithSection {
@@ -11,9 +11,10 @@ interface IFilesWithSection {
 // TO BE MODIFIED for current flow
 
 export const uploadFilesInBackground = async (
+  productId: string,
   uploadedFiles: IFilesWithSection[],
-  localSections: CourseProductSection[],
-  savedSections: CourseProductSection[],
+  localSections: ProductSection[],
+  savedSections: ProductSection[],
 ) => {
   const localIdToBackendId = new Map<string, string>();
 
@@ -31,7 +32,7 @@ export const uploadFilesInBackground = async (
     }
 
     return files.map((file) =>
-      uploadFileToSection(backendId, file).then(
+      uploadFileToSection(productId, backendId, file).then(
         () => ({ status: 'fulfilled', file }),
         (error) => ({ status: 'rejected', file, error }),
       ),

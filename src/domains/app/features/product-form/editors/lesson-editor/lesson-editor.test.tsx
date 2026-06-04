@@ -29,14 +29,14 @@ import { selectAuthUser } from 'core/store/auth-store';
 
 jest.mock('@store/product-store', () => ({
   __esModule: true,
-  createLesson: jest.fn(),
-  updateLessonDetails: jest.fn(),
-  deleteLesson: jest.fn(),
+  createCourseLesson: jest.fn(),
+  updateCourseLesson: jest.fn(),
+  deleteCourseLesson: jest.fn(),
 }));
 import {
-  createLesson,
-  updateLessonDetails,
-  deleteLesson,
+  createCourseLesson,
+  updateCourseLesson,
+  deleteCourseLesson,
 } from 'core/store/product-store';
 
 // ── 3) MOCK shared UI barrel (@shared/ui) ─────────────────────────────
@@ -215,8 +215,8 @@ describe('<LessonEditor />', () => {
   const mockedUseSelector = useSelector as jest.MockedFunction<
     typeof useSelector
   >;
-  const mockedDeleteLesson = deleteLesson as jest.MockedFunction<
-    typeof deleteLesson
+  const mockedDeleteLesson = deleteCourseLesson as jest.MockedFunction<
+    typeof deleteCourseLesson
   >;
 
   let fakeDispatch: jest.Mock<any, any>;
@@ -231,7 +231,6 @@ describe('<LessonEditor />', () => {
     type: 'VIDEO' as LessonType,
     sectionId: 'sec-1',
     position: 1,
-    userId: 'user-123',
   };
 
   beforeEach(() => {
@@ -266,6 +265,7 @@ describe('<LessonEditor />', () => {
       <LessonEditor
         lesson={newLesson}
         index={2}
+        productId="product-1"
         sectionId="sec-1"
         removeLessonFromList={removeLessonMock}
         onChange={changeLessonMock}
@@ -300,6 +300,7 @@ describe('<LessonEditor />', () => {
       <LessonEditor
         lesson={existingLesson}
         index={3}
+        productId="product-1"
         sectionId="sec-1"
         removeLessonFromList={removeLessonMock}
         onChange={changeLessonMock}
@@ -311,8 +312,9 @@ describe('<LessonEditor />', () => {
     });
 
     expect(mockedDeleteLesson).toHaveBeenCalledWith({
-      id: 'to-delete',
-      userId: 'user-123',
+      productId: 'product-1',
+      sectionId: 'sec-1',
+      lessonId: 'to-delete',
     });
     expect(fakeDispatch).toHaveBeenCalledWith(fakeDeleteThunk);
 

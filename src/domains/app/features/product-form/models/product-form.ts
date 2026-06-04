@@ -1,6 +1,5 @@
 import {
-  CourseProductSection,
-  DownloadSection,
+  ProductSection,
   ProductType,
   ProductStatus,
   ConsultationDetails,
@@ -33,7 +32,7 @@ export interface ProductDraft {
   consultationDetails?: ConsultationDetails;
 }
 
-export type SectionDraft = CourseProductSection | DownloadSection;
+export type SectionDraft = ProductSection;
 
 export interface UseProductFormFacadeResult {
   user: ReturnType<typeof selectAuthUser> | null;

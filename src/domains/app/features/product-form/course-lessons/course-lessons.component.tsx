@@ -9,6 +9,7 @@ import { getCssVar } from '@shared/utils';
 import './course-lessons.styles.scss';
 
 interface CourseLessonsProps {
+  productId: string;
   sectionId: string;
   lessons: CourseLesson[];
   // eslint-disable-next-line no-unused-vars
@@ -16,6 +17,7 @@ interface CourseLessonsProps {
 }
 
 const CourseLessons: React.FC<CourseLessonsProps> = ({
+  productId,
   sectionId,
   lessons,
   onLessonsChange,
@@ -54,6 +56,7 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
             key={index}
             index={index}
             lesson={lesson}
+            productId={productId}
             sectionId={sectionId}
             removeLessonFromList={handleRemoveLessonFromList}
             onChange={handleLessonChange}

@@ -52,6 +52,7 @@ const AppRouter: React.FC = () => {
         {/* Public routes under /app */}
         <Route path="explore" element={<ExplorePage />} />
         <Route path="explore/search" element={<SearchResultsPage />} />
+        <Route path="product/:id" element={<ProductPage />} />
         <Route path="product/:id/:type" element={<ProductPage />} />
         <Route path="store/:creatorId" element={<StorefrontPage />} />
 
@@ -90,6 +91,7 @@ const AppRouter: React.FC = () => {
           >
             <Route index element={<ProductsList />} />
             <Route path="create" element={<ProductForm />} />
+            <Route path="edit/:id" element={<ProductForm />} />
             <Route path="edit/:type/:id" element={<ProductForm />} />
           </Route>
 

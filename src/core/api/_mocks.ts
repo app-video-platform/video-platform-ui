@@ -6,7 +6,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { User, UserRole } from './models/user/user';
 import { SearchResponse } from './services/products/products-api';
 import { SocialPlatforms } from './models/socials/social-media-link';
-import { CourseSectionUpdateRequest } from './models/product/section';
+import { ProductSectionUpdateRequest } from './models/product/section';
 import { ProductMinimised } from './models/product/product';
 import { AbstractProduct, ProductType } from './models';
 
@@ -57,28 +57,246 @@ export function setupMocks(client: AxiosInstance) {
     const productData = JSON.parse(config.data);
     console.info('[MOCK] product creation:', productData);
 
+    const seededSections =
+      productData.type === 'COURSE'
+        ? [
+            {
+              id: 'section-1-id-mocked',
+              title: 'Draft',
+              description: '',
+              position: 1,
+              lessons: [],
+            },
+          ]
+        : [];
+
     const response = {
       id: 'mocked-product-id',
       price: 'free',
-      sections: [
-        {
-          id: 'section-1-id-mocked',
-          title: '',
-          description: '',
-          position: 1,
-        },
-      ],
       ...productData,
+      details:
+        productData.type === 'CONSULTATION'
+          ? productData.details ?? null
+          : { sections: seededSections },
     };
     return [200, response];
   });
 
-  mock.onPut('api/products').reply((config) => {
+  mock.onPatch(new RegExp('^api/products/[^/]+$')).reply((config) => {
     const productData = JSON.parse(config.data) as AbstractProduct;
     console.info('[MOCK] product update:', productData);
 
     return [200, productData];
   });
+
+  mock.onGet(new RegExp('^api/products\\?ownerId=.*')).reply(() => {
+    return [
+      200,
+      [
+        {
+          type: 'COURSE' as ProductType,
+          id: 'mocked-course-product-id-1',
+          title: 'Mocked Course Product 1',
+          description: 'This is a mocked course product description.',
+          status: 'DRAFT',
+          price: 'free',
+          createdById: 'mocked-user-id',
+          createdByName: 'Aleb Mocked',
+          createdByTitle: 'D to the E.V.I.L',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          type: 'DOWNLOAD' as ProductType,
+          id: 'mocked-download-product-id-1',
+          title: 'Mocked Download Product 1',
+          description: 'This is a mocked download product description.',
+          status: 'DRAFT',
+          price: 50,
+          createdById: 'mocked-user-id',
+          createdByName: 'Aleb Mocked',
+          createdByTitle: 'D to the E.V.I.L',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    ];
+  });
+
+  mock.onGet(new RegExp('^api/products/[^/]+$')).reply((config) => {
+    const productId = config.url?.split('/').pop();
+    const isDownload = productId?.includes('download');
+
+    return [
+      200,
+      {
+        type: isDownload ? ('DOWNLOAD' as ProductType) : ('COURSE' as ProductType),
+        id: productId,
+        name: isDownload
+          ? 'Mocked Download Product 1'
+          : 'Mocked Course Product 1',
+        description: 'This is a mocked product description.',
+        status: 'DRAFT',
+        price: 'free',
+        userId: 'mocked-user-id',
+        details: {
+          sections: [
+            {
+              id: 'mocked-section-id-1',
+              title: 'Mocked Section 1',
+              description: 'This is a mocked section description.',
+              position: 1,
+              productId,
+              lessons: isDownload
+                ? []
+                : [
+                    {
+                      id: 'mocked-lesson-id-1',
+                      title: 'Mocked Lesson 1',
+                      description: 'This is a mocked lesson description.',
+                      position: 1,
+                      sectionId: 'mocked-section-id-1',
+                      content: 'This is some mocked content for lesson 1.',
+                    },
+                  ],
+              files: isDownload
+                ? [
+                    {
+                      id: 'mocked-file-id-1',
+                      fileName: 'starter-pack.zip',
+                      fileType: 'application/zip',
+                      size: 120,
+                      url: 'https://cdn.example.com/starter-pack.zip',
+                    },
+                  ]
+                : [],
+            },
+          ],
+        },
+      },
+    ];
+  });
+
+  mock.onPost(new RegExp('^api/products/[^/]+/sections$')).reply((config) => {
+    const sectionData = JSON.parse(config.data);
+    const productId = config.url?.split('/')[2];
+
+    return [
+      200,
+      {
+        id: `mocked-section-id-${sectionData.position ?? 0}`,
+        productId,
+        title: sectionData.title,
+        description: sectionData.description,
+        position: sectionData.position ?? 0,
+        lessons: [],
+        files: [],
+      },
+    ];
+  });
+
+  mock
+    .onPatch(new RegExp('^api/products/[^/]+/sections/[^/]+$'))
+    .reply((config) => {
+      const sectionData = JSON.parse(config.data) as ProductSectionUpdateRequest;
+      const parts = config.url?.split('/') ?? [];
+      const productId = parts[2];
+      const sectionId = parts[4];
+
+      return [
+        200,
+        {
+          id: sectionId,
+          productId,
+          title: sectionData.title ?? 'Updated section',
+          description: sectionData.description ?? '',
+          position: sectionData.position ?? 0,
+          lessons: [],
+          files: [],
+        },
+      ];
+    });
+
+  mock.onDelete(new RegExp('^api/products/[^/]+/sections/[^/]+$')).reply(204);
+
+  mock
+    .onPost(new RegExp('^api/products/[^/]+/sections/[^/]+/lessons$'))
+    .reply((config) => {
+      const lessonData = JSON.parse(config.data);
+      const parts = config.url?.split('/') ?? [];
+      const productId = parts[2];
+      const sectionId = parts[4];
+
+      return [
+        200,
+        {
+          id: `mocked-lesson-id-${lessonData.position ?? 0}`,
+          productId,
+          sectionId,
+          ...lessonData,
+        },
+      ];
+    });
+
+  mock
+    .onPatch(new RegExp('^api/products/[^/]+/sections/[^/]+/lessons/[^/]+$'))
+    .reply((config) => {
+      const lessonData = JSON.parse(config.data);
+      const parts = config.url?.split('/') ?? [];
+      const productId = parts[2];
+      const sectionId = parts[4];
+      const lessonId = parts[6];
+
+      return [
+        200,
+        {
+          id: lessonId,
+          productId,
+          sectionId,
+          ...lessonData,
+        },
+      ];
+    });
+
+  mock
+    .onDelete(new RegExp('^api/products/[^/]+/sections/[^/]+/lessons/[^/]+$'))
+    .reply(204);
+
+  mock
+    .onGet(new RegExp('^/api/products/[^/]+/sections/[^/]+/files/presigned-url.*'))
+    .reply((config) => {
+      const url = new URL(config.url!, 'http://localhost');
+      const filename = url.searchParams.get('filename');
+
+      return [
+        200,
+        {
+          fileId: 'mocked-file-id-2',
+          presignedUrl: 'https://upload.example.com/presigned',
+          key: `uploads/${filename}`,
+          fileUrl: `https://cdn.example.com/${filename}`,
+        },
+      ];
+    });
+
+  mock
+    .onPost(new RegExp('^/api/products/[^/]+/sections/[^/]+/files/confirm-upload$'))
+    .reply((config) => {
+      const payload = JSON.parse(config.data);
+
+      return [
+        201,
+        {
+          fileId: 'mocked-file-id-2',
+          fileName: payload.fileName,
+          url: payload.fileUrl,
+        },
+      ];
+    });
+
+  mock
+    .onDelete(new RegExp('^/api/products/[^/]+/sections/[^/]+/files/[^/]+$'))
+    .reply(204);
 
   mock.onPost('api/products/course/section').reply((config) => {
     const sectionData = JSON.parse(config.data);
@@ -92,7 +310,7 @@ export function setupMocks(client: AxiosInstance) {
   });
 
   mock.onPut('api/products/course/section').reply((config) => {
-    const sectionData = JSON.parse(config.data) as CourseSectionUpdateRequest;
+    const sectionData = JSON.parse(config.data) as ProductSectionUpdateRequest;
     console.info('[MOCK] section update:', sectionData);
     return [200, 'Done'];
   });
@@ -235,7 +453,6 @@ export function setupMocks(client: AxiosInstance) {
         userId: 'mocked-user-id',
         sections: [
           {
-            userId: 'mocked-user-id',
             id: 'mocked-section-id-1',
             title: 'Mocked Section 1',
             description: 'This is a mocked section description.',
@@ -257,7 +474,7 @@ export function setupMocks(client: AxiosInstance) {
                 content: 'This is some mocked content for lesson 2.',
               },
             ],
-          } as CourseSectionUpdateRequest,
+          },
         ],
       },
       {
@@ -314,7 +531,7 @@ export function setupMocks(client: AxiosInstance) {
     // Generate some fake products matching the term
     const all: ProductMinimised[] = Array.from({ length: size }, (_, i) => ({
       id: `mock-${term}-${page * size + i}`,
-      name: `${term || 'Product'} ${page * size + i + 1}`,
+      title: `${term || 'Product'} ${page * size + i + 1}`,
       type: 'COURSE',
       price: i % 2 === 0 ? 'free' : 9.99,
       createdById: 'mocked-user-id',
@@ -356,7 +573,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'COURSE' as ProductType,
       id: 'mocked-course-product-id-1',
-      name: 'Mocked Course Product 1',
+      title: 'Mocked Course Product 1',
       price: 'free',
       createdById: 'mocked-user-id',
       createdByName: 'Aleb Mocked',
@@ -367,7 +584,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'DOWNLOAD' as ProductType,
       id: 'mocked-course-product-id-2',
-      name: 'Mocked Download Product 1',
+      title: 'Mocked Download Product 1',
       price: 120,
       createdById: 'mocked-user-id',
       createdByName: 'Aleb Mocked',
@@ -378,7 +595,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'COURSE' as ProductType,
       id: 'mocked-course-product-id-3',
-      name: 'Mocked Course Product 2',
+      title: 'Mocked Course Product 2',
       price: 'free',
       createdById: 'mocked-user-id-2',
       createdByName: 'Tomi',
@@ -389,7 +606,7 @@ export function setupMocks(client: AxiosInstance) {
     {
       type: 'CONSULTATION' as ProductType,
       id: 'mocked-course-product-id-4',
-      name: 'Mocked Consultation Product 1',
+      title: 'Mocked Consultation Product 1',
       price: 780,
       createdById: 'mocked-user-id-3',
       createdByName: 'Janos',

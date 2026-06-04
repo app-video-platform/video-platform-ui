@@ -2,9 +2,9 @@
 import { useState, useRef, useEffect } from 'react';
 
 import { selectAuthUser } from 'core/store/auth-store';
-import { updateSectionDetails } from 'core/store/product-store';
+import { updateProductSection } from 'core/store/product-store';
 import { SectionDraft } from '../models/product-form';
-import { CourseSectionUpdateRequest, AppDispatch } from 'core/api/models';
+import { AppDispatch, ProductSectionUpdateRequest } from 'core/api/models';
 
 interface UseSectionAutosaveParams {
   section: SectionDraft;
@@ -57,14 +57,15 @@ export const useSectionAutosave = ({
 
     const timeoutId = window.setTimeout(() => {
       try {
-        const updatedSection: CourseSectionUpdateRequest = {
-          ...section,
+        const updatedSection: ProductSectionUpdateRequest = {
           productId,
-          id: section.id ?? '',
-          userId: user.id ?? '',
+          sectionId: section.id ?? '',
+          title: section.title,
+          description: section.description,
+          position: section.position,
         };
 
-        dispatch(updateSectionDetails(updatedSection))
+        dispatch(updateProductSection(updatedSection))
           .unwrap()
           .then(() => {
             lastSavedSnapshot.current = currentSnapshot;

@@ -44,7 +44,9 @@ const GalWishlistDropdown: React.FC = () => {
                 wishlistProducts &&
                 wishlistProducts.map((item) => (
                   <div key={item.id} className="cart-item-box">
-                    <span className="item-title">{item.name}</span>{' '}
+                    <span className="item-title">
+                      {item.title ?? 'Untitled product'}
+                    </span>{' '}
                     <span className="item-price">{item.price}</span>
                     <Button
                       type="button"

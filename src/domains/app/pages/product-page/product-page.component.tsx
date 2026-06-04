@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AbstractProduct, ProductType, AppDispatch } from 'core/api/models';
+import { AbstractProduct, AppDispatch } from 'core/api/models';
 import { Button, GalExpansionPanel } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
-import { getProductByProductId } from 'core/store/product-store';
+import { getProductById } from 'core/store/product-store';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../../assets/image-placeholder.png');
 
@@ -22,20 +22,18 @@ const ProductPage: React.FC = () => {
   const [isOwner, setIsOwner] = useState<boolean>(false);
 
   useEffect(() => {
-    if (id && type) {
-      dispatch(
-        getProductByProductId({
-          productId: id,
-          productType: type as ProductType,
-        }),
-      )
+    if (id) {
+      dispatch(getProductById({ productId: id }))
         .unwrap()
         .then((product) => {
+          if (type && product.type !== type) {
+            navigate(`/app/product/${product.id}`, { replace: true });
+          }
           getProductInformation(product);
           setProduct(product);
         });
     }
-  }, [dispatch, id, type]);
+  }, [dispatch, id, navigate, type]);
 
   useEffect(() => {
     if (user && user.id === product?.userId) {
@@ -43,7 +41,7 @@ const ProductPage: React.FC = () => {
     } else {
       setIsOwner(false);
     }
-  }, [user]);
+  }, [product, user]);
 
   const getProductInformation = (product: AbstractProduct) => {
     let numOfSections = 0;
@@ -85,7 +83,7 @@ const ProductPage: React.FC = () => {
                     variant="primary"
                     onClick={() =>
                       navigate(
-                        `/app/products/edit/${product.type}/${product.id}`,
+                        `/app/products/edit/${product.id}`,
                       )
                     }
                   >
