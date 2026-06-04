@@ -1,0 +1,37 @@
+@use '../../../../../styles/index.scss' as *;
+
+.about-sec-content {
+  text-align: center;
+  width: 550px;
+  margin: $spacing-5 auto 0;
+
+  // your spacing rules (kept)
+  .asc-nos,
+  .asc-justs,
+  .asc-last {
+    margin-top: $spacing-3;
+  }
+
+  .about-line {
+    // keep it readable and cinematic
+    transition:
+      opacity 220ms ease,
+      filter 220ms ease,
+      transform 220ms ease;
+    color: var(--text-primary);
+
+    // optional: make body lines slightly softer than key lines
+    opacity: 0.92;
+  }
+
+  .about-line.is-key {
+    opacity: 1;
+    // subtle emphasis (not always glowing; GSAP adds a brief drop-shadow)
+    letter-spacing: 0.2px;
+  }
+}
+
+/* Optional: if you want the “No…” set to feel tighter */
+.about-sec-content .about-line + .about-line {
+  margin-top: 6px;
+}

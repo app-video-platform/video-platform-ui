@@ -1,0 +1,237 @@
+@use '../../../../../styles/index.scss' as *;
+
+.products-section {
+  // wrapper for scoping (optional but clean)
+}
+
+.products-section-content {
+  display: flex;
+  gap: $spacing-6;
+  // margin-top: $spacing-6;
+  justify-content: space-evenly;
+
+  // prevent CSS/GSAP conflicts while revealing
+  &.is-revealing .product-card {
+    transition: none !important;
+  }
+
+  .product-col {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 300px;
+    text-align: center;
+
+    position: relative;
+    background: transparent; // no card backgrounds
+    isolation: isolate; // keeps blend effects contained
+
+    transition:
+      transform 280ms ease,
+      opacity 280ms ease,
+      filter 280ms ease;
+
+    // --- Cinematic overlays ---
+    .pc-energy {
+      position: absolute;
+      top: 18px; // anchored around the image area
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      height: 160px;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 0;
+
+      background:
+        radial-gradient(
+          circle at 35% 30%,
+          rgba(58, 201, 219, 0.22) 0%,
+          rgba(58, 201, 219, 0.08) 35%,
+          transparent 72%
+        ),
+        radial-gradient(
+          circle at 70% 65%,
+          rgba(58, 46, 111, 0.26) 0%,
+          rgba(58, 46, 111, 0.1) 40%,
+          transparent 74%
+        );
+
+      filter: blur(10px);
+      opacity: 0.35;
+
+      // ambient life (very slow drift)
+      background-size: 140% 140%;
+      background-position: 40% 45%;
+      transition:
+        opacity 300ms ease,
+        transform 300ms ease,
+        filter 300ms ease;
+    }
+
+    .pc-sheen {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      pointer-events: none;
+      z-index: 1;
+
+      // subtle scan sheen – hidden by default
+      opacity: 0;
+      transform: translateX(-120%) skewX(-12deg);
+      background: linear-gradient(
+        110deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.06) 50%,
+        transparent 65%
+      );
+      filter: blur(0.6px);
+      mix-blend-mode: screen;
+    }
+
+    .pc-media {
+      position: relative;
+      z-index: 2;
+      margin-top: $spacing-2;
+    }
+
+    .pc-img {
+      position: relative;
+      z-index: 2;
+      will-change: transform, filter;
+      transition:
+        transform 280ms ease,
+        filter 280ms ease;
+    }
+
+    .card-title {
+      font-family: $font-body;
+      position: relative;
+      z-index: 2;
+      transition: filter 280ms ease;
+    }
+
+    .card-text-wrapper {
+      height: 45px;
+      display: flex;
+
+      .card-text {
+        margin: auto;
+        position: relative;
+        z-index: 2;
+      }
+    }
+
+    .prod-list {
+      list-style-type: disc;
+      text-align: left;
+      margin-left: $spacing-8;
+      align-self: flex-start;
+      position: relative;
+      z-index: 2;
+
+      .prod-item {
+        line-height: 1.5rem;
+        transition: color 220ms ease;
+
+        &::marker {
+          color: var(--brand-primary);
+          transition:
+            color 220ms ease,
+            filter 220ms ease;
+        }
+
+        &:hover::marker {
+          color: #ffbd41;
+          filter: drop-shadow(0 0 10px rgba(255, 189, 65, 0.35));
+        }
+      }
+    }
+
+    .pc-btn {
+      margin-top: $spacing-6;
+      position: relative;
+      z-index: 2;
+      transition:
+        transform 220ms ease,
+        filter 220ms ease;
+    }
+
+    // --- Hover: “activate module” ---
+    &:hover {
+      transform: translateY(-10px);
+      filter: saturate(1.02);
+
+      .pc-img {
+        transform: translateY(-3px) scale(1.03);
+        filter: drop-shadow(0 14px 24px rgba(58, 201, 219, 0.14))
+          drop-shadow(0 18px 44px rgba(58, 46, 111, 0.18))
+          drop-shadow(0 14px 36px rgba(255, 189, 65, 0.1));
+      }
+
+      .pc-energy {
+        opacity: 0.75;
+        transform: translateX(-50%) scale(1.05);
+        filter: blur(12px);
+        animation: pcEnergyDrift 10s ease-in-out infinite;
+      }
+
+      .pc-btn {
+        transform: translateY(-2px);
+        filter: drop-shadow(0 10px 22px rgba(255, 189, 65, 0.1));
+      }
+
+      .card-title {
+        filter: drop-shadow(0 10px 26px rgba(255, 189, 65, 0.1));
+      }
+
+      .pc-sheen {
+        opacity: 1;
+        animation: pcSheenSweep 900ms ease-out 1;
+      }
+    }
+
+    // Focus mode (dim siblings)
+    &.is-dimmed {
+      opacity: 0.38;
+      filter: saturate(0.9);
+      transform: translateY(0);
+    }
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes pcSheenSweep {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(140%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pcEnergyDrift {
+  0% {
+    background-position: 40% 45%;
+  }
+  50% {
+    background-position: 60% 35%;
+  }
+  100% {
+    background-position: 40% 45%;
+  }
+}

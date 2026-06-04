@@ -92,6 +92,7 @@ describe('App Component', () => {
     expect(container.querySelector('.site-layout')).toBeInTheDocument();
     expect(container.querySelector('.website-navbar')).toBeInTheDocument();
     expect(container.querySelector('.landing-page')).toBeInTheDocument();
-    expect(screen.getByText(/create courses that inspire/i)).toBeInTheDocument();
+    expect(screen.getByText(/create courses that/i)).toBeInTheDocument();
+    expect(screen.getByText(/inspire/i)).toBeInTheDocument();
   });
 });

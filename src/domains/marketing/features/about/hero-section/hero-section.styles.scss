@@ -1,0 +1,69 @@
+@use '../../../../../styles/index.scss' as *;
+
+.about-hero {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: $spacing-9 $spacing-6; // 96px top/bottom, 32px sides
+  min-height: 80vh; // your “B” choice
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: $spacing-8; // 64px
+  position: relative;
+  overflow: hidden;
+}
+
+.about-hero__content {
+  z-index: 2;
+
+  h1 {
+    font-size: $size-xxl; // 64px
+    line-height: 0.95;
+    margin: 0 0 $spacing-4 0;
+  }
+}
+
+.about-hero__subtext {
+  max-width: 560px;
+  font-size: $size-h3; // 20px
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.about-hero__visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* The planet itself */
+.about-hero__planet {
+  width: min(520px, 40vw);
+  height: auto;
+  transform: translateY(-10px); // slight lift looks more “hero”
+  filter: drop-shadow(0 24px 70px rgba(0, 0, 0, 0.55));
+  opacity: 0.98;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+/* Optional subtle atmosphere behind the planet */
+.about-hero__visual::before {
+  content: '';
+  position: absolute;
+  width: 640px;
+  height: 520px;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    rgba(58, 46, 111, 0.22) 0%,
+    rgba(58, 201, 219, 0.1) 35%,
+    rgba(15, 15, 45, 0) 70%
+  );
+  filter: blur(22px);
+  opacity: 0.9;
+  transform: translateY(-10px);
+  pointer-events: none;
+}

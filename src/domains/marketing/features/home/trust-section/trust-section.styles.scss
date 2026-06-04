@@ -1,0 +1,141 @@
+@use '../../../../../styles/index.scss' as *;
+
+.trust-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .trust-header {
+    margin: $spacing-7 0 $spacing-5;
+  }
+
+  .trust-cards {
+    display: flex;
+    gap: $spacing-6;
+    width: 100%;
+    justify-content: space-evenly;
+    margin-top: $spacing-7;
+
+    // while GSAP reveals, avoid CSS fighting transforms/opacity
+    &.is-revealing .trust-card {
+      transition: none !important;
+    }
+
+    .trust-card {
+      display: flex;
+      flex-direction: column;
+      text-wrap: wrap;
+      text-align: center;
+      align-items: center;
+      width: 280px;
+
+      position: relative;
+
+      // No background. No borders. Cinematic “floating UI fragments”.
+      background: transparent;
+
+      // Hover/interaction transitions (disabled during reveal via .is-revealing)
+      transition:
+        transform 260ms ease,
+        opacity 260ms ease,
+        filter 260ms ease;
+
+      // Hover focus base
+      opacity: 1;
+
+      .tc-image-wrap {
+        position: relative;
+        display: grid;
+        place-items: center;
+        // width: 92px;
+        height: 92px;
+
+        // Energy field behind the icon (this is the cinematic part)
+        .tc-energy {
+          position: absolute;
+          inset: 0;
+          margin: auto;
+          width: 88px;
+          height: 88px;
+          border-radius: 999px;
+          pointer-events: none;
+          z-index: 0;
+
+          // layered glow field (no card background required)
+          background:
+            radial-gradient(
+              circle at 30% 30%,
+              rgba(58, 201, 219, 0.22) 0%,
+              rgba(58, 201, 219, 0.08) 35%,
+              transparent 70%
+            ),
+            radial-gradient(
+              circle at 70% 65%,
+              rgba(58, 46, 111, 0.22) 0%,
+              rgba(58, 46, 111, 0.1) 38%,
+              transparent 72%
+            );
+
+          filter: blur(4px);
+          opacity: 0.55;
+          transform: scale(1);
+          will-change: transform, opacity;
+        }
+
+        .tc-image {
+          position: relative;
+          z-index: 1;
+          transition:
+            transform 260ms ease,
+            filter 260ms ease;
+          will-change: transform, filter;
+        }
+      }
+
+      .tc-header {
+        margin-top: $spacing-4;
+        font-family: $font-body;
+      }
+
+      .tc-text {
+        margin-top: $spacing-1;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      // Cinematic hover: minimal lift + icon “energize”
+      &:hover {
+        transform: translateY(-8px) !important;
+        cursor: pointer;
+
+        .tc-image {
+          transform: translateY(-2px) scale(1.03);
+          filter: drop-shadow(0 10px 18px rgba(58, 201, 219, 0.16))
+            drop-shadow(0 12px 34px rgba(58, 46, 111, 0.18))
+            drop-shadow(0 10px 26px rgba(255, 189, 65, 0.1));
+        }
+
+        .tc-energy {
+          opacity: 0.95;
+          transform: scale(1.07);
+          filter: blur(5px);
+        }
+      }
+
+      // Dim others when one is hovered (your existing behavior, tuned)
+      &.is-dimmed {
+        opacity: 0.42;
+        filter: saturate(0.92);
+        transform: translateY(0);
+      }
+
+      &.is-active {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.trust-cards.is-revealing .trust-card {
+  transition: none !important;
+}

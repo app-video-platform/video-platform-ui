@@ -1,0 +1,56 @@
+.hiw-progress {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(720px, 80%);
+  height: 40px;
+  z-index: 4;
+}
+
+.hiw-progress__line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(59, 201, 219, 0.4),
+    rgba(255, 255, 255, 0.15)
+  );
+}
+
+.hiw-progress__node {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3a2e6f;
+  transition: all 0.25s ease;
+
+  &.is-active {
+    background: #3bc9db;
+    box-shadow: 0 0 12px rgba(59, 201, 219, 0.6);
+  }
+}
+
+.hiw-progress__rocket {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  will-change: left, transform;
+}
+
+.hiw-progress__rocketInner {
+  display: block;
+  will-change: transform;
+  width: 30px;
+  height: 54px;
+}

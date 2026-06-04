@@ -64,9 +64,12 @@ const GalUserDropdown: React.FC = () => {
         trigger={({ toggle }) => (
           <button
             onClick={toggle}
-            className="user-profile-button"
+            className="user-profile-button inline"
             aria-label={getProfileNameInitials(user.firstName, user.lastName)}
           >
+            <span className="user-name">
+              {user.firstName} {user.lastName}
+            </span>
             <UserAvatar
               imageUrl={user.imageUrl ?? ''}
               alt={`${user.firstName} ${user.lastName}`}

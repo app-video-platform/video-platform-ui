@@ -1,211 +1,126 @@
 @use '../../../../styles/index.scss' as *;
 
 .landing-page {
-  section {
-    max-width: $bp-desktop;
-    margin: auto;
+  margin: 0;
+  min-height: 100vh;
+
+  .hero-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+  }
+
+  // .section-glass {
+
+  // }
+
+  .section-surface {
+    background:
+      radial-gradient(
+        circle at 20% 20%,
+        rgba(58, 46, 111, 0.18),
+        transparent 55%
+      ),
+      linear-gradient(180deg, var(--surface-1) 0%, var(--surface-0) 100%);
+  }
+
+  .section-calm {
+    background: linear-gradient(
+      0deg,
+      var(--surface-1) 0%,
+      var(--surface-0) 100%
+    );
+  }
+
+  // .section-calm--inverse {
+  //   background: linear-gradient(
+  //     180deg,
+  //     var(--surface-1) 0%,
+  //     var(--surface-0) 100%
+  //   );
+  // }
+
+  // .has-grain {
+  //   position: relative;
+  //   overflow: hidden;
+  // }
+  // .has-grain::after {
+  //   content: '';
+  //   position: absolute;
+  //   inset: 0;
+  //   // background: url('../../../../../public/images/grain.webp') center/cover
+  //   //   repeat;
+  //   opacity: var(--overlay-grain);
+  //   pointer-events: none;
+  //   mix-blend-mode: overlay;
+  // }
+
+  .section-subtext {
+    font-size: 14px;
   }
 
   .hero-section-wrapper {
     position: relative;
     width: 100%;
     height: 100vh;
-    // background: url('../../../../../public/images/hero-bg-layer.webp')
-    //   center/cover no-repeat;
-
-    // &:after {
-    //   content: '';
-    //   position: absolute;
-    //   inset: 0;
-    //   background: url('../../../../../public/images/stars.webp') center/cover
-    //     no-repeat;
-    //   mix-blend-mode: color-dodge;
-    //   opacity: 0.4;
-    //   z-index: -1;
-    // }
+    background: url('../../../../../public/images/hero-bg-con-galaxy.webp')
+      center/cover no-repeat;
 
     .hero-section {
       height: calc(100vh - 80px);
       top: 80px;
       position: relative;
-      // height: 100vh;
-      // padding: 120px 0;
-      // display: flex;
       width: 100%;
-      // justify-content: space-between;
-
-      // .hero-header,
-      // .hero-subtext {
-      //   width: 500px;
-      // }
-
-      // .hero-content,
-      // .hero-image {
-      //   width: calc(50% - 30px);
-      // }
 
       .hero-content {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        height: 100%;
-        justify-content: center;
+        padding-top: calc(3 * $spacing-7);
 
-        .hero-cta {
-          width: 200px;
-          height: 48px;
-          border-radius: 8px;
-          margin-top: 30px;
+        .hero-subtext {
+          max-width: 600px;
+          font-size: 1.2rem;
         }
-      }
 
-      .hero-image {
-        width: 70%;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        z-index: -1;
-        transform: translateY(-50%);
+        .hero-actions {
+          display: flex;
+          flex-direction: column;
+          gap: $spacing-5;
+          width: fit-content;
+          margin-top: $spacing-9;
+
+          .launch-action {
+            width: 300px;
+          }
+
+          .see-action {
+            width: 250px;
+          }
+        }
       }
     }
   }
 
-  .video-section {
-    background-color: rgb(199, 199, 199);
-    padding: 80px 100px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+  .trust-section {
+    padding: 0 $spacing-7 $spacing-8;
+  }
+
+  .about-sec-content {
     text-align: center;
-    border-radius: 20px;
+    width: 550px;
+    margin: $spacing-5 auto 0;
 
-    .video-container {
-      width: 80%;
-      margin: auto;
-      height: 400px;
-      background-color: gray;
-      border-radius: 12px;
-    }
-  }
-
-  .services-section {
-    margin-top: 120px;
-
-    .services-header {
-      margin-bottom: 80px;
-      text-align: center;
-    }
-
-    .services {
-      display: flex;
-      width: 100%;
-      gap: 30px;
-      justify-content: center;
-      text-align: center;
-
-      .service-container {
-        position: relative;
-        width: 400px;
-        padding: 40px;
-        border-radius: 12px;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0) 0%,
-          rgba(196, 196, 196, 0.45) 40%,
-          rgba(153, 153, 153, 1) 100%
-        );
-
-        .service-icon {
-          width: 100px;
-          height: 100px;
-          border-radius: 50%;
-          position: absolute;
-          left: 50%;
-          transform: translate(-50%, -80px);
-          background-color: #c9c8c5;
-        }
-        .service-header {
-          margin: 30px 0;
-        }
-      }
+    .asc-nos,
+    .asc-justs,
+    .asc-last {
+      margin-top: $spacing-3;
     }
   }
 
   .features-section {
-    background-color: #c9c8c5;
+    // background-color: #c9c8c5;
     width: 100%;
-    max-width: unset;
-    margin-top: 120px;
-    padding: 60px 0;
-
-    .features-wrapper {
-      max-width: 1480px;
-      margin: auto;
-
-      .features-header {
-        text-align: center;
-      }
-
-      .features-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        grid-column-gap: 20px;
-        grid-row-gap: 20px;
-        width: 950px;
-        margin: 30px auto 0;
-
-        .feature-container {
-          background-color: #e9e9e9;
-          padding: 40px;
-          text-align: center;
-          border-radius: 12px;
-
-          .feature-header {
-            margin-bottom: 30px;
-          }
-
-          .feature-icon {
-            background-color: grey;
-            width: 100px;
-            height: 100px;
-            margin: auto;
-
-            &__email {
-              margin-bottom: 30px;
-            }
-
-            &__branding {
-              margin-top: 30px;
-            }
-          }
-
-          &__analitics {
-            grid-area: 2 / 1 / 3 / 3;
-
-            display: flex;
-            width: 100%;
-            gap: 30px;
-
-            .analitics-text {
-              width: 400px;
-            }
-
-            .branding-image {
-              flex: 1;
-            }
-          }
-
-          &__branding {
-            grid-area: 1 / 2 / 2 / 3;
-          }
-
-          &__email {
-            grid-area: 1 / 1 / 2 / 2;
-          }
-        }
-      }
-    }
+    // max-width: unset;
+    // margin-top: 120px;
+    // padding: 60px 0;
   }
 
   .cta-section {
@@ -222,8 +137,10 @@
 
     .btns-container {
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      gap: 30px;
+      gap: $spacing-2;
+      margin-top: $spacing-4;
     }
   }
 }

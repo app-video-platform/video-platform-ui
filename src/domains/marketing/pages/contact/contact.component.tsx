@@ -1,20 +1,27 @@
 import React from 'react';
 
 import { GalExpansionPanel } from '@shared/ui';
-import { ContactForm, CtaSection } from '@domains/marketing/components';
+import { ContactForm, CTASection } from '@domains/marketing/shared';
 
 import './contact.styles.scss';
 
 const Contact: React.FC = () => (
   <main className="contact-page">
-    <div className="contact-hero-section">
+    <section className="contact-hero-section">
       <div className="contact-hero-content">
+        <span className="contact-hero-kicker">Transmission channel open</span>
+
         <div className="contact-hero-header">
-          <h1>Let us know how we can help</h1>
-          <p>Got ideas or questions? Let&apos;s talk</p>
+          <h1>Send us a signal</h1>
+          <p>
+            Got questions, ideas, or support requests? Beam them our way and
+            we’ll get back to you.
+          </p>
         </div>
+
         <div className="contact-hero-socials">
           <span>Find us on our socials</span>
+
           <ul className="contact-hero-socials-list">
             <li>f</li>
             <li>IG</li>
@@ -22,14 +29,23 @@ const Contact: React.FC = () => (
             <li>TT</li>
           </ul>
         </div>
+
+        <p className="contact-response-note">
+          Average response time: 1–2 business days
+        </p>
       </div>
+
       <div className="contact-form-container">
+        <div className="contact-form-orbit" />
         <ContactForm />
       </div>
-    </div>
-    <div className="faq-section">
+    </section>
+
+    <section className="faq-section">
+      <span className="faq-kicker">Signal archive</span>
       <h1>Frequently Asked Questions</h1>
-      <p className="subheading">Find here answers to some common questions</p>
+      <p className="subheading">Find answers to some common questions.</p>
+
       <div className="faq-list">
         <GalExpansionPanel header="How do I reset my password?">
           <p>
@@ -43,21 +59,22 @@ const Contact: React.FC = () => (
           defaultExpanded
         >
           <p>
-            {' '}
-            You can reach our support team via the contact form above or email
-            us directly.
+            You can find your purchase history from your account dashboard under
+            purchases.
           </p>
         </GalExpansionPanel>
 
         <GalExpansionPanel header="How can I contact support?">
-          <p>This panel can’t be opened because it’s disabled. (haha no)</p>
+          <p>You can reach our support team through the contact form above.</p>
         </GalExpansionPanel>
       </div>
-    </div>
+    </section>
 
-    <CtaSection
-      headerText="Not a member yet?"
-      descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    <CTASection
+      title={<span>Ready to launch?</span>}
+      primaryText="Launch now"
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      onPrimaryClick={() => {}}
     />
   </main>
 );

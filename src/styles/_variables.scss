@@ -55,6 +55,16 @@
     0 10px 30px rgba(0, 0, 0, 0.45), 0 0 30px rgba(255, 189, 65, 0.35);
   --shadow-button-app: 0 6px 18px rgba(0, 0, 0, 0.4);
   --shadow-inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* Reusable “space haze” alphas */
+  --haze-strong: 0.55;
+  --haze-mid: 0.35;
+  --haze-light: 0.18;
+
+  /* Optional overlay alphas */
+  --overlay-nebula: 0.65;
+  --overlay-stars: 0.22;
+  --overlay-grain: 0.08;
 }
 
 /*

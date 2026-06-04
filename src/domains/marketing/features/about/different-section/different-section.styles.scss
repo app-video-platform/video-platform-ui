@@ -1,0 +1,102 @@
+@use '../../../../../styles/index.scss' as *;
+
+.different-section {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 96px;
+  align-items: center;
+  padding: 120px 0;
+}
+
+.different-heading-container {
+  h2 {
+    font-size: $size-xl;
+    line-height: 0.95;
+    margin-bottom: 24px;
+
+    span {
+      color: var(--brand-primary);
+    }
+  }
+
+  p {
+    max-width: 520px;
+    color: var(--text-secondary);
+    font-size: 18px;
+  }
+}
+
+.different-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+  margin: 0;
+}
+
+.different-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 20px;
+  align-items: start;
+  cursor: pointer;
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: linear-gradient(
+    90deg,
+    rgba(58, 46, 111, 0.28),
+    rgba(21, 21, 56, 0.48)
+  );
+  border: 1px solid var(--divider-default);
+  box-shadow: var(--shadow-e1), var(--shadow-inner-highlight);
+  overflow: hidden;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+    width: 2px;
+    background: linear-gradient(
+      180deg,
+      rgba(59, 201, 219, 0),
+      rgba(59, 201, 219, 0.75),
+      rgba(59, 201, 219, 0)
+    );
+    opacity: 0.75;
+  }
+
+  &:hover {
+    transform: translateX(6px);
+    border-color: rgba(59, 201, 219, 0.22);
+    box-shadow:
+      var(--shadow-e2),
+      0 0 40px rgba(58, 46, 111, 0.18),
+      var(--shadow-inner-highlight);
+  }
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 24px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+.different-item__marker {
+  font-family: $font-heading;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: var(--ambient-cyan);
+  opacity: 0.82;
+}

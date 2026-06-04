@@ -1,6 +1,7 @@
 @use 'variables' as *;
 @use 'typography' as *;
 @use 'spacing' as *;
+@use 'breakpoints' as *;
 
 .error-text-red {
   color: var(--error);
@@ -24,6 +25,25 @@
   height: 1px;
   background-color: var(--divider-default);
   margin: $spacing-2 0 $spacing-5;
+}
+
+.max-w {
+  max-width: $bp-desktop;
+  margin: auto;
+}
+
+.section-padding {
+  padding: $spacing-9;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.primary-word {
+  color: var(--brand-primary);
 }
 
 @keyframes twinkle {

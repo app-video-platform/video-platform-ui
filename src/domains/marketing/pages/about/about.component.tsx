@@ -2,23 +2,23 @@ import React from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
 
 import { GalIcon } from '@shared/ui';
-import { CtaSection } from '@domains/marketing/components';
+import { CTASection } from '@domains/marketing/shared';
+import {
+  DifferentSection,
+  HeroSection,
+  MissionSection,
+  QuoteSection,
+  ValuesSection,
+} from '@domains/marketing/features';
 
 import './about.styles.scss';
 
 const About: React.FC = () => (
   <main className="about-page">
-    <section className="about-hero">
-      <h1>From Idea to Impact</h1>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam porttitor
-        faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor.
-        In aliquam, lacus sed ullamcorper commodo, nisi ipsum dictum magna, ac
-        pulvinar diam nisi mattis sapien.{' '}
-      </p>
-      <div className="about-hero-image"></div>
-    </section>
-    <section className="mission-section">
+    <HeroSection />
+    <MissionSection />
+    <ValuesSection />
+    {/* <section className="mission-section">
       <div className="mission-image"></div>
       <div className="mission-content">
         <h1>Our Space Mission</h1>
@@ -58,16 +58,17 @@ const About: React.FC = () => (
           <p>Value</p>
         </li>
       </ul>
-    </section>
-    <section className="different-section">
-      <div className="different-heading-container">
+    </section> */}
+    <DifferentSection />
+
+    {/* <section className="different-section">
+          <div className="different-heading-container">
         <h1>What Makes Us Different</h1>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
           porttitor faucibus interdum.
         </p>
       </div>
-      {/* <div className="different-list-container"> */}
       <ul className="different-list">
         <li className="different-item">
           <GalIcon icon={FaCheckSquare} color="green" size={24} />
@@ -86,10 +87,10 @@ const About: React.FC = () => (
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
       </ul>
-      {/* </div> */}
-    </section>
+    </section> */}
+    <QuoteSection imageSrc="" />
 
-    <section className="tati-section">
+    {/* <section className="tati-section">
       <div className="image-container">
         <div className="tati-image" />
       </div>
@@ -106,12 +107,12 @@ const About: React.FC = () => (
         </p>
         <span className="author">Tati, CEO</span>
       </div>
-    </section>
-
-    <CtaSection
-      headerText="Start building with us"
-      descriptionText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-      Etiam porttitor faucibus interdum. Quisque at efficitur tellus. Nulla sed tortor dolor."
+    </section> */}
+    <CTASection
+      title={<span>Start building with us</span>}
+      primaryText="Launch now"
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      onPrimaryClick={() => {}}
     />
   </main>
 );

@@ -91,9 +91,13 @@ jest.mock('domains/app/features/product-form', () => ({
   BuilderSidebar: ({
     activeTab,
     onChange,
+    onSectionClick,
+    onLessonClick,
   }: {
     activeTab: string | null;
     onChange: (tab: any) => void;
+    onSectionClick?: (id: string) => void;
+    onLessonClick?: (id: string) => void;
   }) => (
     <div data-testid="builder-sidebar">
       <span data-testid="active-tab">{activeTab ?? 'none'}</span>
@@ -114,6 +118,18 @@ jest.mock('domains/app/features/product-form', () => ({
       </button>
       <button data-testid="tab-media" onClick={() => onChange('media')}>
         Media
+      </button>
+      <button
+        data-testid="sidebar-section-link"
+        onClick={() => onSectionClick?.('section-1')}
+      >
+        Go section
+      </button>
+      <button
+        data-testid="sidebar-lesson-link"
+        onClick={() => onLessonClick?.('lesson-1')}
+      >
+        Go lesson
       </button>
     </div>
   ),
@@ -335,5 +351,51 @@ describe('<ProductForm />', () => {
     fireEvent.submit(form!);
 
     expect(handleSubmitMock).toHaveBeenCalled();
+  });
+
+  it('switches to Sections before triggering section navigation from the sidebar', async () => {
+    const state = makeFacadeState();
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('tab-pricing'));
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('pricing');
+
+    fireEvent.click(screen.getByTestId('sidebar-section-link'));
+
+    await waitFor(() => {
+      expect(state.handleSidebarSectionClick).toHaveBeenCalledWith('section-1');
+    });
+
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('sections');
+  });
+
+  it('switches to Sections before triggering lesson navigation from the sidebar', async () => {
+    const state = makeFacadeState();
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('tab-media'));
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('media');
+
+    fireEvent.click(screen.getByTestId('sidebar-lesson-link'));
+
+    await waitFor(() => {
+      expect(state.handleSidebarLessonClick).toHaveBeenCalledWith('lesson-1');
+    });
+
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('sections');
   });
 });

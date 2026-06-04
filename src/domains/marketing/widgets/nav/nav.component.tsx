@@ -30,7 +30,10 @@ const Navigation: React.FC = () => {
           <li>
             <Link to={'/pricing'}>Pricing</Link>
           </li>
-          <GalNavDropdown />
+          <li>
+            <Link to={'/getting-started'}>Getting Started</Link>
+          </li>
+          {/* <GalNavDropdown /> */}
 
           <li>
             <Link to={'/contact'}>Contact Us</Link>
@@ -39,7 +42,12 @@ const Navigation: React.FC = () => {
         <div className="user-buttons">
           <ul className="nav-link-list">
             {user ? (
-              <GalUserDropdown />
+              <div className="inline">
+                <Link className="dashboard-link" to={'/app'}>
+                  Go to Dashboard
+                </Link>
+                <GalUserDropdown />
+              </div>
             ) : (
               <ul className="nav-link-list">
                 <li>

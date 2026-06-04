@@ -1,0 +1,22 @@
+@use '../../../../../styles/index.scss' as *;
+
+.word-slot {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.2em;
+  vertical-align: baseline;
+
+  .word-track {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+
+    & > span {
+      height: 1.2em;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      color: var(--brand-primary);
+    }
+  }
+}

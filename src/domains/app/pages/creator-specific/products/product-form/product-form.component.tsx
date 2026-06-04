@@ -47,6 +47,10 @@ const ProductForm: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
   const [hasHeroCollapsed, setHasHeroCollapsed] = useState(false);
+  const [pendingSidebarScrollTarget, setPendingSidebarScrollTarget] = useState<{
+    id: string;
+    type: 'section' | 'lesson';
+  } | null>(null);
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -61,6 +65,49 @@ const ProductForm: React.FC = () => {
       setActiveTab(tab);
     }
   }, [formData.type, showRestOfForm]);
+
+  useEffect(() => {
+    if (activeTab !== 'sections' || !pendingSidebarScrollTarget) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (pendingSidebarScrollTarget.type === 'section') {
+        handleSidebarSectionClick(pendingSidebarScrollTarget.id);
+      } else {
+        handleSidebarLessonClick(pendingSidebarScrollTarget.id);
+      }
+
+      setPendingSidebarScrollTarget(null);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [
+    activeTab,
+    pendingSidebarScrollTarget,
+    handleSidebarLessonClick,
+    handleSidebarSectionClick,
+  ]);
+
+  const handleSidebarSectionNavigation = (sectionId: string) => {
+    if (activeTab === 'sections') {
+      handleSidebarSectionClick(sectionId);
+      return;
+    }
+
+    setPendingSidebarScrollTarget({ id: sectionId, type: 'section' });
+    setActiveTab('sections');
+  };
+
+  const handleSidebarLessonNavigation = (lessonId: string) => {
+    if (activeTab === 'sections') {
+      handleSidebarLessonClick(lessonId);
+      return;
+    }
+
+    setPendingSidebarScrollTarget({ id: lessonId, type: 'lesson' });
+    setActiveTab('sections');
+  };
 
   useProductFormAnimation(container, showRestOfForm, () => {
     setHasHeroCollapsed(true);
@@ -114,14 +161,18 @@ const ProductForm: React.FC = () => {
                 activeTab={activeTab}
                 sections={sidebarSections} // your sections + lessons summary
                 onChange={(tab) => setActiveTab(tab)}
-                onSectionClick={handleSidebarSectionClick}
-                onLessonClick={handleSidebarLessonClick}
+                onSectionClick={handleSidebarSectionNavigation}
+                onLessonClick={handleSidebarLessonNavigation}
               />
             </div>
 
             <div className="product-create-section">
               {activeTab === 'basics' && (
-                <BasicInfo formData={formData} setField={setField} />
+                <BasicInfo
+                  formData={formData}
+                  setField={setField}
+                  showOnlyCurrentType={isEditMode}
+                />
               )}
 
               {activeTab === 'pricing' && (
