@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { selectAuthUser } from 'core/store/auth-store';
-import { isCreatorOrAdmin } from 'core/api/models';
+import { hasRole, UserRole } from 'core/api/models';
 import { Button } from '@shared/ui';
 import { SmartSearch } from 'domains/app/features/smart-search';
 import {
@@ -19,7 +19,7 @@ const TopNavbar: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
   const location = useLocation();
-  const isUserCreator = isCreatorOrAdmin(user?.roles);
+  const isUserCreator = hasRole(user?.roles, UserRole.CREATOR);
   const isPathDashboard = location.pathname.startsWith('/app') && isUserCreator;
 
   return (

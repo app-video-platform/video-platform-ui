@@ -2,10 +2,16 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { AppDispatch, getPrimaryRole } from 'core/api/models';
+import {
+  AppDispatch,
+  getPrimaryRole,
+  rolePrecedence,
+  UserRole,
+} from 'core/api/models';
 import { GalDropdown, UserAvatar } from '@shared/ui';
 import {
   selectAuthUser,
+  changeDevUserRole,
   logout,
   logoutUser,
 } from 'core/store/auth-store';
@@ -17,6 +23,13 @@ const GalUserDropdown: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const primaryRole = getPrimaryRole(user?.roles);
+  const roleOptions = rolePrecedence.filter((role) => role !== primaryRole);
+  const showDevRoleSwitch = process.env.NODE_ENV !== 'production';
+
+  const handleRoleChange = (role: UserRole) => {
+    dispatch(changeDevUserRole(role));
+  };
 
   // Log the user out
   const handleLogout = () => {
@@ -67,8 +80,25 @@ const GalUserDropdown: React.FC = () => {
               <span>{user.email}</span>
             </div>
             <div className="dropdown-item">
-              <span>Role: {getPrimaryRole(user.roles)}</span>
+              <span>Role: {primaryRole}</span>
             </div>
+            {showDevRoleSwitch && (
+              <div className="dropdown-item dev-role-switch">
+                <span>Change Role (for dev):</span>
+                <div className="role-selector">
+                  {roleOptions.map((role) => (
+                    <button
+                      key={role}
+                      type="button"
+                      className="role-button"
+                      onClick={() => handleRoleChange(role)}
+                    >
+                      {role}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="dropdown-item dev-items">
               <Link to="/dev-dashboard">Dev Dashboard</Link>
               <Link

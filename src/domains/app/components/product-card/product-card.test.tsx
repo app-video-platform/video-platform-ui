@@ -38,10 +38,11 @@ describe('ProductCard', () => {
       updatedAt: new Date('2026-03-02T00:00:00.000Z'),
     };
 
-    render(
+    const { container } = render(
       <ProductCard product={product} />,
     );
 
+    expect(container.firstChild).toHaveClass('vp-product-card');
     expect(
       screen.getByRole('heading', { level: 2, name: 'Masterclass' }),
     ).toBeInTheDocument();
