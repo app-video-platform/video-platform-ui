@@ -148,7 +148,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   return (
     <ExpansionPanel
       className="section-editor"
-      id={`lesson-${sectionDomId}`}
+      id={`section-${sectionDomId}`}
       defaultExpanded={true}
       hideToggle={!section.id}
       header={
