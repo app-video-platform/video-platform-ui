@@ -63,6 +63,7 @@ jest.mock('@shared/ui', () => ({
 }));
 
 import CreatorDashboard from './creator-dashboard.component';
+import { UserRole } from 'core/api/models';
 
 describe('<CreatorDashboard />', () => {
   const mockedUseDispatch = useDispatch as jest.MockedFunction<typeof useDispatch>;
@@ -89,6 +90,7 @@ describe('<CreatorDashboard />', () => {
           firstName: 'Ada',
           lastName: 'Lovelace',
           email: 'ada@example.com',
+          roles: [UserRole.CREATOR],
         };
       }
       if (selector === selectTopThreeProducts) {
@@ -144,6 +146,7 @@ describe('<CreatorDashboard />', () => {
           firstName: 'Ada',
           lastName: 'Lovelace',
           email: 'ada@example.com',
+          roles: [UserRole.CREATOR],
         };
       }
       if (selector === selectTopThreeProducts) {
@@ -159,5 +162,34 @@ describe('<CreatorDashboard />', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Create Product' }));
     expect(mockNavigate).toHaveBeenCalledWith('products/create');
+  });
+
+  it('renders the shared dashboard for non-creators without creator actions', () => {
+    mockedUseSelector.mockImplementation((selector: any) => {
+      if (selector === selectAuthUser) {
+        return {
+          id: 'user-1',
+          firstName: 'Normal',
+          lastName: 'User',
+          email: 'normal@example.com',
+          roles: [UserRole.USER],
+        };
+      }
+      if (selector === selectTopThreeProducts) {
+        return [];
+      }
+      return undefined;
+    });
+
+    render(<CreatorDashboard />);
+
+    expect(screen.getByText(/user account/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/creator tools are available when your active role is creator/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Preview' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Create Product' })).toBeNull();
+    expect(mockedGetProductSummariesByOwner).not.toHaveBeenCalled();
+    expect(mockedGetAllProductsByUserId).not.toHaveBeenCalled();
   });
 });

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 
 import { selectAuthUser } from 'core/store/auth-store';
-import { isCreatorOrAdmin } from 'core/api/models';
+import { hasRole, UserRole } from 'core/api/models';
 import {
   SidebarLayoutProvider,
   SidebarNav,
@@ -43,7 +43,7 @@ const Shell: React.FC = () => {
 
   const user = useSelector(selectAuthUser);
 
-  const isUserCreator = isCreatorOrAdmin(user?.roles);
+  const isUserCreator = hasRole(user?.roles, UserRole.CREATOR);
 
   const inCreatorArea = CREATOR_ROUTES.some((pattern) =>
     Boolean(matchPath(pattern, location.pathname)),

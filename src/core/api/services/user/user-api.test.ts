@@ -2,7 +2,11 @@
 import httpClient from '../../http-client';
 import { UpdateUserRequest } from '../../models/user/update-user-request';
 import { User, UserRole } from '../../models/user/user';
-import { getUserProfileAPI, updateUserDetailsAPI } from './user-api';
+import {
+  changeDevUserRoleAPI,
+  getUserProfileAPI,
+  updateUserDetailsAPI,
+} from './user-api';
 
 jest.mock('../../http-client');
 
@@ -84,6 +88,28 @@ describe('User API', () => {
         'Update failed',
       );
       expect(errorLogSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('changeDevUserRoleAPI', () => {
+    it('PUTs the requested role and returns the updated user', async () => {
+      const response: User = {
+        firstName: 'Mock',
+        lastName: 'Creator',
+        email: 'mock@creator.test',
+        roles: [UserRole.CREATOR],
+      };
+
+      mockedHttpClient.put.mockResolvedValueOnce({ data: response });
+
+      const result = await changeDevUserRoleAPI(UserRole.CREATOR);
+
+      expect(result).toEqual(response);
+      expect(mockedHttpClient.put).toHaveBeenCalledWith(
+        'api/user/dev/role',
+        { role: UserRole.CREATOR },
+        { withCredentials: true },
+      );
     });
   });
 });

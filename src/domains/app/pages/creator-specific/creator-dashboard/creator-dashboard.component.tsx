@@ -11,7 +11,7 @@ import {
   selectTopThreeProducts,
   getProductSummariesByOwner,
 } from 'core/store/product-store';
-import { AppDispatch } from 'core/api/models';
+import { AppDispatch, getPrimaryRole, hasRole, UserRole } from 'core/api/models';
 
 import './creator-dashboard.styles.scss';
 
@@ -20,13 +20,14 @@ const CreatorDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
   const topThreeProducts = useSelector(selectTopThreeProducts);
+  const isCreator = hasRole(user?.roles, UserRole.CREATOR);
 
   useEffect(() => {
-    if (user && user.id) {
+    if (isCreator && user && user.id) {
       dispatch(getProductSummariesByOwner(user.id));
       dispatch(getAllProductsByUserId(user.id));
     }
-  }, [dispatch, user]);
+  }, [dispatch, isCreator, user]);
 
   return (
     <div className="user-dashboard-container">
@@ -39,28 +40,36 @@ const CreatorDashboard: React.FC = () => {
               {user?.firstName} {user?.lastName}
             </h2>
             <span>{user?.email}</span>
-            <span>Content Creator</span>
+            <span>
+              {isCreator
+                ? 'Content Creator'
+                : `${getPrimaryRole(user?.roles)} account`}
+            </span>
             <span>
               Member since: <strong>12 March 2025</strong>
             </span>
           </div>
         </div>
 
-        <div className="action-buttons-container">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => navigate('my-page-preview')}
-          >
-            Preview
-          </Button>
-        </div>
+        {isCreator && (
+          <div className="action-buttons-container">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => navigate('my-page-preview')}
+            >
+              Preview
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="producs-section">
         <h2>Most successful products</h2>
         <div className="product-cards">
-          {topThreeProducts && topThreeProducts.length > 0 ? (
+          {!isCreator ? (
+            <p>Creator tools are available when your active role is CREATOR.</p>
+          ) : topThreeProducts && topThreeProducts.length > 0 ? (
             topThreeProducts.map((item) => (
               <GalProductCard key={item.id} product={item} />
             ))

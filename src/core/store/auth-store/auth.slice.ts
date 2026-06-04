@@ -6,6 +6,7 @@ import {
   RegisterRequest,
   UpdateUserRequest,
   User,
+  UserRole,
 } from 'core/api/models';
 import {
   registerUser,
@@ -15,6 +16,7 @@ import {
   getUserProfileAPI,
   logoutAPI,
   updateUserDetailsAPI,
+  changeDevUserRoleAPI,
 } from 'core/api/services';
 import { extractErrorMessage } from '@shared/utils';
 
@@ -129,6 +131,18 @@ export const updateUserDetails = createAsyncThunk<
   try {
     const response = await updateUserDetailsAPI(userData);
     return response; // API returns user info with token
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
+  }
+});
+
+export const changeDevUserRole = createAsyncThunk<
+  User,
+  UserRole,
+  { rejectValue: string }
+>('auth/changeDevUserRole', async (role, { rejectWithValue }) => {
+  try {
+    return await changeDevUserRoleAPI(role);
   } catch (error: unknown) {
     return rejectWithValue(extractErrorMessage(error));
   }
@@ -249,6 +263,22 @@ const authSlice = createSlice({
       .addCase(updateUserDetails.rejected, (state) => {
         state.loading = false;
         state.error = 'Update user details failed';
+      })
+      .addCase(changeDevUserRole.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        changeDevUserRole.fulfilled,
+        (state, action: PayloadAction<User>) => {
+          state.loading = false;
+          state.user = action.payload;
+          state.isUserLoggedIn = true;
+        },
+      )
+      .addCase(changeDevUserRole.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Change dev user role failed';
       });
   },
 });

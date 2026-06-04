@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
+import { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AppDispatch } from 'core/api/models';
+import { AbstractProduct, AppDispatch } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import { UseProductFormFacadeResult } from '../models/product-form';
 import { useProductAutosave } from './use-product-autosave.hook';
@@ -37,6 +38,15 @@ export const useProductFormFacade = (): UseProductFormFacadeResult => {
     setShowLoadingRestOfForm,
   } = useProductFormState();
 
+  const handleProductLoaded = useCallback(
+    (product: AbstractProduct) => {
+      if (type && product.type !== type) {
+        navigate(`/app/products/edit/${product.id}`, { replace: true });
+      }
+    },
+    [navigate, type],
+  );
+
   // 2) load existing product
   useProductLoader({
     isEditMode,
@@ -45,11 +55,7 @@ export const useProductFormFacade = (): UseProductFormFacadeResult => {
     setFormData,
     setErrors,
     setShowRestOfForm,
-    onProductLoaded: (product) => {
-      if (type && product.type !== type) {
-        navigate(`/app/products/edit/${product.id}`, { replace: true });
-      }
-    },
+    onProductLoaded: handleProductLoaded,
   });
 
   // 3) autosave

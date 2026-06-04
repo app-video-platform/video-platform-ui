@@ -75,7 +75,23 @@ describe('GalUserDropdown component', () => {
     fireEvent.click(profileButton);
     expect(screen.getByText(/john\.doe@example\.com/i)).toBeInTheDocument();
     expect(screen.getByText(/role: admin/i)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: UserRole.CREATOR })).toBeNull();
+    expect(screen.getByText(/change role \(for dev\):/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: UserRole.CREATOR })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: UserRole.USER })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: UserRole.ADMIN })).toBeNull();
+  });
+
+  it('dispatches backend-backed dev role changes from the role switcher', () => {
+    render(
+      <MemoryRouter>
+        <GalUserDropdown />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /jd/i }));
+    fireEvent.click(screen.getByRole('button', { name: UserRole.CREATOR }));
+
+    expect(mockDispatch).toHaveBeenCalledWith(expect.any(Function));
   });
 
   it('closes the dropdown when clicking outside', () => {

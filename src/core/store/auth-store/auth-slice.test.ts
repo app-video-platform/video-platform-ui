@@ -6,6 +6,7 @@ import authReducer, {
   signupUser,
   verifyEmail,
   signinUser,
+  changeDevUserRole,
 } from './auth.slice';
 
 // Define an initial state matching your AuthState interface
@@ -110,5 +111,25 @@ describe('auth slice async thunks', () => {
     const state = authReducer({ ...initialState, loading: true }, action);
     expect(state.loading).toBe(false);
     expect(state.error).toBe('Signin failed');
+  });
+
+  it('should handle changeDevUserRole.fulfilled', () => {
+    const user = {
+      firstName: 'Alice',
+      lastName: 'Creator',
+      email: 'alice@example.com',
+      roles: [UserRole.CREATOR],
+    } as User;
+
+    const action = {
+      type: changeDevUserRole.fulfilled.type,
+      payload: user,
+    };
+
+    const state = authReducer({ ...initialState, loading: true }, action);
+
+    expect(state.loading).toBe(false);
+    expect(state.user).toEqual(user);
+    expect(state.isUserLoggedIn).toBe(true);
   });
 });

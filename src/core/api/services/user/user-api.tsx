@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import httpClient from '../../http-client';
 import { UpdateUserRequest } from '../../models/user/update-user-request';
-import { User } from '../../models/user/user';
+import { User, UserRole } from '../../models/user/user';
 
 export const getUserProfileAPI = async () => {
   try {
@@ -23,6 +23,20 @@ export const updateUserDetailsAPI = async (payload: UpdateUserRequest) => {
     return response.data;
   } catch (error) {
     console.error('Error updating user details:', error);
+    throw error;
+  }
+};
+
+export const changeDevUserRoleAPI = async (role: UserRole) => {
+  try {
+    const response = await httpClient.put<User>(
+      'api/user/dev/role',
+      { role },
+      { withCredentials: true },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error changing dev user role:', error);
     throw error;
   }
 };
