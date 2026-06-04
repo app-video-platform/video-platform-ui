@@ -25,7 +25,6 @@ const GalUserDropdown: React.FC = () => {
   const navigate = useNavigate();
   const primaryRole = getPrimaryRole(user?.roles);
   const roleOptions = rolePrecedence.filter((role) => role !== primaryRole);
-  const showDevRoleSwitch = process.env.NODE_ENV !== 'production';
 
   const handleRoleChange = (role: UserRole) => {
     dispatch(changeDevUserRole(role));
@@ -82,23 +81,21 @@ const GalUserDropdown: React.FC = () => {
             <div className="dropdown-item">
               <span>Role: {primaryRole}</span>
             </div>
-            {showDevRoleSwitch && (
-              <div className="dropdown-item dev-role-switch">
-                <span>Change Role (for dev):</span>
-                <div className="role-selector">
-                  {roleOptions.map((role) => (
-                    <button
-                      key={role}
-                      type="button"
-                      className="role-button"
-                      onClick={() => handleRoleChange(role)}
-                    >
-                      {role}
-                    </button>
-                  ))}
-                </div>
+            <div className="dropdown-item dev-role-switch">
+              <span>Change Role (for dev):</span>
+              <div className="role-selector">
+                {roleOptions.map((role) => (
+                  <button
+                    key={role}
+                    type="button"
+                    className="role-button"
+                    onClick={() => handleRoleChange(role)}
+                  >
+                    {role}
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
             <div className="dropdown-item dev-items">
               <Link to="/dev-dashboard">Dev Dashboard</Link>
               <Link
