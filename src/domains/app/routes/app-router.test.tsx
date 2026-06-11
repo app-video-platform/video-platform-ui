@@ -13,9 +13,18 @@ jest.mock('react-redux', () => ({
 }));
 
 jest.mock('../pages', () => {
-  const React = require('react');
-  const { Outlet } = require('react-router-dom');
-  const makePage = (name: string) => () => <div>{name}</div>;
+  const ReactActual = jest.requireActual<typeof import('react')>('react');
+  const { Outlet } =
+    jest.requireActual<typeof import('react-router-dom')>('react-router-dom');
+
+  const makePage = (name: string) => {
+    const MockPage = () => ReactActual.createElement('div', null, name);
+    MockPage.displayName = `Mock${name.replace(/\s+/g, '')}`;
+    return MockPage;
+  };
+
+  const MockOutletPage = () => ReactActual.createElement(Outlet);
+  MockOutletPage.displayName = 'MockOutletPage';
 
   return {
     AllProductsTab: makePage('All products'),
@@ -23,7 +32,7 @@ jest.mock('../pages', () => {
     AdminPage: makePage('Admin dashboard'),
     AdminProductsPage: makePage('Admin products'),
     AdminUsersPage: makePage('Admin users'),
-    AppLayout: () => <Outlet />,
+    AppLayout: MockOutletPage,
     Cart: makePage('Cart'),
     ConsultationTab: makePage('Consultations'),
     CoursesTab: makePage('Courses'),
@@ -31,7 +40,7 @@ jest.mock('../pages', () => {
     DownloadPackagesTab: makePage('Downloads'),
     ExplorePage: makePage('Explore'),
     GalacticaHome: makePage('User home'),
-    LibraryPage: () => <Outlet />,
+    LibraryPage: MockOutletPage,
     MarketingPage: makePage('Marketing'),
     Onboarding: makePage('Onboarding'),
     ProductForm: makePage('Product form'),
