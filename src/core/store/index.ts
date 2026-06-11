@@ -1,3 +1,4 @@
+export * from './admin-store';
 export * from './auth-store';
 export * from './notifications';
 export * from './product-store';

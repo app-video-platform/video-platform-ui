@@ -1,8 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
-import { AbstractProduct, AppDispatch } from 'core/api/models';
+import {
+  AbstractProduct,
+  AppDispatch,
+  hasRole,
+  UserRole,
+} from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import { UseProductFormFacadeResult } from '../models/product-form';
 import { useProductAutosave } from './use-product-autosave.hook';
@@ -16,10 +21,13 @@ import {
 
 export const useProductFormFacade = (): UseProductFormFacadeResult => {
   const { type, id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
   const isEditMode = Boolean(id);
+  const selectedAdminOwnerId = searchParams.get('ownerId') ?? undefined;
+  const isAdmin = hasRole(user?.roles, UserRole.ADMIN);
 
   // 1) core form state
   const {
@@ -84,6 +92,10 @@ export const useProductFormFacade = (): UseProductFormFacadeResult => {
   return {
     user,
     isEditMode,
+    productOwnerId:
+      !isEditMode && isAdmin && selectedAdminOwnerId
+        ? selectedAdminOwnerId
+        : formData.userId ?? user?.id,
     formData,
     setFormData,
     setField,

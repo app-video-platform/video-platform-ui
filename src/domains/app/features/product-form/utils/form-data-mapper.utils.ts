@@ -13,7 +13,7 @@ export const mapFormDataToProductPayload = (
     description: formData.description,
     price: formData.price,
     status: 'DRAFT' as const,
-    userId: user?.id,
+    userId: formData.userId ?? user?.id,
   };
 
   const consDetails = formData.consultationDetails;

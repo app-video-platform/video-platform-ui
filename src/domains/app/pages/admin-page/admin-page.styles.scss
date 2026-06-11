@@ -1,0 +1,139 @@
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.admin-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+.admin-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.admin-page__tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  background: var(--surface-primary);
+
+  span {
+    font-weight: 700;
+  }
+
+  small {
+    color: var(--text-secondary);
+  }
+}
+
+.admin-toolbar,
+.admin-create-row,
+.admin-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-toolbar input,
+.admin-toolbar select,
+.admin-create-row select {
+  min-height: 36px;
+  min-width: 180px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  background: var(--surface-primary);
+  color: var(--text-primary);
+}
+
+.admin-create-row button,
+.admin-pagination button,
+.admin-table button {
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.admin-create-row button:disabled,
+.admin-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th,
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-primary);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+
+  small {
+    display: block;
+    max-width: 220px;
+    overflow-wrap: anywhere;
+    color: var(--text-secondary);
+  }
+
+  select {
+    min-height: 32px;
+    padding: 6px 8px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--surface-primary);
+    color: var(--text-primary);
+  }
+}
+
+.admin-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-error {
+  margin: 0;
+  color: var(--error-primary, #b42318);
+}

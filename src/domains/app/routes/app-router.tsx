@@ -1,8 +1,13 @@
 import React from 'react';
 import { Route, Routes, Navigate, Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import {
   AllProductsTab,
+  AdminAuditPage,
+  AdminPage,
+  AdminProductsPage,
+  AdminUsersPage,
   AppLayout,
   Cart,
   ConsultationTab,
@@ -10,6 +15,7 @@ import {
   CreatorDashboard,
   DownloadPackagesTab,
   ExplorePage,
+  GalacticaHome,
   LibraryPage,
   MarketingPage,
   Onboarding,
@@ -24,7 +30,23 @@ import {
   WishlistTab,
 } from '../pages';
 import { ProtectedRoute } from '@core/providers';
-import { UserRole } from '@core/api';
+import { getPrimaryRole, UserRole } from '@core/api';
+import { selectAuthUser } from '@core/store/auth-store';
+
+const RoleHome: React.FC = () => {
+  const user = useSelector(selectAuthUser);
+  const primaryRole = getPrimaryRole(user?.roles);
+
+  if (primaryRole === UserRole.ADMIN) {
+    return <AdminPage />;
+  }
+
+  if (primaryRole === UserRole.CREATOR) {
+    return <CreatorDashboard />;
+  }
+
+  return <GalacticaHome />;
+};
 
 const AppRouter: React.FC = () => (
   <Routes>
@@ -60,7 +82,22 @@ const AppRouter: React.FC = () => (
         }
       >
         {/* Shared dashboard home */}
-        <Route index element={<CreatorDashboard />} />
+        <Route index element={<RoleHome />} />
+
+        <Route
+          path="admin"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <Outlet />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="products/create" element={<ProductForm />} />
+          <Route path="audit" element={<AdminAuditPage />} />
+        </Route>
 
         {/* Creator/Admin: products */}
         <Route

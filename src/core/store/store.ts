@@ -1,5 +1,6 @@
 import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit';
 import authReducer from './auth-store/auth.slice';
+import adminReducer from './admin-store/admin.slice';
 import productsReducer from './product-store/product.slice';
 import notificationsReducer from './notifications/notifications.slice';
 import shopCartReducer, {
@@ -20,6 +21,7 @@ const preloadedCart = loadCartFromStorage();
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    admin: adminReducer,
     products: productsReducer,
     notifications: notificationsReducer,
     shopCart: shopCartReducer,

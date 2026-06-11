@@ -17,13 +17,14 @@ let mockFormName = 'Initial product';
 jest.mock('react-redux', () => ({
   __esModule: true,
   useDispatch: () => mockDispatch,
-  useSelector: () => ({ id: 'user-1' }),
+  useSelector: () => ({ id: 'user-1', roles: ['CREATOR'] }),
 }));
 
 jest.mock('react-router-dom', () => ({
   __esModule: true,
   useNavigate: () => mockNavigate,
   useParams: () => mockParams,
+  useSearchParams: () => [new URLSearchParams()],
 }));
 
 jest.mock('./use-product-loader.hooks', () => ({

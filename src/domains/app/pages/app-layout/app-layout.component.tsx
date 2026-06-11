@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 
 import { selectAuthUser } from 'core/store/auth-store';
-import { hasRole, UserRole } from 'core/api/models';
+import { isCreatorOrAdmin } from 'core/api/models';
 import {
   SidebarLayoutProvider,
   SidebarNav,
@@ -17,6 +17,7 @@ import './app-layout.styles.scss';
 
 const CREATOR_ROUTES = [
   '/app',
+  '/app/admin/*',
   '/app/products/*',
   '/app/sales',
   '/app/marketing',
@@ -35,7 +36,8 @@ const Shell: React.FC = () => {
 
     if (
       matchedRoute?.collapseSidebarOnLoad === true ||
-      location.pathname.includes('create' || 'edit')
+      location.pathname.includes('create') ||
+      location.pathname.includes('edit')
     ) {
       setIsSidebarCollapsed(true);
     }
@@ -43,16 +45,17 @@ const Shell: React.FC = () => {
 
   const user = useSelector(selectAuthUser);
 
-  const isUserCreator = hasRole(user?.roles, UserRole.CREATOR);
+  const hasManagementRole = isCreatorOrAdmin(user?.roles);
 
   const inCreatorArea = CREATOR_ROUTES.some((pattern) =>
     Boolean(matchPath(pattern, location.pathname)),
   );
-  const showSidebar = inCreatorArea && isUserCreator;
+  const showSidebar = inCreatorArea && hasManagementRole;
 
   const isBuilderRoute =
     location.pathname.startsWith('/app/products/create') ||
-    location.pathname.startsWith('/app/products/edit');
+    location.pathname.startsWith('/app/products/edit') ||
+    location.pathname.startsWith('/app/admin/products/create');
 
   useEffect(() => {
     if (!isBuilderRoute) {
