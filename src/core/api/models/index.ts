@@ -1,4 +1,5 @@
 export * from './admin';
+export * from './entitlement';
 export * from './auth';
 export * from './calendars';
 export * from './cancellation';

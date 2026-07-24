@@ -102,7 +102,7 @@ const shopCartSlice = createSlice({
     ) {
       const idToRemove = action.payload;
       const idx = state.products?.findIndex((p) => p.id === idToRemove);
-      if (idx && idx >= 0) {
+      if (idx >= 0) {
         state.products?.splice(idx, 1);
         state.total = recomputeTotal(state.products);
       }
