@@ -156,7 +156,7 @@ const ExplorePage: React.FC = () => {
                       type="button"
                       variant="secondary"
                       onClick={() =>
-                        navigate(`/product/${product.id}/${product.type}`)
+                        navigate(`/app/product/${product.id}/${product.type}`)
                       }
                     >
                       View Product

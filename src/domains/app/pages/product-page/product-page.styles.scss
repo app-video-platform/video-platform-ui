@@ -15,4 +15,26 @@
     margin: auto;
     padding-top: 50px;
   }
+
+  .cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .lesson-line,
+  .download-line {
+    padding: 12px 0;
+    border-top: 1px solid var(--divider-default);
+  }
+
+  video {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .content-locked {
+    margin-top: 24px;
+    font-weight: 600;
+  }
 }
