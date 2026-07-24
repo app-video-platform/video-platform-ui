@@ -45,6 +45,7 @@ export const useProductLoader = ({
           description: product.description ?? '',
           type: product.type ?? 'COURSE',
           price: product.price ?? 'free',
+          userId: product.userId,
         };
 
         let newData: ProductDraft = baseData;

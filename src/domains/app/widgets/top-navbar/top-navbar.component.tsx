@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { selectAuthUser } from 'core/store/auth-store';
-import { hasRole, UserRole } from 'core/api/models';
+import { isCreatorOrAdmin } from 'core/api/models';
 import { Button } from '@shared/ui';
 import { SmartSearch } from 'domains/app/features/smart-search';
 import {
@@ -19,8 +19,9 @@ const TopNavbar: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
   const location = useLocation();
-  const isUserCreator = hasRole(user?.roles, UserRole.CREATOR);
-  const isPathDashboard = location.pathname.startsWith('/app') && isUserCreator;
+  const hasManagementRole = isCreatorOrAdmin(user?.roles);
+  const isPathDashboard =
+    location.pathname.startsWith('/app') && hasManagementRole;
 
   return (
     <nav className="galactica-home-nav">
@@ -43,13 +44,13 @@ const TopNavbar: React.FC = () => {
           ) : (
             <Link to={'library/all-products'}>Library</Link>
           ))} */}
-        {user && !isUserCreator && (
+        {user && !hasManagementRole && (
           <Link to={'library/all-products'}>Library</Link>
         )}
       </div>
       {user && (
         <div className="nav-links">
-          {!isUserCreator && (
+          {!hasManagementRole && (
             <>
               <GalWishlistDropdown />
               <ShopCartDropdown />

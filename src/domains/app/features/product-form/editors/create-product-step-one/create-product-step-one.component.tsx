@@ -64,6 +64,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
           if (data) {
             // formData.id = data.id; // Set the product ID in formData
             setField('id', data.id ?? ''); // Ensure the formData is updated with the new ID
+            setField('userId', data.userId ?? userId);
             // formData.sections = data.sections || []; // Initialize sections if they exist
             if (data.type !== 'CONSULTATION') {
               setField('sections', data.sections || []); // Update sections in formData

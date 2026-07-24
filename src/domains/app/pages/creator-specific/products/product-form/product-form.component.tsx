@@ -29,6 +29,7 @@ const ProductForm: React.FC = () => {
   const {
     user,
     isEditMode,
+    productOwnerId,
     formData,
     setFormData,
     setField,
@@ -117,6 +118,10 @@ const ProductForm: React.FC = () => {
     return <p>You must be logged in to create a product.</p>;
   }
 
+  if (!isEditMode && !productOwnerId) {
+    return <p>Select a creator owner before creating a product.</p>;
+  }
+
   return (
     <div ref={container}>
       <ProductHeader
@@ -142,7 +147,7 @@ const ProductForm: React.FC = () => {
               showRestOfForm={showRestOfForm}
               setShowRestOfForm={setShowRestOfForm}
               setShowLoadingRestOfForm={setShowLoadingRestOfForm}
-              userId={user?.id}
+              userId={productOwnerId ?? ''}
             />
           </div>
         )}

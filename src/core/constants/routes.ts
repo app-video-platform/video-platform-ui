@@ -7,6 +7,7 @@ import {
 } from 'react-icons/io5';
 import { FaMoneyBillTrendUp } from 'react-icons/fa6';
 import { TiMessages } from 'react-icons/ti';
+import { MdAdminPanelSettings } from 'react-icons/md';
 
 import { Route } from '../api';
 
@@ -22,6 +23,11 @@ export const appRoutes: Route[] = [
     label: 'Products',
     icon: RxDashboard,
     collapseSidebarOnLoad: true,
+  },
+  {
+    path: '/app/admin',
+    label: 'Admin',
+    icon: MdAdminPanelSettings,
   },
   {
     path: '/app/sales',

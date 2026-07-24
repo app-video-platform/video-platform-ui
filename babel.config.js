@@ -1,8 +1,12 @@
 /* eslint-env node */
-module.exports = {
-  presets: [
-    ['@babel/preset-env', { targets: { node: 'current' } }],
-    '@babel/preset-react',
-    '@babel/preset-typescript'
-  ]
+module.exports = (api) => {
+  const isTest = api.env('test');
+
+  return {
+    presets: [
+      ['@babel/preset-env', { targets: { node: isTest ? '12' : 'current' } }],
+      '@babel/preset-react',
+      '@babel/preset-typescript',
+    ],
+  };
 };

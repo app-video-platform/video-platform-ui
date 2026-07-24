@@ -37,6 +37,7 @@ export type SectionDraft = ProductSection;
 export interface UseProductFormFacadeResult {
   user: ReturnType<typeof selectAuthUser> | null;
   isEditMode: boolean;
+  productOwnerId?: string;
   formData: ProductDraft;
   setFormData: React.Dispatch<React.SetStateAction<ProductDraft>>;
   setField: <K extends keyof ProductDraft>(

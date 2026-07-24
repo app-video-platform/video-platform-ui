@@ -16,16 +16,16 @@ module.exports = {
   // Defines transformations for your source files
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
-    '^.+\\.(js|jsx|mjs)$': 'babel-jest',
+    '^.+\\.(js|jsx|mjs|cjs)$': 'babel-jest',
   },
 
   // Tells Jest explicitly which node_modules need transformation
   transformIgnorePatterns: [
-    '/node_modules/(?!(axios|@testing-library|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error|react-icons|pretty-bytes|aria-query|dom-accessibility-api)/)',
+    '/node_modules/(?!(axios|@testing-library|@uppy|nanoid|preact|exifr|p-queue|p-timeout|companion-client|p-retry|retry|is-network-error|react-icons|pretty-bytes|aria-query|dom-accessibility-api|react-redux|uuid)/)',
   ],
 
   // File extensions Jest recognizes during module resolution
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'mjs'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'mjs', 'cjs'],
 
   // Allows importing CSS/SCSS files into Jest tests
   moduleNameMapper: {

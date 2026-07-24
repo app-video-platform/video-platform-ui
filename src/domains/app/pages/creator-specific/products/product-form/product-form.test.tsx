@@ -170,6 +170,7 @@ afterEach(() => {
 const makeFacadeState = (overrides: Partial<any> = {}) => ({
   user: { id: 'user-123' },
   isEditMode: false,
+  productOwnerId: 'user-123',
   formData: {
     id: 'prod-1',
     name: 'My Product',
