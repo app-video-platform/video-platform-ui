@@ -50,3 +50,13 @@ Use the current code as source of truth. `README.md` still contains starter-era 
 - Storybook: `npm run storybook`; build with `npm run build-storybook`.
 
 Current checkout verification: `npm run tsc` passes; `npm test -- --runInBand` passes.
+
+## Documentation Rule
+
+After implementing or merging a feature:
+
+- Determine whether the feature changes the product capabilities.
+- If yes, recommend Docusaurus updates.
+- Determine whether the feature changes architecture or project conventions.
+- If yes, recommend updating PROJECT_CONTEXT.md.
+- If neither changed, explicitly state that no documentation updates are required.
