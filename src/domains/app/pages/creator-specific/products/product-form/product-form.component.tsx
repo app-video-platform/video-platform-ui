@@ -31,15 +31,15 @@ export interface FormErrors {
 
 const getInitialBuilderTab = (productType: ProductType): BuilderTab => {
   switch (productType) {
-    case 'CONSULTATION':
-      return 'consultation-details';
-    case 'MEMBERSHIP':
-      return 'membership-content';
-    case 'COURSE':
-    case 'DOWNLOAD':
-      return 'sections';
-    default:
-      return 'basics';
+  case 'CONSULTATION':
+    return 'consultation-details';
+  case 'MEMBERSHIP':
+    return 'membership-content';
+  case 'COURSE':
+  case 'DOWNLOAD':
+    return 'sections';
+  default:
+    return 'basics';
   }
 };
 
