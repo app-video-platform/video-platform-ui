@@ -409,6 +409,18 @@ describe('Products API', () => {
       ]);
     });
 
+    it('leaves Membership product responses as shared product data', async () => {
+      const product = {
+        id: 'membership-1',
+        type: 'MEMBERSHIP',
+        name: 'Founders Club',
+        details: null,
+      };
+      mockedHttpClient.get.mockResolvedValueOnce({ data: product });
+
+      await expect(getProductByIdAPI('membership-1')).resolves.toEqual(product);
+    });
+
     it('getAllProductsMinimalAPI GETs min list', async () => {
       const arr = [{ id: 'm1' }];
       mockedHttpClient.get.mockResolvedValueOnce({ data: arr });

@@ -57,6 +57,8 @@ export function setupMocks(client: AxiosInstance) {
     const productData = JSON.parse(config.data);
     console.info('[MOCK] product creation:', productData);
 
+    const isSectionBased =
+      productData.type === 'COURSE' || productData.type === 'DOWNLOAD';
     const seededSections =
       productData.type === 'COURSE'
         ? [
@@ -77,7 +79,9 @@ export function setupMocks(client: AxiosInstance) {
       details:
         productData.type === 'CONSULTATION'
           ? productData.details ?? null
-          : { sections: seededSections },
+          : isSectionBased
+            ? { sections: seededSections }
+            : null,
     };
     return [200, response];
   });

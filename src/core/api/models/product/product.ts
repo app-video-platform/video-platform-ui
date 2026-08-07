@@ -35,6 +35,10 @@ export interface ConsultationProduct extends AbstractProductBase {
   consultationDetails?: ConsultationDetails;
 }
 
+export interface MembershipProduct extends AbstractProductBase {
+  type: 'MEMBERSHIP';
+}
+
 export interface ConsultationDetails {
   durationMinutes?: number;
   meetingMethod?: MeetingMethod;

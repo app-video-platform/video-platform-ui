@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { IconType } from 'react-icons';
 import { TbListDetails, TbSection } from 'react-icons/tb';
 import { IoIosPricetags } from 'react-icons/io';
-import { MdPermMedia } from 'react-icons/md';
+import { MdGroups, MdPermMedia } from 'react-icons/md';
 import { CgDetailsMore } from 'react-icons/cg';
 import { PiRectangleDashed } from 'react-icons/pi';
 
@@ -19,6 +19,7 @@ export type BuilderTab =
   | 'basics'
   | 'sections'
   | 'consultation-details'
+  | 'membership-content'
   | 'pricing'
   | 'media';
 
@@ -84,6 +85,18 @@ export const getProductTabs = (productType: ProductType): ProductTab[] => {
     ];
   }
 
+  if (productType === 'MEMBERSHIP') {
+    return [
+      ...baseTabs,
+      {
+        id: 'membership-content',
+        label: 'Membership Content',
+        icon: MdGroups,
+        position: 3,
+      },
+    ];
+  }
+
   return baseTabs;
 };
 
@@ -144,7 +157,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
 
             {/* Insert sections + lessons RIGHT AFTER the Sections tab */}
             {tab.id === 'sections' &&
-              productType !== 'CONSULTATION' &&
+              (productType === 'COURSE' || productType === 'DOWNLOAD') &&
               sortedSections.length > 0 && (
                 <>
                   {sortedSections.map((section) => (

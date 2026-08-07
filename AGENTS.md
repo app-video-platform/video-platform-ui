@@ -31,12 +31,15 @@ Use the current code as source of truth. `README.md` still contains starter-era 
 
 ## Product Builder Rules
 
-- Product types are `COURSE`, `DOWNLOAD`, and `CONSULTATION`.
+- Supported product types are `COURSE`, `DOWNLOAD`, `CONSULTATION`, and `MEMBERSHIP`.
 - Preserve the discriminated product model in `src/core/api/models/product`.
-- Preserve the centralized product builder under `src/domains/app/features/product-form` and `ProductForm`.
+- Preserve the centralized product builder under `src/domains/app/features/product-form` and `ProductForm`; Membership uses this shared builder shell.
 - Creation is two-step: create a `DRAFT` product with title/type/owner first, then reveal the full builder.
-- Keep frontend draft state (`ProductDraft`, blank sections/lessons) separate from backend DTOs.
+- `COURSE` and `DOWNLOAD` are section-based. `CONSULTATION` uses consultation-specific details. `MEMBERSHIP` has its own builder path/content tab and must not fall into generic “non-consultation = section-based” logic.
+- Keep frontend draft state (`ProductDraft`, blank sections/lessons, local Membership UI state) separate from backend DTOs.
 - Do not include sections in product autosave snapshots; sections, lessons, and download files have separate APIs/autosave flows.
+- Membership included-product relationships are currently frontend-only. Recurring Membership pricing is currently frontend-only.
+- Unsupported Membership fields must not be invented in backend DTOs/API payloads. Do not introduce Membership persistence contracts without confirmed backend support.
 - Do not invent product-type-specific backend endpoints when generic `api/products/...` endpoints already exist.
 
 ## Validation Commands

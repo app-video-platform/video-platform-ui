@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ProductType } from 'core/api/models';
+import { PRODUCT_BASIC_INFO_OPTIONS } from 'core/constants';
 import { GalBoxSelector } from 'domains/app/components';
 import { Input, Textarea } from '@shared/ui';
 import { ProductDraft } from '../models';
@@ -25,7 +26,7 @@ const BasicInfo: React.FC<BasicInfoProps> = ({
 }) => {
   const availableProductTypes: ProductType[] = showOnlyCurrentType
     ? [formData.type]
-    : ['CONSULTATION', 'COURSE', 'DOWNLOAD'];
+    : PRODUCT_BASIC_INFO_OPTIONS.map((option) => option.type);
 
   return (
     <div className="basic-info">

@@ -31,9 +31,10 @@ Role precedence is `ADMIN > CREATOR > USER` in `role-utils.ts`.
 
 Important product types:
 
-- `COURSE`: sections with lessons.
-- `DOWNLOAD`: sections with downloadable files.
+- `COURSE`: section-based product with lessons.
+- `DOWNLOAD`: section-based product with downloadable files.
 - `CONSULTATION`: appointment/session details instead of sections.
+- `MEMBERSHIP`: shared Product with a Membership-specific builder path; included products and recurring pricing are currently frontend-only.
 
 ## Architecture Summary
 
@@ -66,15 +67,17 @@ Flow:
 3. `BuilderSidebar` chooses tabs by product type.
 4. `COURSE` and `DOWNLOAD` use sections.
 5. `CONSULTATION` uses consultation details.
-6. Product details autosave separately from section, lesson, and download-file updates.
+6. `MEMBERSHIP` uses the shared builder shell with a Membership Content tab and recurring-pricing UI in the Pricing tab.
+7. Product details autosave separately from section, lesson, and download-file updates. Membership included products and recurring pricing do not currently autosave to backend Product payloads.
 
 Intentional model decisions:
 
 - Product union types live in `src/core/api/models/product`.
-- `AbstractProduct` is a discriminated union of course/download/consultation.
+- `AbstractProduct` is a discriminated union of course/download/consultation/membership.
 - `ProductDraft` allows incomplete frontend state before backend persistence.
-- `mapFormDataToProductPayload` maps drafts to backend payloads and keeps unsupported product types explicit.
-- Product normalizers handle backend `details` payload shape for sections and consultation details.
+- `mapFormDataToProductPayload` maps drafts to backend payloads and keeps unsupported product types explicit. Membership maps only shared Product fields today.
+- Product normalizers handle backend `details` payload shape for sections and consultation details; Membership responses currently remain shared Product data with no persisted Membership-specific details.
+- Product type metadata is centralized in `src/core/constants/products.ts` and drives create options, basic info options, filters, headers, and type metadata.
 
 ## Current Feature State
 
@@ -83,7 +86,9 @@ Implemented / reasonably wired:
 - Auth signup, login, verify email, forgot password, Google sign-in hooks.
 - Protected routes by role.
 - Creator product list with local filters/sorting.
-- Product create/edit builder for course/download/consultation basics.
+- Product create/edit builder for course/download/consultation/membership basics.
+- Membership builder integration with a Membership Content tab.
+- Generic reusable Product Picker used by Membership included-product selection.
 - Course/download section creation, autosave, deletion.
 - Course lesson creation, autosave, deletion for `VIDEO`, `ARTICLE`, `QUIZ`; assignment is placeholder.
 - Download section file upload via presigned URL + confirm upload.
@@ -99,6 +104,8 @@ Partially implemented / placeholder:
 - Storefront page fetches creator products but currently renders mostly empty UI.
 - Creator dashboard has placeholder audience/sales sections and hardcoded “member since”.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
+- Membership included products are limited to existing Course/Download products and held in frontend state only.
+- Membership recurring pricing has a frontend-only `RecurringPricing` model and `RecurringPriceSelector`; no backend Product pricing contract exists for it yet.
 - Lesson content persistence for uploaded videos/rich text/quiz data may need backend contract verification.
 - Assignment lesson editor is a visible placeholder.
 - Rich text editor embed support has a TODO.
@@ -115,25 +122,33 @@ Confirmed:
 - `src/domains/app/pages/storefront-page/storefront-page.component.tsx` has unused fetched state in the rendered UI.
 - `.github/workflows/docs.yml` expects a `docs/` directory, but no `docs/` directory exists in this checkout.
 - `src/core/store/shop-cart/shop-cart.slice.ts` removal has a likely index bug: index `0` is treated as false, so the first cart item may not remove.
+- Membership has no backend included-product relationship API yet.
+- Membership has no backend recurring pricing contract yet.
+- Membership has no subscription/entitlement/member-access model yet.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Download upload deduping is local to the section editor instance.
+- Membership included-product selection is local frontend state until a relationship API exists.
+- Membership recurring pricing is local frontend state until a structured recurring pricing contract exists.
 
 Speculative / verify before changing:
 
 - Backend shape for lesson rich text, quiz payloads, video upload, checkout/cart, and storefront data.
+- Backend contracts for Membership included products, recurring pricing, subscriptions, entitlements, and member access.
 - Whether product type changes after creation should remain disallowed in edit mode; current UI limits edit mode to current type in `BasicInfo`.
 
 ## Recent / Unfinished Work
 
-Recent Git history centers on admin role/product ownership work:
+Recent Git history includes admin role/product ownership work and Membership frontend work:
 
 - Admin role management UI and role-based routing.
 - Dev role switcher/backend role change support.
 - Admin product management and create-for-creator flow using `ownerId` query param.
+- Membership added as a first-class frontend Product type.
+- Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, and frontend-only recurring pricing controls.
 
 Likely next steps:
 
@@ -141,3 +156,4 @@ Likely next steps:
 - Complete product detail and storefront UI using real backend fields.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.
+- Define backend contracts for Membership included-product relationships, recurring pricing, subscription checkout, and entitlement/member access before persisting Membership-specific fields.

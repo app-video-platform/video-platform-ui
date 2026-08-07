@@ -76,6 +76,7 @@ describe('<BasicInfo />', () => {
     expect(screen.getByTestId('product-type-COURSE')).toBeInTheDocument();
     expect(screen.getByTestId('product-type-CONSULTATION')).toBeInTheDocument();
     expect(screen.getByTestId('product-type-DOWNLOAD')).toBeInTheDocument();
+    expect(screen.getByTestId('product-type-MEMBERSHIP')).toBeInTheDocument();
   });
 
   it('shows only the current product type option in edit mode', () => {
@@ -98,6 +99,9 @@ describe('<BasicInfo />', () => {
       screen.queryByTestId('product-type-CONSULTATION'),
     ).not.toBeInTheDocument();
     expect(screen.queryByTestId('product-type-DOWNLOAD')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('product-type-MEMBERSHIP'),
+    ).not.toBeInTheDocument();
   });
 
   it('still routes selection through setField for the current type', () => {

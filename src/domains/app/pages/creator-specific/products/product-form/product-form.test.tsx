@@ -74,6 +74,10 @@ jest.mock('domains/app/features/product-form', () => ({
     <div data-testid="consultation-details">ConsultationDetails</div>
   ),
 
+  MembershipContentSection: () => (
+    <div data-testid="membership-content">Included Products</div>
+  ),
+
   // sections editor stub
   CreateProductSections: ({
     productType,
@@ -116,6 +120,12 @@ jest.mock('domains/app/features/product-form', () => ({
       >
         Consultation
       </button>
+      <button
+        data-testid="tab-membership-content"
+        onClick={() => onChange('membership-content')}
+      >
+        Membership
+      </button>
       <button data-testid="tab-media" onClick={() => onChange('media')}>
         Media
       </button>
@@ -136,11 +146,25 @@ jest.mock('domains/app/features/product-form', () => ({
 
   // runtime placeholders for types (not actually used at runtime)
   BuilderTab: {} as any,
+  DEFAULT_RECURRING_PRICING: {
+    amount: 0,
+    currency: 'EUR',
+    interval: 'MONTH',
+  },
   SectionDraft: {} as any,
   ProductHeader: (props: any) => {
     mockProductHeader(props);
     return <div data-testid="product-header">ProductHeader</div>;
   },
+  RecurringPriceSelector: ({
+    value,
+  }: {
+    value: { amount: number; currency: string; interval: string };
+  }) => (
+    <div data-testid="recurring-price-selector">
+      RecurringPriceSelector ({value.amount} {value.currency} {value.interval})
+    </div>
+  ),
   PriceSelector: ({ price }: { price: number }) => (
     <div data-testid="price-selector">
       PriceSelector (price: {String(price)})
@@ -301,6 +325,95 @@ describe('<ProductForm />', () => {
     // Now the pricing panel should show our GalPriceSelector stub
     expect(screen.getByTestId('price-selector')).toBeInTheDocument();
     // And sections panel should be gone
+    expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
+  });
+
+  it.each(['COURSE', 'DOWNLOAD', 'CONSULTATION'])(
+    'uses the legacy GalPriceSelector for %s pricing',
+    async (productType) => {
+      const state = makeFacadeState({
+        showRestOfForm: true,
+        formData: {
+          id: `${productType.toLowerCase()}-1`,
+          name: `${productType} Product`,
+          description: '',
+          type: productType,
+          price: 99,
+          sections: [],
+        },
+      });
+
+      mockUseProductFormFacade.mockReturnValue(state);
+
+      render(<ProductForm />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('tab-pricing'));
+
+      expect(screen.getByTestId('price-selector')).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('recurring-price-selector'),
+      ).not.toBeInTheDocument();
+    },
+  );
+
+  it('uses RecurringPriceSelector for Membership pricing', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'membership-1',
+        name: 'Founders Club',
+        description: '',
+        type: 'MEMBERSHIP',
+        price: 25,
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('tab-pricing'));
+
+    expect(screen.getByTestId('recurring-price-selector')).toBeInTheDocument();
+    expect(screen.getByTestId('recurring-price-selector')).toHaveTextContent(
+      '0 EUR MONTH',
+    );
+    expect(screen.queryByTestId('price-selector')).not.toBeInTheDocument();
+  });
+
+  it('when showRestOfForm is true for a MEMBERSHIP, shows membership content after effect', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'membership-1',
+        name: 'Founders Club',
+        description: '',
+        type: 'MEMBERSHIP',
+        price: 25,
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+      expect(screen.getByTestId('membership-content')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Included Products')).toBeInTheDocument();
+    expect(screen.getByTestId('active-tab')).toHaveTextContent(
+      'membership-content',
+    );
     expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
   });
 

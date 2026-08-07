@@ -81,7 +81,7 @@ describe('product slice', () => {
     expect(nextState.currentProduct).toBeNull();
   });
 
-  it('creates, updates, and deletes sections on the current non-consultation product', () => {
+  it('creates, updates, and deletes sections on the current section-based product', () => {
     const initialState = {
       ...makeState(),
       currentProduct: {
@@ -162,6 +162,39 @@ describe('product slice', () => {
     expect(afterDelete.currentProduct?.sections).toEqual([
       expect.objectContaining({ id: 'section-2' }),
     ]);
+  });
+
+  it('does not create sections on a Membership product', () => {
+    const initialState = {
+      ...makeState(),
+      currentProduct: {
+        id: 'membership-1',
+        type: 'MEMBERSHIP',
+        name: 'Membership',
+      },
+    } as any;
+
+    const nextState = productReducer(
+      initialState,
+      createProductSection.fulfilled(
+        {
+          id: 'section-1',
+          title: 'Should not attach',
+          position: 1,
+        },
+        'req-membership-section',
+        {
+          productId: 'membership-1',
+          title: 'Should not attach',
+        } as any,
+      ),
+    );
+
+    expect(nextState.currentProduct).toEqual({
+      id: 'membership-1',
+      type: 'MEMBERSHIP',
+      name: 'Membership',
+    });
   });
 
   it('creates, updates, and deletes lessons inside the matching course section', () => {

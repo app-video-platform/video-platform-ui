@@ -9,6 +9,7 @@ import {
   selectProductsError,
   selectProductsLoading,
 } from 'core/store/product-store';
+import { PRODUCT_TYPE_REGISTRY } from 'core/constants';
 import { Button } from '@shared/ui';
 import { SavingIndicator } from 'domains/app/components';
 
@@ -73,9 +74,9 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
             })}
           >
             <div ref={box1} className="product-summary-header__type-pill">
-              {formData.type === 'COURSE' && '🎓 Course'}
-              {formData.type === 'DOWNLOAD' && '⬇️ Download'}
-              {formData.type === 'CONSULTATION' && '🎧 Consultation'}
+              {`${PRODUCT_TYPE_REGISTRY[formData.type].displayIcon} ${
+                PRODUCT_TYPE_REGISTRY[formData.type].label
+              }`}
             </div>
             <div ref={box2} className="product-summary-header__title">
               {formData.name}

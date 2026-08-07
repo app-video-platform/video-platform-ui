@@ -48,6 +48,12 @@ export const mapFormDataToProductPayload = (
         },
       };
 
+    case 'MEMBERSHIP':
+      return {
+        ...base,
+        type: 'MEMBERSHIP',
+      };
+
     default:
       throw new Error(`Unsupported product type: ${formData.type}`);
   }
