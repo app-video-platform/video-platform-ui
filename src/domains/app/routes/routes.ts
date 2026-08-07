@@ -2,7 +2,8 @@ export const appRoutes = {
   root: '/app',
   explore: '/app/explore',
   exploreSearch: '/app/explore/search',
-  product: (id = ':id') => `/app/product/${id}`,
+  product: (id = ':id', type?: string) =>
+    `/app/product/${id}${type ? `/${type}` : ''}`,
   store: (creatorId = ':creatorId') => `/app/store/${creatorId}`,
 
   products: '/app/products',

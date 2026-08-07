@@ -7,6 +7,7 @@ import { FaHeart } from 'react-icons/fa';
 import { ProductMinimised, AppDispatch } from 'core/api/models';
 import { getAllProductsMinimalAPI } from 'core/api/services';
 import { GalIcon, Button } from '@shared/ui';
+import { appRoutes } from '../../routes/routes';
 import {
   selectAllShopCartProducts,
   addProductToCart,
@@ -156,7 +157,7 @@ const ExplorePage: React.FC = () => {
                       type="button"
                       variant="secondary"
                       onClick={() =>
-                        navigate(`/product/${product.id}/${product.type}`)
+                        navigate(appRoutes.product(product.id, product.type))
                       }
                     >
                       View Product
