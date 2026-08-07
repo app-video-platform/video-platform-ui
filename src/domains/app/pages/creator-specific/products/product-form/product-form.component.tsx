@@ -12,10 +12,14 @@ import {
   useProductFormFacade,
   useProductFormAnimation,
   BasicInfo,
+  DEFAULT_RECURRING_PRICING,
   SectionDraft,
   ProductHeader,
+  MembershipContentSection,
+  RecurringPriceSelector,
+  RecurringPricing,
 } from 'domains/app/features/product-form';
-import { ProductWithSections } from 'core/api/models';
+import { ProductType, ProductWithSections } from 'core/api/models';
 
 import './product-form.styles.scss';
 
@@ -24,6 +28,20 @@ export interface FormErrors {
   type?: string;
   api?: string;
 }
+
+const getInitialBuilderTab = (productType: ProductType): BuilderTab => {
+  switch (productType) {
+    case 'CONSULTATION':
+      return 'consultation-details';
+    case 'MEMBERSHIP':
+      return 'membership-content';
+    case 'COURSE':
+    case 'DOWNLOAD':
+      return 'sections';
+    default:
+      return 'basics';
+  }
+};
 
 const ProductForm: React.FC = () => {
   const {
@@ -47,6 +65,8 @@ const ProductForm: React.FC = () => {
   } = useProductFormFacade();
 
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
+  const [membershipRecurringPricing, setMembershipRecurringPricing] =
+    useState<RecurringPricing>(DEFAULT_RECURRING_PRICING);
   const [hasHeroCollapsed, setHasHeroCollapsed] = useState(false);
   const [pendingSidebarScrollTarget, setPendingSidebarScrollTarget] = useState<{
     id: string;
@@ -61,9 +81,7 @@ const ProductForm: React.FC = () => {
     }
 
     if (!activeTab) {
-      const tab: BuilderTab =
-        formData.type === 'CONSULTATION' ? 'consultation-details' : 'sections';
-      setActiveTab(tab);
+      setActiveTab(getInitialBuilderTab(formData.type));
     }
   }, [formData.type, showRestOfForm]);
 
@@ -182,11 +200,23 @@ const ProductForm: React.FC = () => {
 
               {activeTab === 'pricing' && (
                 <div className="price-selector-wrapper">
-                  <h3>Choose Your Price Option</h3>
-                  <GalPriceSelector
-                    price={formData.price ?? 0}
-                    setPrice={handleSetPrice}
-                  />
+                  {formData.type === 'MEMBERSHIP' ? (
+                    <>
+                      <h3>Membership price</h3>
+                      <RecurringPriceSelector
+                        value={membershipRecurringPricing}
+                        onChange={setMembershipRecurringPricing}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <h3>Choose Your Price Option</h3>
+                      <GalPriceSelector
+                        price={formData.price ?? 0}
+                        setPrice={handleSetPrice}
+                      />
+                    </>
+                  )}
                 </div>
               )}
 
@@ -206,6 +236,13 @@ const ProductForm: React.FC = () => {
                   formData={formData}
                   errors={errors}
                   setFormData={setFormData}
+                />
+              )}
+
+              {activeTab === 'membership-content' && (
+                <MembershipContentSection
+                  ownerId={productOwnerId}
+                  currentProductId={formData.id}
                 />
               )}
 

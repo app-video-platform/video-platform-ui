@@ -66,7 +66,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
             setField('id', data.id ?? ''); // Ensure the formData is updated with the new ID
             setField('userId', data.userId ?? userId);
             // formData.sections = data.sections || []; // Initialize sections if they exist
-            if (data.type !== 'CONSULTATION') {
+            if (data.type === 'COURSE' || data.type === 'DOWNLOAD') {
               setField('sections', data.sections || []); // Update sections in formData
             }
             setShowRestOfForm(true);

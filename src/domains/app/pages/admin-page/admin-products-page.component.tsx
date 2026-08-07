@@ -17,10 +17,13 @@ import {
   selectAdminProductsPage,
 } from 'core/store/admin-store';
 import { deleteProduct } from 'core/store/product-store';
+import { PRODUCT_FILTER_OPTIONS } from 'core/constants';
 
 import './admin-page.styles.scss';
 
-const productTypes: ProductType[] = ['COURSE', 'DOWNLOAD', 'CONSULTATION'];
+const productTypes: ProductType[] = PRODUCT_FILTER_OPTIONS.map(
+  (option) => option.type,
+);
 const productStatuses: ProductStatus[] = ['DRAFT', 'PUBLISHED', 'HIDDEN'];
 
 const AdminProductsPage: React.FC = () => {

@@ -60,6 +60,8 @@ export const useProductLoader = ({
             ...baseData,
             consultationDetails: product.consultationDetails,
           };
+        } else if (product.type === 'MEMBERSHIP') {
+          newData = baseData;
         }
 
         setFormData(newData);

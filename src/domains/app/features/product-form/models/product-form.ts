@@ -16,7 +16,7 @@ export interface FormErrors {
 export interface ProductDraft {
   // from AbstractProductBase
   id?: string;
-  type: ProductType; // 'COURSE' | 'DOWNLOAD' | 'CONSULTATION'
+  type: ProductType;
   name?: string;
   description?: string;
   status?: ProductStatus;
