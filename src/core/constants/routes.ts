@@ -9,7 +9,8 @@ import { FaMoneyBillTrendUp } from 'react-icons/fa6';
 import { TiMessages } from 'react-icons/ti';
 import { MdAdminPanelSettings } from 'react-icons/md';
 
-import { Route } from '../api';
+import { Route } from '../api/models/misc';
+import { UserRole } from '../api/models/user';
 
 export const appRoutes: Route[] = [
   {
@@ -28,6 +29,7 @@ export const appRoutes: Route[] = [
     path: '/app/admin',
     label: 'Admin',
     icon: MdAdminPanelSettings,
+    allowedRoles: [UserRole.ADMIN],
   },
   {
     path: '/app/sales',
