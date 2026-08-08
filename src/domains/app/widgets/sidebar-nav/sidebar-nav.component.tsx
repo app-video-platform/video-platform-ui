@@ -1,9 +1,12 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from 'react-icons/hi2';
 
 import { appRoutes } from 'core/constants';
+import { hasAnyRole } from 'core/api/models';
+import { selectAuthUser } from 'core/store/auth-store';
 import { GalIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { useSidebarLayout } from './sidebar-layout.context';
@@ -12,6 +15,7 @@ import './sidebar-nav.styles.scss';
 
 const SidebarNav: React.FC = () => {
   const { isSidebarCollapsed, toggleSidebar } = useSidebarLayout();
+  const user = useSelector(selectAuthUser);
 
   const linkClass = (active: boolean) =>
     clsx('sidebar-link', { 'sidebar-link__active': active });
@@ -27,7 +31,11 @@ const SidebarNav: React.FC = () => {
       </div>
       <ul className="routes-list">
         {appRoutes
-          .filter((route) => !route.hideFromSidebar)
+          .filter(
+            (route) =>
+              !route.hideFromSidebar &&
+              (!route.allowedRoles || hasAnyRole(user?.roles, route.allowedRoles)),
+          )
           .map((route, index) => (
             <li key={index}>
               <NavLink

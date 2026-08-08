@@ -56,12 +56,14 @@ const renderIncludedProducts = ({
   products = productSummaries,
   loading = false,
   error = null,
+  productPickerRequest = 0,
 }: {
   ownerId?: string;
   currentProductId?: string;
   products?: ProductMinimised[] | null;
   loading?: boolean;
   error?: string | null;
+  productPickerRequest?: number;
 } = {}) => {
   const dispatch = jest.fn();
 
@@ -83,14 +85,25 @@ const renderIncludedProducts = ({
       }) as any) as typeof getProductSummariesByOwner,
   );
 
-  render(
+  const view = render(
     <MembershipIncludedProducts
       ownerId={ownerId}
       currentProductId={currentProductId}
+      productPickerRequest={productPickerRequest}
     />,
   );
 
-  return { dispatch };
+  const rerenderIncludedProducts = (nextProductPickerRequest: number) => {
+    view.rerender(
+      <MembershipIncludedProducts
+        ownerId={ownerId}
+        currentProductId={currentProductId}
+        productPickerRequest={nextProductPickerRequest}
+      />,
+    );
+  };
+
+  return { dispatch, rerenderIncludedProducts };
 };
 
 afterEach(() => {
@@ -114,14 +127,12 @@ describe('<MembershipIncludedProducts />', () => {
   it('renders the local empty state before products are selected', () => {
     renderIncludedProducts();
 
-    expect(screen.getByText('Included Products')).toBeInTheDocument();
-    expect(screen.getByText('No products included yet.')).toBeInTheDocument();
+    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
   });
 
   it('opens the inline picker and adds selected products locally', async () => {
-    renderIncludedProducts();
+    renderIncludedProducts({ productPickerRequest: 1 });
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Product' }));
     fireEvent.click(screen.getByLabelText('Select Course One'));
     fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
 
@@ -134,34 +145,34 @@ describe('<MembershipIncludedProducts />', () => {
   });
 
   it('prevents adding the same product twice', () => {
-    renderIncludedProducts();
+    const { rerenderIncludedProducts } = renderIncludedProducts({
+      productPickerRequest: 1,
+    });
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Product' }));
     fireEvent.click(screen.getByLabelText('Select Course One'));
     fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Product' }));
+    rerenderIncludedProducts(2);
 
     expect(screen.queryByLabelText('Select Course One')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Select Download Kit')).toBeInTheDocument();
   });
 
   it('allows an included product to be removed and selected again', () => {
-    renderIncludedProducts();
+    const { rerenderIncludedProducts } = renderIncludedProducts({
+      productPickerRequest: 1,
+    });
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Product' }));
     fireEvent.click(screen.getByLabelText('Select Course One'));
     fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Product' }));
+    rerenderIncludedProducts(2);
 
     expect(screen.getByLabelText('Select Course One')).toBeInTheDocument();
   });
 
   it('keeps memberships out of the picker candidates', () => {
-    renderIncludedProducts();
-
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Product' }));
+    renderIncludedProducts({ productPickerRequest: 1 });
 
     expect(screen.queryByText('Other Membership')).not.toBeInTheDocument();
   });
