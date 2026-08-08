@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
@@ -13,17 +14,12 @@ import {
   useProductFormAnimation,
   BasicInfo,
   DEFAULT_RECURRING_PRICING,
-  DEFAULT_RECURRING_PRICING,
   SectionDraft,
   ProductHeader,
   MembershipContentSection,
   RecurringPriceSelector,
   RecurringPricing,
-  MembershipContentSection,
-  RecurringPriceSelector,
-  RecurringPricing,
 } from 'domains/app/features/product-form';
-import { ProductType, ProductWithSections } from 'core/api/models';
 import { ProductType, ProductWithSections } from 'core/api/models';
 
 import './product-form.styles.scss';
@@ -70,8 +66,6 @@ const ProductForm: React.FC = () => {
   } = useProductFormFacade();
 
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
-  const [membershipRecurringPricing, setMembershipRecurringPricing] =
-    useState<RecurringPricing>(DEFAULT_RECURRING_PRICING);
   const [membershipRecurringPricing, setMembershipRecurringPricing] =
     useState<RecurringPricing>(DEFAULT_RECURRING_PRICING);
   const [hasHeroCollapsed, setHasHeroCollapsed] = useState(false);
