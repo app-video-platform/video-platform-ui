@@ -10,16 +10,20 @@ import {
 } from 'core/store/product-store';
 import { ProductPicker } from '../product-picker';
 import MembershipContentList from './membership-content-list.component';
-import { MembershipContentItemBase } from './models';
+import { MembershipContentItem } from './models';
 
 const ALLOWED_INCLUDED_PRODUCT_TYPES: ProductType[] = ['COURSE', 'DOWNLOAD'];
 
 interface MembershipIncludedProductsProps {
   ownerId?: string;
   currentProductId?: string;
-  nativeContentItems?: MembershipContentItemBase[];
+  nativeContentItems?: MembershipContentItem[];
   productPickerRequest?: number;
   isContentListHidden?: boolean;
+  // eslint-disable-next-line no-unused-vars
+  onEditContent?: (contentId: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onDeleteContent?: (contentId: string) => void;
 }
 
 const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
@@ -28,6 +32,8 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   nativeContentItems = [],
   productPickerRequest = 0,
   isContentListHidden = false,
+  onEditContent,
+  onDeleteContent,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const products = useSelector(selectProductSummaries);
@@ -114,6 +120,8 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
           nativeContentItems={nativeContentItems}
           includedProducts={includedProducts}
           onRemoveProduct={handleRemoveProduct}
+          onEditContent={onEditContent}
+          onDeleteContent={onDeleteContent}
         />
       )}
 

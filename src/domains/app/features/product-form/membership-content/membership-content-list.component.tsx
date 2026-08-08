@@ -7,14 +7,18 @@ import {
   createMembershipContentListItems,
   MEMBERSHIP_CONTENT_TYPE_ICONS,
   MEMBERSHIP_CONTENT_TYPE_LABELS,
-  MembershipContentItemBase,
+  MembershipContentItem,
 } from './models';
 
 interface MembershipContentListProps {
-  nativeContentItems: readonly MembershipContentItemBase[];
+  nativeContentItems: readonly MembershipContentItem[];
   includedProducts: readonly ProductMinimised[];
   // eslint-disable-next-line no-unused-vars
   onRemoveProduct?: (productId?: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onEditContent?: (contentId: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onDeleteContent?: (contentId: string) => void;
 }
 
 const getProductTitle = (product: ProductMinimised) =>
@@ -24,6 +28,8 @@ const MembershipContentList: React.FC<MembershipContentListProps> = ({
   nativeContentItems,
   includedProducts,
   onRemoveProduct,
+  onEditContent,
+  onDeleteContent,
 }) => {
   const listItems = useMemo(
     () => createMembershipContentListItems(nativeContentItems, includedProducts),
@@ -60,8 +66,33 @@ const MembershipContentList: React.FC<MembershipContentListProps> = ({
                     {content.status}
                   </span>
                 </div>
-                {content.description && <p>{content.description}</p>}
+                {content.type === 'POST' && <p>{content.body}</p>}
+                {content.type !== 'POST' && content.description && (
+                  <p>{content.description}</p>
+                )}
               </div>
+              {content.type === 'POST' && (
+                <div className="membership-content-list-item__actions">
+                  {onEditContent && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => onEditContent(content.id)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  {onDeleteContent && (
+                    <Button
+                      type="button"
+                      variant="remove"
+                      onClick={() => onDeleteContent(content.id)}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           );
         }

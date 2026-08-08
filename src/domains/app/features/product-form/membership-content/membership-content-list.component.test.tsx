@@ -6,14 +6,16 @@ import { ProductMinimised } from 'core/api/models';
 import MembershipContentList from './membership-content-list.component';
 import {
   createMembershipContentListItems,
-  MembershipContentItemBase,
+  createMembershipPostItem,
+  MembershipContentItem,
+  updateMembershipPostItem,
 } from './models';
 
-const nativePost: MembershipContentItemBase = {
+const nativePost: MembershipContentItem = {
   id: 'post-1',
   type: 'POST',
   title: 'Member update',
-  description: 'A quick note for members',
+  body: 'A quick note for members',
   status: 'DRAFT',
   createdAt: '2026-08-08T10:00:00.000Z',
   updatedAt: '2026-08-08T10:00:00.000Z',
@@ -118,5 +120,37 @@ describe('<MembershipContentList />', () => {
     ]);
     expect(nativeContentItems).toEqual([nativePost]);
     expect(includedProducts).toEqual([courseProduct]);
+  });
+
+  it('updating a Post preserves id and createdAt', () => {
+    const created = createMembershipPostItem(
+      {
+        title: 'Original title',
+        body: 'Original body',
+        status: 'DRAFT',
+      },
+      'post-1',
+      '2026-08-08T10:00:00.000Z',
+    );
+
+    const updated = updateMembershipPostItem(
+      created,
+      {
+        title: 'Updated title',
+        body: 'Updated body',
+        status: 'PUBLISHED',
+      },
+      '2026-08-08T11:00:00.000Z',
+    );
+
+    expect(updated).toEqual({
+      ...created,
+      title: 'Updated title',
+      body: 'Updated body',
+      status: 'PUBLISHED',
+      updatedAt: '2026-08-08T11:00:00.000Z',
+    });
+    expect(updated.id).toBe(created.id);
+    expect(updated.createdAt).toBe(created.createdAt);
   });
 });

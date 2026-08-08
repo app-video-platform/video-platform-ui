@@ -86,6 +86,22 @@
   }
 }
 
+.membership-post-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--surface-0);
+}
+
+.membership-post-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
 .membership-included-products {
   display: flex;
   flex-direction: column;
@@ -185,4 +201,11 @@
   color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.membership-content-list-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }

@@ -88,8 +88,10 @@ describe('<MembershipContentSection />', () => {
     fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
 
-    expect(screen.getByText('Creating Post')).toBeInTheDocument();
-    expect(screen.getByText('Post editor coming next.')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Post title')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Write a member-only update'),
+    ).toBeInTheDocument();
   });
 
   it('selecting Video switches to VIDEO creation mode', () => {
@@ -119,7 +121,7 @@ describe('<MembershipContentSection />', () => {
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    expect(screen.queryByText('Creating Post')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Post title')).not.toBeInTheDocument();
     expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
   });
 
@@ -152,6 +154,114 @@ describe('<MembershipContentSection />', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.getByText('Course One')).toBeInTheDocument();
+  });
+
+  it('saving creates a local Post and renders it in the unified list', () => {
+    renderMembershipContent();
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: /Post/i }));
+    fireEvent.change(screen.getByPlaceholderText('Post title'), {
+      target: { value: 'First member post' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Write a member-only update'), {
+      target: { value: 'Welcome to the membership.' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(screen.getByText('First member post')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to the membership.')).toBeInTheDocument();
+    expect(screen.getByText('DRAFT')).toBeInTheDocument();
+  });
+
+  it('saving a published Post renders its status', () => {
+    renderMembershipContent();
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: /Post/i }));
+    fireEvent.change(screen.getByPlaceholderText('Post title'), {
+      target: { value: 'Published post' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Write a member-only update'), {
+      target: { value: 'This is live.' },
+    });
+    fireEvent.change(screen.getByLabelText('Status'), {
+      target: { value: 'PUBLISHED' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(screen.getByText('Published post')).toBeInTheDocument();
+    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+  });
+
+  it('Edit opens existing Post values and saving updates the Post', () => {
+    renderMembershipContent();
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: /Post/i }));
+    fireEvent.change(screen.getByPlaceholderText('Post title'), {
+      target: { value: 'Original post' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Write a member-only update'), {
+      target: { value: 'Original body' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+
+    expect(screen.getByDisplayValue('Original post')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Original body')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText('Post title'), {
+      target: { value: 'Updated post' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Write a member-only update'), {
+      target: { value: 'Updated body' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(screen.getByText('Updated post')).toBeInTheDocument();
+    expect(screen.getByText('Updated body')).toBeInTheDocument();
+    expect(screen.queryByText('Original post')).not.toBeInTheDocument();
+  });
+
+  it('Cancel Edit leaves original Post unchanged', () => {
+    renderMembershipContent();
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: /Post/i }));
+    fireEvent.change(screen.getByPlaceholderText('Post title'), {
+      target: { value: 'Keep me' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Write a member-only update'), {
+      target: { value: 'Original body' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    fireEvent.change(screen.getByPlaceholderText('Post title'), {
+      target: { value: 'Do not keep me' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(screen.getByText('Keep me')).toBeInTheDocument();
+    expect(screen.queryByText('Do not keep me')).not.toBeInTheDocument();
+  });
+
+  it('Delete removes Post', () => {
+    renderMembershipContent();
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: /Post/i }));
+    fireEvent.change(screen.getByPlaceholderText('Post title'), {
+      target: { value: 'Delete me' },
+    });
+    fireEvent.change(screen.getByPlaceholderText('Write a member-only update'), {
+      target: { value: 'Temporary body' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(screen.queryByText('Delete me')).not.toBeInTheDocument();
+    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
   });
 
   it('content list renders normally when no creation mode is active', () => {

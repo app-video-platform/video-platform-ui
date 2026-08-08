@@ -88,7 +88,8 @@ Membership content architecture:
 - `MembershipContentList` is the presentation shell that renders a unified Membership content hub from native content items plus included Products.
 - `MembershipContentSection` owns the inline `+ Add Content` chooser state and current native content creation mode. This state is local React state, not Redux.
 - `MembershipContentTypeChooser` is presentation/control-only. It offers `Video`, `Post`, `Resource`, and `Existing Product`, but does not fetch data or create content.
-- Selecting `Video`, `Post`, or `Resource` sets a local frontend-only `MembershipContentCreationMode` and shows a minimal placeholder; native editors are not implemented yet.
+- Selecting `Post` opens `MembershipPostEditor`, a controlled frontend-only editor for title, body, and status. Selecting `Video` or `Resource` still shows only a minimal placeholder.
+- `MembershipContentSection` owns native Membership content items in local React state. Post create/edit/delete is frontend-only; it uses local counter IDs and ISO timestamps, and it must not write to Product autosave or API payloads.
 - Selecting `Existing Product` closes the chooser and requests that `MembershipIncludedProducts` open its existing `ProductPicker`; no second ProductPicker or duplicated product loading logic should be introduced.
 - The current deterministic list order is native Membership content first, then included Products. There is no drag-and-drop, `position`, or persisted ordering contract yet.
 - `MembershipIncludedProducts` owns Product summary loading, picker state, included-product IDs, add/remove behavior, and duplicate prevention; it delegates list rendering to `MembershipContentList`.
@@ -104,7 +105,7 @@ Implemented / reasonably wired:
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
-- Unified Membership content list foundation and inline `+ Add Content` chooser that can select native Membership content modes or open the existing ProductPicker.
+- Unified Membership content list foundation, inline `+ Add Content` chooser, and frontend-only Post create/edit/delete flow.
 - Course/download section creation, autosave, deletion.
 - Course lesson creation, autosave, deletion for `VIDEO`, `ARTICLE`, `QUIZ`; assignment is placeholder.
 - Download section file upload via presigned URL + confirm upload.
@@ -121,7 +122,7 @@ Partially implemented / placeholder:
 - Creator dashboard has placeholder audience/sales sections and hardcoded “member since”.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
 - Membership included products are limited to existing Course/Download products and held in frontend state only.
-- Native Membership content has frontend-only model/list/chooser foundations and placeholder creation modes, but no create/edit/delete UI and no backend persistence.
+- Native Membership Post content has frontend-only create/edit/delete support. Native Video and Resource remain placeholders. No native Membership content has backend persistence.
 - Membership recurring pricing has a frontend-only `RecurringPricing` model and `RecurringPriceSelector`; no backend Product pricing contract exists for it yet.
 - Lesson content persistence for uploaded videos/rich text/quiz data may need backend contract verification.
 - Assignment lesson editor is a visible placeholder.
@@ -150,7 +151,7 @@ Deliberate temporary implementations:
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection is local frontend state until a relationship API exists.
-- Membership native content state is currently an empty frontend boundary with local placeholder creation modes until content creation/editing and persistence are defined.
+- Membership native content state is local frontend state. Post can be created/edited/deleted locally; Video/Resource and backend persistence remain undefined.
 - Membership recurring pricing is local frontend state until a structured recurring pricing contract exists.
 
 Speculative / verify before changing:
@@ -167,7 +168,7 @@ Recent Git history includes admin role/product ownership work and Membership fro
 - Dev role switcher/backend role change support.
 - Admin product management and create-for-creator flow using `ownerId` query param.
 - Membership added as a first-class frontend Product type.
-- Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, a frontend-only native content list/chooser foundation, and frontend-only recurring pricing controls.
+- Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, frontend-only Post content creation/editing, native Video/Resource placeholders, and frontend-only recurring pricing controls.
 
 Likely next steps:
 

@@ -24,10 +24,57 @@ export interface MembershipContentItemBase {
   updatedAt: string;
 }
 
+export interface MembershipPostItem extends MembershipContentItemBase {
+  type: 'POST';
+  body: string;
+}
+
+export type MembershipContentItem =
+  | MembershipPostItem
+  | (MembershipContentItemBase & { type: 'VIDEO' | 'RESOURCE' });
+
+export interface MembershipPostDraft {
+  title: string;
+  body: string;
+  status: MembershipContentStatus;
+}
+
+export const createBlankMembershipPostDraft = (): MembershipPostDraft => ({
+  title: '',
+  body: '',
+  status: 'DRAFT',
+});
+
+export const createMembershipPostItem = (
+  draft: MembershipPostDraft,
+  id: string,
+  now: string,
+): MembershipPostItem => ({
+  id,
+  type: 'POST',
+  title: draft.title.trim(),
+  body: draft.body.trim(),
+  status: draft.status,
+  createdAt: now,
+  updatedAt: now,
+});
+
+export const updateMembershipPostItem = (
+  item: MembershipPostItem,
+  draft: MembershipPostDraft,
+  now: string,
+): MembershipPostItem => ({
+  ...item,
+  title: draft.title.trim(),
+  body: draft.body.trim(),
+  status: draft.status,
+  updatedAt: now,
+});
+
 export type MembershipContentListItem =
   | {
       kind: 'CONTENT';
-      content: MembershipContentItemBase;
+      content: MembershipContentItem;
     }
   | {
       kind: 'PRODUCT';
@@ -53,7 +100,7 @@ export const MEMBERSHIP_CONTENT_TYPE_ICONS: Record<
 };
 
 export const createMembershipContentListItems = (
-  nativeContentItems: readonly MembershipContentItemBase[],
+  nativeContentItems: readonly MembershipContentItem[],
   includedProducts: readonly ProductMinimised[],
 ): MembershipContentListItem[] => [
   ...nativeContentItems.map((content) => ({
