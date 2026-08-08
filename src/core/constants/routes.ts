@@ -58,6 +58,7 @@ export const appRoutes: Route[] = [
     path: '/app/products/edit',
     label: 'Edit',
     icon: IoSettingsOutline,
+    hideFromSidebar: true,
     collapseSidebarOnLoad: true,
   },
 ];

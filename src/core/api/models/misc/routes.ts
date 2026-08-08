@@ -5,5 +5,6 @@ export interface Route {
   label: string;
   icon: IconType;
   end?: boolean;
+  hideFromSidebar?: boolean;
   collapseSidebarOnLoad?: boolean;
 }

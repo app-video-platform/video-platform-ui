@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { getCssVar } from '@shared/utils';
 import { CiText } from 'react-icons/ci';
 import { FaList } from 'react-icons/fa';
@@ -106,8 +107,8 @@ export const PRODUCT_TYPE_REGISTRY: Record<ProductType, ProductTypeConfig> = {
 
 const byOrder =
   (orderKey: keyof ProductTypeConfig) =>
-    (a: ProductTypeConfig, b: ProductTypeConfig) =>
-      Number(a[orderKey]) - Number(b[orderKey]);
+  (a: ProductTypeConfig, b: ProductTypeConfig) =>
+    Number(a[orderKey]) - Number(b[orderKey]);
 
 export const PRODUCT_META: Record<ProductType, TypeMeta> = Object.fromEntries(
   Object.entries(PRODUCT_TYPE_REGISTRY).map(([type, config]) => [

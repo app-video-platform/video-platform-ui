@@ -16,8 +16,7 @@ import { AbstractProduct, ProductType } from './models';
 export function setupMocks(client: AxiosInstance) {
   const mock = new MockAdapter(client, { delayResponse: 300 });
 
-  /* ------------------USER-----------------------------------*/
-  mock.onGet('api/user/userInfo').reply(200, {
+  const mockedUser: User = {
     id: 'mocked-user-id',
     firstName: 'Aleb',
     lastName: 'Mocked',
@@ -42,7 +41,23 @@ export function setupMocks(client: AxiosInstance) {
         url: 'tt.com/alebMocked',
       },
     ],
-  } as User);
+  };
+
+  /* ------------------USER-----------------------------------*/
+  mock.onGet('api/user/userInfo').reply(200, mockedUser);
+
+  mock.onPut('api/user/dev/role').reply((config) => {
+    const { role } = JSON.parse(config.data) as { role?: UserRole };
+
+    if (!role || !Object.values(UserRole).includes(role)) {
+      return [400, { message: 'Invalid role' }];
+    }
+
+    mockedUser.roles = [role];
+    console.info('[MOCK] dev user role changed:', role);
+
+    return [200, mockedUser];
+  });
 
   /* ------------------AUTH-----------------------------------*/
   mock.onPost('api/auth/login').reply((config) => {

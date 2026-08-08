@@ -26,30 +26,32 @@ const SidebarNav: React.FC = () => {
         {!isSidebarCollapsed && <h2>Galactica</h2>}
       </div>
       <ul className="routes-list">
-        {appRoutes.map((route, index) => (
-          <li key={index}>
-            <NavLink
-              to={route.path}
-              end={route.end}
-              className={({ isActive }) => linkClass(isActive)}
-            >
-              {({ isActive }) => (
-                <>
-                  <GalIcon
-                    icon={route.icon}
-                    color={
-                      isActive
-                        ? getCssVar('--text-primary')
-                        : getCssVar('--text-secondary')
-                    }
-                    size={20}
-                  />
-                  {!isSidebarCollapsed && <span>{route.label}</span>}
-                </>
-              )}
-            </NavLink>
-          </li>
-        ))}
+        {appRoutes
+          .filter((route) => !route.hideFromSidebar)
+          .map((route, index) => (
+            <li key={index}>
+              <NavLink
+                to={route.path}
+                end={route.end}
+                className={({ isActive }) => linkClass(isActive)}
+              >
+                {({ isActive }) => (
+                  <>
+                    <GalIcon
+                      icon={route.icon}
+                      color={
+                        isActive
+                          ? getCssVar('--text-primary')
+                          : getCssVar('--text-secondary')
+                      }
+                      size={20}
+                    />
+                    {!isSidebarCollapsed && <span>{route.label}</span>}
+                  </>
+                )}
+              </NavLink>
+            </li>
+          ))}
       </ul>
       <button
         type="button"
