@@ -1,12 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { AppDispatch, ProductMinimised, ProductType } from 'core/api/models';
 import {
   getProductSummariesByOwner,
-  selectProductSummaries,
-  selectProductsError,
-  selectProductsLoading,
 } from 'core/store/product-store';
 import { ProductPicker } from '../product-picker';
 import MembershipContentList from './membership-content-list.component';
@@ -26,6 +23,10 @@ interface MembershipIncludedProductsProps {
   feedEntries: MembershipFeedEntry[];
   orderingMode: MembershipOrderingMode;
   includedProductEntries: MembershipProductFeedEntry[];
+  productSummaries: ProductMinimised[] | null;
+  includedProducts: ProductMinimised[];
+  isLoadingProducts: boolean;
+  productsError: string | null;
   productPickerRequest?: number;
   isContentListHidden?: boolean;
   // eslint-disable-next-line no-unused-vars
@@ -47,6 +48,10 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   feedEntries,
   orderingMode,
   includedProductEntries,
+  productSummaries,
+  includedProducts,
+  isLoadingProducts,
+  productsError,
   productPickerRequest = 0,
   isContentListHidden = false,
   onAddProducts,
@@ -56,9 +61,6 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   onDeleteContent,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const products = useSelector(selectProductSummaries);
-  const loading = useSelector(selectProductsLoading);
-  const error = useSelector(selectProductsError);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const previousProductPickerRequest = useRef(0);
   const includedProductIds = includedProductEntries.map(
@@ -66,12 +68,12 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   );
 
   useEffect(() => {
-    if (!ownerId || products || loading) {
+    if (!ownerId || productSummaries || isLoadingProducts) {
       return;
     }
 
     dispatch(getProductSummariesByOwner(ownerId));
-  }, [dispatch, loading, ownerId, products]);
+  }, [dispatch, isLoadingProducts, ownerId, productSummaries]);
 
   useEffect(() => {
     if (productPickerRequest === previousProductPickerRequest.current) {
@@ -85,23 +87,7 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
     }
   }, [productPickerRequest]);
 
-  const productById = useMemo(() => {
-    const productMap = new Map<string, ProductMinimised>();
-
-    (products ?? []).forEach((product) => {
-      if (product.id) {
-        productMap.set(product.id, product);
-      }
-    });
-
-    return productMap;
-  }, [products]);
-
-  const includedProducts = includedProductIds
-    .map((id) => productById.get(id))
-    .filter((product): product is ProductMinimised => Boolean(product));
-
-  const eligibleProductCount = (products ?? []).filter(
+  const eligibleProductCount = (productSummaries ?? []).filter(
     (product) =>
       product.id &&
       product.type &&
@@ -122,10 +108,12 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
         </p>
       )}
 
-      {ownerId && loading && <p>Loading products...</p>}
-      {ownerId && error && <p className="error-message">Error: {error}</p>}
+      {ownerId && isLoadingProducts && <p>Loading products...</p>}
+      {ownerId && productsError && (
+        <p className="error-message">Error: {productsError}</p>
+      )}
 
-      {ownerId && !loading && !error && !isContentListHidden && (
+      {ownerId && !isLoadingProducts && !productsError && !isContentListHidden && (
         <MembershipContentList
           nativeContentItems={nativeContentItems}
           feedEntries={feedEntries}
@@ -138,7 +126,7 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
         />
       )}
 
-      {ownerId && !loading && !error && eligibleProductCount === 0 && (
+      {ownerId && !isLoadingProducts && !productsError && eligibleProductCount === 0 && (
         <p className="membership-included-products__empty">
           You do not have any eligible products to include yet.
         </p>
@@ -146,7 +134,7 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
 
       {isPickerOpen && (
         <ProductPicker
-          products={products ?? []}
+          products={productSummaries ?? []}
           selectedIds={[]}
           allowedTypes={ALLOWED_INCLUDED_PRODUCT_TYPES}
           excludedIds={[...includedProductIds, currentProductId].filter(

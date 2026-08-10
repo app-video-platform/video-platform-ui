@@ -54,6 +54,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ProductMinimised } from 'core/api/models';
 import MembershipContentSection from './membership-content.component';
 import { useMembershipBuilderState } from './use-membership-builder-state.hook';
+import { resolveMembershipIncludedProducts } from './utils/membership-readiness.utils';
 
 const productSummaries: ProductMinimised[] = [
   {
@@ -103,6 +104,13 @@ const renderMembershipContent = () => {
         feedEntries={membershipBuilderState.feedEntries}
         orderingMode={membershipBuilderState.orderingMode}
         includedProductEntries={membershipBuilderState.includedProductEntries}
+        productSummaries={productSummaries}
+        includedProducts={resolveMembershipIncludedProducts(
+          membershipBuilderState.includedProductEntries,
+          productSummaries,
+        )}
+        isLoadingProducts={false}
+        productsError={null}
         getNextNativeContentId={
           membershipBuilderState.getNextNativeContentId
         }
@@ -160,6 +168,13 @@ const renderSwitchableMembershipContent = () => {
             includedProductEntries={
               membershipBuilderState.includedProductEntries
             }
+            productSummaries={productSummaries}
+            includedProducts={resolveMembershipIncludedProducts(
+              membershipBuilderState.includedProductEntries,
+              productSummaries,
+            )}
+            isLoadingProducts={false}
+            productsError={null}
             getNextNativeContentId={
               membershipBuilderState.getNextNativeContentId
             }

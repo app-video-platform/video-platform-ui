@@ -21,6 +21,7 @@ import { ProductMinimised } from 'core/api/models';
 import { getProductSummariesByOwner } from 'core/store/product-store';
 import MembershipIncludedProducts from './membership-included-products.component';
 import { useMembershipBuilderState } from './use-membership-builder-state.hook';
+import { resolveMembershipIncludedProducts } from './utils/membership-readiness.utils';
 
 const productSummaries: ProductMinimised[] = [
   {
@@ -101,6 +102,13 @@ const renderIncludedProducts = ({
         feedEntries={membershipBuilderState.feedEntries}
         orderingMode={membershipBuilderState.orderingMode}
         includedProductEntries={membershipBuilderState.includedProductEntries}
+        productSummaries={products}
+        includedProducts={resolveMembershipIncludedProducts(
+          membershipBuilderState.includedProductEntries,
+          products,
+        )}
+        isLoadingProducts={loading}
+        productsError={error}
         productPickerRequest={request}
         onAddProducts={membershipBuilderState.addIncludedProducts}
         onRemoveProduct={membershipBuilderState.removeIncludedProduct}

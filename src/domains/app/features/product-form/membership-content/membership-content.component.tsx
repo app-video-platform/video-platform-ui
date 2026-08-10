@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, Radio, RadioGroup } from '@shared/ui';
+import { ProductMinimised } from 'core/api/models';
 import MembershipIncludedProducts from './membership-included-products.component';
 import MembershipContentTypeChooser from './membership-content-type-chooser.component';
 import MembershipPostEditor from './membership-post-editor.component';
@@ -36,6 +37,10 @@ interface MembershipContentSectionProps {
   feedEntries: MembershipFeedEntry[];
   orderingMode: MembershipOrderingMode;
   includedProductEntries: MembershipProductFeedEntry[];
+  productSummaries: ProductMinimised[] | null;
+  includedProducts: ProductMinimised[];
+  isLoadingProducts: boolean;
+  productsError: string | null;
   // eslint-disable-next-line no-unused-vars
   getNextNativeContentId: (type: MembershipContentItem['type']) => string;
   // eslint-disable-next-line no-unused-vars
@@ -71,6 +76,10 @@ const MembershipContentSection: React.FC<MembershipContentSectionProps> = ({
   feedEntries,
   orderingMode,
   includedProductEntries,
+  productSummaries,
+  includedProducts,
+  isLoadingProducts,
+  productsError,
   getNextNativeContentId,
   onAddNativeContentItem,
   onUpdateNativeContentItem,
@@ -355,6 +364,10 @@ const MembershipContentSection: React.FC<MembershipContentSectionProps> = ({
         feedEntries={feedEntries}
         orderingMode={orderingMode}
         includedProductEntries={includedProductEntries}
+        productSummaries={productSummaries}
+        includedProducts={includedProducts}
+        isLoadingProducts={isLoadingProducts}
+        productsError={productsError}
         productPickerRequest={productPickerRequest}
         isContentListHidden={Boolean(creationMode)}
         onAddProducts={onAddIncludedProducts}

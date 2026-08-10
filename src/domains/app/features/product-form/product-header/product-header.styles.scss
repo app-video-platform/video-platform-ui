@@ -38,6 +38,7 @@
   .product-main-actions {
     margin-left: auto;
     display: flex;
+    align-items: center;
     gap: $spacing-4;
 
     .saving-spinner {
@@ -47,6 +48,50 @@
       width: 30px;
       height: 30px;
       animation: spin 0.5s linear infinite;
+    }
+  }
+
+  .membership-readiness-summary {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    max-width: 360px;
+    padding: $spacing-2 $spacing-3;
+    border: 1px solid var(--border-color);
+    border-radius: $radius-sm;
+    background: var(--surface-1);
+    font-size: 12px;
+
+    &__ready {
+      border-color: var(--success);
+    }
+
+    &__status {
+      display: block;
+      font-weight: 700;
+    }
+
+    &__meta {
+      color: var(--text-secondary);
+    }
+
+    &__inline-list,
+    &__popover-content ul {
+      margin: $spacing-1 0 0;
+      padding-left: $spacing-4;
+    }
+
+    &__inline-list {
+      max-width: 210px;
+    }
+
+    &__popover-content {
+      display: grid;
+      gap: $spacing-2;
+    }
+
+    &__popover-content p {
+      margin: 0;
     }
   }
 }
