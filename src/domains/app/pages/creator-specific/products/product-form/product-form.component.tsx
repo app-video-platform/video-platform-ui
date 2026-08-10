@@ -19,6 +19,7 @@ import {
   MembershipContentSection,
   RecurringPriceSelector,
   RecurringPricing,
+  useMembershipBuilderState,
 } from 'domains/app/features/product-form';
 import { ProductType, ProductWithSections } from 'core/api/models';
 
@@ -68,6 +69,7 @@ const ProductForm: React.FC = () => {
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
   const [membershipRecurringPricing, setMembershipRecurringPricing] =
     useState<RecurringPricing>(DEFAULT_RECURRING_PRICING);
+  const membershipBuilderState = useMembershipBuilderState();
   const [hasHeroCollapsed, setHasHeroCollapsed] = useState(false);
   const [pendingSidebarScrollTarget, setPendingSidebarScrollTarget] = useState<{
     id: string;
@@ -244,6 +246,32 @@ const ProductForm: React.FC = () => {
                 <MembershipContentSection
                   ownerId={productOwnerId}
                   currentProductId={formData.id}
+                  nativeContentItems={membershipBuilderState.nativeContentItems}
+                  feedEntries={membershipBuilderState.feedEntries}
+                  orderingMode={membershipBuilderState.orderingMode}
+                  includedProductEntries={
+                    membershipBuilderState.includedProductEntries
+                  }
+                  getNextNativeContentId={
+                    membershipBuilderState.getNextNativeContentId
+                  }
+                  onAddNativeContentItem={
+                    membershipBuilderState.addNativeContentItem
+                  }
+                  onUpdateNativeContentItem={
+                    membershipBuilderState.updateNativeContentItem
+                  }
+                  onDeleteNativeContentItem={
+                    membershipBuilderState.deleteNativeContentItem
+                  }
+                  onOrderingModeChange={membershipBuilderState.setOrderingMode}
+                  onAddIncludedProducts={
+                    membershipBuilderState.addIncludedProducts
+                  }
+                  onRemoveIncludedProduct={
+                    membershipBuilderState.removeIncludedProduct
+                  }
+                  onMoveFeedEntry={membershipBuilderState.moveFeedEntry}
                 />
               )}
 

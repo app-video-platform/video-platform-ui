@@ -44,6 +44,7 @@ jest.mock('@shared/ui', () => ({
 const mockUseProductFormFacade = jest.fn();
 const mockUseProductFormAnimation = jest.fn();
 const mockProductHeader = jest.fn();
+const mockUseMembershipBuilderState = jest.fn();
 
 jest.mock('domains/app/features/product-form', () => ({
   __esModule: true,
@@ -51,6 +52,8 @@ jest.mock('domains/app/features/product-form', () => ({
   useProductFormFacade: (...args: any[]) => mockUseProductFormFacade(...args),
   useProductFormAnimation: (...args: any[]) =>
     mockUseProductFormAnimation(...args),
+  useMembershipBuilderState: (...args: any[]) =>
+    mockUseMembershipBuilderState(...args),
 
   // step one: just a button that can toggle showRestOfForm
   CreateProductStepOne: ({
@@ -189,6 +192,23 @@ import ProductForm from './product-form.component';
 afterEach(() => {
   cleanup();
   jest.clearAllMocks();
+});
+
+beforeEach(() => {
+  mockUseMembershipBuilderState.mockReturnValue({
+    nativeContentItems: [],
+    feedEntries: [],
+    orderingMode: 'NEWEST_FIRST',
+    includedProductEntries: [],
+    getNextNativeContentId: jest.fn(),
+    setOrderingMode: jest.fn(),
+    addNativeContentItem: jest.fn(),
+    updateNativeContentItem: jest.fn(),
+    deleteNativeContentItem: jest.fn(),
+    addIncludedProducts: jest.fn(),
+    removeIncludedProduct: jest.fn(),
+    moveFeedEntry: jest.fn(),
+  });
 });
 
 const makeFacadeState = (overrides: Partial<any> = {}) => ({

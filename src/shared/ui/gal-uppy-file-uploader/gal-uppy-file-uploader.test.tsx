@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import GalUppyFileUploader from './gal-uppy-file-uploader.component';
 import Uppy from '@uppy/core';
+import XHRUpload from '@uppy/xhr-upload';
 import '@testing-library/jest-dom';
 
 jest.mock('@uppy/thumbnail-generator', () => jest.fn());
@@ -71,6 +72,30 @@ describe('GalUppyFileUploader component', () => {
     expect(dashboardProps.proudlyDisplayPoweredByUppy).toBe(true);
   });
 
+  it('uses XHR upload by default', () => {
+    render(<GalUppyFileUploader onFilesChange={mockOnFilesChange} />);
+
+    expect(mockUppyInstance.use).toHaveBeenCalledWith(XHRUpload, {
+      endpoint: '/upload',
+      fieldName: 'file',
+      formData: true,
+    });
+  });
+
+  it('does not use XHR upload in selection-only mode', () => {
+    render(
+      <GalUppyFileUploader
+        uploadMode="SELECT_ONLY"
+        onFilesChange={mockOnFilesChange}
+      />,
+    );
+
+    expect(mockUppyInstance.use).not.toHaveBeenCalledWith(
+      XHRUpload,
+      expect.anything(),
+    );
+  });
+
   it('registers event listeners for file-added and file-removed', () => {
     render(<GalUppyFileUploader onFilesChange={mockOnFilesChange} />);
     // Verify that our uppy instance registered "file-added" and "file-removed" event listeners.
@@ -85,7 +110,12 @@ describe('GalUppyFileUploader component', () => {
   });
 
   it('calls onFilesChange when a file is added', () => {
-    render(<GalUppyFileUploader onFilesChange={mockOnFilesChange} />);
+    render(
+      <GalUppyFileUploader
+        uploadMode="SELECT_ONLY"
+        onFilesChange={mockOnFilesChange}
+      />,
+    );
     // Retrieve the callback that was registered for "file-added"
     const fileAddedCallback = mockUppyInstance.on.mock.calls.find(
       (call: any) => call[0] === 'file-added',

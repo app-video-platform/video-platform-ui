@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Input, Select, Textarea } from '@shared/ui';
 import {
   MembershipContentStatus,
+  MEMBERSHIP_CONTENT_STATUS_OPTIONS,
   MembershipPostDraft,
 } from './models';
 
@@ -13,13 +14,6 @@ interface MembershipPostEditorProps {
   onSave: () => void;
   onCancel: () => void;
 }
-
-const STATUS_OPTIONS: Array<{ value: MembershipContentStatus; label: string }> =
-  [
-    { value: 'DRAFT', label: 'Draft' },
-    { value: 'PUBLISHED', label: 'Published' },
-    { value: 'HIDDEN', label: 'Hidden' },
-  ];
 
 const isValidPostDraft = (value: MembershipPostDraft) =>
   value.title.trim().length > 0 && value.body.trim().length > 0;
@@ -59,7 +53,7 @@ const MembershipPostEditor: React.FC<MembershipPostEditorProps> = ({
         name="membership-post-status"
         label="Status"
         value={value.status}
-        options={STATUS_OPTIONS}
+        options={MEMBERSHIP_CONTENT_STATUS_OPTIONS}
         onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
           onChange({
             ...value,
