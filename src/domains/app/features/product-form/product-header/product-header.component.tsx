@@ -10,8 +10,9 @@ import {
   selectProductsLoading,
 } from 'core/store/product-store';
 import { PRODUCT_TYPE_REGISTRY } from 'core/constants';
-import { Button } from '@shared/ui';
+import { Button, InfoPopover } from '@shared/ui';
 import { SavingIndicator } from 'domains/app/components';
+import { MembershipReadinessResult } from '../membership-content';
 
 import './product-header.styles.scss';
 
@@ -21,6 +22,7 @@ interface ProductHeaderProps extends React.BaseHTMLAttributes<HTMLDivElement> {
   showRestOfForm: boolean;
   hasHeroCollapsed: boolean;
   headerRef: React.Ref<HTMLDivElement> | undefined;
+  membershipReadiness?: MembershipReadinessResult;
 }
 
 const ProductHeader: React.FC<ProductHeaderProps> = ({
@@ -29,6 +31,7 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
   showRestOfForm,
   hasHeroCollapsed,
   headerRef,
+  membershipReadiness,
 }) => {
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
@@ -63,6 +66,80 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
     minSavingMs: 200,
     savedVisibleMs: 2000,
   });
+  const isMembership = formData.type === 'MEMBERSHIP';
+  const membershipPublishMessage =
+    'Membership publishing will be enabled once Membership persistence is available.';
+  const handleMembershipPublishClick = () => {
+    window.alert(membershipPublishMessage);
+  };
+
+  const renderMembershipReadiness = () => {
+    if (!membershipReadiness) {
+      return null;
+    }
+
+    const requirementText = membershipReadiness.canPublish
+      ? 'Ready to publish'
+      : 'Not ready to publish';
+    const blockingIssues = membershipReadiness.errors.slice(0, 2);
+    const remainingBlockers =
+      membershipReadiness.errors.length - blockingIssues.length;
+
+    return (
+      <div
+        className={clsx('membership-readiness-summary', {
+          'membership-readiness-summary__ready': membershipReadiness.canPublish,
+        })}
+      >
+        <div>
+          <span className="membership-readiness-summary__status">
+            {requirementText}
+          </span>
+          <span className="membership-readiness-summary__meta">
+            {membershipReadiness.canPublish
+              ? `${membershipReadiness.warnings.length} warnings`
+              : `${membershipReadiness.errors.length} blockers`}
+          </span>
+        </div>
+        {!membershipReadiness.canPublish && (
+          <ul className="membership-readiness-summary__inline-list">
+            {blockingIssues.map((issue) => (
+              <li key={issue.code}>{issue.message}</li>
+            ))}
+            {remainingBlockers > 0 && <li>{remainingBlockers} more blockers</li>}
+          </ul>
+        )}
+        <InfoPopover className="membership-readiness-summary__popover">
+          <div className="membership-readiness-summary__popover-content">
+            {membershipReadiness.errors.length > 0 && (
+              <>
+                <strong>Blockers</strong>
+                <ul>
+                  {membershipReadiness.errors.map((issue) => (
+                    <li key={issue.code}>{issue.message}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {membershipReadiness.warnings.length > 0 && (
+              <>
+                <strong>Warnings</strong>
+                <ul>
+                  {membershipReadiness.warnings.map((issue) => (
+                    <li key={issue.code}>{issue.message}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {membershipReadiness.canPublish && (
+              <p>{membershipPublishMessage}</p>
+            )}
+          </div>
+        </InfoPopover>
+      </div>
+    );
+  };
+
   return (
     <div className="product-header" ref={headerRef}>
       <h1>{isEditMode ? 'EDIT PRODUCT' : 'CREATE NEW PRODUCT'}</h1>
@@ -85,8 +162,20 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
 
           <div className="product-main-actions">
             <SavingIndicator status={saveStatus} size="sm" />
+            {isMembership && renderMembershipReadiness()}
             <Button variant="secondary">Save</Button>
-            <Button variant="primary">Publish</Button>
+            {isMembership ? (
+              <Button
+                type="button"
+                variant="primary"
+                disabled={!membershipReadiness?.canPublish}
+                onClick={handleMembershipPublishClick}
+              >
+                Publish
+              </Button>
+            ) : (
+              <Button variant="primary">Publish</Button>
+            )}
           </div>
         </>
       )}

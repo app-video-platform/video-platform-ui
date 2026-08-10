@@ -1,5 +1,6 @@
 /* eslint-disable indent */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 
 import { GalPriceSelector } from 'domains/app/components';
@@ -20,8 +21,16 @@ import {
   RecurringPriceSelector,
   RecurringPricing,
   useMembershipBuilderState,
+  evaluateMembershipReadiness,
+  resolveMembershipIncludedProducts,
 } from 'domains/app/features/product-form';
-import { ProductType, ProductWithSections } from 'core/api/models';
+import { AppDispatch, ProductType, ProductWithSections } from 'core/api/models';
+import {
+  getProductSummariesByOwner,
+  selectProductSummaries,
+  selectProductsError,
+  selectProductsLoading,
+} from 'core/store/product-store';
 
 import './product-form.styles.scss';
 
@@ -46,6 +55,10 @@ const getInitialBuilderTab = (productType: ProductType): BuilderTab => {
 };
 
 const ProductForm: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const productSummaries = useSelector(selectProductSummaries);
+  const productsLoading = useSelector(selectProductsLoading);
+  const productsError = useSelector(selectProductsError);
   const {
     user,
     isEditMode,
@@ -53,6 +66,7 @@ const ProductForm: React.FC = () => {
     formData,
     setFormData,
     setField,
+    productImage,
     handleSetPrice,
     handleImageChange,
     showRestOfForm,
@@ -70,6 +84,33 @@ const ProductForm: React.FC = () => {
   const [membershipRecurringPricing, setMembershipRecurringPricing] =
     useState<RecurringPricing>(DEFAULT_RECURRING_PRICING);
   const membershipBuilderState = useMembershipBuilderState();
+  const includedProducts = useMemo(
+    () =>
+      resolveMembershipIncludedProducts(
+        membershipBuilderState.includedProductEntries,
+        productSummaries,
+      ),
+    [membershipBuilderState.includedProductEntries, productSummaries],
+  );
+  const membershipReadiness = useMemo(() => {
+    if (formData.type !== 'MEMBERSHIP') {
+      return undefined;
+    }
+
+    return evaluateMembershipReadiness({
+      formData,
+      recurringPricing: membershipRecurringPricing,
+      nativeContentItems: membershipBuilderState.nativeContentItems,
+      includedProducts,
+      hasThumbnail: Boolean(formData.imageUrl || productImage),
+    });
+  }, [
+    formData,
+    includedProducts,
+    membershipBuilderState.nativeContentItems,
+    membershipRecurringPricing,
+    productImage,
+  ]);
   const [hasHeroCollapsed, setHasHeroCollapsed] = useState(false);
   const [pendingSidebarScrollTarget, setPendingSidebarScrollTarget] = useState<{
     id: string;
@@ -87,6 +128,27 @@ const ProductForm: React.FC = () => {
       setActiveTab(getInitialBuilderTab(formData.type));
     }
   }, [formData.type, showRestOfForm]);
+
+  useEffect(() => {
+    if (
+      formData.type !== 'MEMBERSHIP' ||
+      !showRestOfForm ||
+      !productOwnerId ||
+      productSummaries ||
+      productsLoading
+    ) {
+      return;
+    }
+
+    dispatch(getProductSummariesByOwner(productOwnerId));
+  }, [
+    dispatch,
+    formData.type,
+    productOwnerId,
+    productSummaries,
+    productsLoading,
+    showRestOfForm,
+  ]);
 
   useEffect(() => {
     if (activeTab !== 'sections' || !pendingSidebarScrollTarget) {
@@ -151,6 +213,7 @@ const ProductForm: React.FC = () => {
         hasHeroCollapsed={hasHeroCollapsed}
         showRestOfForm={showRestOfForm}
         headerRef={undefined}
+        membershipReadiness={membershipReadiness}
       />
 
       <form onSubmit={handleSubmit}>
@@ -252,6 +315,10 @@ const ProductForm: React.FC = () => {
                   includedProductEntries={
                     membershipBuilderState.includedProductEntries
                   }
+                  productSummaries={productSummaries}
+                  includedProducts={includedProducts}
+                  isLoadingProducts={productsLoading}
+                  productsError={productsError}
                   getNextNativeContentId={
                     membershipBuilderState.getNextNativeContentId
                   }
