@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ProductMinimised } from 'core/api/models';
 import { getProductSummariesByOwner } from 'core/store/product-store';
 import MembershipIncludedProducts from './membership-included-products.component';
+import { useMembershipBuilderState } from './use-membership-builder-state.hook';
 
 const productSummaries: ProductMinimised[] = [
   {
@@ -85,22 +86,33 @@ const renderIncludedProducts = ({
       }) as any) as typeof getProductSummariesByOwner,
   );
 
-  const view = render(
-    <MembershipIncludedProducts
-      ownerId={ownerId}
-      currentProductId={currentProductId}
-      productPickerRequest={productPickerRequest}
-    />,
-  );
+  const TestIncludedProducts = ({
+    request,
+  }: {
+    request: number;
+  }) => {
+    const membershipBuilderState = useMembershipBuilderState();
 
-  const rerenderIncludedProducts = (nextProductPickerRequest: number) => {
-    view.rerender(
+    return (
       <MembershipIncludedProducts
         ownerId={ownerId}
         currentProductId={currentProductId}
-        productPickerRequest={nextProductPickerRequest}
-      />,
+        nativeContentItems={membershipBuilderState.nativeContentItems}
+        feedEntries={membershipBuilderState.feedEntries}
+        orderingMode={membershipBuilderState.orderingMode}
+        includedProductEntries={membershipBuilderState.includedProductEntries}
+        productPickerRequest={request}
+        onAddProducts={membershipBuilderState.addIncludedProducts}
+        onRemoveProduct={membershipBuilderState.removeIncludedProduct}
+        onMoveFeedEntry={membershipBuilderState.moveFeedEntry}
+      />
     );
+  };
+
+  const view = render(<TestIncludedProducts request={productPickerRequest} />);
+
+  const rerenderIncludedProducts = (nextProductPickerRequest: number) => {
+    view.rerender(<TestIncludedProducts request={nextProductPickerRequest} />);
   };
 
   return { dispatch, rerenderIncludedProducts };

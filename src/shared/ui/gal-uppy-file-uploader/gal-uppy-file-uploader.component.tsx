@@ -30,6 +30,7 @@ interface GalUppyFileUploaderProps {
    * If true, do not load any “import/Companion” plugins (GoogleDrive, Dropbox, etc.)
    */
   disableImporters?: boolean;
+  uploadMode?: 'UPLOAD' | 'SELECT_ONLY';
 }
 
 const GalUppyFileUploader: React.FC<GalUppyFileUploaderProps> = ({
@@ -39,6 +40,7 @@ const GalUppyFileUploader: React.FC<GalUppyFileUploaderProps> = ({
   maxNumberOfFiles,
   maxFileSize = 5 * 1024 * 1024, // default to 5 MB
   disableImporters = false,
+  uploadMode = 'UPLOAD',
 }) => {
   // Use state to hold the Uppy instance so that re-render occurs when it’s created
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,12 +59,14 @@ const GalUppyFileUploader: React.FC<GalUppyFileUploaderProps> = ({
       locale: en_US,
     });
 
-    // Configure the upload endpoint (adjust '/upload' as needed)
-    uppyInstance.use(XHRUpload, {
-      endpoint: '/upload',
-      fieldName: 'file',
-      formData: true,
-    });
+    if (uploadMode === 'UPLOAD') {
+      // Configure the upload endpoint (adjust '/upload' as needed)
+      uppyInstance.use(XHRUpload, {
+        endpoint: '/upload',
+        fieldName: 'file',
+        formData: true,
+      });
+    }
 
     // Add additional plugins with the default Companion service
 
@@ -121,6 +125,7 @@ const GalUppyFileUploader: React.FC<GalUppyFileUploaderProps> = ({
     maxNumberOfFiles,
     memoizedOnFilesChange,
     disableImporters,
+    uploadMode,
   ]);
 
   // const mergedLocale: Locale<number> | undefined = customDropText ? {...en_US, strings: {

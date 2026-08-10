@@ -10,7 +10,12 @@ import {
 } from 'core/store/product-store';
 import { ProductPicker } from '../product-picker';
 import MembershipContentList from './membership-content-list.component';
-import { MembershipContentItem } from './models';
+import {
+  MembershipContentItem,
+  MembershipFeedEntry,
+  MembershipOrderingMode,
+  MembershipProductFeedEntry,
+} from './models';
 
 const ALLOWED_INCLUDED_PRODUCT_TYPES: ProductType[] = ['COURSE', 'DOWNLOAD'];
 
@@ -18,8 +23,17 @@ interface MembershipIncludedProductsProps {
   ownerId?: string;
   currentProductId?: string;
   nativeContentItems?: MembershipContentItem[];
+  feedEntries: MembershipFeedEntry[];
+  orderingMode: MembershipOrderingMode;
+  includedProductEntries: MembershipProductFeedEntry[];
   productPickerRequest?: number;
   isContentListHidden?: boolean;
+  // eslint-disable-next-line no-unused-vars
+  onAddProducts: (productIds: string[], addedAt: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onRemoveProduct: (productId?: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onMoveFeedEntry: (entryId: string, direction: 'UP' | 'DOWN') => void;
   // eslint-disable-next-line no-unused-vars
   onEditContent?: (contentId: string) => void;
   // eslint-disable-next-line no-unused-vars
@@ -30,8 +44,14 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   ownerId,
   currentProductId,
   nativeContentItems = [],
+  feedEntries,
+  orderingMode,
+  includedProductEntries,
   productPickerRequest = 0,
   isContentListHidden = false,
+  onAddProducts,
+  onRemoveProduct,
+  onMoveFeedEntry,
   onEditContent,
   onDeleteContent,
 }) => {
@@ -39,9 +59,11 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   const products = useSelector(selectProductSummaries);
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
-  const [includedProductIds, setIncludedProductIds] = useState<string[]>([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const previousProductPickerRequest = useRef(0);
+  const includedProductIds = includedProductEntries.map(
+    (entry) => entry.productId,
+  );
 
   useEffect(() => {
     if (!ownerId || products || loading) {
@@ -88,20 +110,8 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   ).length;
 
   const handleConfirmProducts = (selectedIds: string[]) => {
-    setIncludedProductIds((currentIds) =>
-      Array.from(new Set([...currentIds, ...selectedIds])),
-    );
+    onAddProducts(selectedIds, new Date().toISOString());
     setIsPickerOpen(false);
-  };
-
-  const handleRemoveProduct = (productId?: string) => {
-    if (!productId) {
-      return;
-    }
-
-    setIncludedProductIds((currentIds) =>
-      currentIds.filter((id) => id !== productId),
-    );
   };
 
   return (
@@ -118,8 +128,11 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
       {ownerId && !loading && !error && !isContentListHidden && (
         <MembershipContentList
           nativeContentItems={nativeContentItems}
+          feedEntries={feedEntries}
+          orderingMode={orderingMode}
           includedProducts={includedProducts}
-          onRemoveProduct={handleRemoveProduct}
+          onRemoveProduct={onRemoveProduct}
+          onMoveFeedEntry={onMoveFeedEntry}
           onEditContent={onEditContent}
           onDeleteContent={onDeleteContent}
         />
