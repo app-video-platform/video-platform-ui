@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { HiMenuAlt2, HiX } from 'react-icons/hi';
 
-import { GalIcon } from '@shared/ui';
+import { Button, GalIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { GalUserDropdown } from 'domains/app/components';
 import { SidebarNav } from 'domains/app/widgets/sidebar-nav';
@@ -21,15 +21,17 @@ const CreatorAppShell: React.FC = () => {
       </aside>
 
       <div className="creator-app-shell__mobile-bar">
-        <button
+        <Button
           type="button"
+          variant="tertiary"
+          size="icon"
           className="creator-app-shell__icon-button"
           aria-label="Open navigation"
           aria-expanded={isMobileNavOpen}
           onClick={() => setIsMobileNavOpen(true)}
         >
           <GalIcon icon={HiMenuAlt2} size={22} color={getCssVar('--text-primary')} />
-        </button>
+        </Button>
         <span className="creator-app-shell__mobile-brand brand-display">
           Galactica
         </span>
@@ -45,14 +47,16 @@ const CreatorAppShell: React.FC = () => {
             onClick={closeMobileNav}
           />
           <aside className="creator-app-shell__drawer" aria-label="Creator navigation">
-            <button
+            <Button
               type="button"
+              variant="tertiary"
+              size="icon"
               className="creator-app-shell__drawer-close"
               aria-label="Close navigation"
               onClick={closeMobileNav}
             >
               <GalIcon icon={HiX} size={20} color={getCssVar('--text-primary')} />
-            </button>
+            </Button>
             <SidebarNav onNavigate={closeMobileNav} />
           </aside>
         </div>

@@ -53,7 +53,7 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
         <div className="product-workspace-shell__identity">
           <Button
             type="button"
-            variant="neutral"
+            variant="tertiary"
             className="product-workspace-shell__back"
             onClick={() => navigate('/app/products')}
           >
@@ -82,7 +82,8 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
             </Button>
             <Button
               type="button"
-              variant="neutral"
+              variant="tertiary"
+              size="icon"
               className="product-workspace-shell__overflow"
               aria-label="More product actions"
               disabled

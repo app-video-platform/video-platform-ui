@@ -30,7 +30,14 @@ const ShopCartDropdown: React.FC = () => {
       <GalDropdown
         customClassName="galactica-shopping-cart"
         trigger={({ toggle }) => (
-          <button onClick={toggle} className="cart-icon-button">
+          <Button
+            type="button"
+            variant="tertiary"
+            size="icon"
+            onClick={toggle}
+            className="cart-icon-button"
+            aria-label="Open shopping cart"
+          >
             <GalIcon
               icon={FaShoppingCart}
               size={18}
@@ -41,7 +48,7 @@ const ShopCartDropdown: React.FC = () => {
                 {formatCount(countFromStore)}
               </span>
             )}
-          </button>
+          </Button>
         )}
         menu={() => (
           <>

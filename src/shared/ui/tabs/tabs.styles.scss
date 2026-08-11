@@ -4,24 +4,53 @@
   .tabs-header {
     display: flex;
     width: 100%;
+    gap: $spacing-1;
+    border-bottom: 1px solid var(--border-subtle);
 
     .tab-button {
-      padding: $spacing-3 $spacing-4;
-      border-bottom: 1px solid var(--brand-secondary);
-      color: var(--text-primary);
-      font-size: 11px;
-      transition: all $transition-fast;
+      min-height: 40px;
+      padding: 0 $spacing-4;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      border-radius: $radius-md $radius-md 0 0;
+      color: var(--text-secondary);
+      background: transparent;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      transition:
+        background $transition-fast,
+        border-color $transition-fast,
+        color $transition-fast;
+
+      &:hover:not(.tab-button__active) {
+        background: var(--overlay-hover);
+        color: var(--text-primary);
+      }
+
+      &:active {
+        background: var(--overlay-pressed);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow:
+          0 0 0 2px var(--surface-canvas),
+          0 0 0 4px var(--focus-ring);
+      }
 
       &__active {
-        border-radius: $radius-sm;
-
-        border-color: transparent;
-        background-color: var(--brand-primary);
+        color: var(--text-primary);
+        background: rgba(var(--brand-secondary-rgb), 0.18);
+        border-color: var(--border-subtle);
+        border-bottom-color: var(--brand-primary);
       }
     }
 
     .tab-full-space {
       flex: 1;
+      min-height: 40px;
+      padding: 0;
+      pointer-events: none;
     }
   }
 

@@ -134,3 +134,6 @@ dist
 src/core/api/_mocks.ts
 *storybook.log
 storybook-static
+
+# Codex visual-inspection screenshots
+/artifacts/
