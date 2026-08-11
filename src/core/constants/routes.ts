@@ -30,7 +30,6 @@ export const appRoutes: Route[] = [
     path: '/app/customers',
     label: 'Customers',
     icon: MdGroups,
-    disabled: true,
     group: 'primary',
   },
   {
