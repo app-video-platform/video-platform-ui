@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: flex-start;
   gap: $spacing-5;
-  background: rgba($color: var(--surface-1), $alpha: 0.4);
+  background: rgba(var(--surface-panel-rgb), 0.4);
   border-radius: $radius-md;
   border: 2px solid transparent;
   background:
@@ -25,7 +25,7 @@
     &__type-pill {
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(var(--brand-secondary), 0.6);
+      background: rgba(var(--brand-secondary-rgb), 0.6);
       font-size: 12px;
     }
 

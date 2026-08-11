@@ -12,6 +12,18 @@ import { useDispatch, useSelector } from 'react-redux';
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   __esModule: true,
+  Link: ({
+    children,
+    to,
+    ...props
+  }: {
+    children: React.ReactNode;
+    to: string;
+  }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
   useNavigate: () => mockNavigate,
 }));
 
@@ -25,22 +37,11 @@ jest.mock('@store/product-store', () => ({
   __esModule: true,
   getAllProductsByUserId: jest.fn(),
   getProductSummariesByOwner: jest.fn(),
-  selectTopThreeProducts: jest.fn(),
 }));
 import {
   getAllProductsByUserId,
   getProductSummariesByOwner,
-  selectTopThreeProducts,
 } from 'core/store/product-store';
-
-jest.mock('domains/app/components', () => ({
-  __esModule: true,
-  GalProductCard: ({
-    product,
-  }: {
-    product: { title?: string; id?: string };
-  }) => <div data-testid="product-card">{product.title ?? product.id}</div>,
-}));
 
 jest.mock('@shared/ui', () => ({
   __esModule: true,
@@ -75,10 +76,13 @@ describe('<CreatorDashboard />', () => {
       typeof getProductSummariesByOwner
     >;
 
+  const originalUseMocks = process.env.REACT_APP_USE_MOCKS;
+
   let fakeDispatch: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.REACT_APP_USE_MOCKS = 'true';
 
     fakeDispatch = jest.fn();
     mockedUseDispatch.mockReturnValue(fakeDispatch as any);
@@ -92,12 +96,6 @@ describe('<CreatorDashboard />', () => {
           email: 'ada@example.com',
           roles: [UserRole.CREATOR],
         };
-      }
-      if (selector === selectTopThreeProducts) {
-        return [
-          { id: 'p1', title: 'Product 1', price: 10 },
-          { id: 'p2', title: 'Product 2', price: 20 },
-        ];
       }
       return undefined;
     });
@@ -119,10 +117,11 @@ describe('<CreatorDashboard />', () => {
   });
 
   afterEach(() => {
+    process.env.REACT_APP_USE_MOCKS = originalUseMocks;
     cleanup();
   });
 
-  it('loads both summary cards and full products for the signed-in creator', () => {
+  it('loads product context for the signed-in creator and renders business overview sections', () => {
     render(<CreatorDashboard />);
 
     expect(mockedGetProductSummariesByOwner).toHaveBeenCalledWith('creator-1');
@@ -135,36 +134,96 @@ describe('<CreatorDashboard />', () => {
       2,
       expect.objectContaining({ type: 'products', payload: 'creator-1' }),
     );
-    expect(screen.getAllByTestId('product-card')).toHaveLength(2);
+
+    expect(screen.getByRole('heading', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(screen.getByText(/good/i)).toHaveTextContent('Ada');
+    expect(screen.queryByText(/compact view of performance/i)).toBeNull();
+    expect(screen.getAllByText('Revenue').length).toBeGreaterThan(0);
+    expect(screen.getByText('Recent activity')).toBeInTheDocument();
+    expect(screen.getByText('Top products')).toBeInTheDocument();
+    expect(screen.getByText('Needs attention')).toBeInTheDocument();
   });
 
-  it('navigates to preview and create-product routes from the dashboard actions', () => {
-    mockedUseSelector.mockImplementation((selector: any) => {
-      if (selector === selectAuthUser) {
-        return {
-          id: 'creator-1',
-          firstName: 'Ada',
-          lastName: 'Lovelace',
-          email: 'ada@example.com',
-          roles: [UserRole.CREATOR],
-        };
-      }
-      if (selector === selectTopThreeProducts) {
-        return [];
-      }
-      return undefined;
-    });
+  it('removes account-profile emphasis from the dashboard', () => {
+    render(<CreatorDashboard />);
+
+    expect(screen.queryByText('ada@example.com')).toBeNull();
+    expect(screen.queryByText(/member since/i)).toBeNull();
+    expect(screen.queryByText(/most successful products/i)).toBeNull();
+  });
+
+  it('navigates from deterministic attention actions', () => {
+    render(<CreatorDashboard />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add media' }));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/app/products/edit/prod-membership-lab',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reconnect' }));
+    expect(mockNavigate).toHaveBeenCalledWith('/app/settings?tab=calendar');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Review drafts' }));
+
+    expect(mockNavigate).toHaveBeenCalledWith('/app/products');
+  });
+
+  it('links only metrics with meaningful destinations', () => {
+    render(<CreatorDashboard />);
+
+    expect(screen.getByRole('link', { name: /view revenue details/i })).toHaveAttribute(
+      'href',
+      '/app/sales',
+    );
+    expect(screen.getByRole('link', { name: /view sales details/i })).toHaveAttribute(
+      'href',
+      '/app/sales',
+    );
+    expect(
+      screen.queryByRole('link', { name: /view customers details/i }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('link', { name: /view active memberships details/i }),
+    ).toBeNull();
+  });
+
+  it('links top products to their product workspaces', () => {
+    render(<CreatorDashboard />);
+
+    expect(
+      screen.getByRole('link', { name: /edit creator product growth system/i }),
+    ).toHaveAttribute('href', '/app/products/edit/prod-course-growth');
+    expect(screen.getByRole('link', { name: /edit launch toolkit/i })).toHaveAttribute(
+      'href',
+      '/app/products/edit/prod-download-toolkit',
+    );
+  });
+
+  it('keeps activity navigation specific to meaningful existing destinations', () => {
+    render(<CreatorDashboard />);
+
+    expect(
+      screen.getByRole('link', { name: /open product updated: launch toolkit/i }),
+    ).toHaveAttribute('href', '/app/products/edit/prod-download-toolkit');
+    expect(screen.queryByRole('link', { name: /open new sale/i })).toBeNull();
+    expect(
+      screen.queryByRole('link', { name: /open membership started/i }),
+    ).toBeNull();
+    expect(screen.queryByRole('link', { name: /open payment failed/i })).toBeNull();
+  });
+
+  it('uses honest unavailable states when inspection mocks are off', () => {
+    process.env.REACT_APP_USE_MOCKS = 'false';
 
     render(<CreatorDashboard />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
-    expect(mockNavigate).toHaveBeenCalledWith('my-page-preview');
-
-    fireEvent.click(screen.getByRole('button', { name: 'Create Product' }));
-    expect(mockNavigate).toHaveBeenCalledWith('products/create');
+    expect(screen.getAllByText('Unavailable')).toHaveLength(4);
+    expect(
+      screen.getByText(/activity will appear here once business events are available/i),
+    ).toBeInTheDocument();
   });
 
-  it('renders the shared dashboard for non-creators without creator actions', () => {
+  it('renders the shared dashboard boundary for non-creators', () => {
     mockedUseSelector.mockImplementation((selector: any) => {
       if (selector === selectAuthUser) {
         return {
@@ -175,20 +234,14 @@ describe('<CreatorDashboard />', () => {
           roles: [UserRole.USER],
         };
       }
-      if (selector === selectTopThreeProducts) {
-        return [];
-      }
       return undefined;
     });
 
     render(<CreatorDashboard />);
 
-    expect(screen.getByText(/user account/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/creator tools are available when your active role is creator/i),
+      screen.getByText(/creator business tools are available/i),
     ).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Preview' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Create Product' })).toBeNull();
     expect(mockedGetProductSummariesByOwner).not.toHaveBeenCalled();
     expect(mockedGetAllProductsByUserId).not.toHaveBeenCalled();
   });

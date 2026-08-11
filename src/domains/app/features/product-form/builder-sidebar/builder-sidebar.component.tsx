@@ -69,7 +69,12 @@ export const getProductTabs = (productType: ProductType): ProductTab[] => {
   if (productType === 'COURSE' || productType === 'DOWNLOAD') {
     return [
       ...baseTabs,
-      { id: 'sections', label: 'Sections', icon: TbSection, position: 3 },
+      {
+        id: 'sections',
+        label: productType === 'COURSE' ? 'Curriculum' : 'Files',
+        icon: TbSection,
+        position: 3,
+      },
     ];
   }
 
@@ -78,7 +83,7 @@ export const getProductTabs = (productType: ProductType): ProductTab[] => {
       ...baseTabs,
       {
         id: 'consultation-details',
-        label: 'Consultation Details',
+        label: 'Availability',
         icon: CgDetailsMore,
         position: 3,
       },
@@ -90,7 +95,7 @@ export const getProductTabs = (productType: ProductType): ProductTab[] => {
       ...baseTabs,
       {
         id: 'membership-content',
-        label: 'Membership Content',
+        label: 'Content',
         icon: MdGroups,
         position: 3,
       },
@@ -130,7 +135,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
   const sortedSections = [...sections].sort((a, b) => a.position - b.position);
 
   return (
-    <aside className="builder-sidebar" aria-label="Product sections">
+    <aside className="builder-sidebar" aria-label="Workspace sections">
       <ul className="builder-sidebar-tabs">
         {productTabs.map((tab) => (
           <React.Fragment key={tab.id}>

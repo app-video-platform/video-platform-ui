@@ -16,13 +16,13 @@ import {
   BasicInfo,
   DEFAULT_RECURRING_PRICING,
   SectionDraft,
-  ProductHeader,
   MembershipContentSection,
   RecurringPriceSelector,
   RecurringPricing,
   useMembershipBuilderState,
   evaluateMembershipReadiness,
   resolveMembershipIncludedProducts,
+  useGlobalSaveStatus,
 } from 'domains/app/features/product-form';
 import { AppDispatch, ProductType, ProductWithSections } from 'core/api/models';
 import {
@@ -31,6 +31,7 @@ import {
   selectProductsError,
   selectProductsLoading,
 } from 'core/store/product-store';
+import { ProductWorkspaceShell } from 'domains/app/layouts/product-workspace-shell';
 
 import './product-form.styles.scss';
 
@@ -53,6 +54,15 @@ const getInitialBuilderTab = (productType: ProductType): BuilderTab => {
       return 'basics';
   }
 };
+
+const getInitialRecurringPricing = (): RecurringPricing =>
+  process.env.REACT_APP_USE_MOCKS === 'true'
+    ? {
+        amount: 39,
+        currency: 'EUR',
+        interval: 'MONTH',
+      }
+    : DEFAULT_RECURRING_PRICING;
 
 const ProductForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -78,11 +88,12 @@ const ProductForm: React.FC = () => {
     handleSidebarSectionClick,
     handleSidebarLessonClick,
     sidebarSections,
+    isAutosaving,
   } = useProductFormFacade();
 
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
   const [membershipRecurringPricing, setMembershipRecurringPricing] =
-    useState<RecurringPricing>(DEFAULT_RECURRING_PRICING);
+    useState<RecurringPricing>(getInitialRecurringPricing);
   const membershipBuilderState = useMembershipBuilderState();
   const includedProducts = useMemo(
     () =>
@@ -196,6 +207,14 @@ const ProductForm: React.FC = () => {
   useProductFormAnimation(container, showRestOfForm, () => {
     setHasHeroCollapsed(true);
   });
+  const saveStatus = useGlobalSaveStatus(
+    isAutosaving || productsLoading,
+    Boolean(errors.api || productsError),
+    {
+      minSavingMs: 200,
+      savedVisibleMs: 2000,
+    },
+  );
 
   if (!user || !user.id) {
     return <p>You must be logged in to create a product.</p>;
@@ -205,18 +224,40 @@ const ProductForm: React.FC = () => {
     return <p>Select a creator owner before creating a product.</p>;
   }
 
-  return (
-    <div ref={container}>
-      <ProductHeader
-        formData={formData}
-        isEditMode={isEditMode}
-        hasHeroCollapsed={hasHeroCollapsed}
-        showRestOfForm={showRestOfForm}
-        headerRef={undefined}
-        membershipReadiness={membershipReadiness}
-      />
+  const isMembership = formData.type === 'MEMBERSHIP';
+  const canPublish = showRestOfForm && !isMembership;
+  const publishDisabledReason = isMembership
+    ? membershipReadiness?.canPublish
+      ? 'Membership publishing will be enabled once Membership persistence is available.'
+      : 'Resolve membership requirements before publishing. Membership publishing will be enabled once Membership persistence is available.'
+    : undefined;
 
-      <form onSubmit={handleSubmit}>
+  const workspaceNavigation =
+    showRestOfForm && activeTab ? (
+      <BuilderSidebar
+        productType={formData.type}
+        activeTab={activeTab}
+        sections={sidebarSections}
+        onChange={(tab) => setActiveTab(tab)}
+        onSectionClick={handleSidebarSectionNavigation}
+        onLessonClick={handleSidebarLessonNavigation}
+      />
+    ) : null;
+
+  return (
+    <ProductWorkspaceShell
+      productType={formData.type}
+      productTitle={formData.name}
+      productStatus={formData.status}
+      isEditMode={isEditMode}
+      showWorkspace={showRestOfForm}
+      saveStatus={saveStatus}
+      canPublish={canPublish}
+      publishDisabledReason={publishDisabledReason}
+      navigation={workspaceNavigation}
+    >
+      <div ref={container}>
+        <form id="product-builder-form" onSubmit={handleSubmit}>
         {!showRestOfForm && (
           <div
             className={clsx('product-create-hero', {
@@ -244,17 +285,6 @@ const ProductForm: React.FC = () => {
               'product-builder__full': showRestOfForm,
             })}
           >
-            <div className="product-create-sidebar">
-              <BuilderSidebar
-                productType={formData.type}
-                activeTab={activeTab}
-                sections={sidebarSections} // your sections + lessons summary
-                onChange={(tab) => setActiveTab(tab)}
-                onSectionClick={handleSidebarSectionNavigation}
-                onLessonClick={handleSidebarLessonNavigation}
-              />
-            </div>
-
             <div className="product-create-section">
               {activeTab === 'basics' && (
                 <BasicInfo
@@ -359,8 +389,9 @@ const ProductForm: React.FC = () => {
             </div>
           </div>
         )}
-      </form>
-    </div>
+        </form>
+      </div>
+    </ProductWorkspaceShell>
   );
 };
 

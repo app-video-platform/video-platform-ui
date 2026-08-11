@@ -1,0 +1,142 @@
+@use '../../../../styles/index.scss' as *;
+
+.product-workspace-shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top right, rgba(var(--brand-secondary-rgb), 0.14), transparent 36rem),
+    var(--surface-canvas);
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-shell);
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-5;
+    padding: $spacing-4 $spacing-6;
+    background: rgba(var(--surface-canvas-rgb), 0.92);
+    border-bottom: 1px solid var(--border-subtle);
+    backdrop-filter: blur(16px);
+  }
+
+  &__identity,
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    min-width: 0;
+  }
+
+  &__back {
+    gap: $spacing-2;
+    min-width: auto;
+    padding-inline: $spacing-2;
+  }
+
+  &__meta {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+
+    h1 {
+      max-width: clamp(16rem, 38vw, 44rem);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+  }
+
+  &__type {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-1;
+    color: var(--text-secondary);
+    font-size: $app-label-size;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__overflow {
+    min-width: 40px;
+    width: 40px;
+    padding: 0;
+  }
+
+  &__body {
+    display: grid;
+    grid-template-columns: 264px minmax(0, 1fr);
+    gap: $spacing-6;
+    align-items: flex-start;
+    padding: $spacing-6;
+  }
+
+  &__nav {
+    position: sticky;
+    top: 100px;
+  }
+
+  &__content {
+    min-width: 0;
+  }
+}
+
+@media (max-width: $bp-laptop) {
+  .product-workspace-shell {
+    &__body {
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: $spacing-4;
+      padding: $spacing-5;
+    }
+
+    &__header {
+      padding-inline: $spacing-5;
+    }
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .product-workspace-shell {
+    &__header {
+      min-height: auto;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: $spacing-3;
+      padding: $spacing-3 $spacing-4;
+    }
+
+    &__identity,
+    &__actions {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    &__actions {
+      justify-content: flex-start;
+    }
+
+    &__meta h1 {
+      max-width: min(72vw, 28rem);
+      font-size: 1rem;
+    }
+
+    &__body {
+      display: block;
+      padding: $spacing-4;
+    }
+
+    &__nav {
+      position: sticky;
+      top: 116px;
+      z-index: var(--z-sticky);
+      margin: 0 0 $spacing-4;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(var(--surface-canvas-rgb), 0.94);
+      backdrop-filter: blur(12px);
+    }
+  }
+}

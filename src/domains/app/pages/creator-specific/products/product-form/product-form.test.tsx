@@ -57,7 +57,8 @@ jest.mock('react-redux', () => ({
 // ── 2) Mock app features barrel used by ProductForm ──────────────────────
 const mockUseProductFormFacade = jest.fn();
 const mockUseProductFormAnimation = jest.fn();
-const mockProductHeader = jest.fn();
+const mockProductWorkspaceShell = jest.fn();
+const mockUseGlobalSaveStatus = jest.fn(() => 'idle');
 const mockUseMembershipBuilderState = jest.fn();
 const mockEvaluateMembershipReadiness = jest.fn(
   ({
@@ -101,6 +102,7 @@ jest.mock('domains/app/features/product-form', () => ({
   useProductFormFacade: (...args: any[]) => mockUseProductFormFacade(...args),
   useProductFormAnimation: (...args: any[]) =>
     mockUseProductFormAnimation(...args),
+  useGlobalSaveStatus: () => mockUseGlobalSaveStatus(),
   useMembershipBuilderState: (...args: any[]) =>
     mockUseMembershipBuilderState(...args),
   evaluateMembershipReadiness: (input: any) =>
@@ -214,10 +216,6 @@ jest.mock('domains/app/features/product-form', () => ({
     interval: 'MONTH',
   },
   SectionDraft: {} as any,
-  ProductHeader: (props: any) => {
-    mockProductHeader(props);
-    return <div data-testid="product-header">ProductHeader</div>;
-  },
   RecurringPriceSelector: ({
     value,
     onChange,
@@ -242,6 +240,19 @@ jest.mock('domains/app/features/product-form', () => ({
       PriceSelector (price: {String(price)})
     </div>
   ),
+}));
+
+jest.mock('domains/app/layouts/product-workspace-shell', () => ({
+  __esModule: true,
+  ProductWorkspaceShell: (props: any) => {
+    mockProductWorkspaceShell(props);
+    return (
+      <div data-testid="product-workspace-shell">
+        <div data-testid="workspace-navigation">{props.navigation}</div>
+        <div>{props.children}</div>
+      </div>
+    );
+  },
 }));
 
 // ── 3) Mock app components barrel used by ProductForm ────────────────────
@@ -309,6 +320,8 @@ const makeFacadeState = (overrides: Partial<any> = {}) => ({
   handleSidebarSectionClick: jest.fn(),
   handleSidebarLessonClick: jest.fn(),
   sidebarSections: [],
+  isAutosaving: false,
+  lastSavedAt: null,
   ...overrides,
 });
 
@@ -324,14 +337,14 @@ describe('<ProductForm />', () => {
     ).toBeInTheDocument();
   });
 
-  it('passes isEditMode from facade to ProductHeader', () => {
+  it('passes isEditMode from facade to ProductWorkspaceShell', () => {
     mockUseProductFormFacade.mockReturnValue(
       makeFacadeState({ isEditMode: true }),
     );
 
     render(<ProductForm />);
 
-    expect(mockProductHeader).toHaveBeenCalledWith(
+    expect(mockProductWorkspaceShell).toHaveBeenCalledWith(
       expect.objectContaining({
         isEditMode: true,
       }),
@@ -482,7 +495,7 @@ describe('<ProductForm />', () => {
     expect(screen.queryByTestId('price-selector')).not.toBeInTheDocument();
   });
 
-  it('passes derived Membership readiness to ProductHeader', async () => {
+  it('passes derived Membership readiness to ProductWorkspaceShell publish state', async () => {
     mockUseMembershipBuilderState.mockReturnValue({
       nativeContentItems: [
         {
@@ -532,11 +545,9 @@ describe('<ProductForm />', () => {
       );
     });
 
-    expect(mockProductHeader).toHaveBeenLastCalledWith(
+    expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        membershipReadiness: expect.objectContaining({
-          canPublish: false,
-        }),
+        canPublish: false,
       }),
     );
   });
@@ -723,9 +734,9 @@ describe('<ProductForm />', () => {
     fireEvent.click(screen.getByTestId('tab-pricing'));
     fireEvent.click(screen.getByTestId('tab-membership-content'));
 
-    expect(mockProductHeader).toHaveBeenLastCalledWith(
+    expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        membershipReadiness: expect.any(Object),
+        showWorkspace: true,
       }),
     );
   });

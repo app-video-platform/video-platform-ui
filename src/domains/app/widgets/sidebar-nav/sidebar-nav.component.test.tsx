@@ -54,4 +54,35 @@ describe('SidebarNav', () => {
 
     expect(screen.queryByRole('link', { name: /admin/i })).toBeNull();
   });
+
+  it('uses the Creator MVP navigation and omits removed marketplace items', () => {
+    renderSidebar([UserRole.CREATOR]);
+
+    expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /products/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /sales/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /marketing/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /storefront/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /explore/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /messages/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /reviews/i })).toBeNull();
+  });
+
+  it('shows planned IA items without linking to nonexistent routes', () => {
+    renderSidebar([UserRole.CREATOR]);
+
+    expect(screen.getByRole('button', { name: /customers/i })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /analytics/i })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /help/i })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
 });

@@ -13,7 +13,11 @@ import { useSidebarLayout } from './sidebar-layout.context';
 
 import './sidebar-nav.styles.scss';
 
-const SidebarNav: React.FC = () => {
+interface SidebarNavProps {
+  onNavigate?: () => void;
+}
+
+const SidebarNav: React.FC<SidebarNavProps> = ({ onNavigate }) => {
   const { isSidebarCollapsed, toggleSidebar } = useSidebarLayout();
   const user = useSelector(selectAuthUser);
 
@@ -24,42 +28,76 @@ const SidebarNav: React.FC = () => {
     'sidebar-nav__collapsed': isSidebarCollapsed,
   });
 
+  const visibleRoutes = appRoutes.filter(
+    (route) =>
+      !route.hideFromSidebar &&
+      (!route.allowedRoles || hasAnyRole(user?.roles, route.allowedRoles)),
+  );
+  const primaryRoutes = visibleRoutes.filter(
+    (route) => route.group !== 'utility',
+  );
+  const utilityRoutes = visibleRoutes.filter(
+    (route) => route.group === 'utility',
+  );
+
+  const renderRoute = (route: (typeof visibleRoutes)[number]) => {
+    const iconColor = route.disabled
+      ? getCssVar('--text-muted')
+      : getCssVar('--text-secondary');
+
+    if (route.disabled) {
+      return (
+        <button
+          type="button"
+          className={clsx('sidebar-link', 'sidebar-link__disabled')}
+          aria-disabled="true"
+          title={`${route.label} is planned`}
+        >
+          <GalIcon icon={route.icon} color={iconColor} size={20} />
+          {!isSidebarCollapsed && <span>{route.label}</span>}
+        </button>
+      );
+    }
+
+    return (
+      <NavLink
+        to={route.path}
+        end={route.end}
+        className={({ isActive }) => linkClass(isActive)}
+        onClick={onNavigate}
+      >
+        {({ isActive }) => (
+          <>
+            <GalIcon
+              icon={route.icon}
+              color={
+                isActive
+                  ? getCssVar('--text-primary')
+                  : getCssVar('--text-secondary')
+              }
+              size={20}
+            />
+            {!isSidebarCollapsed && <span>{route.label}</span>}
+          </>
+        )}
+      </NavLink>
+    );
+  };
+
   return (
-    <nav className={sidebarClass}>
+    <nav className={sidebarClass} aria-label="Creator navigation">
       <div className="logo-container">
-        {!isSidebarCollapsed && <h2>Galactica</h2>}
+        {!isSidebarCollapsed && <h2 className="brand-display">Galactica</h2>}
       </div>
       <ul className="routes-list">
-        {appRoutes
-          .filter(
-            (route) =>
-              !route.hideFromSidebar &&
-              (!route.allowedRoles || hasAnyRole(user?.roles, route.allowedRoles)),
-          )
-          .map((route, index) => (
-            <li key={index}>
-              <NavLink
-                to={route.path}
-                end={route.end}
-                className={({ isActive }) => linkClass(isActive)}
-              >
-                {({ isActive }) => (
-                  <>
-                    <GalIcon
-                      icon={route.icon}
-                      color={
-                        isActive
-                          ? getCssVar('--text-primary')
-                          : getCssVar('--text-secondary')
-                      }
-                      size={20}
-                    />
-                    {!isSidebarCollapsed && <span>{route.label}</span>}
-                  </>
-                )}
-              </NavLink>
-            </li>
-          ))}
+        {primaryRoutes.map((route) => (
+          <li key={route.path}>{renderRoute(route)}</li>
+        ))}
+      </ul>
+      <ul className="routes-list routes-list__utility">
+        {utilityRoutes.map((route) => (
+          <li key={route.path}>{renderRoute(route)}</li>
+        ))}
       </ul>
       <button
         type="button"

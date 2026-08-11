@@ -6,21 +6,11 @@
   position: relative;
 
   &__full {
-    display: flex;
-    // gap: $spacing-5;
-    align-items: flex-start; // important so the sticky element doesn't stretch
-  }
-
-  .product-create-sidebar {
-    flex: 0 0 280px; // sidebar column width
-    max-width: 320px;
-    position: sticky;
-    top: 110px;
+    display: block;
   }
 
   .product-create-section {
-    flex: 1 1 auto;
-    min-width: 0; // so content can shrink instead of overflowing
+    min-width: 0;
   }
 }
 
@@ -39,6 +29,12 @@
     pointer-events: none;
     height: 0;
     overflow: hidden;
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .product-create-hero {
+    margin-top: $spacing-5;
   }
 }
 

@@ -19,7 +19,7 @@
     &:focus {
       outline: none;
       border-color: var(--brand-primary);
-      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+      box-shadow: 0 0 0 2px var(--border-focus);
     }
 
     &.input-error {
@@ -36,12 +36,12 @@
 
       &:focus {
         outline: none;
-        border-bottom-color: #3bc9db;
-        box-shadow: 0 2px 0 0 rgba(59, 201, 219, 0.4);
+        border-bottom-color: var(--info);
+        box-shadow: 0 2px 0 0 rgba(85, 199, 232, 0.4);
       }
 
       &:hover {
-        border-bottom-color: #3bc9db;
+        border-bottom-color: var(--info);
       }
     }
   }

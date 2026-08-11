@@ -1,114 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 
 import { selectAuthUser } from 'core/store/auth-store';
 import { isCreatorOrAdmin } from 'core/api/models';
-import {
-  SidebarLayoutProvider,
-  SidebarNav,
-  useSidebarLayout,
-} from 'domains/app/widgets/sidebar-nav';
+import { SidebarLayoutProvider } from 'domains/app/widgets/sidebar-nav';
 import { TopNavbar } from 'domains/app/widgets/top-navbar';
-import { appRoutes } from 'core/constants';
+import { CreatorAppShell } from 'domains/app/layouts/creator-app-shell';
 
 import './app-layout.styles.scss';
 
 const CREATOR_ROUTES = [
   '/app',
   '/app/admin/*',
-  '/app/products/*',
+  '/app/products',
   '/app/sales',
   '/app/marketing',
   '/app/settings',
+  '/app/my-page-preview',
 ];
 
 const Shell: React.FC = () => {
   const location = useLocation();
-  const { setIsSidebarCollapsed } = useSidebarLayout();
-  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
-
-  useEffect(() => {
-    const matchedRoute = appRoutes.find((route) =>
-      matchPath({ path: route.path, end: route.end }, location.pathname),
-    );
-
-    if (
-      matchedRoute?.collapseSidebarOnLoad === true ||
-      location.pathname.includes('create') ||
-      location.pathname.includes('edit')
-    ) {
-      setIsSidebarCollapsed(true);
-    }
-  }, [location, setIsSidebarCollapsed]);
-
   const user = useSelector(selectAuthUser);
-
   const hasManagementRole = isCreatorOrAdmin(user?.roles);
-
   const inCreatorArea = CREATOR_ROUTES.some((pattern) =>
     Boolean(matchPath(pattern, location.pathname)),
   );
-  const showSidebar = inCreatorArea && hasManagementRole;
-
   const isBuilderRoute =
     location.pathname.startsWith('/app/products/create') ||
     location.pathname.startsWith('/app/products/edit') ||
     location.pathname.startsWith('/app/admin/products/create');
 
-  useEffect(() => {
-    if (!isBuilderRoute) {
-      setIsHeaderCollapsed(false);
-      return;
-    }
+  if (isBuilderRoute) {
+    return <Outlet />;
+  }
 
-    const scrollEl = document.querySelector(
-      'main.content',
-    ) as HTMLElement | null;
-    if (!scrollEl) {
-      return;
-    }
-
-    const handleScroll = () => {
-      const y = scrollEl.scrollTop;
-
-      // First scroll down → collapse
-      // Back to top (or almost) → expand
-      if (y > 8) {
-        setIsHeaderCollapsed(true);
-      } else {
-        setIsHeaderCollapsed(false);
-      }
-    };
-
-    handleScroll(); // set initial state
-
-    scrollEl.addEventListener('scroll', handleScroll);
-    return () => {
-      scrollEl.removeEventListener('scroll', handleScroll);
-    };
-  }, [isBuilderRoute, location.pathname]);
+  if (inCreatorArea && hasManagementRole) {
+    return <CreatorAppShell />;
+  }
 
   return (
-    <div
-      className={clsx('app-layout', {
-        'app-layout--builder-mode': isBuilderRoute,
-        'app-layout--header-collapsed': isBuilderRoute && isHeaderCollapsed,
-      })}
-    >
-      {showSidebar && (
-        <aside className="sidebar">
-          <SidebarNav />
-        </aside>
-      )}
-
+    <div className={clsx('app-layout', 'app-layout--marketplace')}>
       <div className="app-container">
-        <header
-          className={clsx('app-header', {
-            'app-header--collapsed': isBuilderRoute && isHeaderCollapsed,
-          })}
-        >
+        <header className="app-header">
           <TopNavbar />
         </header>
 

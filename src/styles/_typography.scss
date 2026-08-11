@@ -2,7 +2,10 @@ $font-heading: 'Bebas Neue', sans-serif;
 $font-body: 'Open Sans', sans-serif;
 $font-mono: 'Roboto Mono', monospace;
 
-// Font sizes (rem-based scale)
+// App type scale
+$font-display: $font-heading;
+$font-ui: $font-body;
+
 $size-xxl: 4rem; // 64px
 $size-xl: 3rem; // 48px
 $size-h1: 2rem; // ~32px
@@ -12,14 +15,21 @@ $size-body: 1rem; // ~16px
 $size-small: 0.875rem; // ~14px
 $size-xsmall: 0.688rem; // ~11px
 
+$app-page-title-size: 1.75rem;
+$app-section-title-size: 1.25rem;
+$app-component-title-size: 1rem;
+$app-label-size: 0.75rem;
+$app-button-size: 0.875rem;
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: $font-heading;
-  letter-spacing: 0.5px;
+  font-family: $font-body;
+  letter-spacing: 0;
+  line-height: 1.2;
 }
 
 p {
@@ -34,4 +44,10 @@ textarea {
 button {
   font-family: $font-body;
   font-weight: 500;
+}
+
+.brand-display {
+  font-family: $font-heading;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }

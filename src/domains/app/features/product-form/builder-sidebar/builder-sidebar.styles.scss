@@ -1,49 +1,128 @@
 @use '../../../../../styles/index.scss' as *;
 
 .builder-sidebar {
-  background: rgba($color: var(--surface-1), $alpha: 0.4);
+  background: rgba(var(--surface-panel-rgb), 0.84);
   border-radius: $radius-md;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
-    /* inner layer */
-      linear-gradient(135deg, var(--surface-0), var(--brand-secondary))
-      border-box; /* gradient border */
-  width: 240px;
-  min-height: 500px;
+  border: 1px solid var(--border-subtle);
+  width: 100%;
+  min-height: 0;
 
   .builder-sidebar-tabs {
     list-style: none;
-    padding: $spacing-5;
+    display: grid;
+    gap: $spacing-1;
+    padding: $spacing-3;
+
+    > li {
+      min-width: 0;
+      overflow: hidden;
+    }
 
     .sidebar-tab {
-      line-height: 3rem;
+      min-height: 40px;
       color: var(--text-primary);
-      display: inline-flex;
+      display: flex;
+      align-items: center;
       gap: $spacing-2;
+      width: 100%;
+      min-width: 0;
+      padding: 0 $spacing-3;
+      border-radius: $radius-md;
+      justify-content: flex-start;
+
+      span {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
       &__active {
+        background: rgba(var(--brand-secondary-rgb), 0.18);
         color: var(--brand-primary);
+      }
+
+      &:hover {
+        background: var(--surface-interactive);
       }
     }
 
     .sidebar-outline-section {
       margin-left: $spacing-3;
-      line-height: 2rem;
+      min-height: 32px;
       color: var(--text-primary);
-      display: inline-flex;
+      display: flex;
+      align-items: center;
       gap: $spacing-2;
+      width: calc(100% - #{$spacing-3});
+      min-width: 0;
+      overflow: hidden;
+      justify-content: flex-start;
+
+      &__title {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     .builder-sidebar-outline-lessons {
       list-style: none;
+      min-width: 0;
+      overflow: hidden;
 
       .sidebar-outline-lesson {
         margin-left: $spacing-6;
-        line-height: 1.5rem;
+        min-height: 28px;
         color: var(--text-primary);
-        display: inline-flex;
+        display: flex;
+        align-items: center;
         gap: $spacing-2;
+        width: calc(100% - #{$spacing-6});
+        min-width: 0;
+        overflow: hidden;
+        justify-content: flex-start;
+
+        &__title {
+          display: block;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .builder-sidebar {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+
+    .builder-sidebar-tabs {
+      display: flex;
+      gap: $spacing-2;
+      overflow-x: auto;
+      padding: $spacing-2 0;
+
+      > li {
+        flex: 0 0 auto;
+      }
+
+      .sidebar-tab,
+      .sidebar-outline-section,
+      .sidebar-outline-lesson {
+        white-space: nowrap;
+      }
+
+      .sidebar-outline-section,
+      .builder-sidebar-outline-lessons {
+        display: none;
       }
     }
   }
