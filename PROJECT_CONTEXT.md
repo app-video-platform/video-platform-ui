@@ -65,8 +65,8 @@ Creator/Admin management routes are visually and structurally separated from buy
 
 Current Creator IA:
 
-- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Sales (`/app/sales`), Marketing (`/app/marketing`), Storefront (`/app/my-page-preview`), Settings (`/app/settings`).
-- Intentionally disabled sidebar destinations: Customers (`/app/customers`), Analytics (`/app/analytics`), Help (`/app/help`).
+- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Customers (`/app/customers`), Sales (`/app/sales`), Marketing (`/app/marketing`), Storefront (`/app/my-page-preview`), Settings (`/app/settings`).
+- Intentionally disabled sidebar destinations: Analytics (`/app/analytics`), Help (`/app/help`).
 - Admin appears as a utility route for admin users only.
 - Messages and Reviews are not part of the current Creator MVP navigation. Reviews code still exists under marketing/reviews services/features, but it is not exposed as a Creator IA destination.
 
@@ -151,9 +151,10 @@ Implemented / reasonably wired:
 
 - Auth signup, login, verify email, forgot password, Google sign-in hooks.
 - Protected routes by role.
-- Creator management shell with Dashboard, Products, Sales, Marketing, Storefront, and Settings destinations; Customers, Analytics, and Help are visible as disabled planned destinations.
+- Creator management shell with Dashboard, Products, Customers, Sales, Marketing, Storefront, and Settings destinations; Analytics and Help are visible as disabled planned destinations.
 - Creator Dashboard redesign with business metrics, recent activity, top products, and needs-attention panels.
 - Creator Products management redesign with local search/filter/sort, list/table desktop composition, mobile management cards, and distinct empty/loading/error states.
+- Creator Customers management area with a customer list and dedicated customer detail route.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
@@ -171,7 +172,7 @@ Partially implemented / placeholder:
 
 - Product detail page has real loading by product ID but still contains placeholder copy, fake rating/language/duration/creator text, and placeholder image.
 - Storefront page fetches creator products but currently renders mostly empty UI.
-- Creator Customers, Analytics, and Help navigation destinations are disabled because implementations are not available yet.
+- Creator Analytics and Help navigation destinations are disabled because implementations are not available yet.
 - Creator Sales and Marketing routes exist, but verify their feature completeness before expanding them.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
 - Membership included products are limited to existing Course/Download products and held in frontend state only.
@@ -197,15 +198,17 @@ Confirmed:
 - Membership has no backend native content API yet.
 - Membership has no backend recurring pricing contract yet.
 - Membership has no subscription/entitlement/member-access model yet.
+- Creator Customers has no production customer list/detail API, purchase/order API, entitlement/access contract, subscription/customer membership-state contract, waitlist API, tags/notes persistence, production pagination contract, or manual access-management API yet.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
-- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics or states.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Customers, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics, customer records, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Creator Dashboard inspection fixtures live in `src/domains/app/pages/creator-specific/creator-dashboard/fixtures/dashboard-inspection-fixture.ts`. When mocks are off, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
 - Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
 - Creator Products inspection fixtures currently come through ignored local mock data in `src/core/api/_mocks.ts` when mocks are enabled.
+- Creator Customers inspection fixtures live under `src/domains/app/pages/creator-specific/customers` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Customers renders honest unavailable states rather than fabricating customer business data. Fixture data must remain development/inspection infrastructure, not a production fallback.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
 - Membership native content state is local frontend state lifted above the Membership Content tab. Post, Video, and Resource can be created/edited/deleted locally; Video/Resource use selection-only local file metadata. Backend persistence remains undefined.
@@ -257,6 +260,44 @@ Current implemented patterns:
 
 Do not document or introduce unsupported list actions such as Delete, Duplicate, Archive, Publish, or Unpublish unless the implementation actually adds them.
 
+## Creator Customers Management
+
+The Creator customer area is implemented under `src/domains/app/pages/creator-specific/customers` and is the Creator-facing surface for understanding customer relationships across buyers, members, past-due members, and waitlist leads.
+
+Routes:
+
+- Customer list: `/app/customers`.
+- Customer detail: `/app/customers/:customerId`.
+
+Current Customer List patterns:
+
+- Desktop/tablet use a management list/table hybrid with Customer, Status, Products, Total spend, and Last activity columns.
+- Mobile transforms rows into compact customer cards rather than shrinking the desktop table.
+- Customer identity (name/email) is the primary navigation to Customer Detail.
+- There is intentionally no Actions column or overflow menu because no meaningful secondary customer row actions exist yet.
+- Local controls include name/email search, relationship/status filter, product filter, membership filter, sorting, result count, and clear active refinements.
+- Empty states distinguish true empty customer list, search-no-results, filter-no-results, and production unavailable states.
+- The current relationship states are `Active member`, `Past due`, `Buyer`, and `Waitlist`.
+
+Current Customer Detail patterns:
+
+- Customer Detail is a real page, not a modal.
+- The header is a contained profile/identity surface with avatar/initials, name, relationship status, email, and customer-since information when available.
+- Summary metrics currently include Total spent, Orders, Active access, and Membership.
+- Detail sections use accessible tabs: Overview, Purchases, Access, and Notes.
+- Overview contains customer information, relationship information, tags when present in inspection data, and recent activity where available.
+- Purchases, Access, and Notes are read-only in the current implementation.
+
+Important customer-domain boundary:
+
+- Purchases, Access, Notes, tags, waitlist information, spend/order values, membership customer state, and other customer-domain business data are currently deterministic inspection fixtures, not production-backed Creator customer APIs.
+- Access state must not imply grant/revoke controls until backend access-management contracts exist.
+- Notes/tags must not imply editable CRM persistence until a notes/tags API exists.
+- Do not infer fake CRM actions, fake communication features, fake persistence, fake access management, or speculative customer operations from the UI.
+- Customer fixtures are gated behind `REACT_APP_USE_MOCKS=true`; production must not fabricate unsupported Customer business data.
+
+Reusable Customers-local patterns include `CustomerAvatar`, `CustomerStatusBadge`, `CustomerManagementRow`, and customer formatting/filtering utilities in `creator-customers.utils.ts`. Keep these Customer-specific unless another area has a concrete need; do not introduce a generalized CRM/data-grid layer prematurely.
+
 ## Responsive Creator Architecture
 
 Responsive Creator UI should change composition intentionally rather than simply shrink desktop layouts.
@@ -266,6 +307,7 @@ Implemented examples:
 - Creator sidebar becomes compact/collapsible on desktop and a mobile drawer at tablet/mobile widths.
 - Dashboard metrics change layout across breakpoints and panel order changes when content becomes sequential.
 - Products desktop list/table becomes mobile management cards.
+- Customers desktop/tablet list/table becomes mobile customer cards while preserving the stacked mobile filter controls.
 - Product workspace navigation adapts on narrow screens while preserving the focused editing shell.
 
 Avoid hardcoding viewport-specific pixel values into this document; inspect the SCSS breakpoints and component styles when implementing a responsive change.
@@ -279,7 +321,7 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Admin product management and create-for-creator flow using `ownerId` query param.
 - Membership added as a first-class frontend Product type.
 - Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, frontend-only Post/Video/Resource content creation/editing, and frontend-only recurring pricing controls.
-- Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Marketing, Analytics, Storefront, plus Settings/Help utility navigation, with unavailable destinations disabled.
+- Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Marketing, Storefront, plus Settings utility navigation; unavailable destinations such as Analytics and Help remain disabled.
 - Creator Dashboard and Products management visual redesigns.
 - Focused Product Workspace shell for product editing.
 
