@@ -13,6 +13,7 @@ import {
   ConsultationTab,
   CoursesTab,
   CreatorDashboard,
+  CustomerDetail,
   DownloadPackagesTab,
   ExplorePage,
   GalacticaHome,
@@ -22,6 +23,7 @@ import {
   ProductForm,
   ProductPage,
   ProductsList,
+  CustomersList,
   SalesPage,
   SearchResultsPage,
   SettingsPage,
@@ -112,6 +114,18 @@ const AppRouter: React.FC = () => (
           <Route path="create" element={<ProductForm />} />
           <Route path="edit/:id" element={<ProductForm />} />
           <Route path="edit/:type/:id" element={<ProductForm />} />
+        </Route>
+
+        <Route
+          path="customers"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+              <Outlet />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<CustomersList />} />
+          <Route path=":customerId" element={<CustomerDetail />} />
         </Route>
 
         <Route

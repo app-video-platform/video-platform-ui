@@ -37,6 +37,8 @@ jest.mock('../pages', () => {
     ConsultationTab: makePage('Consultations'),
     CoursesTab: makePage('Courses'),
     CreatorDashboard: makePage('Creator dashboard'),
+    CustomerDetail: makePage('Customer detail'),
+    CustomersList: makePage('Customers list'),
     DownloadPackagesTab: makePage('Downloads'),
     ExplorePage: makePage('Explore'),
     GalacticaHome: makePage('User home'),
@@ -103,5 +105,15 @@ describe('AppRouter role routing', () => {
     renderRouter([UserRole.ADMIN], '/admin/users');
 
     expect(screen.getByText('Admin users')).toBeInTheDocument();
+  });
+
+  it('renders creator customer routes for creators', () => {
+    renderRouter([UserRole.CREATOR], '/customers');
+
+    expect(screen.getByText('Customers list')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/customers/cust-1');
+
+    expect(screen.getByText('Customer detail')).toBeInTheDocument();
   });
 });

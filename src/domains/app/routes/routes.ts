@@ -9,6 +9,8 @@ export const appRoutes = {
   products: '/app/products',
   productsCreate: '/app/products/create',
   productsEdit: (id = ':id') => `/app/products/edit/${id}`,
+  customers: '/app/customers',
+  customerDetail: (id = ':customerId') => `/app/customers/${id}`,
 
   sales: '/app/sales',
   marketing: '/app/marketing',

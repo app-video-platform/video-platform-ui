@@ -60,6 +60,7 @@ describe('SidebarNav', () => {
 
     expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /products/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /customers/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /sales/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /marketing/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /storefront/i })).toBeInTheDocument();
@@ -69,13 +70,9 @@ describe('SidebarNav', () => {
     expect(screen.queryByRole('link', { name: /reviews/i })).toBeNull();
   });
 
-  it('shows planned IA items without linking to nonexistent routes', () => {
+  it('shows remaining planned IA items without linking to nonexistent routes', () => {
     renderSidebar([UserRole.CREATOR]);
 
-    expect(screen.getByRole('button', { name: /customers/i })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
     expect(screen.getByRole('button', { name: /analytics/i })).toHaveAttribute(
       'aria-disabled',
       'true',
