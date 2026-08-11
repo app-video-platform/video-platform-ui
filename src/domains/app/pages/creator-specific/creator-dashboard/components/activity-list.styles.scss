@@ -22,6 +22,10 @@
         background: var(--surface-interactive);
       }
 
+      &:active {
+        background: var(--surface-interactive-hover);
+      }
+
       &:focus-visible {
         outline: none;
         box-shadow:

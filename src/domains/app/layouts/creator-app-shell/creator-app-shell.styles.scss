@@ -39,14 +39,13 @@
 
   &__icon-button,
   &__drawer-close {
-    width: 40px;
-    height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: $radius-md;
     background: var(--surface-panel-elevated);
     border: 1px solid var(--border-subtle);
+
+    &:hover:not(:disabled) {
+      background: var(--surface-interactive);
+      border-color: var(--border-strong);
+    }
   }
 
   &__mobile-brand {

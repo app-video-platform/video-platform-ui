@@ -77,6 +77,11 @@
       background: var(--surface-interactive);
     }
 
+    &:active {
+      background: var(--surface-interactive-hover);
+      border-color: var(--divider-strong);
+    }
+
     &:focus-visible {
       outline: none;
       box-shadow:

@@ -29,6 +29,11 @@
       padding: 0 $spacing-3;
       border-radius: $radius-md;
       justify-content: flex-start;
+      border: 1px solid transparent;
+      transition:
+        background $transition-fast,
+        border-color $transition-fast,
+        color $transition-fast;
 
       span {
         display: block;
@@ -41,10 +46,22 @@
       &__active {
         background: rgba(var(--brand-secondary-rgb), 0.18);
         color: var(--brand-primary);
+        border-color: rgba(var(--brand-primary-rgb), 0.24);
       }
 
       &:hover {
         background: var(--surface-interactive);
+      }
+
+      &:active {
+        background: var(--surface-interactive-hover);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow:
+          0 0 0 2px var(--surface-panel),
+          0 0 0 4px var(--focus-ring);
       }
     }
 

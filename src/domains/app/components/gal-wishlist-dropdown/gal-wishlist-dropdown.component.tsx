@@ -24,7 +24,14 @@ const GalWishlistDropdown: React.FC = () => {
       <GalDropdown
         customClassName="galactica-wishlist"
         trigger={({ toggle }) => (
-          <button onClick={toggle} className="wishlist-icon-button">
+          <Button
+            type="button"
+            variant="tertiary"
+            size="icon"
+            onClick={toggle}
+            className="wishlist-icon-button"
+            aria-label="Open wishlist"
+          >
             <GalIcon
               icon={CiHeart}
               size={18}
@@ -35,7 +42,7 @@ const GalWishlistDropdown: React.FC = () => {
                 {formatCount(wishlistProdCount)}
               </span>
             )}
-          </button>
+          </Button>
         )}
         menu={() => (
           <>

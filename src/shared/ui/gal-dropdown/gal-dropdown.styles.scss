@@ -15,7 +15,41 @@
     border-radius: $radius-md;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+    gap: $spacing-1;
+    padding: $spacing-2;
+    box-shadow: var(--shadow-e2);
+
+    button,
+    a,
+    [role='menuitem'] {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      padding: 0 $spacing-3;
+      border-radius: $radius-sm;
+      color: var(--text-secondary);
+      background: transparent;
+      text-align: left;
+      transition:
+        background $transition-fast,
+        color $transition-fast;
+
+      &:hover {
+        background: var(--overlay-hover);
+        color: var(--text-primary);
+      }
+
+      &:active {
+        background: var(--overlay-pressed);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow:
+          0 0 0 2px var(--surface-panel-elevated),
+          0 0 0 4px var(--focus-ring);
+      }
+    }
   }
 }

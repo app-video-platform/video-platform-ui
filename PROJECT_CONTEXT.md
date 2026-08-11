@@ -5,7 +5,7 @@ Generated from repository state:
 Branch: main
 Commit: b9f5510
 
-Last reviewed: 2026-08-08
+Last reviewed: 2026-08-11
 
 # How to use this document
 
@@ -52,6 +52,38 @@ State is centralized in `src/core/store/store.ts` with slices for auth, admin, p
 
 API services live under `src/core/api/services`; DTO/model types live under `src/core/api/models`. `http-client.ts` configures Axios with `REACT_APP_BASE_PATH`, credentials, CSRF injection, refresh-token retry, and optional local mocks when `REACT_APP_USE_MOCKS=true`.
 
+## Authenticated Creator Management Architecture
+
+Creator/Admin management routes are visually and structurally separated from buyer/marketplace routes in `src/domains/app/pages/app-layout/app-layout.component.tsx`.
+
+- `CreatorAppShell` lives in `src/domains/app/layouts/creator-app-shell/creator-app-shell.component.tsx`.
+- Creator navigation is rendered by `SidebarNav` in `src/domains/app/widgets/sidebar-nav/sidebar-nav.component.tsx` using `appRoutes` from `src/core/constants/routes.ts`.
+- Desktop Creator management uses a persistent collapsible sidebar and a separate account/user control.
+- Tablet/mobile Creator management uses a compact top bar with a drawer navigation.
+- Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
+- Marketplace/customer routes still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA.
+
+Current Creator IA:
+
+- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Sales (`/app/sales`), Marketing (`/app/marketing`), Storefront (`/app/my-page-preview`), Settings (`/app/settings`).
+- Intentionally disabled sidebar destinations: Customers (`/app/customers`), Analytics (`/app/analytics`), Help (`/app/help`).
+- Admin appears as a utility route for admin users only.
+- Messages and Reviews are not part of the current Creator MVP navigation. Reviews code still exists under marketing/reviews services/features, but it is not exposed as a Creator IA destination.
+
+## Creator Visual Conventions
+
+The current Creator redesign establishes a dark management application language, not a marketing-page treatment.
+
+- App canvas and surfaces are defined in `src/styles/_variables.scss` with dark navy surface tokens (`--surface-canvas`, `--surface-panel`, `--surface-panel-elevated`) and semantic aliases (`--surface-0`, `--surface-1`, `--surface-2`).
+- Primary Creator actions use restrained warm gold (`--brand-primary`); violet (`--brand-secondary`) is a supporting interaction/brand atmosphere rather than the default action color.
+- Semantic colors (`--success`, `--error`, `--warning`, `--info`) should remain functional, especially for status badges, validation, and alerts.
+- RGB channel tokens (`--brand-primary-rgb`, `--brand-secondary-rgb`, `--success-rgb`, `--error-rgb`, surface RGB tokens) exist for safe alpha composition.
+- Spacing, radius, transitions, and breakpoints are centralized in `src/styles/_spacing.scss`, `_radius.scss`, `_transitions.scss`, and `_breakpoints.scss`. Current breakpoints include mobile, tablet, laptop, desktop, and wide.
+- Management UI should prefer surface hierarchy, spacing, and restrained borders over heavy shadows or decorative card stacking.
+- Body/management typography uses the body font. `Bebas Neue` is available as `$font-heading` and should stay selective for display/brand moments such as the shell brand, not ordinary management headings.
+
+Shared interaction conventions now include semantic `Button` variants/sizes in `src/shared/ui/button`, accessible loading state via `aria-busy`/disabled behavior, calmer hover/focus/active states, and Escape-to-close dropdown behavior in `src/shared/ui/gal-dropdown/gal-dropdown.component.tsx`. The old global animated growing link underline has been removed from application interactions; unclassed prose links now use a simple underline treatment in `src/styles/_base.scss`. Do not assume every legacy UI has been migrated.
+
 ## Product Builder
 
 The builder is centered on:
@@ -59,16 +91,28 @@ The builder is centered on:
 - `src/domains/app/pages/creator-specific/products/product-form/product-form.component.tsx`
 - `src/domains/app/features/product-form/hooks/use-product-form.facade.ts`
 - `src/domains/app/features/product-form/models/product-form.ts`
+- `src/domains/app/layouts/product-workspace-shell/product-workspace-shell.component.tsx`
 
 Flow:
 
 1. `CreateProductStepOne` creates a backend `DRAFT` product with `name`, `type`, `userId`, and `status`.
 2. The rest of the builder appears after a product ID exists.
-3. `BuilderSidebar` chooses tabs by product type.
-4. `COURSE` and `DOWNLOAD` use sections.
-5. `CONSULTATION` uses consultation details.
-6. `MEMBERSHIP` uses the shared builder shell with a Membership Content tab and recurring-pricing UI in the Pricing tab.
-7. Product details autosave separately from section, lesson, and download-file updates. Membership included products and recurring pricing do not currently autosave to backend Product payloads.
+3. `ProductWorkspaceShell` provides the focused editing shell. The normal Creator sidebar is removed while editing, and the workspace header provides Back to Products, product type/title/status, autosave status, disabled Preview/overflow placeholders, and Publish state.
+4. `BuilderSidebar` chooses internal workspace navigation by product type.
+5. `COURSE` and `DOWNLOAD` use sections.
+6. `CONSULTATION` uses consultation details.
+7. `MEMBERSHIP` uses the shared builder shell with a Membership Content tab and recurring-pricing UI in the Pricing tab.
+8. Product details autosave separately from section, lesson, and download-file updates. Membership included products and recurring pricing do not currently autosave to backend Product payloads.
+
+Product workspace terminology:
+
+- Shared tabs: Basics, Pricing, Media.
+- Course section tab: Curriculum.
+- Download section tab: Files.
+- Consultation tab: Availability.
+- Membership tab: Content.
+
+Individual product types share `ProductWorkspaceShell`, while their domain-specific editors remain separate inside `src/domains/app/features/product-form`.
 
 Intentional model decisions:
 
@@ -107,7 +151,9 @@ Implemented / reasonably wired:
 
 - Auth signup, login, verify email, forgot password, Google sign-in hooks.
 - Protected routes by role.
-- Creator product list with local filters/sorting.
+- Creator management shell with Dashboard, Products, Sales, Marketing, Storefront, and Settings destinations; Customers, Analytics, and Help are visible as disabled planned destinations.
+- Creator Dashboard redesign with business metrics, recent activity, top products, and needs-attention panels.
+- Creator Products management redesign with local search/filter/sort, list/table desktop composition, mobile management cards, and distinct empty/loading/error states.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
@@ -125,7 +171,8 @@ Partially implemented / placeholder:
 
 - Product detail page has real loading by product ID but still contains placeholder copy, fake rating/language/duration/creator text, and placeholder image.
 - Storefront page fetches creator products but currently renders mostly empty UI.
-- Creator dashboard has placeholder audience/sales sections and hardcoded “member since”.
+- Creator Customers, Analytics, and Help navigation destinations are disabled because implementations are not available yet.
+- Creator Sales and Marketing routes exist, but verify their feature completeness before expanding them.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
 - Membership included products are limited to existing Course/Download products and held in frontend state only.
 - Native Membership Post, Video, and Resource content have frontend-only create/edit/delete support. Native Video/Resource store selected local file metadata only and have no upload/persistence contract. No native Membership content has backend persistence.
@@ -154,7 +201,11 @@ Confirmed:
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics or states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
+- Creator Dashboard inspection fixtures live in `src/domains/app/pages/creator-specific/creator-dashboard/fixtures/dashboard-inspection-fixture.ts`. When mocks are off, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
+- Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
+- Creator Products inspection fixtures currently come through ignored local mock data in `src/core/api/_mocks.ts` when mocks are enabled.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
 - Membership native content state is local frontend state lifted above the Membership Content tab. Post, Video, and Resource can be created/edited/deleted locally; Video/Resource use selection-only local file metadata. Backend persistence remains undefined.
@@ -166,15 +217,71 @@ Speculative / verify before changing:
 - Backend contracts for Membership native content, included products, recurring pricing, subscriptions, entitlements, and member access.
 - Whether product type changes after creation should remain disallowed in edit mode; current UI limits edit mode to current type in `BasicInfo`.
 
+## Creator Dashboard
+
+The redesigned Creator Dashboard in `src/domains/app/pages/creator-specific/creator-dashboard/creator-dashboard.component.tsx` is the reference implementation for the current authenticated Creator visual language.
+
+Implemented Dashboard concepts:
+
+- Business metrics: Revenue, Sales, Customers, Active memberships.
+- Metric direction and metric sentiment are modeled separately in the dashboard inspection fixture types. UI copy is concise while preserving semantic styling and accessible trend labels.
+- Revenue and Sales metric cards navigate to Sales when deterministic inspection data is enabled.
+- Recent activity, Top products, and Needs attention are separate components under `src/domains/app/pages/creator-specific/creator-dashboard/components`.
+- Top products navigate to Product Workspace edit routes when a destination exists.
+- Recent activity rows are only interactive when a meaningful destination exists; customer/member-only activity states without real destinations remain non-interactive.
+- Needs attention actions navigate only when an action path exists.
+- Responsive ordering is intentional: metrics remain first, and when panels become sequential the actionable Needs attention panel takes priority before historical Recent activity.
+
+Important fixture rule:
+
+- The Dashboard is intentionally future-facing for visual inspection only. Metrics/business states not yet supported by production APIs may be represented by deterministic development-only fixture data when `REACT_APP_USE_MOCKS=true`.
+- Production must not fake those values. With mocks off, the dashboard uses unavailable states from `unavailableDashboard`.
+
+## Creator Products Management
+
+The Creator product list is now a management page named `Products`, implemented under `src/domains/app/pages/creator-specific/products/products-list`.
+
+Current implemented patterns:
+
+- Desktop uses a compact list/table hybrid with Product, Status, Price, Updated, and Actions columns.
+- Mobile transforms rows into management cards rather than shrinking the desktop table.
+- Product identity/title is the primary navigation to Product Workspace (`/app/products/edit/{product.id}`).
+- There are no permanent Edit buttons and no fake/permanent Publish buttons in the list.
+- Overflow menus render only when meaningful secondary actions exist. Published products can expose Preview (`/app/product/{product.id}`); products with no secondary action do not render an ellipsis just for symmetry.
+- Lifecycle status is shown with compact badges.
+- Pricing is formatted as one-time EUR, Free, Price not set, or mock-only recurring Membership display where applicable.
+- Desktop dates stay concise under the visible Updated heading. Tablet/mobile add explicit context such as `Updated Aug 10` when the heading disappears, while preserving accessible full-date/title behavior.
+- Local management controls include Search, Type filter, Status filter, Sort, result count, and Clear filters for active refinements.
+- Empty states distinguish true empty catalog, search-no-results, filter-no-results, loading, and error.
+- For a true zero-product catalog, management search/filter/sort controls and result count are intentionally hidden; the onboarding empty state appears directly below the Products introduction with `Create your first product` and `+ Add product`.
+
+Do not document or introduce unsupported list actions such as Delete, Duplicate, Archive, Publish, or Unpublish unless the implementation actually adds them.
+
+## Responsive Creator Architecture
+
+Responsive Creator UI should change composition intentionally rather than simply shrink desktop layouts.
+
+Implemented examples:
+
+- Creator sidebar becomes compact/collapsible on desktop and a mobile drawer at tablet/mobile widths.
+- Dashboard metrics change layout across breakpoints and panel order changes when content becomes sequential.
+- Products desktop list/table becomes mobile management cards.
+- Product workspace navigation adapts on narrow screens while preserving the focused editing shell.
+
+Avoid hardcoding viewport-specific pixel values into this document; inspect the SCSS breakpoints and component styles when implementing a responsive change.
+
 ## Recent / Unfinished Work
 
-Recent Git history includes admin role/product ownership work and Membership frontend work:
+Recent Git history includes admin role/product ownership work, Membership frontend work, and the authenticated Creator redesign:
 
 - Admin role management UI and role-based routing.
 - Dev role switcher/backend role change support.
 - Admin product management and create-for-creator flow using `ownerId` query param.
 - Membership added as a first-class frontend Product type.
 - Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, frontend-only Post/Video/Resource content creation/editing, and frontend-only recurring pricing controls.
+- Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Marketing, Analytics, Storefront, plus Settings/Help utility navigation, with unavailable destinations disabled.
+- Creator Dashboard and Products management visual redesigns.
+- Focused Product Workspace shell for product editing.
 
 Likely next steps:
 
