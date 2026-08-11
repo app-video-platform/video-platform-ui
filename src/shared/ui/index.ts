@@ -17,6 +17,8 @@ export * from './rich-text-editor';
 export * from './select';
 export * from './star-rating';
 export * from './status-chip';
+export * from './status-badge';
+export * from './drawer';
 export * from './tabs';
 export * from './textarea';
 export * from './toggle';

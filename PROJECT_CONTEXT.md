@@ -84,6 +84,10 @@ The current Creator redesign establishes a dark management application language,
 
 Shared interaction conventions now include semantic `Button` variants/sizes in `src/shared/ui/button`, accessible loading state via `aria-busy`/disabled behavior, calmer hover/focus/active states, and Escape-to-close dropdown behavior in `src/shared/ui/gal-dropdown/gal-dropdown.component.tsx`. The old global animated growing link underline has been removed from application interactions; unclassed prose links now use a simple underline treatment in `src/styles/_base.scss`. Do not assume every legacy UI has been migrated.
 
+Shared status presentation now has a reusable `StatusBadge` in `src/shared/ui/status-badge`. `StatusBadge` owns semantic badge presentation (`success`, `warning`, `danger`, `neutral`, `info`), visible labels, optional icons, and sizing. Feature/domain code remains responsible for deciding which business status maps to which semantic tone. Do not accumulate feature-specific status rules inside the shared primitive. The older `StatusChip` can compose `StatusBadge` where useful, but not every status surface has been migrated.
+
+Shared contextual drawer behavior now lives in `src/shared/ui/drawer`. The shared `Drawer` owns generic interaction/presentation behavior such as overlay rendering, ARIA dialog semantics, Escape-to-close, focus handling/restoration, body scroll locking, scrollable body content, and responsive mobile full-screen treatment. Feature components own drawer content and business behavior. As a convention, use a Page for a substantial destination/workspace with its own navigation depth, a Drawer for contextual inspection or interaction while retaining the parent workspace, and a Modal/Dialog for short focused tasks or confirmations that temporarily interrupt the workflow. Treat this as a convention, not an absolute rule.
+
 ## Product Builder
 
 The builder is centered on:
@@ -155,6 +159,7 @@ Implemented / reasonably wired:
 - Creator Dashboard redesign with business metrics, recent activity, top products, and needs-attention panels.
 - Creator Products management redesign with local search/filter/sort, list/table desktop composition, mobile management cards, and distinct empty/loading/error states.
 - Creator Customers management area with a customer list and dedicated customer detail route.
+- Creator Sales management area with overview metrics, an orders ledger, local search/filter/sort/date preset controls, local pagination, responsive layout, empty/no-result states, and contextual order detail inspection.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
@@ -173,7 +178,7 @@ Partially implemented / placeholder:
 - Product detail page has real loading by product ID but still contains placeholder copy, fake rating/language/duration/creator text, and placeholder image.
 - Storefront page fetches creator products but currently renders mostly empty UI.
 - Creator Analytics and Help navigation destinations are disabled because implementations are not available yet.
-- Creator Sales and Marketing routes exist, but verify their feature completeness before expanding them.
+- Creator Marketing route exists, but verify feature completeness before expanding it.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
 - Membership included products are limited to existing Course/Download products and held in frontend state only.
 - Native Membership Post, Video, and Resource content have frontend-only create/edit/delete support. Native Video/Resource store selected local file metadata only and have no upload/persistence contract. No native Membership content has backend persistence.
@@ -199,16 +204,18 @@ Confirmed:
 - Membership has no backend recurring pricing contract yet.
 - Membership has no subscription/entitlement/member-access model yet.
 - Creator Customers has no production customer list/detail API, purchase/order API, entitlement/access contract, subscription/customer membership-state contract, waitlist API, tags/notes persistence, production pagination contract, or manual access-management API yet.
+- Creator Sales has no production order/payment/refund/subscription/entitlement services, provider-safe financial mutation contract, or server pagination contract yet.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
-- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Customers, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics, customer records, or customer-domain states.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Customers, Sales, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Creator Dashboard inspection fixtures live in `src/domains/app/pages/creator-specific/creator-dashboard/fixtures/dashboard-inspection-fixture.ts`. When mocks are off, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
 - Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
 - Creator Products inspection fixtures currently come through ignored local mock data in `src/core/api/_mocks.ts` when mocks are enabled.
 - Creator Customers inspection fixtures live under `src/domains/app/pages/creator-specific/customers` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Customers renders honest unavailable states rather than fabricating customer business data. Fixture data must remain development/inspection infrastructure, not a production fallback.
+- Creator Sales inspection fixtures live under `src/domains/app/pages/creator-specific/sales-page` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Sales renders an honest unavailable state rather than fabricating order/payment/refund/access data. The `salesEmpty=true` query option and localStorage flag are inspection aids only, not production behavior.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
 - Membership native content state is local frontend state lifted above the Membership Content tab. Post, Video, and Resource can be created/edited/deleted locally; Video/Resource use selection-only local file metadata. Backend persistence remains undefined.
@@ -239,6 +246,46 @@ Important fixture rule:
 
 - The Dashboard is intentionally future-facing for visual inspection only. Metrics/business states not yet supported by production APIs may be represented by deterministic development-only fixture data when `REACT_APP_USE_MOCKS=true`.
 - Production must not fake those values. With mocks off, the dashboard uses unavailable states from `unavailableDashboard`.
+
+## Creator Sales Management
+
+The Creator Sales area is implemented under `src/domains/app/pages/creator-specific/sales-page` and is the Creator-facing financial operations ledger for inspecting orders, payment outcomes, refund context, and resulting access state.
+
+Routes and contextual state:
+
+- Sales workspace: `/app/sales`.
+- Selected order detail uses query state, for example `/app/sales?order=ORD-2026-00124`.
+- Query-state selection keeps the user in the Sales workspace while opening contextual order inspection, supports refresh/deep links/browser navigation, and preserves the parent ledger context.
+- This query-state drawer pattern is a reusable option for contextual inspection. Do not treat it as a requirement for every detail surface.
+
+Current Sales page patterns:
+
+- The page heading is `Sales`, not `Sales & Analytics`.
+- Overview metrics are Revenue, Orders, Refunds, and Failed payments.
+- Metrics are scoped to the selected date preset. Ledger results also apply search, status, product, and sort refinements.
+- Desktop uses a compact orders ledger with Date, Customer, Product, Status, Type, and Amount.
+- Tablet/mobile reduce columns and transform ledger rows into compact transaction cards rather than shrinking the desktop table.
+- Order identity opens the contextual Order Detail drawer. Customer identity links to Customer Detail when a customer ID exists. Product identity links to Product Workspace when a product ID exists.
+- Local controls include search by customer/email/order ID, date preset filter, order status filter, product filter, sorting, result count, Clear filters, and local pagination.
+- Empty states distinguish no sales, search-no-results, filter-no-results, and production unavailable states.
+- Mobile uses the shared `Drawer` for filter controls.
+
+Current Sales domain model:
+
+- Order statuses represented by the frontend are `Paid`, `Failed`, `Refunded`, and `Pending`.
+- Order types represented by the frontend are `One-time`, `Subscription`, and `Renewal`.
+- Refunds are represented as status/context on the original order, not as a separate Creator-facing refund entity or refund ledger.
+- The Order Detail drawer is read-only. It can show order amount/type/date, customer, product, payment facts, order summary, access outcome, subscription context, refund context, and failed-payment context when fixture data contains those fields.
+- Sales explains access consequences but does not expose entitlement grant/revoke controls.
+- Sales shows subscription context for recurring Membership charges but does not expose subscription-management actions.
+- Sales does not currently include charts, analytics, payouts, invoices, tax reporting, disputes, export tooling, refunds-as-actions, manual retries, or provider administration.
+
+Important Sales boundary:
+
+- Current Sales data comes from deterministic inspection fixtures returned only when `REACT_APP_USE_MOCKS=true`.
+- The current frontend does not define production-backed contracts/services for complete Creator orders, payments, refunds, subscriptions, entitlements/access, provider-safe financial mutations, or server pagination.
+- With mocks off, Sales renders an unavailable state rather than fabricated financial data.
+- Do not introduce production APIs or financial mutation behavior merely to support the current inspection UI.
 
 ## Creator Products Management
 
@@ -308,6 +355,7 @@ Implemented examples:
 - Dashboard metrics change layout across breakpoints and panel order changes when content becomes sequential.
 - Products desktop list/table becomes mobile management cards.
 - Customers desktop/tablet list/table becomes mobile customer cards while preserving the stacked mobile filter controls.
+- Sales desktop orders ledger becomes tablet/mobile transaction cards, and mobile secondary filters move into the shared Drawer.
 - Product workspace navigation adapts on narrow screens while preserving the focused editing shell.
 
 Avoid hardcoding viewport-specific pixel values into this document; inspect the SCSS breakpoints and component styles when implementing a responsive change.
@@ -322,7 +370,7 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Membership added as a first-class frontend Product type.
 - Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, frontend-only Post/Video/Resource content creation/editing, and frontend-only recurring pricing controls.
 - Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Marketing, Storefront, plus Settings utility navigation; unavailable destinations such as Analytics and Help remain disabled.
-- Creator Dashboard and Products management visual redesigns.
+- Creator Dashboard, Products, Customers, and Sales management visual redesigns.
 - Focused Product Workspace shell for product editing.
 
 Likely next steps:
