@@ -1,13 +1,13 @@
 import { RxDashboard } from 'react-icons/rx';
 import {
-  IoHomeOutline,
-  IoPlanetOutline,
+  IoHelpCircleOutline,
   IoAnalyticsSharp,
   IoSettingsOutline,
+  IoStorefrontOutline,
 } from 'react-icons/io5';
 import { FaMoneyBillTrendUp } from 'react-icons/fa6';
-import { TiMessages } from 'react-icons/ti';
-import { MdAdminPanelSettings } from 'react-icons/md';
+import { MdAdminPanelSettings, MdCampaign, MdGroups } from 'react-icons/md';
+import { LuLayoutDashboard } from 'react-icons/lu';
 
 import { Route } from '../api/models/misc';
 import { UserRole } from '../api/models/user';
@@ -15,46 +15,68 @@ import { UserRole } from '../api/models/user';
 export const appRoutes: Route[] = [
   {
     path: '/app',
-    label: 'Overview',
-    icon: IoHomeOutline,
+    label: 'Dashboard',
+    icon: LuLayoutDashboard,
     end: true,
+    group: 'primary',
   },
   {
     path: '/app/products',
     label: 'Products',
     icon: RxDashboard,
-    collapseSidebarOnLoad: true,
+    group: 'primary',
+  },
+  {
+    path: '/app/customers',
+    label: 'Customers',
+    icon: MdGroups,
+    disabled: true,
+    group: 'primary',
+  },
+  {
+    path: '/app/sales',
+    label: 'Sales',
+    icon: FaMoneyBillTrendUp,
+    group: 'primary',
+  },
+  {
+    path: '/app/marketing',
+    label: 'Marketing',
+    icon: MdCampaign,
+    group: 'primary',
+  },
+  {
+    path: '/app/analytics',
+    label: 'Analytics',
+    icon: IoAnalyticsSharp,
+    disabled: true,
+    group: 'primary',
+  },
+  {
+    path: '/app/my-page-preview',
+    label: 'Storefront',
+    icon: IoStorefrontOutline,
+    group: 'primary',
   },
   {
     path: '/app/admin',
     label: 'Admin',
     icon: MdAdminPanelSettings,
     allowedRoles: [UserRole.ADMIN],
-  },
-  {
-    path: '/app/sales',
-    label: 'Sales',
-    icon: FaMoneyBillTrendUp,
-  },
-  {
-    path: '/app/marketing',
-    label: 'Marketing',
-    icon: IoPlanetOutline,
-  },
-  {
-    path: '/app/analytics',
-    label: 'Analytics',
-    icon: IoAnalyticsSharp,
-  },
-  {
-    path: '/app/messages',
-    label: 'Messages',
-    icon: TiMessages,
+    group: 'utility',
   },
   {
     path: '/app/settings',
     label: 'Settings',
     icon: IoSettingsOutline,
+    group: 'utility',
+  },
+  {
+    path: '/app/help',
+    label: 'Help',
+    icon: IoHelpCircleOutline,
+    disabled: true,
+    group: 'utility',
   },
   {
     path: '/app/products/edit',

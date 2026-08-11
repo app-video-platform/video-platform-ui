@@ -130,7 +130,6 @@ dist
 .pnp.*
 
 
-# mocks
-src/core/api/_mocks.ts
+# generated mock outputs
 *storybook.log
 storybook-static

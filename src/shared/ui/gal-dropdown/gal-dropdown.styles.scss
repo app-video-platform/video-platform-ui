@@ -8,9 +8,10 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 0;
+    z-index: var(--z-dropdown);
     width: 150px;
     background-color: var(--surface-2);
+    border: 1px solid var(--border-subtle);
     border-radius: $radius-md;
     display: flex;
     flex-direction: column;

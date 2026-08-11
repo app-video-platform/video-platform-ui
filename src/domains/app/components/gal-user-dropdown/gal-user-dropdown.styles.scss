@@ -15,12 +15,13 @@
 
   .galactica-nav {
     width: 350px;
-    background: var(--surface-0);
-    padding: 20px;
-    border-radius: 15px;
-    margin-top: 20px;
+    background: var(--surface-panel-elevated);
+    padding: $spacing-4;
+    border-radius: $radius-md;
+    margin-top: $spacing-3;
     right: 0;
     left: unset;
+    box-shadow: var(--shadow-e2);
 
     .logout-btn {
       cursor: pointer;
@@ -40,13 +41,14 @@
 
       .role-button {
         padding: 0.4rem 0.8rem;
-        background: #fff;
-        border: 1px solid var(--border-color, #d0d0d0);
-        border-radius: 4px;
+        color: var(--text-primary);
+        background: var(--surface-interactive);
+        border: 1px solid var(--border-subtle);
+        border-radius: $radius-sm;
         cursor: pointer;
 
         &:hover {
-          background: #f0f0f0;
+          background: var(--surface-interactive-hover);
         }
       }
     }

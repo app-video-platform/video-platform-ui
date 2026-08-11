@@ -1,22 +1,24 @@
 @use '../../../../styles/index' as *;
 
 .sidebar-nav {
-  background-color: var(--surface-1);
+  background:
+    linear-gradient(180deg, rgba(var(--surface-panel-rgb), 0.96), var(--surface-canvas));
   height: 100%;
-  width: 260px;
+  width: 232px;
   color: var(--text-primary);
-  box-shadow: var(--shadow-e1);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  transition: width 0.25s ease;
+  transition: width $transition-normal;
   position: relative;
+  padding: $spacing-4 $spacing-3;
 
   &__collapsed {
-    width: 72px; // icons-only width
+    width: 76px;
 
     .logo-container {
       justify-content: center;
-      padding: 0;
+      padding: 0 $spacing-2;
     }
 
     .routes-list {
@@ -34,34 +36,57 @@
   .logo-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 64px;
-    background-color: var(--surface-0);
-    // margin: auto;
+    justify-content: flex-start;
+    height: 56px;
+    padding: 0 $spacing-3;
     width: 100%;
     color: var(--text-primary);
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 400;
+    }
   }
 
   .routes-list {
-    margin: 30px 0;
+    display: grid;
+    gap: $spacing-1;
+    margin: $spacing-5 0 0;
     list-style: none;
 
+    &__utility {
+      margin-top: auto;
+      padding-top: $spacing-4;
+      border-top: 1px solid var(--border-subtle);
+    }
+
     .sidebar-link {
-      display: inline-flex;
-      gap: $spacing-2;
+      display: flex;
+      gap: $spacing-3;
       color: var(--text-secondary);
-      // line-height: 4rem;
-      height: 65px;
       width: 100%;
-      justify-content: flex-end;
+      min-height: 42px;
+      justify-content: flex-start;
       align-items: center;
-      padding-right: $spacing-6;
+      padding: 0 $spacing-3;
+      border-radius: $radius-md;
+      transition:
+        background $transition-fast,
+        color $transition-fast;
 
       &__active {
-        background-color: var(--surface-1);
-        border-top: 1px solid;
-        border-bottom: 1px solid;
-        border-color: var(--brand-primary);
+        background: rgba(var(--brand-secondary-rgb), 0.16);
+        color: var(--text-primary);
+        box-shadow: inset 3px 0 0 var(--brand-primary);
+      }
+
+      &__disabled {
+        color: var(--text-muted);
+        cursor: not-allowed;
+      }
+
+      &:not(.sidebar-link__disabled):hover {
+        background: var(--surface-interactive);
         color: var(--text-primary);
       }
     }
@@ -69,14 +94,67 @@
 
   .sidebar-nav-toggle {
     position: absolute;
-    right: -15px;
-    bottom: 100px;
-    background-color: var(--surface-1);
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+    right: -16px;
+    top: 76px;
+    background-color: var(--surface-panel-elevated);
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-subtle);
+    border-radius: $radius-pill;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+}
+
+@media (max-width: $bp-laptop) {
+  .sidebar-nav {
+    width: 76px;
+
+    .logo-container {
+      justify-content: center;
+      padding: 0 $spacing-2;
+
+      h2 {
+        display: none;
+      }
+    }
+
+    .routes-list .sidebar-link {
+      justify-content: center;
+      padding: 0;
+
+      span {
+        display: none;
+      }
+    }
+
+    .sidebar-nav-toggle {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .sidebar-nav {
+    width: 100%;
+    padding-top: $spacing-6;
+
+    .logo-container {
+      justify-content: flex-start;
+
+      h2 {
+        display: block;
+      }
+    }
+
+    .routes-list .sidebar-link {
+      justify-content: flex-start;
+      padding: 0 $spacing-3;
+
+      span {
+        display: inline;
+      }
+    }
   }
 }

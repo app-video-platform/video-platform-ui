@@ -9,4 +9,6 @@ export interface Route {
   allowedRoles?: UserRole[];
   hideFromSidebar?: boolean;
   collapseSidebarOnLoad?: boolean;
+  disabled?: boolean;
+  group?: 'primary' | 'utility';
 }

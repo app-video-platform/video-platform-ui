@@ -11,6 +11,7 @@ import {
   createMembershipProductFeedEntry,
   orderMembershipFeedEntries,
 } from './models';
+import { getMembershipInspectionFixture } from './membership-dev-fixtures';
 
 const getContentIdPrefix = (type: MembershipContentType) =>
   `membership-${type.toLowerCase()}`;
@@ -47,18 +48,24 @@ export interface MembershipBuilderState {
 }
 
 export const useMembershipBuilderState = (): MembershipBuilderState => {
+  const inspectionFixture =
+    process.env.REACT_APP_USE_MOCKS === 'true'
+      ? getMembershipInspectionFixture()
+      : null;
   const nextLocalContentIds = useRef<Record<MembershipContentType, number>>({
     POST: 1,
     VIDEO: 1,
     RESOURCE: 1,
   });
-  const hasInitializedManualOrder = useRef(false);
+  const hasInitializedManualOrder = useRef(Boolean(inspectionFixture));
   const [nativeContentItems, setNativeContentItems] = useState<
     MembershipContentItem[]
-  >([]);
-  const [feedEntries, setFeedEntries] = useState<MembershipFeedEntry[]>([]);
+  >(inspectionFixture?.nativeContentItems ?? []);
+  const [feedEntries, setFeedEntries] = useState<MembershipFeedEntry[]>(
+    inspectionFixture?.feedEntries ?? [],
+  );
   const [orderingMode, setOrderingModeState] = useState<MembershipOrderingMode>(
-    MEMBERSHIP_DEFAULT_ORDERING_MODE,
+    inspectionFixture?.orderingMode ?? MEMBERSHIP_DEFAULT_ORDERING_MODE,
   );
 
   const getNextNativeContentId = (type: MembershipContentType) => {
