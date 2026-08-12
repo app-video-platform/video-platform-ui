@@ -14,6 +14,7 @@ export const appRoutes = {
 
   sales: '/app/sales',
   marketing: '/app/marketing',
+  analytics: '/app/analytics',
   library: '/app/library',
   settings: '/app/settings',
   cart: '/app/cart',

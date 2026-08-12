@@ -46,7 +46,7 @@ describe('Creator Sales', () => {
     renderSales();
 
     expect(screen.getByRole('heading', { name: 'Sales' })).toBeInTheDocument();
-    expect(screen.getByText('8 orders')).toBeInTheDocument();
+    expect(screen.getByText('56 orders')).toBeInTheDocument();
     expect(screen.getByText('Revenue')).toBeInTheDocument();
     expect(screen.getByText('Failed payments')).toBeInTheDocument();
   });
@@ -85,7 +85,7 @@ describe('Creator Sales', () => {
     fireEvent.change(screen.getByLabelText('Select sales date range'), {
       target: { value: '7d' },
     });
-    expect(screen.getByText('6 orders')).toBeInTheDocument();
+    expect(screen.getByText('17 orders')).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText('Sort orders'), {
       target: { value: 'amount-desc' },

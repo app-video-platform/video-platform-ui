@@ -70,12 +70,12 @@ describe('SidebarNav', () => {
     expect(screen.queryByRole('link', { name: /reviews/i })).toBeNull();
   });
 
-  it('shows remaining planned IA items without linking to nonexistent routes', () => {
+  it('enables Analytics and shows remaining planned IA items without linking to nonexistent routes', () => {
     renderSidebar([UserRole.CREATOR]);
 
-    expect(screen.getByRole('button', { name: /analytics/i })).toHaveAttribute(
-      'aria-disabled',
-      'true',
+    expect(screen.getByRole('link', { name: /analytics/i })).toHaveAttribute(
+      'href',
+      '/app/analytics',
     );
     expect(screen.getByRole('button', { name: /help/i })).toHaveAttribute(
       'aria-disabled',

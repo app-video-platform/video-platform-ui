@@ -48,7 +48,6 @@ export const appRoutes: Route[] = [
     path: '/app/analytics',
     label: 'Analytics',
     icon: IoAnalyticsSharp,
-    disabled: true,
     group: 'primary',
   },
   {

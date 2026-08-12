@@ -7,6 +7,7 @@ export * from './gal-spinner';
 export * from './gal-uppy-file-uploader';
 export * from './button';
 export * from './checkbox-input';
+export * from './chart';
 export * from './divider';
 export * from './expansion-panel';
 export * from './info-popover';

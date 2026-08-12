@@ -195,7 +195,7 @@ describe('<CreatorDashboard />', () => {
     ).toHaveAttribute('href', '/app/products/edit/prod-course-growth');
     expect(screen.getByRole('link', { name: /edit launch toolkit/i })).toHaveAttribute(
       'href',
-      '/app/products/edit/prod-download-toolkit',
+      '/app/products/edit/prod-launch-toolkit',
     );
   });
 
@@ -204,7 +204,7 @@ describe('<CreatorDashboard />', () => {
 
     expect(
       screen.getByRole('link', { name: /open product updated: launch toolkit/i }),
-    ).toHaveAttribute('href', '/app/products/edit/prod-download-toolkit');
+    ).toHaveAttribute('href', '/app/products/edit/prod-launch-toolkit');
     expect(screen.queryByRole('link', { name: /open new sale/i })).toBeNull();
     expect(
       screen.queryByRole('link', { name: /open membership started/i }),

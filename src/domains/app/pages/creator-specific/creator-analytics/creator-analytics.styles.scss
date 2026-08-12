@@ -1,0 +1,482 @@
+@use '../../../../../styles/index.scss' as *;
+
+.creator-analytics {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+}
+
+.creator-analytics__intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-4;
+
+  h1 {
+    margin: 0;
+    font-size: $app-page-title-size;
+    font-weight: 800;
+  }
+
+  p {
+    margin: $spacing-2 0 0;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+}
+
+.creator-analytics__period {
+  min-width: 11rem;
+}
+
+.analytics-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $spacing-3;
+}
+
+.analytics-metric-card,
+.analytics-panel {
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: var(--surface-1);
+  box-shadow: var(--shadow-inner-highlight);
+}
+
+.analytics-metric-card {
+  display: grid;
+  min-width: 0;
+  gap: $spacing-1;
+  padding: $spacing-4;
+
+  &__label,
+  &__comparison {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 800;
+  }
+
+  strong {
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 1.35rem;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &--favorable .analytics-metric-card__comparison {
+    color: var(--success);
+  }
+
+  &--unfavorable .analytics-metric-card__comparison {
+    color: var(--error);
+  }
+}
+
+.analytics-primary-grid,
+.analytics-secondary-grid {
+  display: grid;
+  gap: $spacing-5;
+  align-items: start;
+}
+
+.analytics-primary-grid {
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
+}
+
+.analytics-secondary-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.analytics-panel {
+  display: grid;
+  min-width: 0;
+  gap: $spacing-4;
+  padding: $spacing-5;
+
+  &--payments {
+    grid-column: 1 / -1;
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-4;
+
+    h2 {
+      margin: 0;
+      font-size: $app-section-title-size;
+      font-weight: 800;
+    }
+
+    p {
+      margin: $spacing-1 0 0;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+  }
+}
+
+.analytics-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  justify-content: flex-end;
+}
+
+.analytics-insight {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.analytics-chart-with-legend {
+  display: grid;
+  gap: $spacing-3;
+}
+
+.analytics-product-ranking {
+  display: grid;
+  gap: $spacing-2;
+
+  &__row {
+    display: grid;
+    grid-template-columns:
+      1.5rem minmax(0, 1fr) minmax(5rem, auto)
+      minmax(3.5rem, auto);
+    grid-template-areas:
+      'rank identity revenue orders'
+      'rank share share share';
+    gap: $spacing-3;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    padding: $spacing-3;
+    border: 1px solid var(--border-subtle);
+    border-radius: $radius-md;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    transition:
+      background-color $transition-fast,
+      border-color $transition-fast;
+
+    &:hover {
+      border-color: var(--divider-strong);
+      background: var(--surface-interactive);
+    }
+  }
+
+  &__rank {
+    grid-area: rank;
+    align-self: start;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    font-weight: 900;
+  }
+
+  &__identity {
+    grid-area: identity;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: $spacing-3;
+    align-items: center;
+    min-width: 0;
+
+    small {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    strong {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-size: 0.9375rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    small {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+    }
+  }
+
+  &__thumbnail {
+    display: inline-flex;
+    overflow: hidden;
+    width: 42px;
+    height: 42px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-subtle);
+    border-radius: $radius-sm;
+    color: var(--text-primary);
+    background: rgba(var(--brand-secondary-rgb), 0.22);
+    font-size: 0.8125rem;
+    font-weight: 900;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__value,
+  &__share > span:first-child {
+    display: grid;
+    min-width: 0;
+    gap: $spacing-1;
+
+    strong {
+      font-size: 0.875rem;
+      font-weight: 900;
+    }
+
+    small {
+      color: var(--text-muted);
+      font-size: 0.6875rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+  }
+
+  &__value:first-of-type {
+    grid-area: revenue;
+  }
+
+  &__value:nth-of-type(2) {
+    grid-area: orders;
+  }
+
+  &__share {
+    grid-area: share;
+    display: grid;
+    grid-template-columns: minmax(4rem, auto) minmax(0, 1fr);
+    align-items: center;
+    min-width: 0;
+    gap: $spacing-2;
+  }
+
+  &__meter {
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    height: 6px;
+    border-radius: $radius-pill;
+    background: var(--surface-interactive);
+
+    span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--chart-series-1);
+    }
+  }
+}
+
+.membership-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $spacing-2;
+
+  span {
+    display: grid;
+    gap: $spacing-1;
+    padding: $spacing-3;
+    border: 1px solid var(--border-subtle);
+    border-radius: $radius-md;
+    background: var(--surface-2);
+  }
+
+  small {
+    color: var(--text-secondary);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+}
+
+.payment-health {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px)) minmax(0, 1fr);
+  gap: $spacing-3;
+  align-items: stretch;
+}
+
+.payment-health-card {
+  display: grid;
+  gap: $spacing-1;
+  padding: $spacing-4;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: var(--surface-2);
+
+  span,
+  small {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 800;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-size: 1.4rem;
+  }
+
+  &--favorable small {
+    color: var(--success);
+  }
+
+  &--unfavorable small {
+    color: var(--error);
+  }
+}
+
+.payment-health__mini-chart {
+  min-width: 0;
+  padding: $spacing-3;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: var(--surface-2);
+}
+
+.analytics-state {
+  display: flex;
+  min-height: 18rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-3;
+  padding: $spacing-6;
+  text-align: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: var(--surface-1);
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  p {
+    max-width: 34rem;
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .analytics-product-ranking__row {
+    transition: none;
+  }
+}
+
+@media (max-width: $bp-desktop) {
+  .analytics-metrics,
+  .membership-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .analytics-primary-grid,
+  .analytics-secondary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .analytics-panel--payments {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .creator-analytics__intro,
+  .analytics-panel__header {
+    flex-direction: column;
+  }
+
+  .creator-analytics__period {
+    width: 100%;
+  }
+
+  .payment-health {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .payment-health__mini-chart {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: $bp-mobile) {
+  .creator-analytics {
+    gap: $spacing-4;
+  }
+
+  .analytics-panel {
+    padding: $spacing-4;
+  }
+
+  .analytics-metric-card {
+    padding: $spacing-3;
+
+    strong {
+      font-size: 1rem;
+      white-space: normal;
+    }
+  }
+
+  .analytics-product-ranking__row {
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    grid-template-areas:
+      'rank identity'
+      'rank revenue'
+      'rank orders'
+      'rank share';
+  }
+
+  .analytics-product-ranking__rank {
+    grid-area: rank;
+    align-self: start;
+  }
+
+  .analytics-product-ranking__identity {
+    grid-area: identity;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .analytics-product-ranking__thumbnail {
+    display: none;
+  }
+
+  .analytics-product-ranking__value:first-of-type {
+    grid-area: revenue;
+  }
+
+  .analytics-product-ranking__value:nth-of-type(2) {
+    grid-area: orders;
+  }
+
+  .analytics-product-ranking__share {
+    grid-area: share;
+  }
+
+  .membership-summary,
+  .payment-health {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .payment-health__mini-chart {
+    grid-column: auto;
+  }
+}

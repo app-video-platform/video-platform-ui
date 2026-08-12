@@ -18,6 +18,7 @@ const CREATOR_ROUTES = [
   '/app/customers/*',
   '/app/sales',
   '/app/marketing',
+  '/app/analytics',
   '/app/settings',
   '/app/my-page-preview',
 ];
