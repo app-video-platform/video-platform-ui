@@ -1,4 +1,5 @@
 export * from './creator-dashboard';
+export * from './creator-analytics';
 export * from './customers';
 export * from './marketing-page';
 export * from './products';

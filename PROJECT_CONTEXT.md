@@ -5,7 +5,7 @@ Generated from repository state:
 Branch: main
 Commit: b9f5510
 
-Last reviewed: 2026-08-11
+Last reviewed: 2026-08-12
 
 # How to use this document
 
@@ -38,7 +38,7 @@ Important product types:
 
 ## Architecture Summary
 
-The app uses React 18, TypeScript, React Router v6, Redux Toolkit, Axios, SCSS, Jest/Testing Library, Storybook, Tiptap, Uppy, and custom Webpack/Babel config.
+The app uses React 18, TypeScript, React Router v6, Redux Toolkit, Axios, SCSS, Jest/Testing Library, Storybook, Tiptap, Uppy, Recharts for chart rendering, and custom Webpack/Babel config.
 
 Routing starts in `src/App.tsx`:
 
@@ -65,8 +65,8 @@ Creator/Admin management routes are visually and structurally separated from buy
 
 Current Creator IA:
 
-- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Customers (`/app/customers`), Sales (`/app/sales`), Marketing (`/app/marketing`), Storefront (`/app/my-page-preview`), Settings (`/app/settings`).
-- Intentionally disabled sidebar destinations: Analytics (`/app/analytics`), Help (`/app/help`).
+- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Customers (`/app/customers`), Sales (`/app/sales`), Marketing (`/app/marketing`), Analytics (`/app/analytics`), Storefront (`/app/my-page-preview`), Settings (`/app/settings`).
+- Intentionally disabled sidebar destinations: Help (`/app/help`).
 - Admin appears as a utility route for admin users only.
 - Messages and Reviews are not part of the current Creator MVP navigation. Reviews code still exists under marketing/reviews services/features, but it is not exposed as a Creator IA destination.
 
@@ -87,6 +87,8 @@ Shared interaction conventions now include semantic `Button` variants/sizes in `
 Shared status presentation now has a reusable `StatusBadge` in `src/shared/ui/status-badge`. `StatusBadge` owns semantic badge presentation (`success`, `warning`, `danger`, `neutral`, `info`), visible labels, optional icons, and sizing. Feature/domain code remains responsible for deciding which business status maps to which semantic tone. Do not accumulate feature-specific status rules inside the shared primitive. The older `StatusChip` can compose `StatusBadge` where useful, but not every status surface has been migrated.
 
 Shared contextual drawer behavior now lives in `src/shared/ui/drawer`. The shared `Drawer` owns generic interaction/presentation behavior such as overlay rendering, ARIA dialog semantics, Escape-to-close, focus handling/restoration, body scroll locking, scrollable body content, and responsive mobile full-screen treatment. Feature components own drawer content and business behavior. As a convention, use a Page for a substantial destination/workspace with its own navigation depth, a Drawer for contextual inspection or interaction while retaining the parent workspace, and a Modal/Dialog for short focused tasks or confirmations that temporarily interrupt the workflow. Treat this as a convention, not an absolute rule.
+
+Shared chart presentation now lives in `src/shared/ui/chart`. Recharts is the chosen rendering library for current analytics visualizations. Shared chart primitives own generic presentation and accessibility scaffolding such as chart containers, legends, tooltips, empty states, CSS-driven height, and visual token usage. Domain pages own business semantics, period choices, metric definitions, summary copy, and data shaping. Chart colors should use the global visualization tokens in `src/styles/_variables.scss` (`--chart-grid`, `--chart-tick`, `--chart-series-*`, tooltip tokens, and related RGB tokens) rather than hardcoded feature-local palettes. Analytics visualizations should preserve responsive containers, readable axis density at narrow widths, semantic labels/descriptions, Recharts accessibility layers where supported, and text summaries outside SVG/canvas visuals for screen-reader and low-vision access.
 
 ## Product Builder
 
@@ -155,11 +157,12 @@ Implemented / reasonably wired:
 
 - Auth signup, login, verify email, forgot password, Google sign-in hooks.
 - Protected routes by role.
-- Creator management shell with Dashboard, Products, Customers, Sales, Marketing, Storefront, and Settings destinations; Analytics and Help are visible as disabled planned destinations.
+- Creator management shell with Dashboard, Products, Customers, Sales, Marketing, Analytics, Storefront, and Settings destinations; Help is visible as a disabled planned destination.
 - Creator Dashboard redesign with business metrics, recent activity, top products, and needs-attention panels.
 - Creator Products management redesign with local search/filter/sort, list/table desktop composition, mobile management cards, and distinct empty/loading/error states.
 - Creator Customers management area with a customer list and dedicated customer detail route.
 - Creator Sales management area with overview metrics, an orders ledger, local search/filter/sort/date preset controls, local pagination, responsive layout, empty/no-result states, and contextual order detail inspection.
+- Creator Analytics management area with period-scoped business metrics, performance visualization, product ranking, customer growth, membership health, and payment health.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
@@ -177,7 +180,7 @@ Partially implemented / placeholder:
 
 - Product detail page has real loading by product ID but still contains placeholder copy, fake rating/language/duration/creator text, and placeholder image.
 - Storefront page fetches creator products but currently renders mostly empty UI.
-- Creator Analytics and Help navigation destinations are disabled because implementations are not available yet.
+- Creator Help navigation destination is disabled because an implementation is not available yet.
 - Creator Marketing route exists, but verify feature completeness before expanding it.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
 - Membership included products are limited to existing Course/Download products and held in frontend state only.
@@ -205,17 +208,19 @@ Confirmed:
 - Membership has no subscription/entitlement/member-access model yet.
 - Creator Customers has no production customer list/detail API, purchase/order API, entitlement/access contract, subscription/customer membership-state contract, waitlist API, tags/notes persistence, production pagination contract, or manual access-management API yet.
 - Creator Sales has no production order/payment/refund/subscription/entitlement services, provider-safe financial mutation contract, or server pagination contract yet.
+- Creator Analytics has no production analytics API endpoints, mock API responses, Redux/store integration, server-backed period queries, or shared analytics data service yet.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
-- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Customers, Sales, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, or customer-domain states.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Customers, Sales, Analytics, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Creator Dashboard inspection fixtures live in `src/domains/app/pages/creator-specific/creator-dashboard/fixtures/dashboard-inspection-fixture.ts`. When mocks are off, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
 - Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
 - Creator Products inspection fixtures currently come through ignored local mock data in `src/core/api/_mocks.ts` when mocks are enabled.
 - Creator Customers inspection fixtures live under `src/domains/app/pages/creator-specific/customers` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Customers renders honest unavailable states rather than fabricating customer business data. Fixture data must remain development/inspection infrastructure, not a production fallback.
 - Creator Sales inspection fixtures live under `src/domains/app/pages/creator-specific/sales-page` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Sales renders an honest unavailable state rather than fabricating order/payment/refund/access data. The `salesEmpty=true` query option and localStorage flag are inspection aids only, not production behavior.
+- Creator Analytics inspection fixtures live under `src/domains/app/pages/creator-specific/creator-analytics` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Analytics renders an honest unavailable state rather than fabricated revenue, order, customer, membership, product-performance, refund, or failed-payment analytics.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
 - Membership native content state is local frontend state lifted above the Membership Content tab. Post, Video, and Resource can be created/edited/deleted locally; Video/Resource use selection-only local file metadata. Backend persistence remains undefined.
@@ -287,6 +292,44 @@ Important Sales boundary:
 - With mocks off, Sales renders an unavailable state rather than fabricated financial data.
 - Do not introduce production APIs or financial mutation behavior merely to support the current inspection UI.
 
+## Creator Analytics
+
+The Creator Analytics area is implemented under `src/domains/app/pages/creator-specific/creator-analytics` and is the Creator-facing surface for inspecting aggregate business performance across revenue, orders, customer growth, memberships, product performance, and payment health.
+
+Routes and shell integration:
+
+- Analytics workspace: `/app/analytics`.
+- The route is protected for Creator/Admin users.
+- Analytics is part of the Creator management navigation and renders inside `CreatorAppShell`.
+
+Current Analytics page patterns:
+
+- Page-level period selection is limited to `Last 7 days`, `Last 30 days`, and `Last 90 days`. There is no custom date-range UI or contract.
+- Summary metrics are Revenue, Orders, Customers, and Active memberships.
+- The Performance visualization supports Revenue and Orders modes over the selected period.
+- Product Performance ranks products by revenue share while showing revenue, orders, share percentage, share meters, rank, and Product Workspace links.
+- Customer Growth, Memberships, and Payment Health are separate lower-page sections.
+- Membership analytics currently present active, new, cancelled, churn-rate, and movement visualization when inspection data exists.
+- Payment Health currently presents refund-rate and failed-payment aggregates plus a compact trend visualization.
+- Empty/unavailable states are explicit: non-mock mode renders Analytics unavailable, and empty product/performance inputs render shared chart empty states.
+- Desktop, tablet, and mobile layouts change composition through the Analytics SCSS rather than relying on a shrunken desktop grid.
+
+Current Analytics architecture:
+
+- Recharts renders the chart visuals.
+- Shared primitives from `src/shared/ui/chart` provide generic chart containers, legends, tooltips, and empty states.
+- Analytics-specific components under `creator-analytics/components` own domain labels, metric modes, section composition, and business-specific summaries.
+- Chart styling uses the global visualization CSS tokens in `src/styles/_variables.scss`.
+- Accessibility expectations include semantic labels/descriptions on chart containers, Recharts `accessibilityLayer` where available, keyboard-accessible metric toggles, product ranking links with full title access, and textual insight summaries outside the chart visual.
+
+Important Analytics boundary:
+
+- Current Analytics data comes from deterministic inspection fixtures returned only when `REACT_APP_USE_MOCKS=true`.
+- The current frontend does not define production Analytics API endpoints, Redux/store integration, mock API response architecture, backend-backed period queries, or a shared analytics data service.
+- Fixture totals and comparisons are local visual-inspection values and are not product contracts. Do not preserve specific fixture revenue/order/customer/membership numbers as meaningful behavior in documentation or tests unless a test is explicitly covering deterministic inspection rendering.
+- With mocks off, Analytics renders an unavailable state rather than fabricated analytics data.
+- Do not infer traffic, conversion, attribution, payout, tax, course-engagement, cohort, custom date-range, or other analytics capabilities from the current page.
+
 ## Creator Products Management
 
 The Creator product list is now a management page named `Products`, implemented under `src/domains/app/pages/creator-specific/products/products-list`.
@@ -356,6 +399,7 @@ Implemented examples:
 - Products desktop list/table becomes mobile management cards.
 - Customers desktop/tablet list/table becomes mobile customer cards while preserving the stacked mobile filter controls.
 - Sales desktop orders ledger becomes tablet/mobile transaction cards, and mobile secondary filters move into the shared Drawer.
+- Analytics desktop chart/product/secondary grids collapse into single-column tablet/mobile layouts, with product ranking rows reflowing instead of overflowing.
 - Product workspace navigation adapts on narrow screens while preserving the focused editing shell.
 
 Avoid hardcoding viewport-specific pixel values into this document; inspect the SCSS breakpoints and component styles when implementing a responsive change.
@@ -369,8 +413,8 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Admin product management and create-for-creator flow using `ownerId` query param.
 - Membership added as a first-class frontend Product type.
 - Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, frontend-only Post/Video/Resource content creation/editing, and frontend-only recurring pricing controls.
-- Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Marketing, Storefront, plus Settings utility navigation; unavailable destinations such as Analytics and Help remain disabled.
-- Creator Dashboard, Products, Customers, and Sales management visual redesigns.
+- Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Marketing, Analytics, Storefront, plus Settings utility navigation; Help remains disabled.
+- Creator Dashboard, Products, Customers, Sales, and Analytics management visual redesigns.
 - Focused Product Workspace shell for product editing.
 
 Likely next steps:

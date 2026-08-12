@@ -12,6 +12,7 @@ import {
   Cart,
   ConsultationTab,
   CoursesTab,
+  CreatorAnalytics,
   CreatorDashboard,
   CustomerDetail,
   DownloadPackagesTab,
@@ -142,6 +143,15 @@ const AppRouter: React.FC = () => (
           element={
             <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
               <MarketingPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="analytics"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+              <CreatorAnalytics />
             </ProtectedRoute>
           }
         />
