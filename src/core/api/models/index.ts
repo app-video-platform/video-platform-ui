@@ -8,6 +8,7 @@ export * from './dashboard';
 export * from './files';
 export * from './product';
 export * from './socials';
+export * from './storefront';
 export * from './user';
 export * from './misc';
 export * from './reviews';

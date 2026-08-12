@@ -1,65 +1,47 @@
 /// <reference types="@testing-library/jest-dom" />
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { configureStore } from '@reduxjs/toolkit';
+import MockAdapter from 'axios-mock-adapter';
+import { Provider } from 'react-redux';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-import { ProductMinimised } from 'core/api/models';
-import { getAllProductsMinimalByUserAPI } from 'core/api/services';
-
+import httpClient from 'core/api/http-client';
+import { registerCreatorStorefrontTestMocks } from 'core/api/test-fixtures/creator-storefront-http.mock';
+import storefrontReducer from 'core/store/storefront-store/storefront.slice';
 import StorefrontPage from './storefront-page.component';
-
-jest.mock('core/api/services', () => ({
-  getAllProductsMinimalByUserAPI: jest.fn(),
-}));
 
 jest.mock('../../../../assets/image-placeholder.png', () => 'placeholder.png');
 
-const renderPublicRoute = () =>
-  render(
-    <MemoryRouter initialEntries={['/app/store/creator-1']}>
-      <Routes>
-        <Route path="/app/store/:creatorId" element={<StorefrontPage />} />
-      </Routes>
-    </MemoryRouter>,
+const renderPublicRoute = (initialEntry = '/app/store/creator-1') => {
+  const testStore = configureStore({
+    reducer: {
+      storefront: storefrontReducer,
+    },
+  });
+
+  return render(
+    <Provider store={testStore}>
+      <MemoryRouter initialEntries={[initialEntry]}>
+        <Routes>
+          <Route path="/app/store/:creatorId" element={<StorefrontPage />} />
+        </Routes>
+      </MemoryRouter>
+    </Provider>,
   );
+};
 
 describe('StorefrontPage', () => {
-  const originalUseMocks = process.env.REACT_APP_USE_MOCKS;
-  const products: ProductMinimised[] = [
-    {
-      id: 'published-course',
-      title: 'Published Course',
-      type: 'COURSE',
-      status: 'PUBLISHED',
-      price: 120,
-      createdByName: 'Ari Lane',
-      createdByTitle: 'Video educator',
-    },
-    {
-      id: 'draft-download',
-      title: 'Draft Download',
-      type: 'DOWNLOAD',
-      status: 'DRAFT',
-      price: 20,
-    },
-    {
-      id: 'hidden-membership',
-      title: 'Hidden Membership',
-      type: 'MEMBERSHIP',
-      status: 'HIDDEN',
-      price: 35,
-    },
-  ];
+  let mock: MockAdapter;
 
   beforeEach(() => {
-    process.env.REACT_APP_USE_MOCKS = 'false';
-    (getAllProductsMinimalByUserAPI as jest.Mock).mockResolvedValue(products);
+    mock = new MockAdapter(httpClient);
+    registerCreatorStorefrontTestMocks(mock);
   });
 
   afterEach(() => {
-    process.env.REACT_APP_USE_MOCKS = originalUseMocks;
-    jest.clearAllMocks();
+    mock.restore();
   });
 
   it('loads the public route by creator id and applies published-only visibility', async () => {
@@ -67,12 +49,31 @@ describe('StorefrontPage', () => {
 
     expect(screen.getByText('Loading Storefront')).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(getAllProductsMinimalByUserAPI).toHaveBeenCalledWith('creator-1');
-    });
+    expect(
+      (await screen.findAllByText('Creator Launch Studio')).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getByText('Content Calendar Kit')).toBeInTheDocument();
+    expect(screen.getByText('Creator Lab Membership')).toBeInTheDocument();
+    expect(screen.queryByText('Unannounced Workshop')).toBeNull();
+    expect(screen.queryByText('Retired Preset Pack')).toBeNull();
+    expect(mock.history.get[0].url).toBe('api/storefronts/creator-1');
+  });
 
-    expect((await screen.findAllByText('Published Course')).length).toBeGreaterThan(0);
-    expect(screen.queryByText('Draft Download')).toBeNull();
-    expect(screen.queryByText('Hidden Membership')).toBeNull();
+  it('renders empty public Storefront state from the public read model', async () => {
+    renderPublicRoute('/app/store/empty-creator');
+
+    expect((await screen.findAllByText('Quiet Creator')).length).toBeGreaterThan(0);
+    expect(screen.getByText('No products are public right now')).toBeInTheDocument();
+    expect(screen.queryByText('Featured product')).toBeNull();
+  });
+
+  it('renders honest unavailable state when the backend contract is missing', async () => {
+    mock.resetHandlers();
+    mock.onAny().reply(404);
+
+    renderPublicRoute('/app/store/missing-creator');
+
+    expect(await screen.findByText('Storefront unavailable')).toBeInTheDocument();
+    expect(screen.queryByText('Creator Launch Studio')).toBeNull();
   });
 });

@@ -2,6 +2,7 @@ import {
   ProductMinimised,
   ProductStatus,
   ProductType,
+  PublicStorefront,
   User,
 } from 'core/api/models';
 
@@ -134,3 +135,24 @@ export const getStorefrontViewModel = ({
     featuredProductId: validFeaturedId,
   };
 };
+
+export const getStorefrontViewModelFromPublicStorefront = (
+  storefront: PublicStorefront,
+): StorefrontViewModel =>
+  getStorefrontViewModel({
+    profile: {
+      id: storefront.creator.id,
+      displayName: storefront.creator.displayName,
+      title: storefront.creator.title,
+      tagline: storefront.creator.tagline,
+      bio: storefront.creator.bio,
+      website: storefront.creator.website,
+      imageUrl: storefront.creator.imageUrl,
+      socialLinks: storefront.creator.socialLinks,
+    },
+    products: storefront.products.map((product) => ({
+      ...product,
+      status: product.status ?? 'PUBLISHED',
+    })),
+    featuredProductId: storefront.featuredProductId,
+  });

@@ -1,4 +1,9 @@
-import { ProductMinimised, ProductStatus, ProductType, User } from 'core/api/models';
+import {
+  ProductMinimised,
+  ProductStatus,
+  ProductType,
+  User,
+} from 'core/api/models';
 
 export interface StorefrontProfile {
   id?: string;
