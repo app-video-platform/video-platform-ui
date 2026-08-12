@@ -12,14 +12,11 @@ import {
 
 import { GalIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
-import {
-  ActivityKind,
-  DashboardActivity,
-} from '../fixtures/dashboard-inspection-fixture';
+import { DashboardActivity, DashboardActivityKind } from 'core/api/models';
 
 import './activity-list.styles.scss';
 
-const activityIcon: Record<ActivityKind, typeof HiShoppingBag> = {
+const activityIcon: Record<DashboardActivityKind, typeof HiShoppingBag> = {
   sale: HiShoppingBag,
   customer: HiUserPlus,
   'membership-started': HiUserPlus,

@@ -4,26 +4,26 @@ import { Link } from 'react-router-dom';
 
 import {
   DashboardMetric,
-  MetricDirection,
-  MetricSentiment,
-} from '../fixtures/dashboard-inspection-fixture';
+  DashboardMetricDirection,
+  DashboardMetricSentiment,
+} from 'core/api/models';
 
 import './metric-card.styles.scss';
 
-const directionSymbol: Record<MetricDirection, string> = {
+const directionSymbol: Record<DashboardMetricDirection, string> = {
   up: '↑',
   down: '↓',
   flat: '—',
 };
 
-const directionAriaLabel: Record<MetricDirection, string> = {
+const directionAriaLabel: Record<DashboardMetricDirection, string> = {
   up: 'Up',
   down: 'Down',
   flat: 'No change',
 };
 
 const formatComparison = (
-  direction: MetricDirection,
+  direction: DashboardMetricDirection,
   comparison: string,
 ) => {
   const conciseComparison =
@@ -32,7 +32,7 @@ const formatComparison = (
   return `${directionSymbol[direction]} ${conciseComparison}`;
 };
 
-const sentimentAriaLabel: Record<MetricSentiment, string> = {
+const sentimentAriaLabel: Record<DashboardMetricSentiment, string> = {
   favorable: 'positive',
   unfavorable: 'needs attention',
   neutral: 'neutral',

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { ProductPerformanceItem } from '../fixtures/dashboard-inspection-fixture';
+import { DashboardTopProduct } from 'core/api/models';
 
 import './product-performance-list.styles.scss';
 
 interface ProductPerformanceListProps {
-  items: ProductPerformanceItem[];
+  items: DashboardTopProduct[];
 }
 
 const ProductPerformanceList: React.FC<ProductPerformanceListProps> = ({

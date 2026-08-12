@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ChartEmptyState } from '@shared/ui';
 import { appRoutes } from 'domains/app/routes/routes';
 
-import { ProductAnalyticsItem } from '../creator-analytics.types';
+import { ProductAnalyticsItem } from 'core/api/models';
 import {
   formatAnalyticsMoney,
   formatAnalyticsNumber,

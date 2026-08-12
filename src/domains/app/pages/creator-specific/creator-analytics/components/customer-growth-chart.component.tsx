@@ -11,7 +11,7 @@ import {
 
 import { ChartContainer, ChartEmptyState, ChartTooltip } from '@shared/ui';
 
-import { AnalyticsPeriod, AnalyticsSeriesPoint } from '../creator-analytics.types';
+import { AnalyticsPeriod, AnalyticsSeriesPoint } from 'core/api/models';
 import { formatAnalyticsNumber } from '../creator-analytics.utils';
 
 interface CustomerGrowthChartProps {

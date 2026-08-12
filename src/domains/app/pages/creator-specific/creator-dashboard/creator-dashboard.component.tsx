@@ -1,22 +1,25 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { selectAuthUser } from 'core/store/auth-store';
 import {
-  getAllProductsByUserId,
-  getProductSummariesByOwner,
-} from 'core/store/product-store';
-import { AppDispatch, hasRole, UserRole } from 'core/api/models';
+  fetchCreatorDashboardSummary,
+  selectCreatorDashboardError,
+  selectCreatorDashboardLoading,
+  selectCreatorDashboardSummary,
+} from 'core/store/dashboard-store';
+import {
+  AppDispatch,
+  CreatorDashboardSummary,
+  hasRole,
+  UserRole,
+} from 'core/api/models';
 import {
   ActivityList,
   AttentionList,
   MetricCard,
   ProductPerformanceList,
 } from './components';
-import {
-  CreatorDashboardFixture,
-  getCreatorDashboardInspectionFixture,
-} from './fixtures/dashboard-inspection-fixture';
 
 import './creator-dashboard.styles.scss';
 
@@ -28,7 +31,7 @@ const getGreeting = (firstName?: string) => {
   return `Good ${dayPart}, ${firstName || 'creator'}.`;
 };
 
-const unavailableDashboard: CreatorDashboardFixture = {
+const unavailableDashboard: CreatorDashboardSummary = {
   metrics: [
     {
       id: 'revenue',
@@ -64,22 +67,15 @@ const CreatorDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
   const isCreator = hasRole(user?.roles, UserRole.CREATOR);
-  const useInspectionData = process.env.REACT_APP_USE_MOCKS === 'true';
+  const dashboard = useSelector(selectCreatorDashboardSummary);
+  const isLoading = useSelector(selectCreatorDashboardLoading);
+  const error = useSelector(selectCreatorDashboardError);
 
   useEffect(() => {
-    if (isCreator && user && user.id) {
-      dispatch(getProductSummariesByOwner(user.id));
-      dispatch(getAllProductsByUserId(user.id));
+    if (isCreator) {
+      dispatch(fetchCreatorDashboardSummary());
     }
-  }, [dispatch, isCreator, user]);
-
-  const dashboard = useMemo(
-    () =>
-      useInspectionData
-        ? getCreatorDashboardInspectionFixture()
-        : unavailableDashboard,
-    [useInspectionData],
-  );
+  }, [dispatch, isCreator]);
 
   if (!isCreator) {
     return (
@@ -89,6 +85,8 @@ const CreatorDashboard: React.FC = () => {
       </section>
     );
   }
+
+  const dashboardSummary = error || !dashboard ? unavailableDashboard : dashboard;
 
   return (
     <div className="creator-dashboard">
@@ -100,8 +98,11 @@ const CreatorDashboard: React.FC = () => {
       </header>
 
       <section className="creator-dashboard__metrics" aria-label="Business metrics">
-        {dashboard.metrics.map((metric) => (
-          <MetricCard key={metric.id} metric={metric} />
+        {dashboardSummary.metrics.map((metric) => (
+          <MetricCard
+            key={metric.id}
+            metric={isLoading && !dashboard ? { ...metric, state: 'loading' } : metric}
+          />
         ))}
       </section>
 
@@ -110,8 +111,8 @@ const CreatorDashboard: React.FC = () => {
           <div className="dashboard-panel__header">
             <h2>Recent activity</h2>
           </div>
-          {dashboard.activities.length > 0 ? (
-            <ActivityList items={dashboard.activities} />
+          {dashboardSummary.activities.length > 0 ? (
+            <ActivityList items={dashboardSummary.activities} />
           ) : (
             <p className="dashboard-panel__empty">
               Activity will appear here once business events are available.
@@ -124,8 +125,8 @@ const CreatorDashboard: React.FC = () => {
             <h2>Top products</h2>
             <span>Revenue</span>
           </div>
-          {dashboard.topProducts.length > 0 ? (
-            <ProductPerformanceList items={dashboard.topProducts} />
+          {dashboardSummary.topProducts.length > 0 ? (
+            <ProductPerformanceList items={dashboardSummary.topProducts} />
           ) : (
             <p className="dashboard-panel__empty">
               Product performance is unavailable until revenue data exists.
@@ -137,8 +138,8 @@ const CreatorDashboard: React.FC = () => {
           <div className="dashboard-panel__header">
             <h2>Needs attention</h2>
           </div>
-          {dashboard.attentionItems.length > 0 ? (
-            <AttentionList items={dashboard.attentionItems} />
+          {dashboardSummary.attentionItems.length > 0 ? (
+            <AttentionList items={dashboardSummary.attentionItems} />
           ) : (
             <p className="dashboard-panel__empty">
               No deterministic attention states are available yet.

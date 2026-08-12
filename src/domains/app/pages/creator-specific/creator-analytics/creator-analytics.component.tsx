@@ -1,7 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MdOutlineCalendarToday } from 'react-icons/md';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Select } from '@shared/ui';
+import { AnalyticsMetricKey, AnalyticsPeriod, AppDispatch } from 'core/api/models';
+import {
+  fetchCreatorAnalyticsOverview,
+  selectAnalyticsError,
+  selectAnalyticsLoading,
+  selectAnalyticsOverview,
+} from 'core/store/analytics-store';
 
 import {
   AnalyticsMetricCard,
@@ -11,8 +19,6 @@ import {
   PerformanceChart,
   ProductPerformanceSection,
 } from './components';
-import { getCreatorAnalyticsData } from './creator-analytics.fixtures';
-import { AnalyticsMetricKey, AnalyticsPeriod } from './creator-analytics.types';
 import {
   analyticsPeriodOptions,
   formatAnalyticsNumber,
@@ -27,16 +33,50 @@ const performanceModeOptions: { label: string; value: AnalyticsMetricKey }[] = [
 ];
 
 const CreatorAnalytics: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const [period, setPeriod] = useState<AnalyticsPeriod>('30d');
   const [performanceMode, setPerformanceMode] =
     useState<AnalyticsMetricKey>('revenue');
-  const data = useMemo(() => getCreatorAnalyticsData(period), [period]);
+  const data = useSelector(selectAnalyticsOverview);
+  const isLoading = useSelector(selectAnalyticsLoading);
+  const error = useSelector(selectAnalyticsError);
+
+  useEffect(() => {
+    dispatch(fetchCreatorAnalyticsOverview({ period }));
+  }, [dispatch, period]);
 
   const handlePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setPeriod(event.target.value as AnalyticsPeriod);
   };
 
-  if (data.status === 'unavailable') {
+  if (isLoading && !data) {
+    return (
+      <div className="creator-analytics">
+        <header className="creator-analytics__intro">
+          <div>
+            <h1>Analytics</h1>
+            <p>Understand how your business is performing over time.</p>
+          </div>
+          <Select
+            name="analytics-period"
+            value={period}
+            options={analyticsPeriodOptions}
+            onChange={handlePeriodChange}
+            customClassName="creator-analytics__period"
+            prefixIcon={MdOutlineCalendarToday}
+            aria-label="Select analytics date range"
+          />
+        </header>
+
+        <section className="analytics-state" role="status" aria-busy="true">
+          <h2>Loading analytics</h2>
+          <p>Fetching the selected Creator analytics overview.</p>
+        </section>
+      </div>
+    );
+  }
+
+  if (error || !data) {
     return (
       <div className="creator-analytics">
         <header className="creator-analytics__intro">

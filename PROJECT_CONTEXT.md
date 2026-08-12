@@ -208,20 +208,21 @@ Confirmed:
 - Membership has no subscription/entitlement/member-access model yet.
 - Creator Customers has frontend contracts, services, Redux store integration, and HTTP mock responses for read-only list/detail data, but the production backend endpoints are not implemented yet. Purchase/order, entitlement/access, subscription/customer membership-state, waitlist, tags/notes persistence, and manual access-management backend ownership still need backend confirmation.
 - Creator Sales has frontend contracts, services, Redux store integration, and HTTP mock responses for summary, orders ledger, and order detail data, but the production backend endpoints are not implemented yet. Provider-safe financial mutations, refund/payment retry actions, subscription management, and entitlement mutation contracts are intentionally not implemented.
-- Creator Analytics has no production analytics API endpoints, mock API responses, Redux/store integration, server-backed period queries, or shared analytics data service yet.
+- Creator Analytics has frontend contracts, services, Redux store integration, and HTTP mock responses for aggregate overview data, but the production backend endpoint is not implemented yet. Traffic, attribution, conversion, engagement, payout, cohort, and custom date-range analytics are intentionally not implemented.
 - Creator Storefront has no production Storefront-specific configuration/persistence API, Redux/store integration, theme/page-builder system, custom-domain/SEO contract, or creator-profile-by-id API yet.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
-- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and frontend-only Membership inspection state. Customers and Sales now use Redux/services/Axios and receive deterministic data from HTTP mock handlers rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, or customer-domain states.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and frontend-only Membership inspection state. Customers, Sales, Analytics, and Dashboard use Redux/services/Axios and receive deterministic data from ignored local HTTP mocks rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
-- Creator Dashboard inspection fixtures live in `src/domains/app/pages/creator-specific/creator-dashboard/fixtures/dashboard-inspection-fixture.ts`. When mocks are off, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
+- Creator Dashboard uses a frontend contract, service, Redux store integration, and ignored local HTTP mock response for the aggregate summary. When the backend contract is unavailable, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
 - Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
 - Creator Products inspection fixtures currently come through ignored local mock data in `src/core/api/_mocks.ts` when mocks are enabled.
-- Creator Customers runtime data path is Component → Redux → thunk → Customer service → Axios → backend or HTTP mock. Mock Customer data is registered through `src/core/api/mock-handlers/creator-customers.mock.ts`; components do not branch on `REACT_APP_USE_MOCKS`.
-- Creator Sales runtime data path is Component → Redux → thunk → Sales service → Axios → backend or HTTP mock. Mock Sales data is registered through `src/core/api/mock-handlers/creator-sales.mock.ts`; components do not branch on `REACT_APP_USE_MOCKS`.
-- Creator Analytics inspection fixtures live under `src/domains/app/pages/creator-specific/creator-analytics` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Analytics renders an honest unavailable state rather than fabricated revenue, order, customer, membership, product-performance, refund, or failed-payment analytics.
+- Creator Customers runtime data path is Component → Redux → thunk → Customer service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
+- Creator Sales runtime data path is Component → Redux → thunk → Sales service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
+- Creator Analytics runtime data path is Component → Redux → thunk → Analytics service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
+- Creator Dashboard runtime data path is Component → Redux → thunk → Dashboard service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Storefront inspection fixtures live under `src/domains/app/features/storefront` and are returned only when `REACT_APP_USE_MOCKS=true`. Fixture creator IDs, product examples, featured selection, and ordering are local inspection aids, not contracts. With mocks off, the public Storefront uses existing product summary data and limited creator fields available there; Storefront management renders unavailable/empty states instead of inventing Storefront-specific configuration.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
@@ -249,10 +250,10 @@ Implemented Dashboard concepts:
 - Needs attention actions navigate only when an action path exists.
 - Responsive ordering is intentional: metrics remain first, and when panels become sequential the actionable Needs attention panel takes priority before historical Recent activity.
 
-Important fixture rule:
+Important data rule:
 
-- The Dashboard is intentionally future-facing for visual inspection only. Metrics/business states not yet supported by production APIs may be represented by deterministic development-only fixture data when `REACT_APP_USE_MOCKS=true`.
-- Production must not fake those values. With mocks off, the dashboard uses unavailable states from `unavailableDashboard`.
+- The Dashboard is an aggregate read model. Metrics/business states not yet supported by production APIs may be represented only by deterministic development-only HTTP mock data when `REACT_APP_USE_MOCKS=true`.
+- Production must not fake those values. With mocks off or when the backend contract is unavailable, the dashboard renders unavailable states.
 
 ## Creator Sales Management
 
@@ -289,9 +290,9 @@ Current Sales domain model:
 
 Important Sales boundary:
 
-- Current Sales data comes from deterministic inspection fixtures returned only when `REACT_APP_USE_MOCKS=true`.
-- The current frontend does not define production-backed contracts/services for complete Creator orders, payments, refunds, subscriptions, entitlements/access, provider-safe financial mutations, or server pagination.
-- With mocks off, Sales renders an unavailable state rather than fabricated financial data.
+- Current Sales read data flows through frontend contracts/services/Redux and Axios. Local deterministic data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`.
+- The current frontend defines backend-pending read contracts for Sales summary, Orders page, and Order detail, but does not define provider-safe financial mutations, refund/payment retry actions, subscription management, or entitlement mutation contracts.
+- With mocks off or when backend contracts are unavailable, Sales renders an unavailable state rather than fabricated financial data.
 - Do not introduce production APIs or financial mutation behavior merely to support the current inspection UI.
 
 ## Creator Analytics
@@ -326,10 +327,10 @@ Current Analytics architecture:
 
 Important Analytics boundary:
 
-- Current Analytics data comes from deterministic inspection fixtures returned only when `REACT_APP_USE_MOCKS=true`.
-- The current frontend does not define production Analytics API endpoints, Redux/store integration, mock API response architecture, backend-backed period queries, or a shared analytics data service.
-- Fixture totals and comparisons are local visual-inspection values and are not product contracts. Do not preserve specific fixture revenue/order/customer/membership numbers as meaningful behavior in documentation or tests unless a test is explicitly covering deterministic inspection rendering.
-- With mocks off, Analytics renders an unavailable state rather than fabricated analytics data.
+- Current Analytics read data flows through a frontend contract/service/Redux and Axios. Local deterministic data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`.
+- The current frontend defines a backend-pending read contract for `api/creator/analytics/overview` with 7d/30d/90d period queries.
+- Mock totals and comparisons are local visual-inspection values and are not product contracts. Do not preserve specific mock revenue/order/customer/membership numbers as meaningful behavior in documentation or tests unless a test is explicitly covering deterministic inspection rendering.
+- With mocks off or when the backend contract is unavailable, Analytics renders an unavailable state rather than fabricated analytics data.
 - Do not infer traffic, conversion, attribution, payout, tax, course-engagement, cohort, custom date-range, or other analytics capabilities from the current page.
 
 ## Creator Storefront

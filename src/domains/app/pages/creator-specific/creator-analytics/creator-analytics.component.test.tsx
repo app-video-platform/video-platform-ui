@@ -2,8 +2,14 @@
 
 import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { configureStore } from '@reduxjs/toolkit';
+import MockAdapter from 'axios-mock-adapter';
+import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
+import httpClient from 'core/api/http-client';
+import analyticsReducer from 'core/store/analytics-store/analytics.slice';
+import { registerCreatorAnalyticsTestMocks } from 'core/api/test-fixtures/creator-analytics-http.mock';
 import CreatorAnalytics from './creator-analytics.component';
 import { ProductPerformanceSection } from './components';
 
@@ -41,52 +47,63 @@ jest.mock('recharts', () => {
   };
 });
 
-const renderAnalytics = () =>
-  render(
-    <MemoryRouter initialEntries={['/app/analytics']}>
-      <Routes>
-        <Route path="/app/analytics" element={<CreatorAnalytics />} />
-        <Route
-          path="/app/products/edit/:productId"
-          element={<div>Product workspace route</div>}
-        />
-      </Routes>
-    </MemoryRouter>,
+const renderAnalytics = () => {
+  const testStore = configureStore({
+    reducer: {
+      analytics: analyticsReducer,
+    },
+  });
+
+  return render(
+    <Provider store={testStore}>
+      <MemoryRouter initialEntries={['/app/analytics']}>
+        <Routes>
+          <Route path="/app/analytics" element={<CreatorAnalytics />} />
+          <Route
+            path="/app/products/edit/:productId"
+            element={<div>Product workspace route</div>}
+          />
+        </Routes>
+      </MemoryRouter>
+    </Provider>,
   );
+};
 
 describe('Creator Analytics', () => {
-  const originalUseMocks = process.env.REACT_APP_USE_MOCKS;
+  let mock: MockAdapter;
 
   beforeEach(() => {
-    process.env.REACT_APP_USE_MOCKS = 'true';
+    mock = new MockAdapter(httpClient);
+    registerCreatorAnalyticsTestMocks(mock);
   });
 
   afterEach(() => {
-    process.env.REACT_APP_USE_MOCKS = originalUseMocks;
+    mock.restore();
   });
 
-  it('renders the Analytics route with metrics and default 30-day data', () => {
+  it('renders the Analytics route with metrics and default 30-day data', async () => {
     renderAnalytics();
 
     expect(screen.getByRole('heading', { name: 'Analytics' })).toBeInTheDocument();
     expect(
       screen.getByText('Understand how your business is performing over time.'),
     ).toBeInTheDocument();
+    expect(await screen.findByText('€3,429')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Performance' })).toBeInTheDocument();
-    expect(screen.getByText('€3,429')).toBeInTheDocument();
     expect(screen.getAllByText('48').length).toBeGreaterThan(0);
     expect(screen.getByText('1,284')).toBeInTheDocument();
     expect(screen.getAllByText('318').length).toBeGreaterThan(0);
   });
 
-  it('updates visible data when the period changes', () => {
+  it('updates visible data when the period changes', async () => {
     renderAnalytics();
 
+    await screen.findByText('€3,429');
     fireEvent.change(screen.getByLabelText('Select analytics date range'), {
       target: { value: '7d' },
     });
 
-    expect(screen.getByText('€958')).toBeInTheDocument();
+    expect(await screen.findByText('€958')).toBeInTheDocument();
     expect(screen.getByText(/Revenue over the last 7 days/i)).toBeInTheDocument();
     expect(screen.getAllByText('7 chart points').length).toBeGreaterThan(0);
 
@@ -94,13 +111,16 @@ describe('Creator Analytics', () => {
       target: { value: '90d' },
     });
 
-    expect(screen.getByText(/Revenue over the last 90 days/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Revenue over the last 90 days/i),
+    ).toBeInTheDocument();
     expect(screen.getAllByText('13 chart points').length).toBeGreaterThan(0);
   });
 
-  it('supports Revenue and Orders performance modes with keyboard-accessible buttons', () => {
+  it('supports Revenue and Orders performance modes with keyboard-accessible buttons', async () => {
     renderAnalytics();
 
+    await screen.findByText('€3,429');
     const toggle = screen.getByRole('group', { name: 'Performance metric' });
     expect(within(toggle).getByRole('button', { name: 'Revenue' })).toHaveAttribute(
       'aria-pressed',
@@ -117,9 +137,10 @@ describe('Creator Analytics', () => {
     expect(screen.getByText(/Orders increased/i)).toBeInTheDocument();
   });
 
-  it('renders product ranking with accessible numeric values and links', () => {
+  it('renders product ranking with accessible numeric values and links', async () => {
     renderAnalytics();
 
+    await screen.findByText('€3,429');
     const section = screen.getByRole('heading', { name: 'Product performance' })
       .parentElement?.parentElement;
     expect(section).toBeTruthy();
@@ -135,9 +156,10 @@ describe('Creator Analytics', () => {
     ).toHaveAttribute('href', '/app/products/edit/prod-course-growth');
   });
 
-  it('renders customer growth, membership health, and payment health summaries', () => {
+  it('renders customer growth, membership health, and payment health summaries', async () => {
     renderAnalytics();
 
+    await screen.findByText('€3,429');
     expect(screen.getByRole('heading', { name: 'Customer growth' })).toBeInTheDocument();
     expect(screen.getByText(/You gained 48 new customers/i)).toBeInTheDocument();
 
@@ -150,12 +172,13 @@ describe('Creator Analytics', () => {
     expect(screen.getByText('Failed payments')).toBeInTheDocument();
   });
 
-  it('renders honest non-mock unavailable state', () => {
-    process.env.REACT_APP_USE_MOCKS = 'false';
+  it('renders honest unavailable state when the backend contract is missing', async () => {
+    mock.resetHandlers();
+    mock.onAny().reply(404);
     renderAnalytics();
 
     expect(
-      screen.getByText('Analytics data is not available yet'),
+      await screen.findByText('Analytics data is not available yet'),
     ).toBeInTheDocument();
     expect(screen.queryByText('Creator Product Growth System')).toBeNull();
   });
@@ -170,9 +193,10 @@ describe('Creator Analytics', () => {
     expect(screen.getByText('No product performance data yet')).toBeInTheDocument();
   });
 
-  it('keeps chart text summaries available outside the SVG visual', () => {
+  it('keeps chart text summaries available outside the SVG visual', async () => {
     renderAnalytics();
 
+    await screen.findByText('€3,429');
     expect(
       screen.getByText(/Revenue increased .* compared with the previous 30 days/i),
     ).toBeInTheDocument();
