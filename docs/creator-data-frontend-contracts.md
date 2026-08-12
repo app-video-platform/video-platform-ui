@@ -2,6 +2,7 @@
 
 Phase 08B introduces frontend API contracts for Creator Customers and Creator Sales.
 Phase 08C adds aggregate read-model contracts for Creator Analytics and Creator Dashboard.
+Phase 08D adds Storefront public read-model and Creator configuration contracts.
 
 These endpoint paths are proposed frontend contracts following current frontend conventions. They may need backend coordination before production implementation, but the use cases and data shapes represent current frontend requirements.
 
@@ -109,6 +110,51 @@ The response is a UI-ready aggregate reporting read model. It includes summary m
 
 Dashboard is a backend-composed aggregate surface. The response includes KPI metrics, recent activity, top products, and needs-attention items with explicit destination metadata where navigation is supported. The current UI renders the metric label `Sales`; Sales/Orders remains the authoritative financial backend domain for revenue, orders, refunds, and failed payments.
 
+## Public Storefront
+
+### BACKEND CONTRACT NOT YET IMPLEMENTED: Public Storefront
+
+- Feature/use case: Buyer-facing Creator Storefront
+- Method: `GET`
+- Proposed path: `api/storefronts/:creatorId`
+- Path params: `creatorId`
+- Query/request shape: none
+- Response shape: `PublicStorefront`
+- Frontend service: `getPublicStorefrontAPI(creatorId)`
+- Frontend consumer: `storefront-store`, `StorefrontPage`
+- Current backend status: pending
+
+The response is a public, read-only Storefront read model for `/app/store/:creatorId`. It embeds the public Creator presentation fields and ordered public products needed by the shared Storefront presentation. The backend should ultimately enforce visibility and return only public products; the frontend still defensively filters to `PUBLISHED` where the shared view model benefits from it.
+
+## Creator Storefront Config
+
+### BACKEND CONTRACT NOT YET IMPLEMENTED: Creator Storefront Config
+
+- Feature/use case: Authenticated Creator Storefront management
+- Method: `GET`
+- Proposed path: `api/creator/storefront`
+- Query/request shape: none
+- Response shape: `CreatorStorefrontConfig`
+- Frontend service: `getCreatorStorefrontConfigAPI()`
+- Frontend consumer: `storefront-store`, `CreatorStorefrontPage`
+- Current backend status: pending
+
+The response contains Storefront-owned configuration only: `featuredProductId` and `productOrderIds`. User/Profile remains authoritative for profile fields such as name, title, bio, website, socials, and avatar. Product remains authoritative for Creator product identity, type, status, price, and thumbnails.
+
+### BACKEND CONTRACT NOT YET IMPLEMENTED: Update Creator Storefront Config
+
+- Feature/use case: Persist featured product and product ordering
+- Method: `PATCH`
+- Proposed path: `api/creator/storefront`
+- Request shape: `CreatorStorefrontConfigUpdateRequest`
+- Request fields: `featuredProductId`, `productOrderIds`
+- Response shape: `CreatorStorefrontConfig`
+- Frontend service: `updateCreatorStorefrontConfigAPI(payload)`
+- Frontend consumer: `storefront-store`, `CreatorStorefrontPage`
+- Current backend status: pending
+
+The current frontend scope does not define page-builder, theme, font, layout-block, custom-domain, SEO, or Storefront analytics contracts.
+
 ## Upcoming Phase 08 Work
 
-Storefront and Membership contracts are intentionally out of scope for Phases 08B and 08C.
+Membership contracts are intentionally out of scope for Phases 08B, 08C, and 08D.

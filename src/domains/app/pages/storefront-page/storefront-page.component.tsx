@@ -1,92 +1,45 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
-import { ProductMinimised } from 'core/api/models';
-import { getAllProductsMinimalByUserAPI } from 'core/api/services';
+import { AppDispatch, RootState } from 'core/api/models';
 import {
-  getProfileFromProducts,
-  getStorefrontViewModel,
+  fetchPublicStorefront,
+  selectPublicStorefrontByCreatorId,
+  selectPublicStorefrontError,
+  selectPublicStorefrontLoading,
+} from 'core/store/storefront-store';
+import {
+  getStorefrontViewModelFromPublicStorefront,
   StorefrontPublicPage,
-  storefrontInspectionFeaturedProductId,
-  storefrontInspectionProducts,
-  storefrontInspectionUser,
 } from 'domains/app/features/storefront';
 
 import './storefront-page.styles.scss';
 
 const StorefrontPage: React.FC = () => {
   const { creatorId } = useParams();
-  const [products, setProducts] = useState<ProductMinimised[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const useInspectionData = process.env.REACT_APP_USE_MOCKS === 'true';
+  const dispatch = useDispatch<AppDispatch>();
+  const storefrontData = useSelector((state: RootState) =>
+    selectPublicStorefrontByCreatorId(state, creatorId),
+  );
+  const loading = useSelector(selectPublicStorefrontLoading);
+  const error = useSelector(selectPublicStorefrontError);
 
   useEffect(() => {
-    if (useInspectionData) {
-      setProducts(storefrontInspectionProducts);
-      setLoading(false);
-      setError(null);
-      return undefined;
-    }
-
     if (creatorId) {
-      let isMounted = true;
-
-      getAllProductsMinimalByUserAPI(creatorId)
-        .then((data) => {
-          if (isMounted) {
-            setProducts(data);
-          }
-        })
-        .catch(() => {
-          if (isMounted) {
-            setError('Failed to load products.');
-          }
-        })
-        .finally(() => {
-          if (isMounted) {
-            setLoading(false);
-          }
-        });
-
-      return () => {
-        isMounted = false;
-      };
+      dispatch(fetchPublicStorefront(creatorId));
     }
-
-    setLoading(false);
-    return undefined;
-  }, [creatorId, useInspectionData]);
-
-  const profile = useMemo(() => {
-    if (useInspectionData) {
-      return {
-        displayName: `${storefrontInspectionUser.firstName} ${storefrontInspectionUser.lastName}`,
-        title: storefrontInspectionUser.title,
-        tagline: storefrontInspectionUser.taglineMission,
-        bio: storefrontInspectionUser.bio,
-        website: storefrontInspectionUser.website,
-        imageUrl: storefrontInspectionUser.imageUrl,
-        socialLinks: storefrontInspectionUser.socialLinks,
-      };
-    }
-
-    return getProfileFromProducts(products, creatorId);
-  }, [creatorId, products, useInspectionData]);
+  }, [creatorId, dispatch]);
 
   const storefront = useMemo(
     () =>
-      getStorefrontViewModel({
-        profile,
-        products,
-        featuredProductId: useInspectionData
-          ? storefrontInspectionFeaturedProductId
-          : undefined,
-      }),
-    [products, profile, useInspectionData],
+      storefrontData
+        ? getStorefrontViewModelFromPublicStorefront(storefrontData)
+        : null,
+    [storefrontData],
   );
 
-  if (loading) {
+  if (loading && !storefront) {
     return (
       <main className="storefront-route-state" aria-busy="true">
         <h1>Loading Storefront</h1>
@@ -95,11 +48,11 @@ const StorefrontPage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error || !storefront) {
     return (
       <main className="storefront-route-state" role="alert">
         <h1>Storefront unavailable</h1>
-        <p>{error}</p>
+        <p>{error ?? 'Failed to load Storefront.'}</p>
       </main>
     );
   }

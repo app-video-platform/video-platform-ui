@@ -5,23 +5,29 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import StorefrontPublicPage from './storefront-public-page.component';
-import { getProfileFromUser, getStorefrontViewModel } from '../storefront.utils';
 import {
-  storefrontInspectionFeaturedProductId,
-  storefrontInspectionProducts,
-  storefrontInspectionUser,
-} from '../storefront.fixtures';
+  publicStorefrontTestFixture,
+  storefrontProductSummariesTestFixture,
+} from 'core/api/test-fixtures/creator-storefront-http.mock';
+import { getStorefrontViewModel } from '../storefront.utils';
 
 jest.mock('../../../../../assets/image-placeholder.png', () => 'placeholder.png');
 
-const renderStorefront = (products = storefrontInspectionProducts) =>
+const renderStorefront = (products = storefrontProductSummariesTestFixture) =>
   render(
     <MemoryRouter>
       <StorefrontPublicPage
         storefront={getStorefrontViewModel({
-          profile: getProfileFromUser(storefrontInspectionUser),
+          profile: {
+            id: publicStorefrontTestFixture.creator.id,
+            displayName: publicStorefrontTestFixture.creator.displayName,
+            title: publicStorefrontTestFixture.creator.title,
+            tagline: publicStorefrontTestFixture.creator.tagline,
+            bio: publicStorefrontTestFixture.creator.bio,
+            website: publicStorefrontTestFixture.creator.website,
+          },
           products,
-          featuredProductId: storefrontInspectionFeaturedProductId,
+          featuredProductId: publicStorefrontTestFixture.featuredProductId,
         })}
       />
     </MemoryRouter>,
@@ -47,7 +53,7 @@ describe('StorefrontPublicPage', () => {
 
   it('renders a graceful empty state when no products are published', () => {
     renderStorefront(
-      storefrontInspectionProducts.map((product) => ({
+      storefrontProductSummariesTestFixture.map((product) => ({
         ...product,
         status: 'DRAFT' as const,
       })),

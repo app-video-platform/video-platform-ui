@@ -7,6 +7,7 @@ import customersReducer from './customers-store/customers.slice';
 import dashboardReducer from './dashboard-store/dashboard.slice';
 import notificationsReducer from './notifications/notifications.slice';
 import salesReducer from './sales-store/sales.slice';
+import storefrontReducer from './storefront-store/storefront.slice';
 import shopCartReducer, {
   loadCartFromStorage,
   saveCartToStorage,
@@ -32,6 +33,7 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     notifications: notificationsReducer,
     sales: salesReducer,
+    storefront: storefrontReducer,
     shopCart: shopCartReducer,
     wishlist: wishlistReducer,
     reviews: reviewsSlice,

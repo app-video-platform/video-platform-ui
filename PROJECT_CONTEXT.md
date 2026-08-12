@@ -209,12 +209,12 @@ Confirmed:
 - Creator Customers has frontend contracts, services, Redux store integration, and HTTP mock responses for read-only list/detail data, but the production backend endpoints are not implemented yet. Purchase/order, entitlement/access, subscription/customer membership-state, waitlist, tags/notes persistence, and manual access-management backend ownership still need backend confirmation.
 - Creator Sales has frontend contracts, services, Redux store integration, and HTTP mock responses for summary, orders ledger, and order detail data, but the production backend endpoints are not implemented yet. Provider-safe financial mutations, refund/payment retry actions, subscription management, and entitlement mutation contracts are intentionally not implemented.
 - Creator Analytics has frontend contracts, services, Redux store integration, and HTTP mock responses for aggregate overview data, but the production backend endpoint is not implemented yet. Traffic, attribution, conversion, engagement, payout, cohort, and custom date-range analytics are intentionally not implemented.
-- Creator Storefront has no production Storefront-specific configuration/persistence API, Redux/store integration, theme/page-builder system, custom-domain/SEO contract, or creator-profile-by-id API yet.
+- Creator Storefront has frontend contracts, services, Redux store integration, and HTTP mock responses for the public read model and Creator configuration, but the production backend endpoints are not implemented yet. Theme/page-builder, custom-domain, SEO, and Storefront analytics contracts are intentionally not implemented.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
-- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and frontend-only Membership inspection state. Customers, Sales, Analytics, and Dashboard use Redux/services/Axios and receive deterministic data from ignored local HTTP mocks rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, or customer-domain states.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and frontend-only Membership inspection state. Customers, Sales, Analytics, Dashboard, and Storefront use Redux/services/Axios and receive deterministic data from ignored local HTTP mocks rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Creator Dashboard uses a frontend contract, service, Redux store integration, and ignored local HTTP mock response for the aggregate summary. When the backend contract is unavailable, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
 - Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
@@ -223,7 +223,8 @@ Deliberate temporary implementations:
 - Creator Sales runtime data path is Component → Redux → thunk → Sales service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Creator Analytics runtime data path is Component → Redux → thunk → Analytics service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Creator Dashboard runtime data path is Component → Redux → thunk → Dashboard service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
-- Storefront inspection fixtures live under `src/domains/app/features/storefront` and are returned only when `REACT_APP_USE_MOCKS=true`. Fixture creator IDs, product examples, featured selection, and ordering are local inspection aids, not contracts. With mocks off, the public Storefront uses existing product summary data and limited creator fields available there; Storefront management renders unavailable/empty states instead of inventing Storefront-specific configuration.
+- Public Storefront runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
+- Creator Storefront config runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
 - Membership native content state is local frontend state lifted above the Membership Content tab. Post, Video, and Resource can be created/edited/deleted locally; Video/Resource use selection-only local file metadata. Backend persistence remains undefined.
@@ -231,7 +232,7 @@ Deliberate temporary implementations:
 
 Speculative / verify before changing:
 
-- Backend shape for lesson rich text, quiz payloads, video upload, checkout/cart, and Storefront data/configuration.
+- Backend shape for lesson rich text, quiz payloads, video upload, and checkout/cart.
 - Backend contracts for Membership native content, included products, recurring pricing, subscriptions, entitlements, and member access.
 - Whether product type changes after creation should remain disallowed in edit mode; current UI limits edit mode to current type in `BasicInfo`.
 
@@ -349,7 +350,7 @@ Current Storefront management patterns:
 
 - The management page shows Storefront status, public URL, copy-link affordance, public profile summary, product visibility information, featured-product selection, product ordering controls, and a live preview.
 - Public profile information reuses existing account/profile user fields such as name, title, tagline, bio, website, image, and social links instead of introducing a separate Storefront profile model.
-- Featured selection and ordering controls are local inspection controls until a persistence contract exists.
+- Featured selection and ordering controls persist through the backend-pending Creator Storefront config contract. Profile fields remain User/Profile-owned; product identities, statuses, prices, and thumbnails remain Product-owned.
 - The live preview uses the same shared `StorefrontPublicPage` presentation as the public Storefront route, with preview styling applied by prop.
 
 Current public Storefront patterns:
@@ -363,10 +364,10 @@ Current public Storefront patterns:
 
 Current Storefront data boundary:
 
-- Storefront currently uses deterministic inspection data when `REACT_APP_USE_MOCKS=true`.
-- Without mocks, the public route fetches existing product summaries for the creator ID and derives only the limited creator identity available on those product summaries. There is no production Storefront profile-by-creator-id API yet.
-- There is no production Storefront-specific persistence API or Redux architecture for Storefront configuration. Featured-product selection and product ordering must not be documented or treated as persisted product behavior.
-- Fixture creator IDs, profile content, example products, screenshots, product order, and featured selections are local inspection aids, not product contracts.
+- The public Storefront route uses the backend-pending `api/storefronts/:creatorId` read-model contract through Redux/services/Axios. The backend should return public creator presentation fields and public products rather than requiring the buyer-facing page to orchestrate User and Product requests.
+- Creator Storefront management uses the backend-pending `api/creator/storefront` config contract through Redux/services/Axios. The config owns `featuredProductId` and `productOrderIds` only.
+- Creator Storefront management combines Storefront config with Product-owned summaries from existing Product Redux/API data and User/Profile-owned account data from Auth.
+- Local deterministic Storefront data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`. Mock creator IDs, profile content, example products, product order, and featured selections are local inspection aids, not product contracts.
 
 ## Creator Products Management
 
@@ -461,7 +462,7 @@ Likely next steps:
 
 - Polish/fix admin product owner filtering UX beyond raw owner ID.
 - Complete product detail UI using real backend fields.
-- Define Storefront persistence/profile/configuration contracts before persisting featured-product selection, product ordering, or Storefront-specific settings.
+- Implement backend Storefront contracts before relying on production persistence for featured-product selection and product ordering; define separate contracts before adding Storefront-specific settings such as themes, page builder, custom domains, SEO, or analytics.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.
 - Define backend contracts for Membership native content, included-product relationships, recurring pricing, subscription checkout, and entitlement/member access before persisting Membership-specific fields.

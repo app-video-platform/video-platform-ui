@@ -4,7 +4,12 @@ import { FiCopy, FiExternalLink } from 'react-icons/fi';
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 
 import { Button, GalIcon, StatusBadge } from '@shared/ui';
-import { AppDispatch, hasRole, ProductMinimised, UserRole } from 'core/api/models';
+import {
+  AppDispatch,
+  hasRole,
+  ProductMinimised,
+  UserRole,
+} from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import {
   getProductSummariesByOwner,
@@ -13,15 +18,21 @@ import {
   selectProductsLoading,
 } from 'core/store/product-store';
 import {
+  fetchCreatorStorefrontConfig,
+  selectCreatorStorefrontConfig,
+  selectCreatorStorefrontConfigError,
+  selectCreatorStorefrontConfigLoading,
+  selectCreatorStorefrontConfigSaveError,
+  selectCreatorStorefrontConfigSaveLoading,
+  updateCreatorStorefrontConfig,
+} from 'core/store/storefront-store';
+import {
   getProfileFromUser,
   getPublicStorefrontProducts,
   getStorefrontViewModel,
   normalizeStorefrontProducts,
   orderStorefrontProducts,
   StorefrontPublicPage,
-  storefrontInspectionFeaturedProductId,
-  storefrontInspectionProducts,
-  storefrontInspectionUser,
   storefrontProductTypeLabels,
   storefrontStatusLabels,
 } from 'domains/app/features/storefront';
@@ -38,13 +49,16 @@ const CreatorStorefrontPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
   const summaries = useSelector(selectProductSummaries);
-  const loading = useSelector(selectProductsLoading);
-  const error = useSelector(selectProductsError);
-  const useInspectionData = process.env.REACT_APP_USE_MOCKS === 'true';
+  const productsLoading = useSelector(selectProductsLoading);
+  const productsError = useSelector(selectProductsError);
+  const config = useSelector(selectCreatorStorefrontConfig);
+  const configLoading = useSelector(selectCreatorStorefrontConfigLoading);
+  const configError = useSelector(selectCreatorStorefrontConfigError);
+  const configSaveLoading = useSelector(selectCreatorStorefrontConfigSaveLoading);
+  const configSaveError = useSelector(selectCreatorStorefrontConfigSaveError);
   const isCreator = hasRole(user?.roles, UserRole.CREATOR);
-  const activeUser = user || (useInspectionData ? storefrontInspectionUser : null);
   const [featuredProductId, setFeaturedProductId] = useState<string | undefined>(
-    storefrontInspectionFeaturedProductId,
+    undefined,
   );
   const [orderedProductIds, setOrderedProductIds] = useState<string[]>([]);
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
@@ -52,16 +66,24 @@ const CreatorStorefrontPage: React.FC = () => {
   useEffect(() => {
     if (isCreator && user?.id) {
       dispatch(getProductSummariesByOwner(user.id));
+      dispatch(fetchCreatorStorefrontConfig());
     }
   }, [dispatch, isCreator, user?.id]);
+
+  useEffect(() => {
+    if (config) {
+      setFeaturedProductId(config.featuredProductId ?? undefined);
+      setOrderedProductIds(config.productOrderIds);
+    }
+  }, [config]);
 
   const rawProducts: ProductMinimised[] = useMemo(() => {
     if (summaries && summaries.length > 0) {
       return summaries;
     }
 
-    return useInspectionData ? storefrontInspectionProducts : [];
-  }, [summaries, useInspectionData]);
+    return [];
+  }, [summaries]);
 
   const allProducts = useMemo(
     () => normalizeStorefrontProducts(rawProducts),
@@ -75,8 +97,8 @@ const CreatorStorefrontPage: React.FC = () => {
     () => getPublicStorefrontProducts(orderedProducts),
     [orderedProducts],
   );
-  const profile = useMemo(() => getProfileFromUser(activeUser), [activeUser]);
-  const publicStorefrontUrl = `/app/store/${activeUser?.id || 'creator'}`;
+  const profile = useMemo(() => getProfileFromUser(user), [user]);
+  const publicStorefrontUrl = `/app/store/${user?.id || 'creator'}`;
   const absoluteStorefrontUrl = `${window.location.origin}${publicStorefrontUrl}`;
   const hasPublishableProducts = publicProducts.length > 0;
   const hiddenCount = allProducts.length - publicProducts.length;
@@ -91,11 +113,26 @@ const CreatorStorefrontPage: React.FC = () => {
     [featuredProductId, orderedProducts, profile],
   );
 
-  useEffect(() => {
-    if (!featuredProductId || !publicProducts.some((product) => product.id === featuredProductId)) {
-      setFeaturedProductId(publicProducts[0]?.id);
-    }
-  }, [featuredProductId, publicProducts]);
+  const persistConfig = (
+    nextFeaturedProductId: string | undefined,
+    nextOrderedProductIds: string[],
+  ) => {
+    dispatch(
+      updateCreatorStorefrontConfig({
+        featuredProductId: nextFeaturedProductId ?? null,
+        productOrderIds: nextOrderedProductIds,
+      }),
+    );
+  };
+
+  const setFeaturedProduct = (productId: string) => {
+    const nextOrder =
+      orderedProductIds.length > 0
+        ? orderedProductIds
+        : allProducts.map((product) => product.id);
+    setFeaturedProductId(productId);
+    persistConfig(productId, nextOrder);
+  };
 
   const moveProduct = (productId: string, direction: -1 | 1) => {
     const currentOrder =
@@ -115,6 +152,7 @@ const CreatorStorefrontPage: React.FC = () => {
       nextOrder[index],
     ];
     setOrderedProductIds(nextOrder);
+    persistConfig(featuredProductId, nextOrder);
   };
 
   const copyStorefrontLink = async () => {
@@ -127,7 +165,7 @@ const CreatorStorefrontPage: React.FC = () => {
     }
   };
 
-  if (!isCreator && !useInspectionData) {
+  if (!isCreator) {
     return (
       <section className="storefront-management storefront-management__state">
         <h1>Storefront</h1>
@@ -136,7 +174,7 @@ const CreatorStorefrontPage: React.FC = () => {
     );
   }
 
-  const unavailable = !useInspectionData && !summaries && !loading && !error;
+  const unavailable = !summaries && !productsLoading && !productsError && !configLoading && !config;
 
   return (
     <div className="storefront-management">
@@ -191,16 +229,22 @@ const CreatorStorefrontPage: React.FC = () => {
         <section className="storefront-management__notice" role="status">
           <h2>Storefront data is not available yet</h2>
           <p>
-            Product and public profile data will appear here once production
-            Storefront data is connected.
+            Product, profile, and Storefront configuration data will appear here
+            once production Storefront data is connected.
           </p>
         </section>
       )}
 
-      {error && (
+      {(productsError || configError || configSaveError) && (
         <section className="storefront-management__notice storefront-management__notice--error" role="alert">
-          <h2>Unable to load products</h2>
-          <p>{error}</p>
+          <h2>Unable to load Storefront data</h2>
+          <p>{productsError || configError || configSaveError}</p>
+        </section>
+      )}
+
+      {configSaveLoading && (
+        <section className="storefront-management__notice" role="status">
+          <h2>Saving Storefront configuration</h2>
         </section>
       )}
 
@@ -238,8 +282,7 @@ const CreatorStorefrontPage: React.FC = () => {
             </div>
             <p className="storefront-management__boundary">
               Profile edits are handled by existing account/profile flows. Storefront
-              ordering and featured selection are local inspection controls until a
-              Storefront persistence contract exists.
+              ordering and featured selection are saved through Storefront configuration.
             </p>
           </section>
 
@@ -253,7 +296,7 @@ const CreatorStorefrontPage: React.FC = () => {
               </div>
             </div>
 
-            {loading ? (
+            {productsLoading || configLoading ? (
               <div className="storefront-management__notice" role="status">
                 <h3>Loading Storefront products</h3>
               </div>
@@ -284,8 +327,8 @@ const CreatorStorefrontPage: React.FC = () => {
                           type="button"
                           variant={isFeatured ? 'primary' : 'secondary'}
                           size="sm"
-                          disabled={!isVisible}
-                          onClick={() => setFeaturedProductId(product.id)}
+                          disabled={!isVisible || configSaveLoading}
+                          onClick={() => setFeaturedProduct(product.id)}
                         >
                           {isFeatured ? 'Featured' : 'Set featured'}
                         </Button>
@@ -294,7 +337,7 @@ const CreatorStorefrontPage: React.FC = () => {
                           variant="ghost"
                           size="icon"
                           aria-label={`Move ${product.title} up`}
-                          disabled={index === 0}
+                          disabled={index === 0 || configSaveLoading}
                           onClick={() => moveProduct(product.id, -1)}
                         >
                           <GalIcon
@@ -308,7 +351,10 @@ const CreatorStorefrontPage: React.FC = () => {
                           variant="ghost"
                           size="icon"
                           aria-label={`Move ${product.title} down`}
-                          disabled={index === orderedProducts.length - 1}
+                          disabled={
+                            index === orderedProducts.length - 1 ||
+                            configSaveLoading
+                          }
                           onClick={() => moveProduct(product.id, 1)}
                         >
                           <GalIcon
