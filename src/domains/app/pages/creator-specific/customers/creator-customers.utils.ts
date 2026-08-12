@@ -1,11 +1,12 @@
 import {
   CreatorCustomer,
+  CreatorCustomerListItem,
   CustomerAccessSource,
   CustomerAccessStatus,
   CustomerMembershipState,
   CustomerPurchaseStatus,
   CustomerRelationshipStatus,
-} from './creator-customers.types';
+} from 'core/api/models';
 
 export type CustomerStatusFilter = 'all' | CustomerRelationshipStatus;
 export type CustomerMembershipFilter = 'all' | CustomerMembershipState;
@@ -64,10 +65,10 @@ export const purchaseStatusLabel: Record<CustomerPurchaseStatus, string> = {
   failed: 'Failed',
 };
 
-export const getCustomerDisplayName = (customer: CreatorCustomer) =>
+export const getCustomerDisplayName = (customer: CreatorCustomerListItem) =>
   customer.name?.trim() || customer.email;
 
-export const getCustomerInitials = (customer: CreatorCustomer) => {
+export const getCustomerInitials = (customer: CreatorCustomerListItem) => {
   const name = customer.name?.trim();
   if (!name) {
     return customer.email.charAt(0).toUpperCase();
@@ -120,7 +121,7 @@ export const formatCustomerShortDate = (value?: string) => {
   }).format(date);
 };
 
-export const getProductSummaryLabel = (customer: CreatorCustomer) => {
+export const getProductSummaryLabel = (customer: CreatorCustomerListItem) => {
   if (customer.products.length === 0) {
     return {
       count: 'No products',

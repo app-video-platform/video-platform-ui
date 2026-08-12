@@ -1,7 +1,25 @@
+import { PageResponse } from '../admin';
+
+export type SalesPeriod = 'today' | '7d' | '30d' | '90d';
 export type SalesOrderStatus = 'paid' | 'failed' | 'refunded' | 'pending';
 export type SalesOrderType = 'one-time' | 'subscription' | 'renewal';
 export type SalesProductType = 'Course' | 'Download' | 'Consultation' | 'Membership';
 export type SalesAccessState = 'granted' | 'revoked' | 'none';
+export type SalesMetricDirection = 'up' | 'down' | 'flat';
+export type SalesMetricSentiment = 'favorable' | 'unfavorable' | 'neutral';
+
+export interface CreatorSalesMetric {
+  label: string;
+  value: string;
+  direction: SalesMetricDirection;
+  sentiment: SalesMetricSentiment;
+  comparison: string;
+}
+
+export interface CreatorSalesSummary {
+  period: SalesPeriod;
+  metrics: CreatorSalesMetric[];
+}
 
 export interface SalesCustomerSummary {
   id?: string;
@@ -40,7 +58,7 @@ export interface SalesOrderSummaryRow {
   amountCents: number;
 }
 
-export interface SalesOrder {
+export interface SalesOrderListItem {
   id: string;
   orderedAt: string;
   status: SalesOrderStatus;
@@ -49,6 +67,9 @@ export interface SalesOrder {
   currency: string;
   customer: SalesCustomerSummary;
   product: SalesProductSummary;
+}
+
+export interface SalesOrderDetail extends SalesOrderListItem {
   provider?: string;
   paymentMethod?: string;
   transactionId?: string;
@@ -64,7 +85,25 @@ export interface SalesOrder {
   subscription?: SalesSubscriptionContext;
 }
 
-export interface CreatorSalesDataState {
-  status: 'ready' | 'unavailable';
-  orders: SalesOrder[];
+export type SalesOrder = SalesOrderDetail;
+
+export type SalesStatusFilter = 'all' | SalesOrderStatus;
+export type SalesSortOption = 'newest' | 'oldest' | 'amount-desc' | 'amount-asc';
+
+export interface CreatorSalesSummaryQuery {
+  period?: SalesPeriod;
 }
+
+export interface CreatorOrdersQuery {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: SalesStatusFilter;
+  product?: string;
+  period?: SalesPeriod;
+  sort?: SalesSortOption;
+}
+
+export type CreatorOrdersPage = PageResponse<SalesOrderListItem> & {
+  productOptions: SalesProductSummary[];
+};

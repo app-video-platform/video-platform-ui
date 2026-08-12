@@ -1,3 +1,5 @@
+import { PageResponse } from '../admin';
+
 export type CustomerRelationshipStatus =
   | 'active-member'
   | 'past-due'
@@ -14,22 +16,23 @@ export type CustomerAccessStatus = 'active' | 'expired' | 'revoked';
 export type CustomerAccessSource = 'purchased' | 'membership' | 'manual';
 export type CustomerPurchaseStatus = 'paid' | 'refunded' | 'failed';
 
+export type CreatorCustomerProductType =
+  | 'Membership'
+  | 'Course'
+  | 'Download'
+  | 'Consultation';
+
 export interface CreatorCustomerProductSummary {
   id: string;
   name: string;
-  type: 'Membership' | 'Course' | 'Download' | 'Consultation';
+  type: CreatorCustomerProductType;
 }
 
-export interface CreatorCustomer {
+export interface CreatorCustomerListItem {
   id: string;
   name?: string;
   email: string;
   avatarUrl?: string;
-  phone?: string;
-  location?: string;
-  language?: string;
-  timezone?: string;
-  customerSince?: string;
   relationshipStatus: CustomerRelationshipStatus;
   membershipState: CustomerMembershipState;
   products: CreatorCustomerProductSummary[];
@@ -38,11 +41,6 @@ export interface CreatorCustomer {
   activeAccessCount: number;
   lastActivityAt?: string;
   lastActivityLabel?: string;
-  tags?: string[];
-  notes?: CreatorCustomerNote[];
-  activity: CreatorCustomerActivity[];
-  purchases: CreatorCustomerPurchase[];
-  access: CreatorCustomerAccess[];
 }
 
 export interface CreatorCustomerActivity {
@@ -56,7 +54,7 @@ export interface CreatorCustomerActivity {
 export interface CreatorCustomerPurchase {
   id: string;
   productName: string;
-  productType: CreatorCustomerProductSummary['type'];
+  productType: CreatorCustomerProductType;
   purchasedAt: string;
   amountCents: number;
   paymentModel: 'One-time' | 'Monthly';
@@ -66,7 +64,7 @@ export interface CreatorCustomerPurchase {
 export interface CreatorCustomerAccess {
   id: string;
   productName: string;
-  productType: CreatorCustomerProductSummary['type'];
+  productType: CreatorCustomerProductType;
   status: CustomerAccessStatus;
   source: CustomerAccessSource;
   grantedAt: string;
@@ -80,7 +78,40 @@ export interface CreatorCustomerNote {
   createdAt: string;
 }
 
-export interface CreatorCustomersDataState {
-  status: 'ready' | 'unavailable';
-  customers: CreatorCustomer[];
+export interface CreatorCustomerDetail extends CreatorCustomerListItem {
+  phone?: string;
+  location?: string;
+  language?: string;
+  timezone?: string;
+  customerSince?: string;
+  tags?: string[];
+  notes?: CreatorCustomerNote[];
+  activity: CreatorCustomerActivity[];
+  purchases: CreatorCustomerPurchase[];
+  access: CreatorCustomerAccess[];
 }
+
+export type CreatorCustomer = CreatorCustomerDetail;
+
+export type CreatorCustomerStatusFilter = 'all' | CustomerRelationshipStatus;
+export type CreatorCustomerMembershipFilter = 'all' | CustomerMembershipState;
+export type CreatorCustomerSortOption =
+  | 'last-activity-desc'
+  | 'spend-desc'
+  | 'spend-asc'
+  | 'name-asc'
+  | 'name-desc';
+
+export interface CreatorCustomersQuery {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: CreatorCustomerStatusFilter;
+  product?: string;
+  membership?: CreatorCustomerMembershipFilter;
+  sort?: CreatorCustomerSortOption;
+}
+
+export type CreatorCustomersPage = PageResponse<CreatorCustomerListItem> & {
+  productOptions: CreatorCustomerProductSummary[];
+};

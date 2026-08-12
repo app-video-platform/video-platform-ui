@@ -1,17 +1,24 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { BiSort } from 'react-icons/bi';
 import { MdGroups, MdOutlineInventory2, MdOutlinePayments } from 'react-icons/md';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Input, Select, SelectOption, Button } from '@shared/ui';
+import { AppDispatch } from 'core/api/models';
+import {
+  fetchCreatorCustomersPage,
+  selectCreatorCustomerProductOptions,
+  selectCreatorCustomers,
+  selectCreatorCustomersListError,
+  selectCreatorCustomersListLoading,
+  selectCreatorCustomersPage,
+} from 'core/store/customers-store';
 
 import CustomerManagementRow from './customer-management-row.component';
-import { getCreatorCustomersData } from './creator-customers.fixtures';
 import {
   CustomerFilterForm,
   defaultCustomerFilterForm,
-  filterAndSortCustomers,
-  getCustomerProductOptions,
 } from './creator-customers.utils';
 
 import './customers.styles.scss';
@@ -43,40 +50,56 @@ const sortOptions: SelectOption[] = [
 ];
 
 const CustomersList: React.FC = () => {
-  const data = useMemo(() => getCreatorCustomersData(), []);
+  const dispatch = useDispatch<AppDispatch>();
+  const customersPage = useSelector(selectCreatorCustomersPage);
+  const customers = useSelector(selectCreatorCustomers);
+  const productFilterOptions = useSelector(selectCreatorCustomerProductOptions);
+  const loading = useSelector(selectCreatorCustomersListLoading);
+  const error = useSelector(selectCreatorCustomersListError);
   const [filterForm, setFilterForm] = useState<CustomerFilterForm>(
     defaultCustomerFilterForm,
   );
   const [page, setPage] = useState(0);
 
-  const hasCustomers = data.customers.length > 0;
+  useEffect(() => {
+    dispatch(
+      fetchCreatorCustomersPage({
+        page,
+        pageSize: PAGE_SIZE,
+        search: filterForm.search,
+        status: filterForm.status,
+        product: filterForm.product,
+        membership: filterForm.membership,
+        sort: filterForm.sort,
+      }),
+    );
+  }, [dispatch, filterForm, page]);
+
   const productOptions = useMemo(
     () => [
       { label: 'All products', value: 'all' },
-      ...getCustomerProductOptions(data.customers),
+      ...productFilterOptions.map((product) => ({
+        label: product.name,
+        value: product.id,
+      })),
     ],
-    [data.customers],
+    [productFilterOptions],
   );
-  const filteredCustomers = useMemo(
-    () => filterAndSortCustomers(data.customers, filterForm),
-    [data.customers, filterForm],
-  );
-  const totalPages = Math.max(1, Math.ceil(filteredCustomers.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages - 1);
-  const pagedCustomers = filteredCustomers.slice(
-    currentPage * PAGE_SIZE,
-    currentPage * PAGE_SIZE + PAGE_SIZE,
-  );
-
   const hasSearch = filterForm.search.trim().length > 0;
   const hasFilters =
     filterForm.status !== 'all' ||
     filterForm.product !== 'all' ||
     filterForm.membership !== 'all';
   const hasActiveRefinement = hasSearch || hasFilters;
+  const totalPages = customersPage?.totalPages ?? 1;
+  const currentPage = customersPage?.number ?? page;
+  const totalElements = customersPage?.totalElements ?? 0;
+  const hasCustomers = totalElements > 0;
+  const hasControls =
+    productFilterOptions.length > 0 || customers.length > 0 || hasActiveRefinement;
   const clearRefinementLabel = hasSearch && !hasFilters ? 'Clear search' : 'Clear filters';
-  const resultCountLabel = `${filteredCustomers.length} ${
-    filteredCustomers.length === 1 ? 'customer' : 'customers'
+  const resultCountLabel = `${totalElements} ${
+    totalElements === 1 ? 'customer' : 'customers'
   }`;
 
   const handleControlChange = (
@@ -107,7 +130,15 @@ const CustomersList: React.FC = () => {
   };
 
   const renderState = (): React.ReactNode => {
-    if (data.status === 'unavailable') {
+    if (loading && !customersPage) {
+      return (
+        <div className="customers-state" role="status">
+          <h2>Loading customers</h2>
+        </div>
+      );
+    }
+
+    if (error) {
       return (
         <div className="customers-state" role="status">
           <h2>Customer data is not available yet</h2>
@@ -119,7 +150,7 @@ const CustomersList: React.FC = () => {
       );
     }
 
-    if (!hasCustomers) {
+    if (!hasCustomers && !hasActiveRefinement) {
       return (
         <div className="customers-state">
           <h2>No customers yet</h2>
@@ -131,7 +162,7 @@ const CustomersList: React.FC = () => {
       );
     }
 
-    if (filteredCustomers.length === 0 && hasSearch) {
+    if (totalElements === 0 && hasSearch) {
       return (
         <div className="customers-state">
           <h2>{`No customers match "${filterForm.search.trim()}".`}</h2>
@@ -143,7 +174,7 @@ const CustomersList: React.FC = () => {
       );
     }
 
-    if (filteredCustomers.length === 0 && hasFilters) {
+    if (totalElements === 0 && hasFilters) {
       return (
         <div className="customers-state">
           <h2>No customers match these filters.</h2>
@@ -167,7 +198,7 @@ const CustomersList: React.FC = () => {
         </div>
       </header>
 
-      {hasCustomers && (
+      {hasControls && (
         <section className="customers-toolbar" aria-label="Customer controls">
           <Input
             value={filterForm.search}
@@ -219,7 +250,7 @@ const CustomersList: React.FC = () => {
         </section>
       )}
 
-      {hasCustomers && (
+      {hasControls && (
         <div className="customers-collection-meta">
           <span>{resultCountLabel}</span>
           {hasActiveRefinement && (
@@ -246,7 +277,7 @@ const CustomersList: React.FC = () => {
               <span>Last activity</span>
             </div>
             <div className="customers-management-list__rows">
-              {pagedCustomers.map((customer) => (
+              {customers.map((customer) => (
                 <CustomerManagementRow customer={customer} key={customer.id} />
               ))}
             </div>

@@ -1,14 +1,21 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import { HiArrowLeft } from 'react-icons/hi';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { GalIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
+import { AppDispatch } from 'core/api/models';
+import {
+  fetchCreatorCustomerDetail,
+  selectCreatorCustomerDetailError,
+  selectCreatorCustomerDetailLoading,
+  selectCurrentCreatorCustomer,
+} from 'core/store/customers-store';
 
 import CustomerAvatar from './customer-avatar.component';
 import CustomerStatusBadge from './customer-status-badge.component';
-import { getCreatorCustomersData } from './creator-customers.fixtures';
 import {
   accessSourceLabel,
   accessStatusLabel,
@@ -33,12 +40,34 @@ const tabs: Array<{ id: CustomerDetailTab; label: string }> = [
 ];
 
 const CustomerDetail: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const { customerId } = useParams();
-  const data = useMemo(() => getCreatorCustomersData(), []);
-  const customer = data.customers.find((item) => item.id === customerId);
+  const customer = useSelector(selectCurrentCreatorCustomer);
+  const loading = useSelector(selectCreatorCustomerDetailLoading);
+  const error = useSelector(selectCreatorCustomerDetailError);
   const [activeTab, setActiveTab] = useState<CustomerDetailTab>('overview');
 
-  if (data.status === 'unavailable') {
+  useEffect(() => {
+    if (customerId) {
+      dispatch(fetchCreatorCustomerDetail(customerId));
+    }
+  }, [customerId, dispatch]);
+
+  if (loading && !customer) {
+    return (
+      <div className="customer-detail-page">
+        <Link to="/app/customers" className="customer-detail-back">
+          <GalIcon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
+          Back to Customers
+        </Link>
+        <div className="customers-state" role="status">
+          <h2>Loading customer</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
     return (
       <div className="customer-detail-page">
         <Link to="/app/customers" className="customer-detail-back">
@@ -65,7 +94,7 @@ const CustomerDetail: React.FC = () => {
         </Link>
         <div className="customers-state">
           <h2>Customer not found</h2>
-          <p>This customer is not available in the current inspection data.</p>
+          <p>This customer is not available.</p>
         </div>
       </div>
     );

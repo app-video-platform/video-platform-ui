@@ -6,7 +6,7 @@ import {
   SalesOrderStatus,
   SalesOrderType,
   SalesProductType,
-} from './creator-sales.types';
+} from 'core/api/models';
 
 export type SalesPeriod = 'today' | '7d' | '30d' | '90d';
 export type SalesStatusFilter = 'all' | SalesOrderStatus;
