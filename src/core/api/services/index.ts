@@ -4,6 +4,7 @@ export * from './auth';
 export * from './calendar';
 export * from './customers';
 export * from './dashboard';
+export * from './membership';
 export * from './products';
 export * from './user';
 export * from './reviews';

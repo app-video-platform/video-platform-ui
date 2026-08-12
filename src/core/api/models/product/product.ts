@@ -4,6 +4,10 @@ import { MeetingMethod } from './meeting-method.types';
 import { ProductType, ProductStatus } from './products.types';
 import { ProductSection } from './section';
 
+export type ProductPricingModel = 'ONE_TIME' | 'RECURRING';
+export type ProductBillingInterval = 'MONTH' | 'YEAR';
+export type ProductCurrency = 'EUR';
+
 export interface AbstractProductBase {
   id: string;
   type: ProductType;
@@ -11,6 +15,9 @@ export interface AbstractProductBase {
   description?: string;
   status?: ProductStatus;
   price?: 'free' | number;
+  pricingModel?: ProductPricingModel;
+  billingInterval?: ProductBillingInterval;
+  currency?: ProductCurrency;
   userId?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -57,6 +64,9 @@ export interface ProductMinimised {
   description?: string;
   type?: ProductType;
   price?: number | 'free';
+  pricingModel?: ProductPricingModel;
+  billingInterval?: ProductBillingInterval;
+  currency?: ProductCurrency;
   status?: ProductStatus;
   imageUrl?: string;
   createdById?: string;

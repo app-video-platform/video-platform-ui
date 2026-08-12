@@ -19,6 +19,13 @@ const mockProductStoreState = {
     loading: false,
     error: null as string | null,
   },
+  membership: {
+    byProductId: {} as Record<string, any>,
+    loading: false,
+    error: null as string | null,
+    saving: false,
+    saveError: null as string | null,
+  },
 };
 
 // ── 1) Mock @shared/ui (UppyFileUploader) ────────────────────────────
@@ -59,7 +66,6 @@ const mockUseProductFormFacade = jest.fn();
 const mockUseProductFormAnimation = jest.fn();
 const mockProductWorkspaceShell = jest.fn();
 const mockUseGlobalSaveStatus = jest.fn(() => 'idle');
-const mockUseMembershipBuilderState = jest.fn();
 const mockEvaluateMembershipReadiness = jest.fn(
   ({
     formData,
@@ -103,8 +109,6 @@ jest.mock('domains/app/features/product-form', () => ({
   useProductFormAnimation: (...args: any[]) =>
     mockUseProductFormAnimation(...args),
   useGlobalSaveStatus: () => mockUseGlobalSaveStatus(),
-  useMembershipBuilderState: (...args: any[]) =>
-    mockUseMembershipBuilderState(...args),
   evaluateMembershipReadiness: (input: any) =>
     mockEvaluateMembershipReadiness(input),
   resolveMembershipIncludedProducts: (
@@ -278,20 +282,11 @@ beforeEach(() => {
   mockProductStoreState.products.productSummaries = null;
   mockProductStoreState.products.loading = false;
   mockProductStoreState.products.error = null;
-  mockUseMembershipBuilderState.mockReturnValue({
-    nativeContentItems: [],
-    feedEntries: [],
-    orderingMode: 'NEWEST_FIRST',
-    includedProductEntries: [],
-    getNextNativeContentId: jest.fn(),
-    setOrderingMode: jest.fn(),
-    addNativeContentItem: jest.fn(),
-    updateNativeContentItem: jest.fn(),
-    deleteNativeContentItem: jest.fn(),
-    addIncludedProducts: jest.fn(),
-    removeIncludedProduct: jest.fn(),
-    moveFeedEntry: jest.fn(),
-  });
+  mockProductStoreState.membership.byProductId = {};
+  mockProductStoreState.membership.loading = false;
+  mockProductStoreState.membership.error = null;
+  mockProductStoreState.membership.saving = false;
+  mockProductStoreState.membership.saveError = null;
 });
 
 const makeFacadeState = (overrides: Partial<any> = {}) => ({
@@ -490,14 +485,16 @@ describe('<ProductForm />', () => {
 
     expect(screen.getByTestId('recurring-price-selector')).toBeInTheDocument();
     expect(screen.getByTestId('recurring-price-selector')).toHaveTextContent(
-      '0 EUR MONTH',
+      '25 EUR MONTH',
     );
     expect(screen.queryByTestId('price-selector')).not.toBeInTheDocument();
   });
 
   it('passes derived Membership readiness to ProductWorkspaceShell publish state', async () => {
-    mockUseMembershipBuilderState.mockReturnValue({
-      nativeContentItems: [
+    mockProductStoreState.membership.byProductId['membership-1'] = {
+      productId: 'membership-1',
+      config: { productId: 'membership-1', orderingMode: 'NEWEST_FIRST' },
+      content: [
         {
           id: 'post-1',
           type: 'POST',
@@ -508,18 +505,8 @@ describe('<ProductForm />', () => {
           updatedAt: '2026-08-10T10:00:00.000Z',
         },
       ],
-      feedEntries: [],
-      orderingMode: 'NEWEST_FIRST',
-      includedProductEntries: [],
-      getNextNativeContentId: jest.fn(),
-      setOrderingMode: jest.fn(),
-      addNativeContentItem: jest.fn(),
-      updateNativeContentItem: jest.fn(),
-      deleteNativeContentItem: jest.fn(),
-      addIncludedProducts: jest.fn(),
-      removeIncludedProduct: jest.fn(),
-      moveFeedEntry: jest.fn(),
-    });
+      feed: [],
+    };
     const state = makeFacadeState({
       formData: {
         id: 'membership-1',
@@ -584,23 +571,15 @@ describe('<ProductForm />', () => {
   });
 
   it('updates Membership readiness when published native content is added', async () => {
-    const emptyBuilderState = {
-      nativeContentItems: [],
-      feedEntries: [],
-      orderingMode: 'NEWEST_FIRST',
-      includedProductEntries: [],
-      getNextNativeContentId: jest.fn(),
-      setOrderingMode: jest.fn(),
-      addNativeContentItem: jest.fn(),
-      updateNativeContentItem: jest.fn(),
-      deleteNativeContentItem: jest.fn(),
-      addIncludedProducts: jest.fn(),
-      removeIncludedProduct: jest.fn(),
-      moveFeedEntry: jest.fn(),
+    const emptyAggregate = {
+      productId: 'membership-1',
+      config: { productId: 'membership-1', orderingMode: 'NEWEST_FIRST' },
+      content: [],
+      feed: [],
     };
-    const publishedBuilderState = {
-      ...emptyBuilderState,
-      nativeContentItems: [
+    const publishedAggregate = {
+      ...emptyAggregate,
+      content: [
         {
           id: 'post-1',
           type: 'POST',
@@ -623,7 +602,8 @@ describe('<ProductForm />', () => {
     });
 
     mockUseProductFormFacade.mockReturnValue(state);
-    mockUseMembershipBuilderState.mockReturnValue(emptyBuilderState);
+    mockProductStoreState.membership.byProductId['membership-1'] =
+      emptyAggregate;
 
     const view = render(<ProductForm />);
 
@@ -633,7 +613,8 @@ describe('<ProductForm />', () => {
       );
     });
 
-    mockUseMembershipBuilderState.mockReturnValue(publishedBuilderState);
+    mockProductStoreState.membership.byProductId['membership-1'] =
+      publishedAggregate;
     view.rerender(<ProductForm />);
 
     await waitFor(() => {
@@ -656,9 +637,11 @@ describe('<ProductForm />', () => {
         status: 'PUBLISHED',
       },
     ];
-    mockUseMembershipBuilderState.mockReturnValue({
-      nativeContentItems: [],
-      feedEntries: [
+    mockProductStoreState.membership.byProductId['membership-1'] = {
+      productId: 'membership-1',
+      config: { productId: 'membership-1', orderingMode: 'NEWEST_FIRST' },
+      content: [],
+      feed: [
         {
           entryId: 'product:download-1',
           kind: 'PRODUCT',
@@ -666,24 +649,7 @@ describe('<ProductForm />', () => {
           addedAt: '2026-08-10T10:00:00.000Z',
         },
       ],
-      orderingMode: 'NEWEST_FIRST',
-      includedProductEntries: [
-        {
-          entryId: 'product:download-1',
-          kind: 'PRODUCT',
-          productId: 'download-1',
-          addedAt: '2026-08-10T10:00:00.000Z',
-        },
-      ],
-      getNextNativeContentId: jest.fn(),
-      setOrderingMode: jest.fn(),
-      addNativeContentItem: jest.fn(),
-      updateNativeContentItem: jest.fn(),
-      deleteNativeContentItem: jest.fn(),
-      addIncludedProducts: jest.fn(),
-      removeIncludedProduct: jest.fn(),
-      moveFeedEntry: jest.fn(),
-    });
+    };
     const state = makeFacadeState({
       formData: {
         id: 'membership-1',
