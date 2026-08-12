@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import { AnalyticsMetric } from '../creator-analytics.types';
+import { AnalyticsMetric } from 'core/api/models';
 import { getTrendSymbol } from '../creator-analytics.utils';
 
 interface AnalyticsMetricCardProps {

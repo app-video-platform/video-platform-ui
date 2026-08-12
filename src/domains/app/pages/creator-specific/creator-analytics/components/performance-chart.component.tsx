@@ -17,7 +17,7 @@ import {
   AnalyticsMetricKey,
   AnalyticsPeriod,
   AnalyticsSeriesPoint,
-} from '../creator-analytics.types';
+} from 'core/api/models';
 import {
   formatAnalyticsCompactMoney,
   formatAnalyticsNumber,

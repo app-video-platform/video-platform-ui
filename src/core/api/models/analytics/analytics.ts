@@ -56,8 +56,7 @@ export interface PaymentHealthMetric {
   sentiment: AnalyticsSentiment;
 }
 
-export interface CreatorAnalyticsData {
-  status: 'ready' | 'unavailable';
+export interface CreatorAnalyticsOverview {
   period: AnalyticsPeriod;
   periodLabel: string;
   previousPeriodLabel: string;
@@ -80,4 +79,8 @@ export interface CreatorAnalyticsData {
     metrics: PaymentHealthMetric[];
     series: AnalyticsSeriesPoint[];
   };
+}
+
+export interface CreatorAnalyticsOverviewQuery {
+  period?: AnalyticsPeriod;
 }

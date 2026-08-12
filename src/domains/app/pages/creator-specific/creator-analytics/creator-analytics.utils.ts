@@ -8,7 +8,7 @@ import {
   AnalyticsSeriesPoint,
   PaymentHealthMetric,
   ProductAnalyticsItem,
-} from './creator-analytics.types';
+} from 'core/api/models';
 
 export const analyticsPeriodOptions: SelectOption[] = [
   { label: 'Last 7 days', value: '7d' },

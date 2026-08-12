@@ -10,7 +10,7 @@ import {
 
 import { ChartTooltip } from '@shared/ui';
 
-import { AnalyticsSeriesPoint, PaymentHealthMetric } from '../creator-analytics.types';
+import { AnalyticsSeriesPoint, PaymentHealthMetric } from 'core/api/models';
 import { formatAnalyticsNumber, getTrendSymbol } from '../creator-analytics.utils';
 
 interface PaymentHealthSectionProps {

@@ -1,8 +1,10 @@
 import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit';
 import authReducer from './auth-store/auth.slice';
 import adminReducer from './admin-store/admin.slice';
+import analyticsReducer from './analytics-store/analytics.slice';
 import productsReducer from './product-store/product.slice';
 import customersReducer from './customers-store/customers.slice';
+import dashboardReducer from './dashboard-store/dashboard.slice';
 import notificationsReducer from './notifications/notifications.slice';
 import salesReducer from './sales-store/sales.slice';
 import shopCartReducer, {
@@ -24,8 +26,10 @@ export const store = configureStore({
   reducer: {
     auth: authReducer,
     admin: adminReducer,
+    analytics: analyticsReducer,
     products: productsReducer,
     customers: customersReducer,
+    dashboard: dashboardReducer,
     notifications: notificationsReducer,
     sales: salesReducer,
     shopCart: shopCartReducer,

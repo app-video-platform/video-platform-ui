@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 
 import { Button } from '@shared/ui';
-import { AttentionItem } from '../fixtures/dashboard-inspection-fixture';
+import { DashboardAttentionItem } from 'core/api/models';
 
 import './attention-list.styles.scss';
 
 interface AttentionListProps {
-  items: AttentionItem[];
+  items: DashboardAttentionItem[];
 }
 
-const severityLabel: Record<AttentionItem['severity'], string> = {
+const severityLabel: Record<DashboardAttentionItem['severity'], string> = {
   high: 'High priority',
   medium: 'Medium priority',
   low: 'Low priority',
