@@ -19,7 +19,6 @@ import {
   ExplorePage,
   GalacticaHome,
   LibraryPage,
-  MarketingPage,
   Onboarding,
   ProductForm,
   ProductPage,
@@ -29,7 +28,7 @@ import {
   SearchResultsPage,
   SettingsPage,
   StorefrontPage,
-  UserPagePreview,
+  CreatorStorefrontPage,
   WishlistTab,
 } from '../pages';
 import { ProtectedRoute } from '@core/providers';
@@ -139,15 +138,6 @@ const AppRouter: React.FC = () => (
         />
 
         <Route
-          path="marketing"
-          element={
-            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
-              <MarketingPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
           path="analytics"
           element={
             <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
@@ -176,7 +166,18 @@ const AppRouter: React.FC = () => (
         </Route>
 
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="my-page-preview" element={<UserPagePreview />} />
+        <Route
+          path="storefront"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+              <CreatorStorefrontPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="my-page-preview"
+          element={<Navigate to="/app/storefront" replace />}
+        />
         <Route path="cart" element={<Cart />} />
 
         {/* Fallback inside /app */}

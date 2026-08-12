@@ -1,0 +1,19 @@
+.storefront-route-state {
+  min-height: calc(100vh - 88px);
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  background: var(--surface-canvas);
+  color: var(--text-primary);
+  padding: 32px;
+  text-align: center;
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-secondary);
+  }
+}

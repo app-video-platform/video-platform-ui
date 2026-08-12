@@ -36,6 +36,7 @@ jest.mock('../pages', () => {
     Cart: makePage('Cart'),
     ConsultationTab: makePage('Consultations'),
     CoursesTab: makePage('Courses'),
+    CreatorAnalytics: makePage('Analytics'),
     CreatorDashboard: makePage('Creator dashboard'),
     CustomerDetail: makePage('Customer detail'),
     CustomersList: makePage('Customers list'),
@@ -43,7 +44,6 @@ jest.mock('../pages', () => {
     ExplorePage: makePage('Explore'),
     GalacticaHome: makePage('User home'),
     LibraryPage: MockOutletPage,
-    MarketingPage: makePage('Marketing'),
     Onboarding: makePage('Onboarding'),
     ProductForm: makePage('Product form'),
     ProductPage: makePage('Product page'),
@@ -52,7 +52,7 @@ jest.mock('../pages', () => {
     SearchResultsPage: makePage('Search results'),
     SettingsPage: makePage('Settings'),
     StorefrontPage: makePage('Storefront'),
-    UserPagePreview: makePage('Preview'),
+    CreatorStorefrontPage: makePage('Creator Storefront'),
     WishlistTab: makePage('Wishlist'),
   };
 });
@@ -115,5 +115,21 @@ describe('AppRouter role routing', () => {
     renderRouter([UserRole.CREATOR], '/customers/cust-1');
 
     expect(screen.getByText('Customer detail')).toBeInTheDocument();
+  });
+
+  it('renders the Creator Storefront route and redirects the legacy preview route', () => {
+    renderRouter([UserRole.CREATOR], '/storefront');
+
+    expect(screen.getByText('Creator Storefront')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/my-page-preview');
+
+    expect(screen.getByText('Creator Storefront')).toBeInTheDocument();
+  });
+
+  it('renders the public Storefront route outside the protected Creator route', () => {
+    renderRouter([UserRole.USER], '/store/creator-1');
+
+    expect(screen.getByText('Storefront')).toBeInTheDocument();
   });
 });

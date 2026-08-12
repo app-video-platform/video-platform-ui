@@ -17,10 +17,9 @@ const CREATOR_ROUTES = [
   '/app/products',
   '/app/customers/*',
   '/app/sales',
-  '/app/marketing',
   '/app/analytics',
   '/app/settings',
-  '/app/my-page-preview',
+  '/app/storefront',
 ];
 
 const Shell: React.FC = () => {
@@ -34,8 +33,11 @@ const Shell: React.FC = () => {
     location.pathname.startsWith('/app/products/create') ||
     location.pathname.startsWith('/app/products/edit') ||
     location.pathname.startsWith('/app/admin/products/create');
+  const isPublicStorefrontRoute = Boolean(
+    matchPath('/app/store/:creatorId', location.pathname),
+  );
 
-  if (isBuilderRoute) {
+  if (isBuilderRoute || isPublicStorefrontRoute) {
     return <Outlet />;
   }
 
