@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { CreatorCustomer } from './creator-customers.types';
+import { CreatorCustomerListItem } from 'core/api/models';
 import { getCustomerDisplayName, getCustomerInitials } from './creator-customers.utils';
 
 interface CustomerAvatarProps {
-  customer: CreatorCustomer;
+  customer: CreatorCustomerListItem;
   large?: boolean;
 }
 

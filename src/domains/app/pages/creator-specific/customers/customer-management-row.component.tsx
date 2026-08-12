@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { CreatorCustomer } from './creator-customers.types';
+import { CreatorCustomerListItem } from 'core/api/models';
 import CustomerAvatar from './customer-avatar.component';
 import CustomerStatusBadge from './customer-status-badge.component';
 import {
@@ -11,7 +11,7 @@ import {
 } from './creator-customers.utils';
 
 interface CustomerManagementRowProps {
-  customer: CreatorCustomer;
+  customer: CreatorCustomerListItem;
 }
 
 const CustomerManagementRow: React.FC<CustomerManagementRowProps> = ({

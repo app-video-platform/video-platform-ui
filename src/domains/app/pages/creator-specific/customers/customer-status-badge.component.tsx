@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 
-import { CustomerRelationshipStatus } from './creator-customers.types';
+import { CustomerRelationshipStatus } from 'core/api/models';
 import { relationshipLabel } from './creator-customers.utils';
 
 interface CustomerStatusBadgeProps {
