@@ -132,6 +132,7 @@ dist
 
 # generated mock outputs
 src/core/api/_mocks.ts
+src/core/api/_mocks/
 *storybook.log
 storybook-static
 

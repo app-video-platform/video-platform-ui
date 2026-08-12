@@ -1,22 +1,33 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BiSort } from 'react-icons/bi';
 import { FaSearch } from 'react-icons/fa';
 import { MdOutlineCalendarToday, MdOutlineFilterList } from 'react-icons/md';
 import { SiStatuspal } from 'react-icons/si';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Drawer, Input, Select, SelectOption, StatusBadge } from '@shared/ui';
+import { AppDispatch, SalesOrderDetail, SalesOrderListItem } from 'core/api/models';
+import {
+  clearCurrentOrder,
+  fetchCreatorOrderDetail,
+  fetchCreatorOrdersPage,
+  fetchCreatorSalesSummary,
+  selectCreatorOrderProductOptions,
+  selectCreatorOrders,
+  selectCreatorOrdersError,
+  selectCreatorOrdersLoading,
+  selectCreatorOrdersPage,
+  selectCreatorSalesSummary,
+  selectCreatorSalesSummaryError,
+  selectCurrentCreatorOrder,
+} from 'core/store/sales-store';
 
-import { getCreatorSalesData } from './creator-sales.fixtures';
-import { SalesOrder } from './creator-sales.types';
 import {
   defaultSalesFilterForm,
-  filterAndSortSalesOrders,
   formatSalesDateTime,
   formatSalesMoney,
   formatSalesShortDate,
-  getSalesMetrics,
-  getSalesProductOptions,
   orderStatusLabel,
   orderStatusTone,
   orderTypeLabel,
@@ -37,49 +48,76 @@ const trendSymbol: Record<string, string> = {
 };
 
 const SalesPage: React.FC = () => {
-  const data = useMemo(() => getCreatorSalesData(), []);
+  const dispatch = useDispatch<AppDispatch>();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedOrderId = searchParams.get('order');
+  const summary = useSelector(selectCreatorSalesSummary);
+  const summaryError = useSelector(selectCreatorSalesSummaryError);
+  const ordersPage = useSelector(selectCreatorOrdersPage);
+  const orders = useSelector(selectCreatorOrders);
+  const productFilterOptions = useSelector(selectCreatorOrderProductOptions);
+  const ordersLoading = useSelector(selectCreatorOrdersLoading);
+  const ordersError = useSelector(selectCreatorOrdersError);
+  const currentOrder = useSelector(selectCurrentCreatorOrder);
   const [filterForm, setFilterForm] = useState(defaultSalesFilterForm);
   const [page, setPage] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const hasOrders = data.orders.length > 0;
+  useEffect(() => {
+    dispatch(fetchCreatorSalesSummary({ period: filterForm.period }));
+  }, [dispatch, filterForm.period]);
+
+  useEffect(() => {
+    dispatch(
+      fetchCreatorOrdersPage({
+        page,
+        pageSize: PAGE_SIZE,
+        search: filterForm.search,
+        status: filterForm.status,
+        product: filterForm.product,
+        period: filterForm.period,
+        sort: filterForm.sort,
+      }),
+    );
+  }, [dispatch, filterForm, page]);
+
+  useEffect(() => {
+    if (selectedOrderId) {
+      dispatch(fetchCreatorOrderDetail(selectedOrderId));
+      return;
+    }
+
+    dispatch(clearCurrentOrder());
+  }, [dispatch, selectedOrderId]);
+
   const productOptions = useMemo<SelectOption[]>(
     () => [
       { label: 'All products', value: 'all' },
-      ...getSalesProductOptions(data.orders),
+      ...productFilterOptions
+        .filter((product) => Boolean(product.id))
+        .map((product) => ({
+          label: product.name,
+          value: product.id ?? '',
+        })),
     ],
-    [data.orders],
+    [productFilterOptions],
   );
-  const filteredOrders = useMemo(
-    () => filterAndSortSalesOrders(data.orders, filterForm),
-    [data.orders, filterForm],
-  );
-  const periodOrders = useMemo(
-    () =>
-      filterAndSortSalesOrders(data.orders, {
-        ...defaultSalesFilterForm,
-        period: filterForm.period,
-      }),
-    [data.orders, filterForm.period],
-  );
-  const metrics = useMemo(() => getSalesMetrics(periodOrders), [periodOrders]);
-  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages - 1);
-  const pagedOrders = filteredOrders.slice(
-    currentPage * PAGE_SIZE,
-    currentPage * PAGE_SIZE + PAGE_SIZE,
-  );
-  const selectedOrder = data.orders.find((order) => order.id === selectedOrderId);
+  const selectedOrder =
+    currentOrder?.id === selectedOrderId ? currentOrder : undefined;
 
   const hasSearch = filterForm.search.trim().length > 0;
   const hasFilters = filterForm.status !== 'all' || filterForm.product !== 'all';
   const activeFilterCount =
     Number(filterForm.status !== 'all') + Number(filterForm.product !== 'all');
   const hasActiveRefinement = hasSearch || hasFilters;
-  const resultCountLabel = `${filteredOrders.length} ${
-    filteredOrders.length === 1 ? 'order' : 'orders'
+  const totalPages = ordersPage?.totalPages ?? 1;
+  const currentPage = ordersPage?.number ?? page;
+  const totalElements = ordersPage?.totalElements ?? 0;
+  const hasOrders = totalElements > 0;
+  const hasControls =
+    productFilterOptions.length > 0 || orders.length > 0 || hasActiveRefinement;
+  const resultCountLabel = `${totalElements} ${
+    totalElements === 1 ? 'order' : 'orders'
   }`;
 
   const handleControlChange = (
@@ -154,7 +192,15 @@ const SalesPage: React.FC = () => {
   );
 
   const renderState = (): React.ReactNode => {
-    if (data.status === 'unavailable') {
+    if (ordersLoading && !ordersPage) {
+      return (
+        <div className="sales-state" role="status">
+          <h2>Loading sales</h2>
+        </div>
+      );
+    }
+
+    if (ordersError || summaryError) {
       return (
         <div className="sales-state" role="status">
           <h2>Sales data is not available yet</h2>
@@ -166,7 +212,7 @@ const SalesPage: React.FC = () => {
       );
     }
 
-    if (!hasOrders) {
+    if (!hasOrders && !hasActiveRefinement) {
       return (
         <div className="sales-state">
           <h2>No sales yet</h2>
@@ -178,7 +224,7 @@ const SalesPage: React.FC = () => {
       );
     }
 
-    if (filteredOrders.length === 0 && hasSearch) {
+    if (totalElements === 0 && hasSearch) {
       return (
         <div className="sales-state">
           <h2>{`No orders match "${filterForm.search.trim()}".`}</h2>
@@ -189,7 +235,7 @@ const SalesPage: React.FC = () => {
       );
     }
 
-    if (filteredOrders.length === 0 && hasFilters) {
+    if (totalElements === 0 && hasFilters) {
       return (
         <div className="sales-state">
           <h2>No orders match these filters.</h2>
@@ -212,9 +258,9 @@ const SalesPage: React.FC = () => {
         </div>
       </header>
 
-      {hasOrders && (
+      {summary?.metrics && (
         <section className="sales-metrics" aria-label="Financial summary">
-          {metrics.map((metric) => (
+          {summary.metrics.map((metric) => (
             <article
               className={`sales-metric sales-metric--${metric.sentiment}`}
               key={metric.label}
@@ -229,7 +275,7 @@ const SalesPage: React.FC = () => {
         </section>
       )}
 
-      {hasOrders && (
+      {hasControls && (
         <section className="sales-toolbar" aria-label="Sales controls">
           <Input
             value={filterForm.search}
@@ -252,7 +298,7 @@ const SalesPage: React.FC = () => {
         </section>
       )}
 
-      {hasOrders && (
+      {hasControls && (
         <div className="sales-collection-meta">
           <span>{resultCountLabel}</span>
           {hasActiveRefinement && (
@@ -275,7 +321,7 @@ const SalesPage: React.FC = () => {
               <span>Amount</span>
             </div>
             <div className="sales-ledger__rows">
-              {pagedOrders.map((order) => (
+              {orders.map((order) => (
                 <OrderLedgerRow
                   key={order.id}
                   order={order}
@@ -330,7 +376,7 @@ const SalesPage: React.FC = () => {
 };
 
 interface OrderLedgerRowProps {
-  order: SalesOrder;
+  order: SalesOrderListItem;
   onOpen: () => void;
 }
 
@@ -401,7 +447,7 @@ const OrderLedgerRow: React.FC<OrderLedgerRowProps> = ({ order, onOpen }) => {
 };
 
 interface OrderDetailDrawerProps {
-  order?: SalesOrder;
+  order?: SalesOrderDetail;
   open: boolean;
   onClose: () => void;
 }
