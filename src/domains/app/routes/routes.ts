@@ -13,8 +13,9 @@ export const appRoutes = {
   customerDetail: (id = ':customerId') => `/app/customers/${id}`,
 
   sales: '/app/sales',
-  marketing: '/app/marketing',
   analytics: '/app/analytics',
+  storefront: '/app/storefront',
+  legacyStorefrontPreview: '/app/my-page-preview',
   library: '/app/library',
   settings: '/app/settings',
   cart: '/app/cart',

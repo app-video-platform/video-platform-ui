@@ -6,7 +6,7 @@ import {
   IoStorefrontOutline,
 } from 'react-icons/io5';
 import { FaMoneyBillTrendUp } from 'react-icons/fa6';
-import { MdAdminPanelSettings, MdCampaign, MdGroups } from 'react-icons/md';
+import { MdAdminPanelSettings, MdGroups } from 'react-icons/md';
 import { LuLayoutDashboard } from 'react-icons/lu';
 
 import { Route } from '../api/models/misc';
@@ -39,19 +39,13 @@ export const appRoutes: Route[] = [
     group: 'primary',
   },
   {
-    path: '/app/marketing',
-    label: 'Marketing',
-    icon: MdCampaign,
-    group: 'primary',
-  },
-  {
     path: '/app/analytics',
     label: 'Analytics',
     icon: IoAnalyticsSharp,
     group: 'primary',
   },
   {
-    path: '/app/my-page-preview',
+    path: '/app/storefront',
     label: 'Storefront',
     icon: IoStorefrontOutline,
     group: 'primary',

@@ -62,9 +62,12 @@ describe('SidebarNav', () => {
     expect(screen.getByRole('link', { name: /products/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /customers/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /sales/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /marketing/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /storefront/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /storefront/i })).toHaveAttribute(
+      'href',
+      '/app/storefront',
+    );
     expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /marketing/i })).toBeNull();
     expect(screen.queryByRole('link', { name: /explore/i })).toBeNull();
     expect(screen.queryByRole('link', { name: /messages/i })).toBeNull();
     expect(screen.queryByRole('link', { name: /reviews/i })).toBeNull();

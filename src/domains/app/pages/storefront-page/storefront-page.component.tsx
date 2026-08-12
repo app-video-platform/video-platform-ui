@@ -1,33 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
-import { selectAuthUser } from 'core/store/auth-store';
 import { ProductMinimised } from 'core/api/models';
 import { getAllProductsMinimalByUserAPI } from 'core/api/services';
+import {
+  getProfileFromProducts,
+  getStorefrontViewModel,
+  StorefrontPublicPage,
+  storefrontInspectionFeaturedProductId,
+  storefrontInspectionProducts,
+  storefrontInspectionUser,
+} from 'domains/app/features/storefront';
 
 import './storefront-page.styles.scss';
 
 const StorefrontPage: React.FC = () => {
   const { creatorId } = useParams();
-  const user = useSelector(selectAuthUser);
   const [products, setProducts] = useState<ProductMinimised[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const useInspectionData = process.env.REACT_APP_USE_MOCKS === 'true';
 
   useEffect(() => {
-    if (creatorId) {
-      let isMounted = true; // ↪️ prevent state updates after unmount
+    if (useInspectionData) {
+      setProducts(storefrontInspectionProducts);
+      setLoading(false);
+      setError(null);
+      return undefined;
+    }
 
-      // call your service
+    if (creatorId) {
+      let isMounted = true;
+
       getAllProductsMinimalByUserAPI(creatorId)
         .then((data) => {
           if (isMounted) {
             setProducts(data);
           }
         })
-        .catch((err) => {
-          console.error(err);
+        .catch(() => {
           if (isMounted) {
             setError('Failed to load products.');
           }
@@ -42,27 +53,58 @@ const StorefrontPage: React.FC = () => {
         isMounted = false;
       };
     }
-  }, []); // empty deps → runs once on mount
 
-  // if (loading) {
-  //   return <p>Loading products…</p>;
-  // }
-  // if (error) {
-  //   return <p>{error}</p>;
-  // }
+    setLoading(false);
+    return undefined;
+  }, [creatorId, useInspectionData]);
 
-  return (
-    <div className="storefront-page">
-      <main className="storefront-page-content">
-        <section className="hero">
-          <div className="creator-profile-image" />
-          <div className="hero-content">
-            <h1></h1>
-          </div>
-        </section>
-      </main>
-    </div>
+  const profile = useMemo(() => {
+    if (useInspectionData) {
+      return {
+        displayName: `${storefrontInspectionUser.firstName} ${storefrontInspectionUser.lastName}`,
+        title: storefrontInspectionUser.title,
+        tagline: storefrontInspectionUser.taglineMission,
+        bio: storefrontInspectionUser.bio,
+        website: storefrontInspectionUser.website,
+        imageUrl: storefrontInspectionUser.imageUrl,
+        socialLinks: storefrontInspectionUser.socialLinks,
+      };
+    }
+
+    return getProfileFromProducts(products, creatorId);
+  }, [creatorId, products, useInspectionData]);
+
+  const storefront = useMemo(
+    () =>
+      getStorefrontViewModel({
+        profile,
+        products,
+        featuredProductId: useInspectionData
+          ? storefrontInspectionFeaturedProductId
+          : undefined,
+      }),
+    [products, profile, useInspectionData],
   );
+
+  if (loading) {
+    return (
+      <main className="storefront-route-state" aria-busy="true">
+        <h1>Loading Storefront</h1>
+        <p>Preparing this creator&apos;s public page.</p>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="storefront-route-state" role="alert">
+        <h1>Storefront unavailable</h1>
+        <p>{error}</p>
+      </main>
+    );
+  }
+
+  return <StorefrontPublicPage storefront={storefront} />;
 };
 
 export default StorefrontPage;

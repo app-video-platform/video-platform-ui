@@ -61,14 +61,15 @@ Creator/Admin management routes are visually and structurally separated from buy
 - Desktop Creator management uses a persistent collapsible sidebar and a separate account/user control.
 - Tablet/mobile Creator management uses a compact top bar with a drawer navigation.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
-- Marketplace/customer routes still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA.
+- Marketplace/customer routes still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
 
 Current Creator IA:
 
-- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Customers (`/app/customers`), Sales (`/app/sales`), Marketing (`/app/marketing`), Analytics (`/app/analytics`), Storefront (`/app/my-page-preview`), Settings (`/app/settings`).
+- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Customers (`/app/customers`), Sales (`/app/sales`), Analytics (`/app/analytics`), Storefront (`/app/storefront`), Settings (`/app/settings`).
 - Intentionally disabled sidebar destinations: Help (`/app/help`).
 - Admin appears as a utility route for admin users only.
-- Messages and Reviews are not part of the current Creator MVP navigation. Reviews code still exists under marketing/reviews services/features, but it is not exposed as a Creator IA destination.
+- Marketing, Messages, and Reviews are not part of the current Creator MVP navigation. Reviews code still exists under marketing/reviews services/features, but it is not exposed as a Creator IA destination.
+- Legacy `/app/my-page-preview` redirects to `/app/storefront`; do not treat it as the active Storefront implementation.
 
 ## Creator Visual Conventions
 
@@ -157,12 +158,14 @@ Implemented / reasonably wired:
 
 - Auth signup, login, verify email, forgot password, Google sign-in hooks.
 - Protected routes by role.
-- Creator management shell with Dashboard, Products, Customers, Sales, Marketing, Analytics, Storefront, and Settings destinations; Help is visible as a disabled planned destination.
+- Creator management shell with Dashboard, Products, Customers, Sales, Analytics, Storefront, and Settings destinations; Help is visible as a disabled planned destination.
 - Creator Dashboard redesign with business metrics, recent activity, top products, and needs-attention panels.
 - Creator Products management redesign with local search/filter/sort, list/table desktop composition, mobile management cards, and distinct empty/loading/error states.
 - Creator Customers management area with a customer list and dedicated customer detail route.
 - Creator Sales management area with overview metrics, an orders ledger, local search/filter/sort/date preset controls, local pagination, responsive layout, empty/no-result states, and contextual order detail inspection.
 - Creator Analytics management area with period-scoped business metrics, performance visualization, product ranking, customer growth, membership health, and payment health.
+- Creator Storefront management area with public URL/copy affordance, profile summary, product visibility information, featured-product selection, product ordering controls, and a live public preview.
+- Public Storefront page at `/app/store/:creatorId` with creator identity/profile information, featured product when applicable, and a customer-facing published-product catalogue.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
@@ -179,9 +182,7 @@ Implemented / reasonably wired:
 Partially implemented / placeholder:
 
 - Product detail page has real loading by product ID but still contains placeholder copy, fake rating/language/duration/creator text, and placeholder image.
-- Storefront page fetches creator products but currently renders mostly empty UI.
 - Creator Help navigation destination is disabled because an implementation is not available yet.
-- Creator Marketing route exists, but verify feature completeness before expanding it.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
 - Membership included products are limited to existing Course/Download products and held in frontend state only.
 - Native Membership Post, Video, and Resource content have frontend-only create/edit/delete support. Native Video/Resource store selected local file metadata only and have no upload/persistence contract. No native Membership content has backend persistence.
@@ -199,7 +200,6 @@ Confirmed:
 - Tests pass but emit React Router v7 future flag warnings.
 - Tests emit icon casing warnings because icon mocks render as unknown tags in some shared UI tests.
 - Some shared UI tests emit controlled-input warnings.
-- `src/domains/app/pages/storefront-page/storefront-page.component.tsx` has unused fetched state in the rendered UI.
 - `.github/workflows/docs.yml` expects a `docs/` directory, but no `docs/` directory exists in this checkout.
 - `src/core/store/shop-cart/shop-cart.slice.ts` removal has a likely index bug: index `0` is treated as false, so the first cart item may not remove.
 - Membership has no backend included-product relationship API yet.
@@ -209,11 +209,12 @@ Confirmed:
 - Creator Customers has no production customer list/detail API, purchase/order API, entitlement/access contract, subscription/customer membership-state contract, waitlist API, tags/notes persistence, production pagination contract, or manual access-management API yet.
 - Creator Sales has no production order/payment/refund/subscription/entitlement services, provider-safe financial mutation contract, or server pagination contract yet.
 - Creator Analytics has no production analytics API endpoints, mock API responses, Redux/store integration, server-backed period queries, or shared analytics data service yet.
+- Creator Storefront has no production Storefront-specific configuration/persistence API, Redux/store integration, theme/page-builder system, custom-domain/SEO contract, or creator-profile-by-id API yet.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
-- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Customers, Sales, Analytics, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, or customer-domain states.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Customers, Sales, Analytics, Storefront, and frontend-only Membership inspection state. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Creator Dashboard inspection fixtures live in `src/domains/app/pages/creator-specific/creator-dashboard/fixtures/dashboard-inspection-fixture.ts`. When mocks are off, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
 - Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
@@ -221,6 +222,7 @@ Deliberate temporary implementations:
 - Creator Customers inspection fixtures live under `src/domains/app/pages/creator-specific/customers` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Customers renders honest unavailable states rather than fabricating customer business data. Fixture data must remain development/inspection infrastructure, not a production fallback.
 - Creator Sales inspection fixtures live under `src/domains/app/pages/creator-specific/sales-page` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Sales renders an honest unavailable state rather than fabricating order/payment/refund/access data. The `salesEmpty=true` query option and localStorage flag are inspection aids only, not production behavior.
 - Creator Analytics inspection fixtures live under `src/domains/app/pages/creator-specific/creator-analytics` and are returned only when `REACT_APP_USE_MOCKS=true`. With mocks off, Analytics renders an honest unavailable state rather than fabricated revenue, order, customer, membership, product-performance, refund, or failed-payment analytics.
+- Storefront inspection fixtures live under `src/domains/app/features/storefront` and are returned only when `REACT_APP_USE_MOCKS=true`. Fixture creator IDs, product examples, featured selection, and ordering are local inspection aids, not contracts. With mocks off, the public Storefront uses existing product summary data and limited creator fields available there; Storefront management renders unavailable/empty states instead of inventing Storefront-specific configuration.
 - Download upload deduping is local to the section editor instance.
 - Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
 - Membership native content state is local frontend state lifted above the Membership Content tab. Post, Video, and Resource can be created/edited/deleted locally; Video/Resource use selection-only local file metadata. Backend persistence remains undefined.
@@ -228,7 +230,7 @@ Deliberate temporary implementations:
 
 Speculative / verify before changing:
 
-- Backend shape for lesson rich text, quiz payloads, video upload, checkout/cart, and storefront data.
+- Backend shape for lesson rich text, quiz payloads, video upload, checkout/cart, and Storefront data/configuration.
 - Backend contracts for Membership native content, included products, recurring pricing, subscriptions, entitlements, and member access.
 - Whether product type changes after creation should remain disallowed in edit mode; current UI limits edit mode to current type in `BasicInfo`.
 
@@ -330,6 +332,41 @@ Important Analytics boundary:
 - With mocks off, Analytics renders an unavailable state rather than fabricated analytics data.
 - Do not infer traffic, conversion, attribution, payout, tax, course-engagement, cohort, custom date-range, or other analytics capabilities from the current page.
 
+## Creator Storefront
+
+The Storefront work is split between an authenticated Creator/Admin management surface and a public customer-facing Storefront, with shared Storefront view-model and presentation logic under `src/domains/app/features/storefront`.
+
+Routes and shell integration:
+
+- Creator/Admin Storefront management workspace: `/app/storefront`.
+- Public buyer-facing Storefront route: `/app/store/:creatorId`.
+- Legacy `/app/my-page-preview` redirects to `/app/storefront`; the old `user-page-preview` implementation has been removed.
+- Storefront management renders inside `CreatorAppShell`.
+- The public Storefront route renders outside Creator management chrome and outside the older marketplace `TopNavbar` shell.
+
+Current Storefront management patterns:
+
+- The management page shows Storefront status, public URL, copy-link affordance, public profile summary, product visibility information, featured-product selection, product ordering controls, and a live preview.
+- Public profile information reuses existing account/profile user fields such as name, title, tagline, bio, website, image, and social links instead of introducing a separate Storefront profile model.
+- Featured selection and ordering controls are local inspection controls until a persistence contract exists.
+- The live preview uses the same shared `StorefrontPublicPage` presentation as the public Storefront route, with preview styling applied by prop.
+
+Current public Storefront patterns:
+
+- `StorefrontPublicPage` renders creator identity/profile information, optional website link, a featured product when the featured product is publicly visible, and a catalogue of public products.
+- Product visibility is centralized in Storefront utilities: `PUBLISHED` products are publicly visible; `DRAFT` and `HIDDEN` products are not publicly visible.
+- Invalid or unavailable featured-product IDs fall back to the first public product.
+- Course, Download, Consultation, and Membership products are all represented with Storefront type labels.
+- The Storefront uses a fixed customer-facing layout. There is no page builder, theme customization system, custom-domain setup, SEO configuration, Storefront analytics, coupons, campaigns, newsletters, automations, attribution, or Reviews surface.
+- Empty and unavailable states are explicit, including the public empty catalogue state when no products are published.
+
+Current Storefront data boundary:
+
+- Storefront currently uses deterministic inspection data when `REACT_APP_USE_MOCKS=true`.
+- Without mocks, the public route fetches existing product summaries for the creator ID and derives only the limited creator identity available on those product summaries. There is no production Storefront profile-by-creator-id API yet.
+- There is no production Storefront-specific persistence API or Redux architecture for Storefront configuration. Featured-product selection and product ordering must not be documented or treated as persisted product behavior.
+- Fixture creator IDs, profile content, example products, screenshots, product order, and featured selections are local inspection aids, not product contracts.
+
 ## Creator Products Management
 
 The Creator product list is now a management page named `Products`, implemented under `src/domains/app/pages/creator-specific/products/products-list`.
@@ -400,6 +437,7 @@ Implemented examples:
 - Customers desktop/tablet list/table becomes mobile customer cards while preserving the stacked mobile filter controls.
 - Sales desktop orders ledger becomes tablet/mobile transaction cards, and mobile secondary filters move into the shared Drawer.
 - Analytics desktop chart/product/secondary grids collapse into single-column tablet/mobile layouts, with product ranking rows reflowing instead of overflowing.
+- Storefront management stacks controls and preview on narrower screens, while the public Storefront hero and product catalogue reflow into single-column customer-facing layouts.
 - Product workspace navigation adapts on narrow screens while preserving the focused editing shell.
 
 Avoid hardcoding viewport-specific pixel values into this document; inspect the SCSS breakpoints and component styles when implementing a responsive change.
@@ -413,14 +451,16 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Admin product management and create-for-creator flow using `ownerId` query param.
 - Membership added as a first-class frontend Product type.
 - Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, frontend-only Post/Video/Resource content creation/editing, and frontend-only recurring pricing controls.
-- Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Marketing, Analytics, Storefront, plus Settings utility navigation; Help remains disabled.
-- Creator Dashboard, Products, Customers, Sales, and Analytics management visual redesigns.
+- Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Analytics, Storefront, plus Settings utility navigation; Help remains disabled and Marketing is removed from the Creator MVP IA.
+- Creator Dashboard, Products, Customers, Sales, Analytics, and Storefront management visual redesigns.
+- Public Storefront implementation at `/app/store/:creatorId`, sharing Storefront presentation/view-model logic with the Creator live preview.
 - Focused Product Workspace shell for product editing.
 
 Likely next steps:
 
 - Polish/fix admin product owner filtering UX beyond raw owner ID.
-- Complete product detail and storefront UI using real backend fields.
+- Complete product detail UI using real backend fields.
+- Define Storefront persistence/profile/configuration contracts before persisting featured-product selection, product ordering, or Storefront-specific settings.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.
 - Define backend contracts for Membership native content, included-product relationships, recurring pricing, subscription checkout, and entitlement/member access before persisting Membership-specific fields.
