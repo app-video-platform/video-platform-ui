@@ -3,6 +3,7 @@ export * from './analytics-store';
 export * from './auth-store';
 export * from './customers-store';
 export * from './dashboard-store';
+export * from './membership-store';
 export * from './notifications';
 export * from './product-store';
 export * from './sales-store';

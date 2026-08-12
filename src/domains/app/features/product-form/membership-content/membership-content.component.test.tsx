@@ -54,6 +54,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ProductMinimised } from 'core/api/models';
 import MembershipContentSection from './membership-content.component';
 import { useMembershipBuilderState } from './use-membership-builder-state.hook';
+import {
+  createMembershipPostItem,
+  createMembershipResourceItem,
+  createMembershipVideoItem,
+} from './models';
 import { resolveMembershipIncludedProducts } from './utils/membership-readiness.utils';
 
 const productSummaries: ProductMinimised[] = [
@@ -95,6 +100,45 @@ const renderMembershipContent = () => {
 
   const TestMembershipContent = () => {
     const membershipBuilderState = useMembershipBuilderState();
+    const addPersistedNativeContent = (payload: any, addedAt: string) => {
+      const id = membershipBuilderState.getNextNativeContentId(payload.type);
+
+      if (payload.type === 'POST') {
+        membershipBuilderState.addNativeContentItem(
+          createMembershipPostItem(payload, id, addedAt),
+          addedAt,
+        );
+      }
+
+      if (payload.type === 'VIDEO') {
+        membershipBuilderState.addNativeContentItem(
+          createMembershipVideoItem(
+            { ...payload, description: payload.description ?? '' },
+            id,
+            addedAt,
+          ),
+          addedAt,
+        );
+      }
+
+      if (payload.type === 'RESOURCE') {
+        membershipBuilderState.addNativeContentItem(
+          createMembershipResourceItem(
+            { ...payload, description: payload.description ?? '' },
+            id,
+            addedAt,
+          ),
+          addedAt,
+        );
+      }
+    };
+    const updatePersistedNativeContent = (contentId: string, payload: any) => {
+      membershipBuilderState.updateNativeContentItem(contentId, (item) => ({
+        ...item,
+        ...payload,
+        updatedAt: new Date().toISOString(),
+      }));
+    };
 
     return (
       <MembershipContentSection
@@ -111,15 +155,8 @@ const renderMembershipContent = () => {
         )}
         isLoadingProducts={false}
         productsError={null}
-        getNextNativeContentId={
-          membershipBuilderState.getNextNativeContentId
-        }
-        onAddNativeContentItem={
-          membershipBuilderState.addNativeContentItem
-        }
-        onUpdateNativeContentItem={
-          membershipBuilderState.updateNativeContentItem
-        }
+        onAddNativeContentItem={addPersistedNativeContent}
+        onUpdateNativeContentItem={updatePersistedNativeContent}
         onDeleteNativeContentItem={
           membershipBuilderState.deleteNativeContentItem
         }
@@ -149,6 +186,45 @@ const renderSwitchableMembershipContent = () => {
   const TestSwitchableMembershipContent = () => {
     const [isContentTabOpen, setIsContentTabOpen] = React.useState(true);
     const membershipBuilderState = useMembershipBuilderState();
+    const addPersistedNativeContent = (payload: any, addedAt: string) => {
+      const id = membershipBuilderState.getNextNativeContentId(payload.type);
+
+      if (payload.type === 'POST') {
+        membershipBuilderState.addNativeContentItem(
+          createMembershipPostItem(payload, id, addedAt),
+          addedAt,
+        );
+      }
+
+      if (payload.type === 'VIDEO') {
+        membershipBuilderState.addNativeContentItem(
+          createMembershipVideoItem(
+            { ...payload, description: payload.description ?? '' },
+            id,
+            addedAt,
+          ),
+          addedAt,
+        );
+      }
+
+      if (payload.type === 'RESOURCE') {
+        membershipBuilderState.addNativeContentItem(
+          createMembershipResourceItem(
+            { ...payload, description: payload.description ?? '' },
+            id,
+            addedAt,
+          ),
+          addedAt,
+        );
+      }
+    };
+    const updatePersistedNativeContent = (contentId: string, payload: any) => {
+      membershipBuilderState.updateNativeContentItem(contentId, (item) => ({
+        ...item,
+        ...payload,
+        updatedAt: new Date().toISOString(),
+      }));
+    };
 
     return (
       <div>
@@ -175,15 +251,8 @@ const renderSwitchableMembershipContent = () => {
             )}
             isLoadingProducts={false}
             productsError={null}
-            getNextNativeContentId={
-              membershipBuilderState.getNextNativeContentId
-            }
-            onAddNativeContentItem={
-              membershipBuilderState.addNativeContentItem
-            }
-            onUpdateNativeContentItem={
-              membershipBuilderState.updateNativeContentItem
-            }
+            onAddNativeContentItem={addPersistedNativeContent}
+            onUpdateNativeContentItem={updatePersistedNativeContent}
             onDeleteNativeContentItem={
               membershipBuilderState.deleteNativeContentItem
             }

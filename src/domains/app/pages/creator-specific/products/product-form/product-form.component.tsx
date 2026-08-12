@@ -14,23 +14,46 @@ import {
   useProductFormFacade,
   useProductFormAnimation,
   BasicInfo,
-  DEFAULT_RECURRING_PRICING,
   SectionDraft,
   MembershipContentSection,
   RecurringPriceSelector,
   RecurringPricing,
-  useMembershipBuilderState,
   evaluateMembershipReadiness,
+  MEMBERSHIP_DEFAULT_ORDERING_MODE,
+  MembershipContentItem,
+  MembershipFeedEntry,
+  MembershipOrderingMode,
+  MembershipProductFeedEntry,
+  orderMembershipFeedEntries,
   resolveMembershipIncludedProducts,
   useGlobalSaveStatus,
 } from 'domains/app/features/product-form';
-import { AppDispatch, ProductType, ProductWithSections } from 'core/api/models';
+import {
+  AppDispatch,
+  MembershipContentCreateRequest,
+  MembershipContentUpdateRequest,
+  ProductType,
+  ProductWithSections,
+  RootState,
+} from 'core/api/models';
 import {
   getProductSummariesByOwner,
   selectProductSummaries,
   selectProductsError,
   selectProductsLoading,
 } from 'core/store/product-store';
+import {
+  createMembershipContent,
+  deleteMembershipContent,
+  fetchMembershipAggregate,
+  selectMembershipAggregateByProductId,
+  selectMembershipError,
+  selectMembershipLoading,
+  selectMembershipSaveError,
+  selectMembershipSaving,
+  updateMembershipContent,
+  updateMembershipFeed,
+} from 'core/store/membership-store';
 import { ProductWorkspaceShell } from 'domains/app/layouts/product-workspace-shell';
 
 import './product-form.styles.scss';
@@ -55,14 +78,16 @@ const getInitialBuilderTab = (productType: ProductType): BuilderTab => {
   }
 };
 
-const getInitialRecurringPricing = (): RecurringPricing =>
-  process.env.REACT_APP_USE_MOCKS === 'true'
-    ? {
-        amount: 39,
-        currency: 'EUR',
-        interval: 'MONTH',
-      }
-    : DEFAULT_RECURRING_PRICING;
+const getRecurringPricingFromProduct = (
+  formData: ReturnType<typeof useProductFormFacade>['formData'],
+): RecurringPricing => ({
+  amount: typeof formData.price === 'number' ? formData.price : 0,
+  currency: formData.currency ?? 'EUR',
+  interval: formData.billingInterval ?? 'MONTH',
+});
+
+const withFeedPositions = (feed: MembershipFeedEntry[]) =>
+  feed.map((entry, index) => ({ ...entry, position: index + 1 }));
 
 const ProductForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -91,17 +116,33 @@ const ProductForm: React.FC = () => {
     isAutosaving,
   } = useProductFormFacade();
 
+  const membershipAggregate = useSelector((state: RootState) =>
+    selectMembershipAggregateByProductId(state, formData.id),
+  );
+  const membershipLoading = useSelector(selectMembershipLoading);
+  const membershipError = useSelector(selectMembershipError);
+  const membershipSaving = useSelector(selectMembershipSaving);
+  const membershipSaveError = useSelector(selectMembershipSaveError);
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
-  const [membershipRecurringPricing, setMembershipRecurringPricing] =
-    useState<RecurringPricing>(getInitialRecurringPricing);
-  const membershipBuilderState = useMembershipBuilderState();
+  const membershipRecurringPricing = useMemo(
+    () => getRecurringPricingFromProduct(formData),
+    [formData],
+  );
+  const membershipNativeContentItems =
+    membershipAggregate?.content ?? [] as MembershipContentItem[];
+  const membershipFeedEntries = membershipAggregate?.feed ?? [];
+  const membershipOrderingMode =
+    membershipAggregate?.config.orderingMode ?? MEMBERSHIP_DEFAULT_ORDERING_MODE;
+  const membershipIncludedProductEntries = membershipFeedEntries.filter(
+    (entry): entry is MembershipProductFeedEntry => entry.kind === 'PRODUCT',
+  );
   const includedProducts = useMemo(
     () =>
       resolveMembershipIncludedProducts(
-        membershipBuilderState.includedProductEntries,
+        membershipIncludedProductEntries,
         productSummaries,
       ),
-    [membershipBuilderState.includedProductEntries, productSummaries],
+    [membershipIncludedProductEntries, productSummaries],
   );
   const membershipReadiness = useMemo(() => {
     if (formData.type !== 'MEMBERSHIP') {
@@ -111,14 +152,14 @@ const ProductForm: React.FC = () => {
     return evaluateMembershipReadiness({
       formData,
       recurringPricing: membershipRecurringPricing,
-      nativeContentItems: membershipBuilderState.nativeContentItems,
+      nativeContentItems: membershipNativeContentItems,
       includedProducts,
       hasThumbnail: Boolean(formData.imageUrl || productImage),
     });
   }, [
     formData,
     includedProducts,
-    membershipBuilderState.nativeContentItems,
+    membershipNativeContentItems,
     membershipRecurringPricing,
     productImage,
   ]);
@@ -158,6 +199,25 @@ const ProductForm: React.FC = () => {
     productOwnerId,
     productSummaries,
     productsLoading,
+    showRestOfForm,
+  ]);
+
+  useEffect(() => {
+    if (formData.type !== 'MEMBERSHIP' || !formData.id || !showRestOfForm) {
+      return;
+    }
+
+    if (membershipAggregate || membershipLoading) {
+      return;
+    }
+
+    dispatch(fetchMembershipAggregate(formData.id));
+  }, [
+    dispatch,
+    formData.id,
+    formData.type,
+    membershipAggregate,
+    membershipLoading,
     showRestOfForm,
   ]);
 
@@ -208,8 +268,8 @@ const ProductForm: React.FC = () => {
     setHasHeroCollapsed(true);
   });
   const saveStatus = useGlobalSaveStatus(
-    isAutosaving || productsLoading,
-    Boolean(errors.api || productsError),
+    isAutosaving || productsLoading || membershipSaving,
+    Boolean(errors.api || productsError || membershipSaveError),
     {
       minSavingMs: 200,
       savedVisibleMs: 2000,
@@ -231,6 +291,159 @@ const ProductForm: React.FC = () => {
       ? 'Membership publishing will be enabled once Membership persistence is available.'
       : 'Resolve membership requirements before publishing. Membership publishing will be enabled once Membership persistence is available.'
     : undefined;
+
+  const updateMembershipFeedForCurrentProduct = (
+    feed: MembershipFeedEntry[],
+    orderingMode: MembershipOrderingMode = membershipOrderingMode,
+  ) => {
+    if (!formData.id) {
+      return;
+    }
+
+    dispatch(
+      updateMembershipFeed({
+        productId: formData.id,
+        payload: {
+          orderingMode,
+          feed: withFeedPositions(feed),
+        },
+      }),
+    );
+  };
+
+  const handleMembershipRecurringPricingChange = (pricing: RecurringPricing) => {
+    setField('price', pricing.amount);
+    setField('pricingModel', 'RECURRING');
+    setField('currency', pricing.currency);
+    setField('billingInterval', pricing.interval);
+  };
+
+  const handleCreateMembershipContent = (
+    payload: MembershipContentCreateRequest,
+  ) => {
+    if (!formData.id) {
+      return;
+    }
+
+    dispatch(createMembershipContent({ productId: formData.id, payload }))
+      .unwrap()
+      .then((result) => {
+        const newEntry: MembershipFeedEntry = {
+          entryId: `content:${result.content.id}`,
+          kind: 'CONTENT',
+          contentId: result.content.id,
+          addedAt: result.content.createdAt,
+        };
+        const nextFeed =
+          membershipOrderingMode === 'MANUAL'
+            ? [newEntry, ...membershipFeedEntries]
+            : [...membershipFeedEntries, newEntry];
+
+        updateMembershipFeedForCurrentProduct(nextFeed);
+      });
+  };
+
+  const handleUpdateMembershipContent = (
+    contentId: string,
+    payload: MembershipContentUpdateRequest,
+  ) => {
+    if (!formData.id) {
+      return;
+    }
+
+    dispatch(
+      updateMembershipContent({
+        productId: formData.id,
+        contentId,
+        payload,
+      }),
+    );
+  };
+
+  const handleDeleteMembershipContent = (contentId: string) => {
+    if (!formData.id) {
+      return;
+    }
+
+    dispatch(deleteMembershipContent({ productId: formData.id, contentId }));
+  };
+
+  const handleMembershipOrderingModeChange = (
+    orderingMode: MembershipOrderingMode,
+  ) => {
+    const nextFeed =
+      orderingMode === 'MANUAL' && membershipOrderingMode === 'NEWEST_FIRST'
+        ? orderMembershipFeedEntries(membershipFeedEntries, 'NEWEST_FIRST')
+        : membershipFeedEntries;
+
+    updateMembershipFeedForCurrentProduct(nextFeed, orderingMode);
+  };
+
+  const handleAddIncludedProducts = (productIds: string[], addedAt: string) => {
+    const existingProductIds = new Set(
+      membershipIncludedProductEntries.map((entry) => entry.productId),
+    );
+    const newEntries = productIds
+      .filter((productId) => !existingProductIds.has(productId))
+      .map<MembershipFeedEntry>((productId) => ({
+        entryId: `product:${productId}`,
+        kind: 'PRODUCT',
+        productId,
+        addedAt,
+      }));
+
+    if (newEntries.length === 0) {
+      return;
+    }
+
+    updateMembershipFeedForCurrentProduct(
+      membershipOrderingMode === 'MANUAL'
+        ? [...newEntries, ...membershipFeedEntries]
+        : [...membershipFeedEntries, ...newEntries],
+    );
+  };
+
+  const handleRemoveIncludedProduct = (productId?: string) => {
+    if (!productId) {
+      return;
+    }
+
+    updateMembershipFeedForCurrentProduct(
+      membershipFeedEntries.filter(
+        (entry) => entry.kind !== 'PRODUCT' || entry.productId !== productId,
+      ),
+    );
+  };
+
+  const handleMoveMembershipFeedEntry = (
+    entryId: string,
+    direction: 'UP' | 'DOWN',
+  ) => {
+    if (membershipOrderingMode !== 'MANUAL') {
+      return;
+    }
+
+    const currentIndex = membershipFeedEntries.findIndex(
+      (entry) => entry.entryId === entryId,
+    );
+    const nextIndex = direction === 'UP' ? currentIndex - 1 : currentIndex + 1;
+
+    if (
+      currentIndex === -1 ||
+      nextIndex < 0 ||
+      nextIndex >= membershipFeedEntries.length
+    ) {
+      return;
+    }
+
+    const nextFeed = [...membershipFeedEntries];
+    const currentEntry = nextFeed[currentIndex];
+
+    nextFeed[currentIndex] = nextFeed[nextIndex];
+    nextFeed[nextIndex] = currentEntry;
+
+    updateMembershipFeedForCurrentProduct(nextFeed);
+  };
 
   const workspaceNavigation =
     showRestOfForm && activeTab ? (
@@ -301,7 +514,7 @@ const ProductForm: React.FC = () => {
                       <h3>Membership price</h3>
                       <RecurringPriceSelector
                         value={membershipRecurringPricing}
-                        onChange={setMembershipRecurringPricing}
+                        onChange={handleMembershipRecurringPricingChange}
                       />
                     </>
                   ) : (
@@ -339,36 +552,21 @@ const ProductForm: React.FC = () => {
                 <MembershipContentSection
                   ownerId={productOwnerId}
                   currentProductId={formData.id}
-                  nativeContentItems={membershipBuilderState.nativeContentItems}
-                  feedEntries={membershipBuilderState.feedEntries}
-                  orderingMode={membershipBuilderState.orderingMode}
-                  includedProductEntries={
-                    membershipBuilderState.includedProductEntries
-                  }
+                  nativeContentItems={membershipNativeContentItems}
+                  feedEntries={membershipFeedEntries}
+                  orderingMode={membershipOrderingMode}
+                  includedProductEntries={membershipIncludedProductEntries}
                   productSummaries={productSummaries}
                   includedProducts={includedProducts}
-                  isLoadingProducts={productsLoading}
-                  productsError={productsError}
-                  getNextNativeContentId={
-                    membershipBuilderState.getNextNativeContentId
-                  }
-                  onAddNativeContentItem={
-                    membershipBuilderState.addNativeContentItem
-                  }
-                  onUpdateNativeContentItem={
-                    membershipBuilderState.updateNativeContentItem
-                  }
-                  onDeleteNativeContentItem={
-                    membershipBuilderState.deleteNativeContentItem
-                  }
-                  onOrderingModeChange={membershipBuilderState.setOrderingMode}
-                  onAddIncludedProducts={
-                    membershipBuilderState.addIncludedProducts
-                  }
-                  onRemoveIncludedProduct={
-                    membershipBuilderState.removeIncludedProduct
-                  }
-                  onMoveFeedEntry={membershipBuilderState.moveFeedEntry}
+                  isLoadingProducts={productsLoading || membershipLoading}
+                  productsError={productsError || membershipError}
+                  onAddNativeContentItem={handleCreateMembershipContent}
+                  onUpdateNativeContentItem={handleUpdateMembershipContent}
+                  onDeleteNativeContentItem={handleDeleteMembershipContent}
+                  onOrderingModeChange={handleMembershipOrderingModeChange}
+                  onAddIncludedProducts={handleAddIncludedProducts}
+                  onRemoveIncludedProduct={handleRemoveIncludedProduct}
+                  onMoveFeedEntry={handleMoveMembershipFeedEntry}
                 />
               )}
 

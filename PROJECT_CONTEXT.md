@@ -34,7 +34,7 @@ Important product types:
 - `COURSE`: section-based product with lessons.
 - `DOWNLOAD`: section-based product with downloadable files.
 - `CONSULTATION`: appointment/session details instead of sections.
-- `MEMBERSHIP`: shared Product with a Membership-specific builder path; included products, native content foundation, and recurring pricing are currently frontend-only.
+- `MEMBERSHIP`: shared Product with a Membership-specific builder path. Product owns the generic shell and recurring pricing metadata; Membership owns content, included-product associations, and feed configuration through Product-scoped contracts.
 
 ## Architecture Summary
 
@@ -48,7 +48,7 @@ Routing starts in `src/App.tsx`:
 - `/*`: marketing domain.
 - legacy auth aliases redirect to `/auth/...`.
 
-State is centralized in `src/core/store/store.ts` with slices for auth, admin, products, notifications, cart, wishlist, and reviews. Product listener middleware creates notifications after product/section/lesson actions. Cart is currently persisted to localStorage.
+State is centralized in `src/core/store/store.ts` with slices for auth, admin, products, membership, notifications, cart, wishlist, and reviews. Product listener middleware creates notifications after product/section/lesson actions. Cart is currently persisted to localStorage.
 
 API services live under `src/core/api/services`; DTO/model types live under `src/core/api/models`. `http-client.ts` configures Axios with `REACT_APP_BASE_PATH`, credentials, CSRF injection, refresh-token retry, and optional local mocks when `REACT_APP_USE_MOCKS=true`.
 
@@ -109,7 +109,7 @@ Flow:
 5. `COURSE` and `DOWNLOAD` use sections.
 6. `CONSULTATION` uses consultation details.
 7. `MEMBERSHIP` uses the shared builder shell with a Membership Content tab and recurring-pricing UI in the Pricing tab.
-8. Product details autosave separately from section, lesson, and download-file updates. Membership included products and recurring pricing do not currently autosave to backend Product payloads.
+8. Product details autosave separately from section, lesson, download-file, and Membership-domain updates. Membership recurring pricing is Product-owned and uses the generic Product payload.
 
 Product workspace terminology:
 
@@ -126,28 +126,28 @@ Intentional model decisions:
 - Product union types live in `src/core/api/models/product`.
 - `AbstractProduct` is a discriminated union of course/download/consultation/membership.
 - `ProductDraft` allows incomplete frontend state before backend persistence.
-- `mapFormDataToProductPayload` maps drafts to backend payloads and keeps unsupported product types explicit. Membership maps only shared Product fields today.
-- Product normalizers handle backend `details` payload shape for sections and consultation details; Membership responses currently remain shared Product data with no persisted Membership-specific details.
+- `mapFormDataToProductPayload` maps drafts to backend payloads and keeps unsupported product types explicit. Membership maps only shared Product fields and Product-owned recurring pricing metadata.
+- Product normalizers handle backend `details` payload shape for sections and consultation details. Membership-specific state loads through the separate Product-scoped Membership contracts, not Product `details`.
 - Product type metadata is centralized in `src/core/constants/products.ts` and drives create options, basic info options, filters, headers, and type metadata.
 
 Membership content architecture:
 
-- Native Membership content is modeled as frontend/domain state under `src/domains/app/features/product-form/membership-content/models`, not as Product API DTOs.
+- Native Membership content is modeled under `src/domains/app/features/product-form/membership-content/models` for UI/domain helpers and under `src/core/api/models/membership` for backend-pending API DTOs.
 - Native Membership content types are `POST`, `VIDEO`, and `RESOURCE`, with statuses `DRAFT`, `PUBLISHED`, and `HIDDEN`.
-- Native Membership content must not be added to `AbstractProduct`, Product autosave payloads, Product normalizers, or fake backend persistence.
+- Native Membership content must not be added to `AbstractProduct`, Product autosave payloads, or Product normalizers.
 - Included standalone Products remain Products, currently represented by `ProductMinimised`; Course/Download products must not be converted into native Membership content entities.
-- Membership builder content state is owned above the conditionally mounted Membership Content tab via `useMembershipBuilderState` in `ProductForm`, so saved native content, included Product relationships, and feed metadata survive tab switches. This state is local React state, not Redux or `ProductDraft`.
-- Membership feed entries are frontend-only metadata objects for native content and included Products. They carry deterministic identities (`content:{contentId}` / `product:{productId}`), Membership-specific `addedAt`, and optional future `position`; Product `createdAt` must not be used as Membership added time.
-- Membership content ordering is frontend-only and owned by the lifted builder state. `NEWEST_FIRST` is the default derived view sorted by feed-entry `addedAt`; `MANUAL` uses feed-entry array order as the source of truth.
-- Switching from `NEWEST_FIRST` to `MANUAL` initializes manual order from the currently visible newest-first sequence. Switching back to `NEWEST_FIRST` derives chronological display without destroying the stored manual sequence for the current builder session.
-- Manual ordering uses unified Move Up / Move Down controls for native content and included Products. Do not add ordering fields to Product, Post, Video, or Resource entities.
+- Membership persisted domain state is owned by `membership-store`, keyed by Product ID. Product Redux remains the owner of the generic Product shell.
+- Membership feed entries are Membership metadata objects for native content and included Products. They carry deterministic identities (`content:{contentId}` / `product:{productId}`), Membership-specific `addedAt`, and `position` for manual order; Product `createdAt` must not be used as Membership added time.
+- Membership content ordering is Membership-owned. `NEWEST_FIRST` is the default derived view sorted by feed-entry `addedAt`; `MANUAL` persists feed-entry positions through the Membership feed contract.
+- Switching from `NEWEST_FIRST` to `MANUAL` initializes manual order from the currently visible newest-first sequence. Switching back to `NEWEST_FIRST` derives chronological display from persisted feed metadata.
+- Manual ordering uses unified Move Up / Move Down controls for native content and included Products. Do not add ordering fields to Product entities.
 - `MembershipContentList` is the presentation shell that renders a unified Membership content hub by resolving ordered feed entries against native content items and included Products.
 - `MembershipContentSection` owns only transient inline `+ Add Content` chooser, editor draft, and editing-mode state.
 - `MembershipContentTypeChooser` is presentation/control-only. It offers `Video`, `Post`, `Resource`, and `Existing Product`, but does not fetch data or create content.
-- Selecting `Post` opens `MembershipPostEditor`, a controlled frontend-only editor for title, body, and status.
-- Selecting `Video` opens `MembershipVideoEditor`, a controlled frontend-only editor for title, description, local video file metadata, and status. Video selection uses `GalUppyFileUploader` in selection-only mode and does not perform a Membership upload request.
-- Selecting `Resource` opens `MembershipResourceEditor`, a controlled frontend-only editor for title, description, local file metadata, and status. Resource selection uses `GalUppyFileUploader` in selection-only mode and does not perform a Membership upload request.
-- Post, Video, and Resource create/edit/delete are frontend-only; they use local counter IDs and ISO timestamps, and they must not write to Product autosave or API payloads.
+- Selecting `Post` opens `MembershipPostEditor`, a controlled editor for unsaved title, body, and status drafts; save dispatches Membership content CRUD.
+- Selecting `Video` opens `MembershipVideoEditor`, a controlled editor for title, description, selected video file metadata, and status. Video selection uses `GalUppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
+- Selecting `Resource` opens `MembershipResourceEditor`, a controlled editor for title, description, selected file metadata, and status. Resource selection uses `GalUppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
+- Post, Video, and Resource create/edit/delete use Membership service/Redux contracts and must not write to Product autosave or Product API payloads.
 - Selecting `Existing Product` closes the chooser and requests that `MembershipIncludedProducts` open its existing `ProductPicker`; no second ProductPicker or duplicated product loading logic should be introduced.
 - The current deterministic manual list order is feed-entry array order. There is no drag-and-drop, populated `position`, or persisted ordering contract yet.
 - `MembershipIncludedProducts` owns Product summary loading and picker state. Included Product relationship state, add/remove behavior, and duplicate prevention are controlled by the lifted Membership builder state.
@@ -169,7 +169,7 @@ Implemented / reasonably wired:
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
-- Unified Membership content list foundation, inline `+ Add Content` chooser, and frontend-only Post/Video/Resource create/edit/delete flows.
+- Unified Membership content list foundation, inline `+ Add Content` chooser, and Membership-backed Post/Video/Resource create/edit/delete flows.
 - Course/download section creation, autosave, deletion.
 - Course lesson creation, autosave, deletion for `VIDEO`, `ARTICLE`, `QUIZ`; assignment is placeholder.
 - Download section file upload via presigned URL + confirm upload.
@@ -184,9 +184,9 @@ Partially implemented / placeholder:
 - Product detail page has real loading by product ID but still contains placeholder copy, fake rating/language/duration/creator text, and placeholder image.
 - Creator Help navigation destination is disabled because an implementation is not available yet.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
-- Membership included products are limited to existing Course/Download products and held in frontend state only.
-- Native Membership Post, Video, and Resource content have frontend-only create/edit/delete support. Native Video/Resource store selected local file metadata only and have no upload/persistence contract. No native Membership content has backend persistence.
-- Membership recurring pricing has a frontend-only `RecurringPricing` model and `RecurringPriceSelector`; no backend Product pricing contract exists for it yet.
+- Membership included products are limited to existing Course/Download products and persist as Membership feed Product-ID associations through backend-pending contracts.
+- Native Membership Post, Video, and Resource content have backend-pending frontend contracts, services, Redux state, and ignored local HTTP mocks. Native Video/Resource binary upload remains unresolved beyond selected file metadata/asset reference.
+- Membership recurring pricing is Product-owned via backend-pending Product pricing fields: `pricingModel`, `billingInterval`, and `currency`, with Product `price` as the amount source of truth.
 - Lesson content persistence for uploaded videos/rich text/quiz data may need backend contract verification.
 - Assignment lesson editor is a visible placeholder.
 - Rich text editor embed support has a TODO.
@@ -202,9 +202,9 @@ Confirmed:
 - Some shared UI tests emit controlled-input warnings.
 - `.github/workflows/docs.yml` expects a `docs/` directory, but no `docs/` directory exists in this checkout.
 - `src/core/store/shop-cart/shop-cart.slice.ts` removal has a likely index bug: index `0` is treated as false, so the first cart item may not remove.
-- Membership has no backend included-product relationship API yet.
-- Membership has no backend native content API yet.
-- Membership has no backend recurring pricing contract yet.
+- Membership has frontend contracts, services, Redux store integration, and ignored local HTTP mock responses for Product-scoped aggregate/config, native content CRUD, and feed/included-product associations, but the production backend endpoints are not implemented yet.
+- Product recurring pricing has frontend model/form support, but the production backend Product contract is not implemented yet.
+- Membership Video/Resource binary asset upload remains backend-pending; the existing Download section upload flow is section-scoped and should be generalized or adapted before claiming real Membership media persistence.
 - Membership has no subscription/entitlement/member-access model yet.
 - Creator Customers has frontend contracts, services, Redux store integration, and HTTP mock responses for read-only list/detail data, but the production backend endpoints are not implemented yet. Purchase/order, entitlement/access, subscription/customer membership-state, waitlist, tags/notes persistence, and manual access-management backend ownership still need backend confirmation.
 - Creator Sales has frontend contracts, services, Redux store integration, and HTTP mock responses for summary, orders ledger, and order detail data, but the production backend endpoints are not implemented yet. Provider-safe financial mutations, refund/payment retry actions, subscription management, and entitlement mutation contracts are intentionally not implemented.
@@ -214,7 +214,7 @@ Confirmed:
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
-- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and frontend-only Membership inspection state. Customers, Sales, Analytics, Dashboard, and Storefront use Redux/services/Axios and receive deterministic data from ignored local HTTP mocks rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, or customer-domain states.
+- `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and Membership. Customers, Sales, Analytics, Dashboard, Storefront, and Membership use Redux/services/Axios and receive deterministic data from ignored local HTTP mocks rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, membership content/feed state, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Creator Dashboard uses a frontend contract, service, Redux store integration, and ignored local HTTP mock response for the aggregate summary. When the backend contract is unavailable, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
 - Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
@@ -225,10 +225,9 @@ Deliberate temporary implementations:
 - Creator Dashboard runtime data path is Component → Redux → thunk → Dashboard service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Public Storefront runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Creator Storefront config runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
+- Membership domain runtime data path is Component → Redux → thunk → Membership service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Download upload deduping is local to the section editor instance.
-- Membership included-product selection, ordering mode, manual feed order, and feed metadata are local frontend state until a relationship/feed API exists.
-- Membership native content state is local frontend state lifted above the Membership Content tab. Post, Video, and Resource can be created/edited/deleted locally; Video/Resource use selection-only local file metadata. Backend persistence remains undefined.
-- Membership recurring pricing is local frontend state until a structured recurring pricing contract exists.
+- Membership editor drafts, selected File objects, chooser/picker state, active editor state, and active builder tab remain local UI state.
 
 Speculative / verify before changing:
 
@@ -381,7 +380,7 @@ Current implemented patterns:
 - There are no permanent Edit buttons and no fake/permanent Publish buttons in the list.
 - Overflow menus render only when meaningful secondary actions exist. Published products can expose Preview (`/app/product/{product.id}`); products with no secondary action do not render an ellipsis just for symmetry.
 - Lifecycle status is shown with compact badges.
-- Pricing is formatted as one-time EUR, Free, Price not set, or mock-only recurring Membership display where applicable.
+- Pricing is formatted as one-time EUR, recurring Membership EUR where Product recurring metadata is present, Free, or Price not set.
 - Desktop dates stay concise under the visible Updated heading. Tablet/mobile add explicit context such as `Updated Aug 10` when the heading disappears, while preserving accessible full-date/title behavior.
 - Local management controls include Search, Type filter, Status filter, Sort, result count, and Clear filters for active refinements.
 - Empty states distinguish true empty catalog, search-no-results, filter-no-results, loading, and error.
@@ -452,7 +451,7 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Dev role switcher/backend role change support.
 - Admin product management and create-for-creator flow using `ownerId` query param.
 - Membership added as a first-class frontend Product type.
-- Membership uses the shared builder shell, its own Membership Content tab, frontend-only Course/Download included-product selection, frontend-only Post/Video/Resource content creation/editing, and frontend-only recurring pricing controls.
+- Membership uses the shared builder shell, its own Membership Content tab, Product-backed recurring pricing controls, and Product-scoped Membership contracts for Course/Download included-product associations plus Post/Video/Resource content metadata.
 - Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Analytics, Storefront, plus Settings utility navigation; Help remains disabled and Marketing is removed from the Creator MVP IA.
 - Creator Dashboard, Products, Customers, Sales, Analytics, and Storefront management visual redesigns.
 - Public Storefront implementation at `/app/store/:creatorId`, sharing Storefront presentation/view-model logic with the Creator live preview.

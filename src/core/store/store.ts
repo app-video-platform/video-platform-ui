@@ -5,6 +5,7 @@ import analyticsReducer from './analytics-store/analytics.slice';
 import productsReducer from './product-store/product.slice';
 import customersReducer from './customers-store/customers.slice';
 import dashboardReducer from './dashboard-store/dashboard.slice';
+import membershipReducer from './membership-store/membership.slice';
 import notificationsReducer from './notifications/notifications.slice';
 import salesReducer from './sales-store/sales.slice';
 import storefrontReducer from './storefront-store/storefront.slice';
@@ -31,6 +32,7 @@ export const store = configureStore({
     products: productsReducer,
     customers: customersReducer,
     dashboard: dashboardReducer,
+    membership: membershipReducer,
     notifications: notificationsReducer,
     sales: salesReducer,
     storefront: storefrontReducer,

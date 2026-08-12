@@ -12,11 +12,10 @@ describe('mapFormDataToProductPayload', () => {
       name: 'Founders Club',
       description: 'Private community',
       price: 25,
-      recurringPricing: {
-        amount: 15,
-        currency: 'EUR',
-        interval: 'MONTH',
-      },
+      pricingModel: 'RECURRING',
+      billingInterval: 'MONTH',
+      currency: 'EUR',
+      status: 'PUBLISHED',
       orderingMode: 'MANUAL',
       nativeContentItems: [
         {
@@ -91,7 +90,10 @@ describe('mapFormDataToProductPayload', () => {
       name: 'Founders Club',
       description: 'Private community',
       price: 25,
-      status: 'DRAFT',
+      pricingModel: 'RECURRING',
+      billingInterval: 'MONTH',
+      currency: 'EUR',
+      status: 'PUBLISHED',
       userId: 'creator-1',
     });
     expect(mapFormDataToProductPayload(formData, null)).not.toHaveProperty(
@@ -112,5 +114,35 @@ describe('mapFormDataToProductPayload', () => {
     );
     expect(getAutosaveSnapshot(formData)).not.toHaveProperty('feedEntries');
     expect(getAutosaveSnapshot(formData)).not.toHaveProperty('orderingMode');
+    expect(getAutosaveSnapshot(formData)).toMatchObject({
+      pricingModel: 'RECURRING',
+      billingInterval: 'MONTH',
+      currency: 'EUR',
+      status: 'PUBLISHED',
+    });
+  });
+
+  it('keeps one-time and free products on the existing pricing shape', () => {
+    const formData = {
+      id: 'download-1',
+      type: 'DOWNLOAD',
+      name: 'Launch Kit',
+      price: 'free',
+      status: 'DRAFT',
+      userId: 'creator-1',
+    } as ProductDraft;
+
+    expect(mapFormDataToProductPayload(formData, null)).toEqual({
+      id: 'download-1',
+      type: 'DOWNLOAD',
+      name: 'Launch Kit',
+      description: undefined,
+      price: 'free',
+      pricingModel: undefined,
+      billingInterval: undefined,
+      currency: undefined,
+      status: 'DRAFT',
+      userId: 'creator-1',
+    });
   });
 });

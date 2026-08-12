@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 
 import { Button, Radio, RadioGroup } from '@shared/ui';
 import { ProductMinimised } from 'core/api/models';
+import {
+  MembershipContentCreateRequest,
+  MembershipContentUpdateRequest,
+} from 'core/api/models/membership';
 import MembershipIncludedProducts from './membership-included-products.component';
 import MembershipContentTypeChooser from './membership-content-type-chooser.component';
 import MembershipPostEditor from './membership-post-editor.component';
@@ -21,12 +25,6 @@ import {
   createBlankMembershipResourceDraft,
   createBlankMembershipPostDraft,
   createBlankMembershipVideoDraft,
-  createMembershipResourceItem,
-  createMembershipPostItem,
-  createMembershipVideoItem,
-  updateMembershipResourceItem,
-  updateMembershipPostItem,
-  updateMembershipVideoItem,
 } from './models';
 import './membership-content.styles.scss';
 
@@ -42,11 +40,9 @@ interface MembershipContentSectionProps {
   isLoadingProducts: boolean;
   productsError: string | null;
   // eslint-disable-next-line no-unused-vars
-  getNextNativeContentId: (type: MembershipContentItem['type']) => string;
-  // eslint-disable-next-line no-unused-vars
   onAddNativeContentItem: (
     // eslint-disable-next-line no-unused-vars
-    item: MembershipContentItem,
+    payload: MembershipContentCreateRequest,
     // eslint-disable-next-line no-unused-vars
     addedAt: string,
   ) => void;
@@ -55,7 +51,7 @@ interface MembershipContentSectionProps {
     // eslint-disable-next-line no-unused-vars
     contentId: string,
     // eslint-disable-next-line no-unused-vars
-    updater: (item: MembershipContentItem) => MembershipContentItem,
+    payload: MembershipContentUpdateRequest,
   ) => void;
   // eslint-disable-next-line no-unused-vars
   onDeleteNativeContentItem: (contentId: string) => void;
@@ -80,7 +76,6 @@ const MembershipContentSection: React.FC<MembershipContentSectionProps> = ({
   includedProducts,
   isLoadingProducts,
   productsError,
-  getNextNativeContentId,
   onAddNativeContentItem,
   onUpdateNativeContentItem,
   onDeleteNativeContentItem,
@@ -144,14 +139,20 @@ const MembershipContentSection: React.FC<MembershipContentSectionProps> = ({
     const now = new Date().toISOString();
 
     if (editingContentId) {
-      onUpdateNativeContentItem(editingContentId, (item) =>
-        item.type === 'POST' ? updateMembershipPostItem(item, postDraft, now) : item,
-      );
+      onUpdateNativeContentItem(editingContentId, {
+        type: 'POST',
+        title,
+        body,
+        status: postDraft.status,
+      });
     } else {
-      const localPostId = getNextNativeContentId('POST');
-
       onAddNativeContentItem(
-        createMembershipPostItem(postDraft, localPostId, now),
+        {
+          type: 'POST',
+          title,
+          body,
+          status: postDraft.status,
+        },
         now,
       );
     }
@@ -177,16 +178,22 @@ const MembershipContentSection: React.FC<MembershipContentSectionProps> = ({
     const now = new Date().toISOString();
 
     if (editingContentId) {
-      onUpdateNativeContentItem(editingContentId, (item) =>
-        item.type === 'VIDEO'
-          ? updateMembershipVideoItem(item, videoDraft, now)
-          : item,
-      );
+      onUpdateNativeContentItem(editingContentId, {
+        type: 'VIDEO',
+        title,
+        description: videoDraft.description.trim() || undefined,
+        status: videoDraft.status,
+        video: videoDraft.video,
+      });
     } else {
-      const localVideoId = getNextNativeContentId('VIDEO');
-
       onAddNativeContentItem(
-        createMembershipVideoItem(videoDraft, localVideoId, now),
+        {
+          type: 'VIDEO',
+          title,
+          description: videoDraft.description.trim() || undefined,
+          status: videoDraft.status,
+          video: videoDraft.video,
+        },
         now,
       );
     }
@@ -212,16 +219,22 @@ const MembershipContentSection: React.FC<MembershipContentSectionProps> = ({
     const now = new Date().toISOString();
 
     if (editingContentId) {
-      onUpdateNativeContentItem(editingContentId, (item) =>
-        item.type === 'RESOURCE'
-          ? updateMembershipResourceItem(item, resourceDraft, now)
-          : item,
-      );
+      onUpdateNativeContentItem(editingContentId, {
+        type: 'RESOURCE',
+        title,
+        description: resourceDraft.description.trim() || undefined,
+        status: resourceDraft.status,
+        file: resourceDraft.file,
+      });
     } else {
-      const localResourceId = getNextNativeContentId('RESOURCE');
-
       onAddNativeContentItem(
-        createMembershipResourceItem(resourceDraft, localResourceId, now),
+        {
+          type: 'RESOURCE',
+          title,
+          description: resourceDraft.description.trim() || undefined,
+          status: resourceDraft.status,
+          file: resourceDraft.file,
+        },
         now,
       );
     }
