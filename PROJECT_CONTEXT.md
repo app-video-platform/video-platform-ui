@@ -61,6 +61,7 @@ Creator/Admin management routes are visually and structurally separated from buy
 - Desktop Creator management uses a persistent collapsible sidebar and a separate account/user control.
 - Tablet/mobile Creator management uses a compact top bar with a drawer navigation.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
+- Routes can request the Creator sidebar collapse through `collapseSidebarOnLoad` route metadata. Product edit routes and the Storefront Builder use this existing shell/sidebar behavior.
 - Marketplace/customer routes still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
 
 Current Creator IA:
@@ -164,7 +165,7 @@ Implemented / reasonably wired:
 - Creator Customers management area with a customer list and dedicated customer detail route.
 - Creator Sales management area with overview metrics, an orders ledger, local search/filter/sort/date preset controls, local pagination, responsive layout, empty/no-result states, and contextual order detail inspection.
 - Creator Analytics management area with period-scoped business metrics, performance visualization, product ranking, customer growth, membership health, and payment health.
-- Creator Storefront management area with public URL/copy affordance, profile summary, product visibility information, featured-product selection, product ordering controls, and a live public preview.
+- Creator Storefront Builder at `/app/storefront`, where the shared public Storefront presentation is the live editing surface for profile fields, theme, featured product, and product ordering.
 - Public Storefront page at `/app/store/:creatorId` with creator identity/profile information, featured product when applicable, and a customer-facing published-product catalogue.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
@@ -209,7 +210,7 @@ Confirmed:
 - Creator Customers has frontend contracts, services, Redux store integration, and HTTP mock responses for read-only list/detail data, but the production backend endpoints are not implemented yet. Purchase/order, entitlement/access, subscription/customer membership-state, waitlist, tags/notes persistence, and manual access-management backend ownership still need backend confirmation.
 - Creator Sales has frontend contracts, services, Redux store integration, and HTTP mock responses for summary, orders ledger, and order detail data, but the production backend endpoints are not implemented yet. Provider-safe financial mutations, refund/payment retry actions, subscription management, and entitlement mutation contracts are intentionally not implemented.
 - Creator Analytics has frontend contracts, services, Redux store integration, and HTTP mock responses for aggregate overview data, but the production backend endpoint is not implemented yet. Traffic, attribution, conversion, engagement, payout, cohort, and custom date-range analytics are intentionally not implemented.
-- Creator Storefront has frontend contracts, services, Redux store integration, and HTTP mock responses for the public read model and Creator configuration, but the production backend endpoints are not implemented yet. Theme/page-builder, custom-domain, SEO, and Storefront analytics contracts are intentionally not implemented.
+- Creator Storefront has frontend contracts, services, Redux store integration, and HTTP mock responses for the public read model and Creator configuration, but the production backend endpoints are not implemented yet. Storefront theme/config fields are frontend-wired through the backend-pending Storefront contracts; arbitrary page-builder blocks, custom-domain, SEO, and Storefront analytics contracts are intentionally not implemented.
 
 Deliberate temporary implementations:
 
@@ -224,7 +225,7 @@ Deliberate temporary implementations:
 - Creator Analytics runtime data path is Component → Redux → thunk → Analytics service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Creator Dashboard runtime data path is Component → Redux → thunk → Dashboard service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Public Storefront runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
-- Creator Storefront config runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
+- Creator Storefront Builder config runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Membership domain runtime data path is Component → Redux → thunk → Membership service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Download upload deduping is local to the section editor instance.
 - Membership editor drafts, selected File objects, chooser/picker state, active editor state, and active builder tab remain local UI state.
@@ -335,38 +336,60 @@ Important Analytics boundary:
 
 ## Creator Storefront
 
-The Storefront work is split between an authenticated Creator/Admin management surface and a public customer-facing Storefront, with shared Storefront view-model and presentation logic under `src/domains/app/features/storefront`.
+Storefront V2 is split between an authenticated Creator/Admin Storefront Builder and a public customer-facing Storefront. Both routes share Storefront view-model utilities and the `StorefrontPublicPage` presentation under `src/domains/app/features/storefront`.
 
 Routes and shell integration:
 
-- Creator/Admin Storefront management workspace: `/app/storefront`.
+- Creator/Admin Storefront Builder: `/app/storefront`.
 - Public buyer-facing Storefront route: `/app/store/:creatorId`.
 - Legacy `/app/my-page-preview` redirects to `/app/storefront`; the old `user-page-preview` implementation has been removed.
-- Storefront management renders inside `CreatorAppShell`.
+- Storefront Builder renders inside `CreatorAppShell`, and the `/app/storefront` route uses `collapseSidebarOnLoad` route metadata so the Creator sidebar collapses with the same shell/sidebar pattern used by builder-style routes.
 - The public Storefront route renders outside Creator management chrome and outside the older marketplace `TopNavbar` shell.
 
-Current Storefront management patterns:
+Current Storefront Builder patterns:
 
-- The management page shows Storefront status, public URL, copy-link affordance, public profile summary, product visibility information, featured-product selection, product ordering controls, and a live preview.
-- Public profile information reuses existing account/profile user fields such as name, title, tagline, bio, website, image, and social links instead of introducing a separate Storefront profile model.
-- Featured selection and ordering controls persist through the backend-pending Creator Storefront config contract. Profile fields remain User/Profile-owned; product identities, statuses, prices, and thumbnails remain Product-owned.
-- The live preview uses the same shared `StorefrontPublicPage` presentation as the public Storefront route, with preview styling applied by prop.
+- `/app/storefront` is a live Storefront Builder, not the previous management-controls plus separate preview layout.
+- The builder itself consumes the same `StorefrontPublicPage` used by the public route, so the shared public presentation is the live preview/editing surface.
+- Builder chrome is compact and includes unsaved-state copy, `Open public Storefront`, copy-link, `Reset changes`, and `Save changes` actions.
+- Public-facing profile fields are editable inline where implemented: display name, title, tagline, bio, website, and public email. Inline editors use edit buttons, Save/Cancel actions, existing shared input/textarea/button/popover primitives, and `updateUserDetails` from the Auth/User profile flow.
+- Avatar/image inline editing is not implemented. The Settings image UI does not currently expose a clean reusable persisted upload flow for Storefront Builder to reuse.
+- Public profile information reuses existing User/Profile fields instead of introducing a separate Storefront profile model. Storefront config must not duplicate display name, title, tagline, bio, website, image, social links, or public email.
+- `publicEmail` is User/Profile-owned. The Storefront view model uses `publicEmail` when set and falls back to the login email when no separate public email is configured. Settings and Storefront share the same public-email concept and the same info-popover copy: "This is the email shown on your storefront. It can be different from the email you use to sign in."
+- Storefront-owned configuration is edited as one local draft containing `theme`, `featuredProductId`, and `productOrderIds`.
+- Theme, featured-product, and ordering changes update the rendered builder immediately but do not PATCH individually.
+- `Save changes` persists the full draft Storefront config through `PATCH api/creator/storefront`; `Reset changes` restores the last persisted Redux config.
+- Product status visibility remains explicit in the builder controls, but Draft/Hidden products are not rendered through the shared public Storefront presentation.
+
+Current Storefront theme/customization patterns:
+
+- `StorefrontTheme` supports `appearance`, `accentColor`, and `typography`.
+- Appearance options are `LIGHT` and `DARK`.
+- Typography options are `MODERN`, `CLASSIC`, and `FRIENDLY`.
+- Brand color supports curated swatches plus a custom color input.
+- Theme rendering is Storefront-scoped through `StorefrontPublicPage` classes and CSS variables such as `--storefront-accent`; it does not switch the global Creator app theme.
+- Accent color affects public Storefront CTAs, eyebrow/accent text, creator initials/accent details, borders, and related highlights.
+- The customization UI is a floating FAB and compact panel on larger screens. At mobile width the same controls open through the shared `Drawer` infrastructure.
 
 Current public Storefront patterns:
 
-- `StorefrontPublicPage` renders creator identity/profile information, optional website link, a featured product when the featured product is publicly visible, and a catalogue of public products.
+- `StorefrontPage` loads the public read model through Redux and `GET api/storefronts/:creatorId`, maps it with `getStorefrontViewModelFromPublicStorefront`, and renders `StorefrontPublicPage`.
+- `StorefrontPublicPage` renders creator identity/profile information, optional website link, public email/contact links, social links, a featured product when the featured product is publicly visible, and a catalogue of public products.
+- Public Storefront receives and applies the persisted theme from the public read model, with `DEFAULT_STOREFRONT_THEME` as a fallback when theme is absent.
 - Product visibility is centralized in Storefront utilities: `PUBLISHED` products are publicly visible; `DRAFT` and `HIDDEN` products are not publicly visible.
 - Invalid or unavailable featured-product IDs fall back to the first public product.
-- Course, Download, Consultation, and Membership products are all represented with Storefront type labels.
-- The Storefront uses a fixed customer-facing layout. There is no page builder, theme customization system, custom-domain setup, SEO configuration, Storefront analytics, coupons, campaigns, newsletters, automations, attribution, or Reviews surface.
+- Course, Download, Consultation, and Membership products are all represented with Storefront type labels. Membership remains supported in public rendering.
 - Empty and unavailable states are explicit, including the public empty catalogue state when no products are published.
 
 Current Storefront data boundary:
 
-- The public Storefront route uses the backend-pending `api/storefronts/:creatorId` read-model contract through Redux/services/Axios. The backend should return public creator presentation fields and public products rather than requiring the buyer-facing page to orchestrate User and Product requests.
-- Creator Storefront management uses the backend-pending `api/creator/storefront` config contract through Redux/services/Axios. The config owns `featuredProductId` and `productOrderIds` only.
-- Creator Storefront management combines Storefront config with Product-owned summaries from existing Product Redux/API data and User/Profile-owned account data from Auth.
-- Local deterministic Storefront data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`. Mock creator IDs, profile content, example products, product order, and featured selections are local inspection aids, not product contracts.
+- The public Storefront route uses the backend-pending `api/storefronts/:creatorId` read-model contract through Redux/services/Axios. The backend should return public creator presentation fields, public products, featured product ID, and persisted theme rather than requiring the buyer-facing page to orchestrate User, Product, and Storefront config requests.
+- Creator Storefront Builder uses the backend-pending `api/creator/storefront` config contract through Redux/services/Axios. The config owns only `theme`, `featuredProductId`, and `productOrderIds`.
+- Storefront service functions live under `src/core/api/services/storefront`, thunks/state live in `src/core/store/storefront-store/storefront.slice.ts`, and selectors are intentionally kept in `src/core/store/storefront-store/storefront.selectors.ts`.
+- Product remains the owner of catalogue/product data, statuses, prices, thumbnails, and public visibility eligibility.
+- User/Profile remains the owner of public profile identity and contact fields, including `publicEmail`.
+- Creator Storefront Builder combines Storefront config with Product-owned summaries from existing Product Redux/API data and User/Profile-owned account data from Auth.
+- Local deterministic Storefront data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`. Mock creator IDs, profile content, theme values, example products, product order, and featured selections are local inspection aids, not product contracts.
+- Storefront V2 does not implement arbitrary page-builder blocks, custom domains, SEO management, Storefront analytics, coupons, campaigns, newsletters, automations, attribution, or Reviews surfaces.
 
 ## Creator Products Management
 
@@ -438,7 +461,7 @@ Implemented examples:
 - Customers desktop/tablet list/table becomes mobile customer cards while preserving the stacked mobile filter controls.
 - Sales desktop orders ledger becomes tablet/mobile transaction cards, and mobile secondary filters move into the shared Drawer.
 - Analytics desktop chart/product/secondary grids collapse into single-column tablet/mobile layouts, with product ranking rows reflowing instead of overflowing.
-- Storefront management stacks controls and preview on narrower screens, while the public Storefront hero and product catalogue reflow into single-column customer-facing layouts.
+- Storefront Builder uses compact builder chrome, a floating customization control, and mobile Drawer-based customization behavior while the shared public Storefront hero and product catalogue reflow into single-column customer-facing layouts.
 - Product workspace navigation adapts on narrow screens while preserving the focused editing shell.
 
 Avoid hardcoding viewport-specific pixel values into this document; inspect the SCSS breakpoints and component styles when implementing a responsive change.
@@ -453,15 +476,15 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Membership added as a first-class frontend Product type.
 - Membership uses the shared builder shell, its own Membership Content tab, Product-backed recurring pricing controls, and Product-scoped Membership contracts for Course/Download included-product associations plus Post/Video/Resource content metadata.
 - Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Analytics, Storefront, plus Settings utility navigation; Help remains disabled and Marketing is removed from the Creator MVP IA.
-- Creator Dashboard, Products, Customers, Sales, Analytics, and Storefront management visual redesigns.
-- Public Storefront implementation at `/app/store/:creatorId`, sharing Storefront presentation/view-model logic with the Creator live preview.
+- Creator Dashboard, Products, Customers, Sales, Analytics, and Storefront Builder visual redesigns.
+- Public Storefront implementation at `/app/store/:creatorId`, sharing Storefront presentation/view-model logic with the Creator Storefront Builder.
 - Focused Product Workspace shell for product editing.
 
 Likely next steps:
 
 - Polish/fix admin product owner filtering UX beyond raw owner ID.
 - Complete product detail UI using real backend fields.
-- Implement backend Storefront contracts before relying on production persistence for featured-product selection and product ordering; define separate contracts before adding Storefront-specific settings such as themes, page builder, custom domains, SEO, or analytics.
+- Implement backend Storefront contracts before relying on production persistence for Storefront configuration; define separate contracts before adding arbitrary page-builder blocks, custom domains, SEO, or analytics.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.
 - Define backend contracts for Membership native content, included-product relationships, recurring pricing, subscription checkout, and entitlement/member access before persisting Membership-specific fields.

@@ -2,6 +2,7 @@ import {
   ProductMinimised,
   ProductStatus,
   ProductType,
+  StorefrontTheme,
   User,
 } from 'core/api/models';
 
@@ -12,6 +13,7 @@ export interface StorefrontProfile {
   tagline?: string;
   bio?: string;
   website?: string;
+  publicEmail?: string;
   imageUrl?: string;
   socialLinks?: User['socialLinks'];
 }
@@ -27,12 +29,14 @@ export interface StorefrontViewModel {
   profile: StorefrontProfile;
   products: StorefrontProduct[];
   featuredProductId?: string;
+  theme: StorefrontTheme;
 }
 
 export interface StorefrontViewModelInput {
   profile: StorefrontProfile;
   products: ProductMinimised[];
   featuredProductId?: string;
+  theme: StorefrontTheme;
 }
 
 export type StorefrontLoadState = 'loading' | 'ready' | 'error' | 'unavailable';

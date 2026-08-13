@@ -1,18 +1,33 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import { HiMenuAlt2, HiX } from 'react-icons/hi';
 
 import { Button, GalIcon } from '@shared/ui';
+import { appRoutes } from 'core/constants';
 import { getCssVar } from '@shared/utils';
 import { GalUserDropdown } from 'domains/app/components';
-import { SidebarNav } from 'domains/app/widgets/sidebar-nav';
+import { SidebarNav, useSidebarLayout } from 'domains/app/widgets/sidebar-nav';
 
 import './creator-app-shell.styles.scss';
 
 const CreatorAppShell: React.FC = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const location = useLocation();
+  const { setIsSidebarCollapsed } = useSidebarLayout();
 
   const closeMobileNav = () => setIsMobileNavOpen(false);
+
+  useEffect(() => {
+    const shouldCollapse = appRoutes.some(
+      (route) =>
+        route.collapseSidebarOnLoad &&
+        Boolean(matchPath(`${route.path}/*`, location.pathname)),
+    );
+
+    if (shouldCollapse) {
+      setIsSidebarCollapsed(true);
+    }
+  }, [location.pathname, setIsSidebarCollapsed]);
 
   return (
     <div className="creator-app-shell">

@@ -36,7 +36,8 @@ export const storefrontProductSummariesTestFixture: ProductMinimised[] = [
   {
     id: 'sf-consultation-1',
     title: 'Launch Strategy Session',
-    description: 'A focused consultation to review your product offer and launch plan.',
+    description:
+      'A focused consultation to review your product offer and launch plan.',
     type: 'CONSULTATION',
     status: 'PUBLISHED',
     price: 220,
@@ -47,7 +48,8 @@ export const storefrontProductSummariesTestFixture: ProductMinimised[] = [
   {
     id: 'sf-membership-1',
     title: 'Creator Lab Membership',
-    description: 'Monthly workshops, critiques, and member-only operating systems.',
+    description:
+      'Monthly workshops, critiques, and member-only operating systems.',
     type: 'MEMBERSHIP',
     status: 'PUBLISHED',
     price: 39,
@@ -69,7 +71,8 @@ export const storefrontProductSummariesTestFixture: ProductMinimised[] = [
   {
     id: 'sf-hidden-1',
     title: 'Retired Preset Pack',
-    description: 'Hidden product intentionally excluded from public Storefront.',
+    description:
+      'Hidden product intentionally excluded from public Storefront.',
     type: 'DOWNLOAD',
     status: 'HIDDEN',
     price: 19,
@@ -85,16 +88,22 @@ export const publicStorefrontTestFixture: PublicStorefront = {
     id: 'creator-1',
     displayName: 'Maya Rivera',
     title: 'Independent filmmaker and creator educator',
-    tagline: 'Practical cinematic systems for creators building paid audiences.',
-    bio:
-      'Maya helps video creators package their knowledge into focused courses, downloads, consultations, and membership communities.',
+    tagline:
+      'Practical cinematic systems for creators building paid audiences.',
+    bio: 'Maya helps video creators package their knowledge into focused courses, downloads, consultations, and membership communities.',
     website: 'https://maya.example.com',
+    publicEmail: 'hello@maya.example.com',
     socialLinks: [
       { platform: SocialPlatforms.YT, url: 'https://youtube.com/@mayarivera' },
       { platform: SocialPlatforms.IG, url: 'https://instagram.com/mayarivera' },
     ],
   },
   featuredProductId: 'sf-course-1',
+  theme: {
+    appearance: 'DARK',
+    accentColor: '#ffbd41',
+    typography: 'MODERN',
+  },
   products: storefrontProductSummariesTestFixture.map((product) => ({
     id: product.id ?? '',
     title: product.title ?? '',
@@ -121,6 +130,11 @@ export const registerCreatorStorefrontTestMocks = (mock: MockAdapter) => {
   let config: CreatorStorefrontConfig = {
     id: 'creator-storefront-config',
     featuredProductId: 'sf-course-1',
+    theme: {
+      appearance: 'DARK',
+      accentColor: '#ffbd41',
+      typography: 'MODERN',
+    },
     productOrderIds: storefrontProductSummariesTestFixture.map(
       (product) => product.id ?? '',
     ),
@@ -159,6 +173,7 @@ export const registerCreatorStorefrontTestMocks = (mock: MockAdapter) => {
       ...config,
       featuredProductId: payload.featuredProductId ?? null,
       productOrderIds: payload.productOrderIds,
+      theme: payload.theme,
       updatedAt: '2026-08-12T11:00:00.000Z',
     };
 

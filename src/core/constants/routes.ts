@@ -49,6 +49,7 @@ export const appRoutes: Route[] = [
     label: 'Storefront',
     icon: IoStorefrontOutline,
     group: 'primary',
+    collapseSidebarOnLoad: true,
   },
   {
     path: '/app/admin',

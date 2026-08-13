@@ -13,6 +13,7 @@ export interface User {
   bio?: string;
   taglineMission?: string;
   website?: string;
+  publicEmail?: string;
   city?: string;
   country?: string;
   lat?: string;
