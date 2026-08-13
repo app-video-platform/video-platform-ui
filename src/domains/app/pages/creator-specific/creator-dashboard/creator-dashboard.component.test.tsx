@@ -172,16 +172,20 @@ describe('<CreatorDashboard />', () => {
     ).toBeNull();
   });
 
-  it('links top products to their product workspaces', async () => {
+  it('links top products to Product Overview routes', async () => {
     renderDashboard();
 
     await screen.findByText('€3,429');
     expect(
-      screen.getByRole('link', { name: /edit creator product growth system/i }),
-    ).toHaveAttribute('href', '/app/products/edit/prod-course-growth');
-    expect(screen.getByRole('link', { name: /edit launch toolkit/i })).toHaveAttribute(
+      screen.getByRole('link', {
+        name: /open creator product growth system product overview/i,
+      }),
+    ).toHaveAttribute('href', '/app/products/prod-course-growth');
+    expect(
+      screen.getByRole('link', { name: /open launch toolkit product overview/i }),
+    ).toHaveAttribute(
       'href',
-      '/app/products/edit/prod-launch-toolkit',
+      '/app/products/prod-launch-toolkit',
     );
   });
 
@@ -191,7 +195,7 @@ describe('<CreatorDashboard />', () => {
     await screen.findByText('€3,429');
     expect(
       screen.getByRole('link', { name: /open product updated: launch toolkit/i }),
-    ).toHaveAttribute('href', '/app/products/edit/prod-launch-toolkit');
+    ).toHaveAttribute('href', '/app/products/prod-launch-toolkit');
     expect(screen.queryByRole('link', { name: /open new sale/i })).toBeNull();
     expect(screen.queryByRole('link', { name: /open payment failed/i })).toBeNull();
   });

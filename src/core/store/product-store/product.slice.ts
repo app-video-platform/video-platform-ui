@@ -755,4 +755,11 @@ export const updateLessonDetails = updateCourseLesson;
 export const deleteLesson = deleteCourseLesson;
 export const getProductByProductId = getProductById;
 
+export const {
+  clearCurrentProduct,
+  deleteProductFromStore,
+  deleteSectionFromStore,
+  deleteLessonFromStore,
+} = productsSlice.actions;
+
 export default productsSlice.reducer;

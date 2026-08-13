@@ -47,7 +47,7 @@ const ProductPerformanceList: React.FC<ProductPerformanceListProps> = ({
             key={item.id}
             className="product-performance-list__row product-performance-list__row--interactive"
             to={item.destinationPath}
-            aria-label={`Edit ${item.name}`}
+            aria-label={`Open ${item.name} product overview`}
           >
             {content}
           </Link>

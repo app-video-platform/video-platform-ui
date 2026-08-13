@@ -5,6 +5,7 @@ import { FiExternalLink, FiMoreHorizontal } from 'react-icons/fi';
 import { ProductMinimised } from 'core/api/models';
 import { Button, Dropdown, Icon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
+import { appRoutes } from 'domains/app/routes/routes';
 
 import {
   formatProductPrice,
@@ -27,7 +28,7 @@ const ProductManagementRow: React.FC<ProductManagementRowProps> = ({
   showInspectionRecurringMembership = false,
 }) => {
   const productName = getProductName(product);
-  const workspacePath = `/app/products/edit/${product.id}`;
+  const overviewPath = appRoutes.productsOverview(product.id);
   const status = product.status ?? 'DRAFT';
   const statusLabel = getProductStatusLabel(status);
   const updated = formatProductUpdatedDate(product);
@@ -42,9 +43,9 @@ const ProductManagementRow: React.FC<ProductManagementRowProps> = ({
     <article className="products-management-row">
       <div className="products-management-row__product">
         <Link
-          to={workspacePath}
+          to={overviewPath}
           className="products-management-row__identity"
-          aria-label={`Open ${productName} workspace`}
+          aria-label={`Open ${productName} product overview`}
         >
           <img
             className="products-management-row__thumbnail"
@@ -113,7 +114,11 @@ const ProductManagementRow: React.FC<ProductManagementRowProps> = ({
             )}
             menu={({ close }) => (
               <>
-                <Link to={`/app/product/${product.id}`} role="menuitem" onClick={close}>
+                <Link
+                  to={appRoutes.product(product.id)}
+                  role="menuitem"
+                  onClick={close}
+                >
                   <Icon
                     icon={FiExternalLink}
                     size={15}

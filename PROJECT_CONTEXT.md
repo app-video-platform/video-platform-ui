@@ -62,6 +62,7 @@ Creator/Admin management routes are visually and structurally separated from buy
 - Creator account controls live in the bottom/footer of the Creator sidebar. The footer reuses `UserDropdown`; account, logout, and dev-role behavior must not be duplicated in sidebar code.
 - Expanded sidebar account footer shows the user avatar, display name, primary role label, and dropdown affordance. Collapsed/compact sidebar shows an avatar-only account trigger with an accessible label/title.
 - Tablet/mobile Creator management retains the compact top bar with drawer navigation and the existing account dropdown trigger in that mobile top bar.
+- Product Overview routes (`/app/products/:productId`) render inside `CreatorAppShell` as Creator/Admin management inspection pages for individual Products.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
 - Routes can request the Creator sidebar collapse through `collapseSidebarOnLoad` route metadata. Product edit routes and the Storefront Builder use this existing shell/sidebar behavior.
 - Marketplace/customer routes such as `/app/explore` still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
@@ -124,6 +125,42 @@ Product workspace terminology:
 
 Individual product types share `ProductWorkspaceShell`, while their domain-specific editors remain separate inside `src/domains/app/features/product-form`.
 
+## Product Overview V1
+
+Creator/Admin Product Overview is the management home for one Product. Route separation is intentional:
+
+- Product Overview: `/app/products/:productId`.
+- Focused Product Workspace: `/app/products/edit/:id`.
+- Legacy/type-bearing Product Workspace path: `/app/products/edit/:type/:id`.
+
+Product Overview lives under `src/domains/app/pages/creator-specific/products/product-overview`, renders inside `CreatorAppShell`, and does not use `ProductWorkspaceShell`. Product create/edit Workspace routes continue to render outside `CreatorAppShell`.
+
+Product Overview reuses the existing single-Product read path: Product service → `getProductById` thunk → Product Redux `currentProduct` → existing Product selectors and normalizers. It does not define or require a new Product Overview backend API. The page clears `currentProduct` before loading a route Product ID and renders loaded Product data only when `currentProduct.id` matches the route `productId`, preventing stale previous-product details during route transitions.
+
+Current Product Overview content:
+
+- Back to Products navigation.
+- Product thumbnail when available, Product name, Product type, semantic Product status, description, and updated date.
+- Compact Product details: status, type, price, created date, and updated date.
+- Primary `Edit product` action to Product Workspace.
+- Published-only `View public page` action to the existing buyer-facing Product page.
+
+Type-specific read-only summaries:
+
+- `COURSE`: section/module count, lesson count, and compact section outline.
+- `DOWNLOAD`: section count, file count where loaded Product data supports it, and compact section outline.
+- `CONSULTATION`: configured details such as duration, meeting method, buffers, max sessions per day, messages/policies, and calendar information when present.
+- `MEMBERSHIP`: generic Product information and configured recurring pricing only.
+
+Product Overview V1 intentionally does not include product-scoped revenue, order counts, customer counts, subscribers/members, conversion, charts, recent orders, ratings/reviews, Storefront visibility controls, access/entitlement management, duplicate/archive, explicit publish/unpublish workflow, landing-page customization, SEO, or new backend APIs. Do not use deterministic mocks to imply those capabilities exist.
+
+Creator product navigation principle:
+
+- Product identity links should generally navigate to Product Overview.
+- Explicit editing/building actions should navigate directly to Product Workspace.
+
+This principle currently applies to Creator Products list identities, Creator Dashboard product destinations, Creator Analytics product ranking rows, and Creator Sales product identity links in the ledger and Order Detail. Explicit edit/build actions, such as `Edit product`, builder CTAs, Dashboard attention actions that mean "fix/edit this product", and Admin explicit Edit actions, remain Product Workspace links.
+
 Intentional model decisions:
 
 - Product union types live in `src/core/api/models/product`.
@@ -164,6 +201,7 @@ Implemented / reasonably wired:
 - Creator management shell with Dashboard, Products, Customers, Sales, Analytics, Storefront, and Settings destinations; Help is visible as a disabled planned destination.
 - Creator Dashboard redesign with business metrics, recent activity, top products, and needs-attention panels.
 - Creator Products management redesign with local search/filter/sort, list/table desktop composition, mobile management cards, and distinct empty/loading/error states.
+- Creator Product Overview V1 at `/app/products/:productId` with Product identity/details, real Product-owned type-specific summaries, and edit/public-page actions.
 - Creator Customers management area with a customer list and dedicated customer detail route.
 - Creator Sales management area with overview metrics, an orders ledger, local search/filter/sort/date preset controls, local pagination, responsive layout, empty/no-result states, and contextual order detail inspection.
 - Creator Analytics management area with period-scoped business metrics, performance visualization, product ranking, customer growth, membership health, and payment health.
@@ -220,7 +258,7 @@ Deliberate temporary implementations:
 - `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and Membership. Customers, Sales, Analytics, Dashboard, Storefront, and Membership use Redux/services/Axios and receive deterministic data from ignored local HTTP mocks rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, membership content/feed state, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
 - Creator Dashboard uses a frontend contract, service, Redux store integration, and ignored local HTTP mock response for the aggregate summary. When the backend contract is unavailable, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
-- Creator Dashboard Top products rows currently navigate directly to Product Workspace edit routes (`/app/products/edit/{productId}`) because there is no Product Overview destination yet. Future Creator product-entity navigation should prefer Product Overview, with editing/building as a secondary action from that overview.
+- Creator product identity navigation now prefers Product Overview (`/app/products/{productId}`), with explicit editing/building actions kept on Product Workspace (`/app/products/edit/{productId}`).
 - Creator Products inspection fixtures currently come through ignored local mock data in `src/core/api/_mocks.ts` when mocks are enabled.
 - Creator Customers runtime data path is Component → Redux → thunk → Customer service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Creator Sales runtime data path is Component → Redux → thunk → Sales service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
@@ -248,7 +286,7 @@ Implemented Dashboard concepts:
 - Metric direction and metric sentiment are modeled separately in the dashboard inspection fixture types. UI copy is concise while preserving semantic styling and accessible trend labels.
 - Revenue and Sales metric cards navigate to Sales when deterministic inspection data is enabled.
 - Recent activity, Top products, and Needs attention are separate components under `src/domains/app/pages/creator-specific/creator-dashboard/components`.
-- Top products navigate to Product Workspace edit routes when a destination exists.
+- Top products navigate to Product Overview routes when a destination exists.
 - Recent activity rows are only interactive when a meaningful destination exists; customer/member-only activity states without real destinations remain non-interactive.
 - Needs attention actions navigate only when an action path exists.
 - Responsive ordering is intentional: metrics remain first, and when panels become sequential the actionable Needs attention panel takes priority before historical Recent activity.
@@ -276,7 +314,7 @@ Current Sales page patterns:
 - Metrics are scoped to the selected date preset. Ledger results also apply search, status, product, and sort refinements.
 - Desktop uses a compact orders ledger with Date, Customer, Product, Status, Type, and Amount.
 - Tablet/mobile reduce columns and transform ledger rows into compact transaction cards rather than shrinking the desktop table.
-- Order identity opens the contextual Order Detail drawer. Customer identity links to Customer Detail when a customer ID exists. Product identity links to Product Workspace when a product ID exists.
+- Order identity opens the contextual Order Detail drawer. Customer identity links to Customer Detail when a customer ID exists. Product identity links to Product Overview when a product ID exists.
 - Local controls include search by customer/email/order ID, date preset filter, order status filter, product filter, sorting, result count, Clear filters, and local pagination.
 - Empty states distinguish no sales, search-no-results, filter-no-results, and production unavailable states.
 - Mobile uses the shared `Drawer` for filter controls.
@@ -313,7 +351,7 @@ Current Analytics page patterns:
 - Page-level period selection is limited to `Last 7 days`, `Last 30 days`, and `Last 90 days`. There is no custom date-range UI or contract.
 - Summary metrics are Revenue, Orders, Customers, and Active memberships.
 - The Performance visualization supports Revenue and Orders modes over the selected period.
-- Product Performance ranks products by revenue share while showing revenue, orders, share percentage, share meters, rank, and Product Workspace links.
+- Product Performance ranks products by revenue share while showing revenue, orders, share percentage, share meters, rank, and Product Overview links.
 - Customer Growth, Memberships, and Payment Health are separate lower-page sections.
 - Membership analytics currently present active, new, cancelled, churn-rate, and movement visualization when inspection data exists.
 - Payment Health currently presents refund-rate and failed-payment aggregates plus a compact trend visualization.
@@ -401,7 +439,7 @@ Current implemented patterns:
 
 - Desktop uses a compact list/table hybrid with Product, Status, Price, Updated, and Actions columns.
 - Mobile transforms rows into management cards rather than shrinking the desktop table.
-- Product identity/title is the primary navigation to Product Workspace (`/app/products/edit/{product.id}`).
+- Product identity/title is the primary navigation to Product Overview (`/app/products/{product.id}`). Explicit editing actions should use Product Workspace (`/app/products/edit/{product.id}`).
 - There are no permanent Edit buttons and no fake/permanent Publish buttons in the list.
 - Overflow menus render only when meaningful secondary actions exist. Published products can expose Preview (`/app/product/{product.id}`); products with no secondary action do not render an ellipsis just for symmetry.
 - Lifecycle status is shown with compact badges.
@@ -480,12 +518,13 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Analytics, Storefront, plus Settings utility navigation; Help remains disabled and Marketing is removed from the Creator MVP IA.
 - Creator Dashboard, Products, Customers, Sales, Analytics, and Storefront Builder visual redesigns.
 - Public Storefront implementation at `/app/store/:creatorId`, sharing Storefront presentation/view-model logic with the Creator Storefront Builder.
+- Product Overview V1 at `/app/products/:productId`, establishing Product identity navigation to Overview and edit/build navigation to Product Workspace.
 - Focused Product Workspace shell for product editing.
 
 Likely next steps:
 
 - Polish/fix admin product owner filtering UX beyond raw owner ID.
-- Complete product detail UI using real backend fields.
+- Complete the buyer-facing Product detail/landing page using real backend fields; `/app/product/:id` and `/app/product/:id/:type` remain placeholder-heavy and are not production-ready product landing-page functionality.
 - Implement backend Storefront contracts before relying on production persistence for Storefront configuration; define separate contracts before adding arbitrary page-builder blocks, custom domains, SEO, or analytics.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.

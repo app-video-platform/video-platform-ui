@@ -169,14 +169,14 @@ describe('<ProductsList />', () => {
     expect(mockNavigate).toHaveBeenCalledWith('create');
   });
 
-  it('links product identity to the existing Product Workspace route', () => {
+  it('links product identity to the Product Overview route', () => {
     renderProductsList();
 
     expect(
       screen.getByRole('link', {
-        name: 'Open Creator Product Growth System workspace',
+        name: 'Open Creator Product Growth System product overview',
       }),
-    ).toHaveAttribute('href', '/app/products/edit/course-1');
+    ).toHaveAttribute('href', '/app/products/course-1');
   });
 
   it('does not expose permanent Edit or fake Publish buttons', () => {

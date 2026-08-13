@@ -60,8 +60,8 @@ const renderAnalytics = () => {
         <Routes>
           <Route path="/app/analytics" element={<CreatorAnalytics />} />
           <Route
-            path="/app/products/edit/:productId"
-            element={<div>Product workspace route</div>}
+            path="/app/products/:productId"
+            element={<div>Product overview route</div>}
           />
         </Routes>
       </MemoryRouter>
@@ -151,9 +151,9 @@ describe('Creator Analytics', () => {
     expect(screen.getByText('34.8%')).toBeInTheDocument();
     expect(
       screen.getByRole('link', {
-        name: 'Open Creator Product Growth System product workspace',
+        name: 'Open Creator Product Growth System product overview',
       }),
-    ).toHaveAttribute('href', '/app/products/edit/prod-course-growth');
+    ).toHaveAttribute('href', '/app/products/prod-course-growth');
   });
 
   it('renders customer growth, membership health, and payment health summaries', async () => {
