@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { HiArrowLeft } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { GalIcon } from '@shared/ui';
+import { Icon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { AppDispatch } from 'core/api/models';
 import {
@@ -57,7 +57,7 @@ const CustomerDetail: React.FC = () => {
     return (
       <div className="customer-detail-page">
         <Link to="/app/customers" className="customer-detail-back">
-          <GalIcon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
+          <Icon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
           Back to Customers
         </Link>
         <div className="customers-state" role="status">
@@ -71,7 +71,7 @@ const CustomerDetail: React.FC = () => {
     return (
       <div className="customer-detail-page">
         <Link to="/app/customers" className="customer-detail-back">
-          <GalIcon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
+          <Icon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
           Back to Customers
         </Link>
         <div className="customers-state" role="status">
@@ -89,7 +89,7 @@ const CustomerDetail: React.FC = () => {
     return (
       <div className="customer-detail-page">
         <Link to="/app/customers" className="customer-detail-back">
-          <GalIcon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
+          <Icon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
           Back to Customers
         </Link>
         <div className="customers-state">
@@ -298,7 +298,7 @@ const CustomerDetail: React.FC = () => {
   return (
     <div className="customer-detail-page">
       <Link to="/app/customers" className="customer-detail-back">
-        <GalIcon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
+        <Icon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
         Back to Customers
       </Link>
 

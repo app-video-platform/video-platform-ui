@@ -10,7 +10,7 @@ import {
   HiXCircle,
 } from 'react-icons/hi2';
 
-import { GalIcon } from '@shared/ui';
+import { Icon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { DashboardActivity, DashboardActivityKind } from 'core/api/models';
 
@@ -34,11 +34,15 @@ interface ActivityListProps {
 const ActivityList: React.FC<ActivityListProps> = ({ items }) => (
   <div className="activity-list">
     {items.map((item) => {
-      const Icon = activityIcon[item.kind];
+      const ActivityIcon = activityIcon[item.kind];
       const content = (
         <>
           <span className="activity-list__icon" aria-hidden="true">
-            <GalIcon icon={Icon} size={16} color={getCssVar('--text-primary')} />
+            <Icon
+              icon={ActivityIcon}
+              size={16}
+              color={getCssVar('--text-primary')}
+            />
           </span>
           <div className="activity-list__content">
             <div className="activity-list__headline">

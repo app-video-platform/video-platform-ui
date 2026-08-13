@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { FiExternalLink } from 'react-icons/fi';
 import clsx from 'clsx';
 
-import { Button, GalIcon } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
 import { SocialPlatforms } from 'core/api/models/socials/social-media-link';
 
 import { StorefrontViewModel } from '../storefront.types';
@@ -141,7 +141,7 @@ const StorefrontPublicPage: React.FC<StorefrontPublicPageProps> = ({
                 rel="noreferrer"
               >
                 Creator website{' '}
-                <GalIcon icon={FiExternalLink} color="currentColor" size={15} />
+                <Icon icon={FiExternalLink} color="currentColor" size={15} />
               </a>
             )}
           </div>

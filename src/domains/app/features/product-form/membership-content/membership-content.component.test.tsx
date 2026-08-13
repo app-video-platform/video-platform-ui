@@ -27,7 +27,7 @@ jest.mock('@shared/ui', () => {
   return {
     __esModule: true,
     ...actual,
-    GalUppyFileUploader: ({
+    UppyFileUploader: ({
       allowedFileTypes = [],
       onFilesChange,
     }: MockUploaderProps) => {

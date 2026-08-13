@@ -4,7 +4,7 @@ import { HiArrowLeft, HiDotsVertical } from 'react-icons/hi';
 
 import { ProductStatus, ProductType } from 'core/api/models';
 import { PRODUCT_TYPE_REGISTRY } from 'core/constants';
-import { Button, GalIcon, StatusChip } from '@shared/ui';
+import { Button, Icon, StatusChip } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { SavingIndicator } from 'domains/app/components';
 import { SaveStatus } from 'domains/app/features/product-form';
@@ -57,7 +57,7 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
             className="product-workspace-shell__back"
             onClick={() => navigate('/app/products')}
           >
-            <GalIcon
+            <Icon
               icon={HiArrowLeft}
               size={18}
               color={getCssVar('--brand-primary')}
@@ -88,7 +88,7 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
               aria-label="More product actions"
               disabled
             >
-              <GalIcon
+              <Icon
                 icon={HiDotsVertical}
                 size={18}
                 color={getCssVar('--text-secondary')}

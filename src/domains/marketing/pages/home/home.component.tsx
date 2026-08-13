@@ -21,11 +21,11 @@ const Home: React.FC = () => {
       <section className="hero-section-wrapper">
         <div className="hero-section max-w">
           <div className="hero-content">
-            <h1 className="gal-huge-header hero-header">
+            <h1 className="huge-header hero-header">
               <span>Create Courses That</span>
               <WordCarousel />
             </h1>
-            <p className="gal-subtext hero-subtext">
+            <p className="subtext hero-subtext">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
               porttitor faucibus interdum. Quisque at efficitur tellus. Nulla
               sed tortor dolor.

@@ -31,17 +31,6 @@ const mockProductStoreState = {
 // ── 1) Mock @shared/ui (UppyFileUploader) ────────────────────────────
 jest.mock('@shared/ui', () => ({
   __esModule: true,
-  GalUppyFileUploader: ({
-    onFilesChange,
-  }: {
-    onFilesChange: (files: File[]) => void;
-    allowedFileTypes?: string[];
-    disableImporters?: boolean;
-  }) => (
-    <button data-testid="file-uploader" onClick={() => onFilesChange([])}>
-      Upload Image
-    </button>
-  ),
   UppyFileUploader: ({
     onFilesChange,
   }: {
@@ -262,9 +251,9 @@ jest.mock('domains/app/layouts/product-workspace-shell', () => ({
 // ── 3) Mock app components barrel used by ProductForm ────────────────────
 jest.mock('domains/app/components', () => ({
   __esModule: true,
-  GalPriceSelector: ({ price }: { price: number }) => (
+  PriceSelector: ({ price }: { price: number }) => (
     <div data-testid="price-selector">
-      GalPriceSelector (price: {String(price)})
+      PriceSelector (price: {String(price)})
     </div>
   ),
 }));
@@ -398,7 +387,7 @@ describe('<ProductForm />', () => {
     expect(screen.queryByTestId('step-one-continue')).not.toBeInTheDocument();
   });
 
-  it('clicking Pricing tab shows the GalPriceSelector panel', async () => {
+  it('clicking Pricing tab shows the PriceSelector panel', async () => {
     const state = makeFacadeState({
       showRestOfForm: true,
       formData: {
@@ -423,14 +412,14 @@ describe('<ProductForm />', () => {
     // Click the "Pricing" tab in our mocked sidebar
     fireEvent.click(screen.getByTestId('tab-pricing'));
 
-    // Now the pricing panel should show our GalPriceSelector stub
+    // Now the pricing panel should show our PriceSelector stub
     expect(screen.getByTestId('price-selector')).toBeInTheDocument();
     // And sections panel should be gone
     expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
   });
 
   it.each(['COURSE', 'DOWNLOAD', 'CONSULTATION'])(
-    'uses the legacy GalPriceSelector for %s pricing',
+    'uses the legacy PriceSelector for %s pricing',
     async (productType) => {
       const state = makeFacadeState({
         showRestOfForm: true,
@@ -735,7 +724,7 @@ describe('<ProductForm />', () => {
     expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
   });
 
-  it('clicking Media tab shows the image uploader (GalUppyFileUploader)', async () => {
+  it('clicking Media tab shows the image uploader (UppyFileUploader)', async () => {
     const state = makeFacadeState({
       showRestOfForm: true,
       formData: {

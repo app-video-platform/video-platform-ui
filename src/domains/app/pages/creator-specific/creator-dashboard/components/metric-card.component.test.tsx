@@ -6,7 +6,7 @@ import MetricCard from './metric-card.component';
 
 jest.mock('@shared/ui', () => ({
   __esModule: true,
-  GalIcon: () => <span data-testid="trend-icon" />,
+  Icon: () => <span data-testid="trend-icon" />,
 }));
 
 jest.mock('react-router-dom', () => ({

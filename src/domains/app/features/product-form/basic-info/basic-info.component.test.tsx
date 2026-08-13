@@ -36,7 +36,7 @@ jest.mock('@shared/ui', () => ({
 
 jest.mock('domains/app/components', () => ({
   __esModule: true,
-  GalBoxSelector: ({
+  BoxSelector: ({
     availableOptions,
     onSelect,
   }: {

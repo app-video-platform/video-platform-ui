@@ -1,11 +1,11 @@
 /* eslint-disable indent */
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5'; // or '@storybook/react-vite'
-import GalTabs, { TabItem } from './tabs.component';
+import Tabs, { TabItem } from './tabs.component';
 
-const meta: Meta<typeof GalTabs> = {
-  title: 'Components/GalTabs',
-  component: GalTabs,
+const meta: Meta<typeof Tabs> = {
+  title: 'Components/Tabs',
+  component: Tabs,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -25,7 +25,7 @@ const meta: Meta<typeof GalTabs> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof GalTabs>;
+type Story = StoryObj<typeof Tabs>;
 
 const sampleItems: TabItem[] = [
   { label: 'Overview', content: <p>Welcome to the Overview tab.</p> },

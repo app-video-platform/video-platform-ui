@@ -10,7 +10,7 @@ import debounce from 'lodash.debounce';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { GalSearch } from 'domains/app/components';
+import { Search } from 'domains/app/components';
 import { fetchProducts } from 'core/api/services';
 import { ProductMinimised } from 'core/api/models';
 
@@ -99,7 +99,7 @@ const SmartSearch: React.FC = () => {
 
   return (
     <div className="smart-search-container">
-      <GalSearch
+      <Search
         value={rawQuery}
         onChange={setRawQuery}
         onSearch={(q) =>

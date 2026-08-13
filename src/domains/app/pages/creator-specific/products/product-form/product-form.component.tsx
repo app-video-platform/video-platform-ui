@@ -3,8 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 
-import { GalPriceSelector } from 'domains/app/components';
-import { GalUppyFileUploader } from '@shared/ui';
+import { PriceSelector } from 'domains/app/components';
+import { UppyFileUploader } from '@shared/ui';
 import {
   CreateProductStepOne,
   ConsultationDetailsSection,
@@ -520,7 +520,7 @@ const ProductForm: React.FC = () => {
                   ) : (
                     <>
                       <h3>Choose Your Price Option</h3>
-                      <GalPriceSelector
+                      <PriceSelector
                         price={formData.price ?? 0}
                         setPrice={handleSetPrice}
                       />
@@ -576,7 +576,7 @@ const ProductForm: React.FC = () => {
                     <h3>Upload an image</h3>
                   </div>
                   <div className="image-uploader-box">
-                    <GalUppyFileUploader
+                    <UppyFileUploader
                       onFilesChange={handleImageChange}
                       allowedFileTypes={['image/*']}
                       disableImporters={true}

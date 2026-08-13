@@ -7,10 +7,10 @@ import { isCreatorOrAdmin } from 'core/api/models';
 import { Button } from '@shared/ui';
 import { SmartSearch } from 'domains/app/features/smart-search';
 import {
-  GalWishlistDropdown,
+  WishlistDropdown,
   ShopCartDropdown,
-  GalNotificationsDropdown,
-  GalUserDropdown,
+  NotificationsDropdown,
+  UserDropdown,
 } from 'domains/app/components';
 
 import './top-navbar.styles.scss';
@@ -24,7 +24,7 @@ const TopNavbar: React.FC = () => {
     location.pathname.startsWith('/app') && hasManagementRole;
 
   return (
-    <nav className="galactica-home-nav">
+    <nav className="top-navbar">
       {!isPathDashboard && (
         <div className="logo-container">
           <h2>Galactica</h2>
@@ -35,7 +35,7 @@ const TopNavbar: React.FC = () => {
         <Link to="/app/explore">Explore</Link>
         {/* {user &&
           (isUserCreator ? (
-            <GalButton
+            <Button
               type="primary"
               customClassName="create-product-btn"
               text="Create Product"
@@ -52,12 +52,12 @@ const TopNavbar: React.FC = () => {
         <div className="nav-links">
           {!hasManagementRole && (
             <>
-              <GalWishlistDropdown />
+              <WishlistDropdown />
               <ShopCartDropdown />
             </>
           )}
-          <GalNotificationsDropdown />
-          <GalUserDropdown />
+          <NotificationsDropdown />
+          <UserDropdown />
         </div>
       )}
 

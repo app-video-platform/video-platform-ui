@@ -9,7 +9,7 @@ import {
   ProductType,
   AppDispatch,
 } from 'core/api/models';
-import { Button, GalIcon, Input } from '@shared/ui';
+import { Button, Icon, Input } from '@shared/ui';
 import { FormErrors } from 'domains/app/pages';
 import { createProduct } from 'core/store/product-store';
 import { ProductTypeSelector } from 'domains/app/features/product-form/product-type-selector';
@@ -121,7 +121,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
             className="create-course-continue-button"
             disabled={isDisabled}
           >
-            <GalIcon
+            <Icon
               icon={FaArrowRight}
               color={getCssVar(
                 isDisabled ? '--text-secondary' : '--text-primary',

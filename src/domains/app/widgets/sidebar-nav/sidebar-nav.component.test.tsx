@@ -14,7 +14,7 @@ jest.mock('react-redux', () => ({
 }));
 
 jest.mock('domains/app/components', () => ({
-  GalUserDropdown: ({ collapsed }: { collapsed?: boolean }) => (
+  UserDropdown: ({ collapsed }: { collapsed?: boolean }) => (
     <button type="button">
       {collapsed ? 'Account footer collapsed' : 'Account footer expanded'}
     </button>

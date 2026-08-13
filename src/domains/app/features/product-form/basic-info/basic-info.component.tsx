@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ProductType } from 'core/api/models';
 import { PRODUCT_BASIC_INFO_OPTIONS } from 'core/constants';
-import { GalBoxSelector } from 'domains/app/components';
+import { BoxSelector } from 'domains/app/components';
 import { Input, Textarea } from '@shared/ui';
 import { ProductDraft } from '../models';
 
@@ -43,7 +43,7 @@ const BasicInfo: React.FC<BasicInfoProps> = ({
 
       <div className="product-type-selectors">
         <span className="type-selectors-label">Product Type</span>
-        <GalBoxSelector<ProductType>
+        <BoxSelector<ProductType>
           selectedOption={formData.type}
           selectFor="product"
           onSelect={(type) => setField('type', type)}

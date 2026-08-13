@@ -17,7 +17,7 @@ import { MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import {
   Button,
   Drawer,
-  GalIcon,
+  Icon,
   InfoPopover,
   Input,
   StatusBadge,
@@ -198,7 +198,7 @@ const InlineProfileEditor: React.FC<InlineProfileEditorProps> = ({
             size="sm"
             loading={saving}
             onClick={save}
-            leadingIcon={<GalIcon icon={FiCheck} color="currentColor" />}
+            leadingIcon={<Icon icon={FiCheck} color="currentColor" />}
           >
             Save
           </Button>
@@ -208,7 +208,7 @@ const InlineProfileEditor: React.FC<InlineProfileEditorProps> = ({
             size="sm"
             disabled={saving}
             onClick={cancel}
-            leadingIcon={<GalIcon icon={FiX} color="currentColor" />}
+            leadingIcon={<Icon icon={FiX} color="currentColor" />}
           >
             Cancel
           </Button>
@@ -233,7 +233,7 @@ const InlineProfileEditor: React.FC<InlineProfileEditorProps> = ({
         aria-label={`Edit ${label}`}
         onClick={() => setEditing(true)}
       >
-        <GalIcon icon={FiEdit3} color="currentColor" size={15} />
+        <Icon icon={FiEdit3} color="currentColor" size={15} />
       </Button>
     </span>
   );
@@ -556,7 +556,7 @@ const CreatorStorefrontPage: React.FC = () => {
             variant="secondary"
             onClick={() => window.open(publicStorefrontUrl, '_blank', 'noopener')}
             leadingIcon={
-              <GalIcon icon={FiExternalLink} color="currentColor" size={15} />
+              <Icon icon={FiExternalLink} color="currentColor" size={15} />
             }
           >
             Open public Storefront
@@ -568,7 +568,7 @@ const CreatorStorefrontPage: React.FC = () => {
             aria-label="Copy public Storefront link"
             onClick={copyStorefrontLink}
           >
-            <GalIcon icon={FiCopy} color="currentColor" size={15} />
+            <Icon icon={FiCopy} color="currentColor" size={15} />
           </Button>
           <Button
             type="button"
@@ -576,7 +576,7 @@ const CreatorStorefrontPage: React.FC = () => {
             disabled={!hasUnsavedChanges || configSaveLoading}
             onClick={resetDraft}
             leadingIcon={
-              <GalIcon icon={FiRotateCcw} color="currentColor" size={15} />
+              <Icon icon={FiRotateCcw} color="currentColor" size={15} />
             }
           >
             Reset changes
@@ -587,7 +587,7 @@ const CreatorStorefrontPage: React.FC = () => {
             loading={configSaveLoading}
             disabled={!hasUnsavedChanges}
             onClick={saveDraft}
-            leadingIcon={<GalIcon icon={FiSave} color="currentColor" size={15} />}
+            leadingIcon={<Icon icon={FiSave} color="currentColor" size={15} />}
           >
             Save changes
           </Button>
@@ -675,7 +675,7 @@ const CreatorStorefrontPage: React.FC = () => {
                       disabled={index === 0 || configSaveLoading}
                       onClick={() => moveProduct(product.id, -1)}
                     >
-                      <GalIcon
+                      <Icon
                         icon={MdKeyboardArrowUp}
                         color="currentColor"
                         size={18}
@@ -692,7 +692,7 @@ const CreatorStorefrontPage: React.FC = () => {
                       }
                       onClick={() => moveProduct(product.id, 1)}
                     >
-                      <GalIcon
+                      <Icon
                         icon={MdKeyboardArrowDown}
                         color="currentColor"
                         size={18}
@@ -731,7 +731,7 @@ const CreatorStorefrontPage: React.FC = () => {
                 aria-label="Close customization panel"
                 onClick={() => setCustomizeOpen(false)}
               >
-                <GalIcon icon={FiX} color="currentColor" size={18} />
+                <Icon icon={FiX} color="currentColor" size={18} />
               </Button>
             </header>
             {customizeControls}
@@ -747,7 +747,7 @@ const CreatorStorefrontPage: React.FC = () => {
           aria-expanded={customizeOpen}
           onClick={() => setCustomizeOpen((open) => !open)}
         >
-          <GalIcon icon={FiSliders} color="currentColor" size={20} />
+          <Icon icon={FiSliders} color="currentColor" size={20} />
         </Button>
       </div>
 

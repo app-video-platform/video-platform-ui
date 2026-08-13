@@ -1,13 +1,13 @@
 import React from 'react';
 import { GoKebabHorizontal } from 'react-icons/go';
 
-import { Button, GalDropdown, GalIcon } from '@shared/ui';
+import { Button, Dropdown, Icon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 
 import './menu-dropdown.styles.scss';
 
 const MenuDropdown: React.FC = () => (
-  <GalDropdown
+  <Dropdown
     customClassName="menu-dropdown"
     trigger={({ toggle }) => (
       <Button
@@ -18,7 +18,7 @@ const MenuDropdown: React.FC = () => (
         className="menu-trigger"
         aria-label="Open item menu"
       >
-        <GalIcon
+        <Icon
           icon={GoKebabHorizontal}
           size={18}
           color={getCssVar('--text-primary')}
