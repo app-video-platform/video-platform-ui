@@ -163,6 +163,18 @@ describe('<ProductOverview />', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/app/products/edit/course-1');
   });
 
+  it('navigates to Product Landing Page Builder from Edit landing page', async () => {
+    mock.onGet('api/products/course-1').reply(200, courseProduct);
+
+    renderOverview();
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Edit landing page' }),
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith('/app/products/course-1/landing-page');
+  });
+
   it('shows the public page action only for published products', async () => {
     mock.onGet('api/products/course-1').reply(200, courseProduct);
 

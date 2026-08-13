@@ -8,6 +8,8 @@ export const appRoutes = {
 
   products: '/app/products',
   productsOverview: (productId = ':productId') => `/app/products/${productId}`,
+  productsLandingPage: (productId = ':productId') =>
+    `/app/products/${productId}/landing-page`,
   productsCreate: '/app/products/create',
   productsEdit: (id = ':id') => `/app/products/edit/${id}`,
   customers: '/app/customers',

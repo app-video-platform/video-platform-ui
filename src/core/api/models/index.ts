@@ -7,6 +7,7 @@ export * from './customers';
 export * from './dashboard';
 export * from './files';
 export * from './membership';
+export * from './product-landing-page';
 export * from './product';
 export * from './socials';
 export * from './storefront';

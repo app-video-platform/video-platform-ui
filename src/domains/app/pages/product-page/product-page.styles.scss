@@ -1,18 +1,21 @@
-.product-page {
-  padding: 50px 0;
+.product-page-state {
+  display: grid;
+  place-content: center;
+  min-height: 70vh;
+  padding: 48px 24px;
+  text-align: center;
 
-  .product-banner {
-    display: flex;
-    flex-wrap: nowrap;
-    width: 80%;
-    margin: auto;
-    gap: 40px;
-    justify-content: space-between;
+  h1 {
+    margin: 0 0 12px;
+    color: var(--text-primary);
+    font-size: 2rem;
+    letter-spacing: 0;
   }
 
-  .product-details {
-    width: 80%;
-    margin: auto;
-    padding-top: 50px;
+  p {
+    max-width: 520px;
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
   }
 }

@@ -5,6 +5,7 @@ export * from './customers-store';
 export * from './dashboard-store';
 export * from './membership-store';
 export * from './notifications';
+export * from './product-landing-page-store';
 export * from './product-store';
 export * from './sales-store';
 export * from './storefront-store';

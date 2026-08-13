@@ -21,6 +21,7 @@ import {
   LibraryPage,
   Onboarding,
   ProductForm,
+  ProductLandingPageBuilder,
   ProductOverview,
   ProductPage,
   ProductsList,
@@ -115,6 +116,7 @@ const AppRouter: React.FC = () => (
           <Route path="create" element={<ProductForm />} />
           <Route path="edit/:id" element={<ProductForm />} />
           <Route path="edit/:type/:id" element={<ProductForm />} />
+          <Route path=":productId/landing-page" element={<ProductLandingPageBuilder />} />
           <Route path=":productId" element={<ProductOverview />} />
         </Route>
 
