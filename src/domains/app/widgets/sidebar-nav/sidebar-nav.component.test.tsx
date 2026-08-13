@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom" />
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -11,6 +11,14 @@ import { SidebarLayoutProvider } from './sidebar-layout.context';
 
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(),
+}));
+
+jest.mock('domains/app/components', () => ({
+  GalUserDropdown: ({ collapsed }: { collapsed?: boolean }) => (
+    <button type="button">
+      {collapsed ? 'Account footer collapsed' : 'Account footer expanded'}
+    </button>
+  ),
 }));
 
 const renderSidebar = (roles: UserRole[]) => {
@@ -84,5 +92,23 @@ describe('SidebarNav', () => {
       'aria-disabled',
       'true',
     );
+  });
+
+  it('renders the account dropdown trigger in the expanded sidebar footer', () => {
+    renderSidebar([UserRole.CREATOR]);
+
+    expect(
+      screen.getByRole('button', { name: 'Account footer expanded' }),
+    ).toBeInTheDocument();
+  });
+
+  it('passes collapsed state to the sidebar account footer trigger', () => {
+    renderSidebar([UserRole.CREATOR]);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Account footer collapsed' }),
+    ).toBeInTheDocument();
   });
 });

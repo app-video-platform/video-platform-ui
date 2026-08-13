@@ -4,16 +4,12 @@ import React from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { UserRole } from 'core/api/models';
 import authReducer from 'core/store/auth-store/auth.slice';
 import { SidebarLayoutProvider } from 'domains/app/widgets/sidebar-nav';
 import CreatorAppShell from './creator-app-shell.component';
-
-jest.mock('domains/app/components', () => ({
-  GalUserDropdown: () => <div data-testid="user-dropdown" />,
-}));
 
 const renderShell = (initialEntry: string) => {
   const testStore = configureStore({
@@ -60,5 +56,17 @@ describe('CreatorAppShell', () => {
         screen.getByRole('button', { name: 'Expand sidebar' }),
       ).toBeInTheDocument();
     });
+  });
+
+  it('opens the existing user dropdown from the sidebar footer', async () => {
+    renderShell('/app/storefront');
+
+    const accountButton = await screen.findByRole('button', {
+      name: 'Open account menu for Maya Rivera',
+    });
+    fireEvent.click(accountButton);
+
+    expect(screen.getByText('maya@example.test')).toBeInTheDocument();
+    expect(screen.getByText('Role: CREATOR')).toBeInTheDocument();
   });
 });

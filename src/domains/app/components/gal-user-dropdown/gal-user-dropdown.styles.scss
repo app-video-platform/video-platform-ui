@@ -13,6 +13,42 @@
     color: var(--text-primary);
   }
 
+  .user-role {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .user-profile-button {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-2;
+    border: 1px solid transparent;
+    border-radius: $radius-md;
+    background: transparent;
+    color: var(--text-primary);
+
+    &:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 2px var(--surface-canvas),
+        0 0 0 4px var(--focus-ring);
+    }
+  }
+
+  .user-profile-button__identity {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+    text-align: left;
+  }
+
+  .user-profile-button__chevron {
+    color: var(--text-secondary);
+    margin-left: auto;
+  }
+
   .galactica-nav {
     width: 350px;
     background: var(--surface-panel-elevated);
@@ -51,6 +87,97 @@
           background: var(--surface-interactive-hover);
         }
       }
+    }
+  }
+}
+
+.gal-user-dropdown--sidebar {
+  display: block;
+  width: 100%;
+
+  .galactica-dropdown {
+    display: block;
+    width: 100%;
+  }
+
+  .user-profile-button {
+    width: 100%;
+    min-height: 54px;
+    padding: $spacing-2;
+
+    &:hover {
+      background: var(--surface-interactive);
+      border-color: var(--border-subtle);
+    }
+  }
+
+  .user-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .galactica-nav {
+    right: auto;
+    left: calc(100% + #{$spacing-3});
+    bottom: 0;
+    top: auto;
+    margin-top: 0;
+  }
+}
+
+.gal-user-dropdown--collapsed {
+  .user-profile-button {
+    width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0;
+  }
+}
+
+@media (max-width: $bp-laptop) {
+  .gal-user-dropdown--sidebar {
+    .user-profile-button {
+      width: 44px;
+      min-height: 44px;
+      justify-content: center;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    .user-profile-button__identity,
+    .user-profile-button__chevron {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .gal-user-dropdown--sidebar {
+    .user-profile-button {
+      width: 100%;
+      min-height: 54px;
+      justify-content: flex-start;
+      margin: 0;
+      padding: $spacing-2;
+    }
+
+    .user-profile-button__identity {
+      display: grid;
+    }
+
+    .user-profile-button__chevron {
+      display: block;
+    }
+
+    .galactica-nav {
+      left: 0;
+      right: auto;
+      bottom: auto;
+      top: 100%;
+      width: min(350px, calc(100vw - 48px));
+      margin-top: $spacing-2;
     }
   }
 }

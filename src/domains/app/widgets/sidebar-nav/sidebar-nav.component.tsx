@@ -9,6 +9,7 @@ import { hasAnyRole } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import { GalIcon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
+import { GalUserDropdown } from 'domains/app/components';
 import { useSidebarLayout } from './sidebar-layout.context';
 
 import './sidebar-nav.styles.scss';
@@ -99,6 +100,9 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ onNavigate }) => {
           <li key={route.path}>{renderRoute(route)}</li>
         ))}
       </ul>
+      <div className="sidebar-nav__account">
+        <GalUserDropdown variant="sidebar" collapsed={isSidebarCollapsed} />
+      </div>
       <button
         type="button"
         className="sidebar-nav-toggle"
