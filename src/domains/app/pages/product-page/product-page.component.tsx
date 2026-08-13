@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { AbstractProduct, AppDispatch } from 'core/api/models';
-import { Button, GalExpansionPanel } from '@shared/ui';
+import { Button, LegacyExpansionPanel } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
 import { getProductById } from 'core/store/product-store';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -131,7 +131,7 @@ const ProductPage: React.FC = () => {
             </p>
             {product.type === 'COURSE' &&
               product.sections?.map((section) => (
-                <GalExpansionPanel
+                <LegacyExpansionPanel
                   key={section.id}
                   header={section.title || ''}
                 >
@@ -143,7 +143,7 @@ const ProductPage: React.FC = () => {
                       <p>Type: {lesson.type}</p>
                     </div>
                   ))}
-                </GalExpansionPanel>
+                </LegacyExpansionPanel>
               ))}
           </div>
         </>

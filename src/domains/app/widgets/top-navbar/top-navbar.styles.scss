@@ -1,6 +1,6 @@
 @use '../../../../styles/index' as *;
 
-.galactica-home-nav {
+.top-navbar {
   display: flex;
   width: 100%;
   height: 100%;
@@ -28,7 +28,7 @@
     margin-left: 70px;
     gap: 20px;
 
-    .galactica-home-search {
+    .top-navbar-search {
       width: 550px;
 
       &__creator {

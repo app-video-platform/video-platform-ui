@@ -28,9 +28,9 @@ const LibraryPage: React.FC = () => {
     <div className="library-page">
       <h1 className="library-page-title">My Library</h1>
 
-      <div className="gal-tabs">
+      <div className="tabs">
         <div
-          className="gal-tabs-header"
+          className="tabs-header"
           role="tablist"
           aria-label="Library sections"
         >
@@ -41,7 +41,7 @@ const LibraryPage: React.FC = () => {
                 key={tab.path}
                 to={`/app/library/${tab.path}`}
                 className={({ isActive: routeActive }) =>
-                  `gal-tab-button${routeActive ? ' gal-tab-button__active' : ''}`
+                  `tab-button${routeActive ? ' tab-button__active' : ''}`
                 }
                 role="tab"
                 aria-selected={isActive}
@@ -53,7 +53,7 @@ const LibraryPage: React.FC = () => {
         </div>
 
         {/* Route content goes here */}
-        <div className="gal-tab-content">
+        <div className="tab-content">
           <Outlet />
         </div>
       </div>

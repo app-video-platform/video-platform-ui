@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import { HiMenuAlt2, HiX } from 'react-icons/hi';
 
-import { Button, GalIcon } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
 import { appRoutes } from 'core/constants';
 import { getCssVar } from '@shared/utils';
-import { GalUserDropdown } from 'domains/app/components';
+import { UserDropdown } from 'domains/app/components';
 import { SidebarNav, useSidebarLayout } from 'domains/app/widgets/sidebar-nav';
 
 import './creator-app-shell.styles.scss';
@@ -45,12 +45,12 @@ const CreatorAppShell: React.FC = () => {
           aria-expanded={isMobileNavOpen}
           onClick={() => setIsMobileNavOpen(true)}
         >
-          <GalIcon icon={HiMenuAlt2} size={22} color={getCssVar('--text-primary')} />
+          <Icon icon={HiMenuAlt2} size={22} color={getCssVar('--text-primary')} />
         </Button>
         <span className="creator-app-shell__mobile-brand brand-display">
           Galactica
         </span>
-        <GalUserDropdown />
+        <UserDropdown />
       </div>
 
       {isMobileNavOpen && (
@@ -70,7 +70,7 @@ const CreatorAppShell: React.FC = () => {
               aria-label="Close navigation"
               onClick={closeMobileNav}
             >
-              <GalIcon icon={HiX} size={20} color={getCssVar('--text-primary')} />
+              <Icon icon={HiX} size={20} color={getCssVar('--text-primary')} />
             </Button>
             <SidebarNav onNavigate={closeMobileNav} />
           </aside>

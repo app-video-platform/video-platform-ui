@@ -36,7 +36,7 @@ jest.mock('../editors/lesson-editor/lesson-editor.component', () => ({
   ),
 }));
 
-// ── 2) MOCK @shared/ui (Button + GalIcon) ──────────────────────────────────────────
+// ── 2) MOCK @shared/ui (Button + Icon) ──────────────────────────────────────────
 jest.mock('@shared/ui', () => ({
   __esModule: true,
   Button: ({
@@ -62,7 +62,7 @@ jest.mock('@shared/ui', () => ({
       {children}
     </button>
   ),
-  GalIcon: () => <span data-testid="gal-icon" />,
+  Icon: () => <span data-testid="icon" />,
 }));
 
 // ── 3) Import the component under test ──────────────────────────────────────────────

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiExternalLink, FiMoreHorizontal } from 'react-icons/fi';
 
 import { ProductMinimised } from 'core/api/models';
-import { Button, GalDropdown, GalIcon } from '@shared/ui';
+import { Button, Dropdown, Icon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 
 import {
@@ -91,7 +91,7 @@ const ProductManagementRow: React.FC<ProductManagementRowProps> = ({
 
       <div className="products-management-row__actions">
         {hasSecondaryActions && (
-          <GalDropdown
+          <Dropdown
             customClassName="products-row-menu"
             trigger={({ open, toggle }) => (
               <Button
@@ -104,7 +104,7 @@ const ProductManagementRow: React.FC<ProductManagementRowProps> = ({
                 aria-label={`Open actions for ${productName}`}
                 className="products-management-row__menu-trigger"
               >
-                <GalIcon
+                <Icon
                   icon={FiMoreHorizontal}
                   size={18}
                   color={getCssVar('--text-primary')}
@@ -114,7 +114,7 @@ const ProductManagementRow: React.FC<ProductManagementRowProps> = ({
             menu={({ close }) => (
               <>
                 <Link to={`/app/product/${product.id}`} role="menuitem" onClick={close}>
-                  <GalIcon
+                  <Icon
                     icon={FiExternalLink}
                     size={15}
                     color={getCssVar('--text-secondary')}

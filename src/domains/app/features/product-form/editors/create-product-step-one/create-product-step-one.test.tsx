@@ -28,7 +28,7 @@ import { createProduct } from 'core/store/product-store';
 
 // ── 3) MOCK child components ────────────────────────────────────────────────
 
-// 3.1. Barrel @shared/ui: Input, Button, GalIcon
+// 3.1. Barrel @shared/ui: Input, Button, Icon
 jest.mock('@shared/ui', () => ({
   __esModule: true,
   Input: ({
@@ -89,7 +89,7 @@ jest.mock('@shared/ui', () => ({
       </button>
     );
   },
-  GalIcon: () => <span data-testid="gal-icon" />,
+  Icon: () => <span data-testid="icon" />,
 }));
 
 // 3.2. ProductTypeSelector: simple stub that can set type to COURSE

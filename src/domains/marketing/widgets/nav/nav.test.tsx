@@ -19,9 +19,9 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('domains/app/components', () => ({
   __esModule: true,
-  GalNavDropdown: () => null,
-  GalUserDropdown: () => (
-    <div data-testid="user-profile-dropdown">GalUserDropdown</div>
+  NavDropdown: () => null,
+  UserDropdown: () => (
+    <div data-testid="user-profile-dropdown">UserDropdown</div>
   ),
 }));
 

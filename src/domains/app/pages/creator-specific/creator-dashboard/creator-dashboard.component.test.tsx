@@ -63,7 +63,7 @@ jest.mock('@shared/ui', () => ({
       {children}
     </button>
   ),
-  GalIcon: () => <span data-testid="gal-icon" />,
+  Icon: () => <span data-testid="icon" />,
 }));
 
 const creatorUser = {

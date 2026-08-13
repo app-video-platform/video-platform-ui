@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { fetchProducts, SearchResponse } from 'core/api/services';
-import { GalProductCard } from 'domains/app/components';
+import { ProductBox } from 'domains/app/components';
 import { ProductMinimised } from 'core/api/models';
 
 import './search-page.styles.scss';
@@ -64,7 +64,7 @@ const SearchResultsPage: React.FC = () => {
         ) : (
           <ul className="results-list">
             {data?.content.map((p: ProductMinimised) => (
-              <GalProductCard key={p.id} product={p} />
+              <ProductBox key={p.id} product={p} />
             ))}
           </ul>
         )}

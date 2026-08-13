@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { GalExpansionPanel } from '@shared/ui';
+import { LegacyExpansionPanel } from '@shared/ui';
 import { ContactForm, CTASection } from '@domains/marketing/shared';
 
 import './contact.styles.scss';
@@ -47,14 +47,14 @@ const Contact: React.FC = () => (
       <p className="subheading">Find answers to some common questions.</p>
 
       <div className="faq-list">
-        <GalExpansionPanel header="How do I reset my password?">
+        <LegacyExpansionPanel header="How do I reset my password?">
           <p>
             Click on &quot;Forgot Password&quot; at the login page and follow
             the instructions.
           </p>
-        </GalExpansionPanel>
+        </LegacyExpansionPanel>
 
-        <GalExpansionPanel
+        <LegacyExpansionPanel
           header="Where can I find my purchase history?"
           defaultExpanded
         >
@@ -62,11 +62,11 @@ const Contact: React.FC = () => (
             You can find your purchase history from your account dashboard under
             purchases.
           </p>
-        </GalExpansionPanel>
+        </LegacyExpansionPanel>
 
-        <GalExpansionPanel header="How can I contact support?">
+        <LegacyExpansionPanel header="How can I contact support?">
           <p>You can reach our support team through the contact form above.</p>
-        </GalExpansionPanel>
+        </LegacyExpansionPanel>
       </div>
     </section>
 

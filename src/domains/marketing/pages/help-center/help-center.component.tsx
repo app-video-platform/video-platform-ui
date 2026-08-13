@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button, Input } from '@shared/ui';
-import { GalExpansionPanel } from '@shared/ui';
+import { LegacyExpansionPanel } from '@shared/ui';
 
 import './help-center.styles.scss';
 
@@ -72,25 +72,25 @@ const HelpCenter: React.FC = () => {
       <section className="help-faq">
         <h2>Frequently Asked Questions</h2>
 
-        <GalExpansionPanel header="How do I create my first product?">
+        <LegacyExpansionPanel header="How do I create my first product?">
           <p>
             Go to your dashboard, click “Create product”, choose a type, and
             follow the guided flow.
           </p>
-        </GalExpansionPanel>
+        </LegacyExpansionPanel>
 
-        <GalExpansionPanel header="Can I sell both courses and memberships?">
+        <LegacyExpansionPanel header="Can I sell both courses and memberships?">
           <p>
             Yes. You can create multiple product types from the same account.
           </p>
-        </GalExpansionPanel>
+        </LegacyExpansionPanel>
 
-        <GalExpansionPanel header="How do I get paid?">
+        <LegacyExpansionPanel header="How do I get paid?">
           <p>
             Payments are processed securely and tracked in your dashboard under
             the Sales section.
           </p>
-        </GalExpansionPanel>
+        </LegacyExpansionPanel>
       </section>
 
       {/* CTA */}

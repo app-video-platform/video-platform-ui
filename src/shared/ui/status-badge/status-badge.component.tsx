@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { IconType } from 'react-icons';
 
-import { GalIcon } from '../gal-icon';
+import { Icon } from '../icon';
 
 import './status-badge.styles.scss';
 
@@ -32,7 +32,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
       className,
     )}
   >
-    {icon && <GalIcon icon={icon} size={size === 'sm' ? 13 : 15} aria-hidden="true" />}
+    {icon && <Icon icon={icon} size={size === 'sm' ? 13 : 15} aria-hidden="true" />}
     <span>{label}</span>
   </span>
 );

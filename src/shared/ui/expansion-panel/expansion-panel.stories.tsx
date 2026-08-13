@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import GalExpansionPanel from './expansion-panel.component';
+import LegacyExpansionPanel from './expansion-panel.component';
 
-const meta: Meta<typeof GalExpansionPanel> = {
-  title: 'Components/GalExpansionPanel',
-  component: GalExpansionPanel,
+const meta: Meta<typeof LegacyExpansionPanel> = {
+  title: 'Components/LegacyExpansionPanel',
+  component: LegacyExpansionPanel,
   tags: ['autodocs'],
   args: {
     header: 'Click to expand',
@@ -42,7 +42,7 @@ const meta: Meta<typeof GalExpansionPanel> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof GalExpansionPanel>;
+type Story = StoryObj<typeof LegacyExpansionPanel>;
 
 export const Default: Story = {};
 
@@ -75,7 +75,7 @@ export const WithExternalState: Story = {
         <p style={{ marginBottom: '0.5rem' }}>
           External state: <strong>{open ? 'Open' : 'Closed'}</strong>
         </p>
-        <GalExpansionPanel
+        <LegacyExpansionPanel
           {...args}
           onPanelToggle={(isOpen) => {
             setOpen(isOpen);

@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { HiX } from 'react-icons/hi';
 
 import { Button } from '../button';
-import { GalIcon } from '../gal-icon';
+import { Icon } from '../icon';
 import { getCssVar } from '@shared/utils';
 
 import './drawer.styles.scss';
@@ -134,7 +134,7 @@ const Drawer: React.FC<DrawerProps> = ({
             aria-label={closeLabel}
             onClick={onClose}
           >
-            <GalIcon icon={HiX} size={20} color={getCssVar('--text-primary')} />
+            <Icon icon={HiX} size={20} color={getCssVar('--text-primary')} />
           </Button>
         </header>
         <div className="drawer-body">{children}</div>

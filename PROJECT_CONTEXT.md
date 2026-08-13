@@ -59,7 +59,7 @@ Creator/Admin management routes are visually and structurally separated from buy
 - `CreatorAppShell` lives in `src/domains/app/layouts/creator-app-shell/creator-app-shell.component.tsx`.
 - Creator navigation is rendered by `SidebarNav` in `src/domains/app/widgets/sidebar-nav/sidebar-nav.component.tsx` using `appRoutes` from `src/core/constants/routes.ts`.
 - Desktop Creator management uses a persistent collapsible sidebar and does not render the marketplace/shared `TopNavbar`.
-- Creator account controls live in the bottom/footer of the Creator sidebar. The footer reuses `GalUserDropdown`; account, logout, and dev-role behavior must not be duplicated in sidebar code.
+- Creator account controls live in the bottom/footer of the Creator sidebar. The footer reuses `UserDropdown`; account, logout, and dev-role behavior must not be duplicated in sidebar code.
 - Expanded sidebar account footer shows the user avatar, display name, primary role label, and dropdown affordance. Collapsed/compact sidebar shows an avatar-only account trigger with an accessible label/title.
 - Tablet/mobile Creator management retains the compact top bar with drawer navigation and the existing account dropdown trigger in that mobile top bar.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
@@ -86,7 +86,7 @@ The current Creator redesign establishes a dark management application language,
 - Management UI should prefer surface hierarchy, spacing, and restrained borders over heavy shadows or decorative card stacking.
 - Body/management typography uses the body font. `Bebas Neue` is available as `$font-heading` and should stay selective for display/brand moments such as the shell brand, not ordinary management headings.
 
-Shared interaction conventions now include semantic `Button` variants/sizes in `src/shared/ui/button`, accessible loading state via `aria-busy`/disabled behavior, calmer hover/focus/active states, and Escape-to-close dropdown behavior in `src/shared/ui/gal-dropdown/gal-dropdown.component.tsx`. The old global animated growing link underline has been removed from application interactions; unclassed prose links now use a simple underline treatment in `src/styles/_base.scss`. Do not assume every legacy UI has been migrated.
+Shared interaction conventions now include semantic `Button` variants/sizes in `src/shared/ui/button`, accessible loading state via `aria-busy`/disabled behavior, calmer hover/focus/active states, and Escape-to-close dropdown behavior in `src/shared/ui/dropdown/dropdown.component.tsx`. The old global animated growing link underline has been removed from application interactions; unclassed prose links now use a simple underline treatment in `src/styles/_base.scss`. Do not assume every legacy UI has been migrated.
 
 Shared status presentation now has a reusable `StatusBadge` in `src/shared/ui/status-badge`. `StatusBadge` owns semantic badge presentation (`success`, `warning`, `danger`, `neutral`, `info`), visible labels, optional icons, and sizing. Feature/domain code remains responsible for deciding which business status maps to which semantic tone. Do not accumulate feature-specific status rules inside the shared primitive. The older `StatusChip` can compose `StatusBadge` where useful, but not every status surface has been migrated.
 
@@ -148,8 +148,8 @@ Membership content architecture:
 - `MembershipContentSection` owns only transient inline `+ Add Content` chooser, editor draft, and editing-mode state.
 - `MembershipContentTypeChooser` is presentation/control-only. It offers `Video`, `Post`, `Resource`, and `Existing Product`, but does not fetch data or create content.
 - Selecting `Post` opens `MembershipPostEditor`, a controlled editor for unsaved title, body, and status drafts; save dispatches Membership content CRUD.
-- Selecting `Video` opens `MembershipVideoEditor`, a controlled editor for title, description, selected video file metadata, and status. Video selection uses `GalUppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
-- Selecting `Resource` opens `MembershipResourceEditor`, a controlled editor for title, description, selected file metadata, and status. Resource selection uses `GalUppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
+- Selecting `Video` opens `MembershipVideoEditor`, a controlled editor for title, description, selected video file metadata, and status. Video selection uses `UppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
+- Selecting `Resource` opens `MembershipResourceEditor`, a controlled editor for title, description, selected file metadata, and status. Resource selection uses `UppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
 - Post, Video, and Resource create/edit/delete use Membership service/Redux contracts and must not write to Product autosave or Product API payloads.
 - Selecting `Existing Product` closes the chooser and requests that `MembershipIncludedProducts` open its existing `ProductPicker`; no second ProductPicker or duplicated product loading logic should be introduced.
 - The current deterministic manual list order is feed-entry array order. There is no drag-and-drop, populated `position`, or persisted ordering contract yet.

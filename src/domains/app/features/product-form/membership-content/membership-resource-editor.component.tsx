@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, GalUppyFileUploader, Input, Select, Textarea } from '@shared/ui';
+import { Button, UppyFileUploader, Input, Select, Textarea } from '@shared/ui';
 import {
   MembershipContentStatus,
   MEMBERSHIP_CONTENT_STATUS_OPTIONS,
@@ -78,7 +78,7 @@ const MembershipResourceEditor: React.FC<MembershipResourceEditorProps> = ({
 
       <div className="membership-resource-editor__file">
         <label>File</label>
-        <GalUppyFileUploader
+        <UppyFileUploader
           allowedFileTypes={RESOURCE_ALLOWED_FILE_TYPES}
           maxNumberOfFiles={1}
           maxFileSize={MAX_RESOURCE_FILE_SIZE}

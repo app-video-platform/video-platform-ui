@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, GalUppyFileUploader, Input, Select, Textarea } from '@shared/ui';
+import { Button, UppyFileUploader, Input, Select, Textarea } from '@shared/ui';
 import {
   MembershipContentStatus,
   MEMBERSHIP_CONTENT_STATUS_OPTIONS,
@@ -65,7 +65,7 @@ const MembershipVideoEditor: React.FC<MembershipVideoEditorProps> = ({
 
       <div className="membership-video-editor__video">
         <label>Video</label>
-        <GalUppyFileUploader
+        <UppyFileUploader
           allowedFileTypes={VIDEO_ALLOWED_FILE_TYPES}
           maxNumberOfFiles={1}
           maxFileSize={MAX_VIDEO_FILE_SIZE}

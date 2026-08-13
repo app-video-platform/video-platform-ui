@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { IconType } from 'react-icons';
 
-import { GalIcon } from '../gal-icon';
+import { Icon } from '../icon';
 import { getCssVar } from '@shared/utils';
 
 import './input.styles.scss';
@@ -53,7 +53,7 @@ const Input: React.FC<InputProps> = ({
       )}
       <div className="input-row">
         {prefixIcon && (
-          <GalIcon
+          <Icon
             className="input-prefix"
             icon={prefixIcon}
             color={getCssVar('--text-secondary')}
@@ -76,7 +76,7 @@ const Input: React.FC<InputProps> = ({
             onClick={handleSuffixClick}
             className="input-suffix"
           >
-            <GalIcon
+            <Icon
               icon={suffixIcon}
               color={getCssVar('--text-secondary')}
               size={18}
