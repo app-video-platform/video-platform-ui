@@ -4,7 +4,6 @@ import {
   CreatorStorefrontConfig,
   CreatorStorefrontConfigUpdateRequest,
   PublicStorefront,
-  RootState,
 } from 'core/api/models';
 import {
   getCreatorStorefrontConfigAPI,
@@ -39,13 +38,16 @@ export const fetchPublicStorefront = createAsyncThunk<
   PublicStorefront,
   string,
   { rejectValue: string }
->('storefront/fetchPublicStorefront', async (creatorId, { rejectWithValue }) => {
-  try {
-    return await getPublicStorefrontAPI(creatorId);
-  } catch (error: unknown) {
-    return rejectWithValue(extractErrorMessage(error));
-  }
-});
+>(
+  'storefront/fetchPublicStorefront',
+  async (creatorId, { rejectWithValue }) => {
+    try {
+      return await getPublicStorefrontAPI(creatorId);
+    } catch (error: unknown) {
+      return rejectWithValue(extractErrorMessage(error));
+    }
+  },
+);
 
 export const fetchCreatorStorefrontConfig = createAsyncThunk<
   CreatorStorefrontConfig,
@@ -130,24 +132,5 @@ const storefrontSlice = createSlice({
       });
   },
 });
-
-export const selectPublicStorefrontByCreatorId = (
-  state: RootState,
-  creatorId?: string,
-) => (creatorId ? state.storefront.publicByCreatorId[creatorId] ?? null : null);
-export const selectPublicStorefrontLoading = (state: RootState) =>
-  state.storefront.publicLoading;
-export const selectPublicStorefrontError = (state: RootState) =>
-  state.storefront.publicError;
-export const selectCreatorStorefrontConfig = (state: RootState) =>
-  state.storefront.creatorConfig;
-export const selectCreatorStorefrontConfigLoading = (state: RootState) =>
-  state.storefront.configLoading;
-export const selectCreatorStorefrontConfigError = (state: RootState) =>
-  state.storefront.configError;
-export const selectCreatorStorefrontConfigSaveLoading = (state: RootState) =>
-  state.storefront.configSaveLoading;
-export const selectCreatorStorefrontConfigSaveError = (state: RootState) =>
-  state.storefront.configSaveError;
 
 export default storefrontSlice.reducer;

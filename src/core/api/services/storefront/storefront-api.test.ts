@@ -50,12 +50,22 @@ describe('storefront-api', () => {
     await updateCreatorStorefrontConfigAPI({
       featuredProductId: 'product-2',
       productOrderIds: ['product-2', 'product-1'],
+      theme: {
+        appearance: 'DARK',
+        accentColor: '#ffbd41',
+        typography: 'MODERN',
+      },
     });
 
     expect(mock.history.patch[0].url).toBe('api/creator/storefront');
     expect(JSON.parse(mock.history.patch[0].data)).toEqual({
       featuredProductId: 'product-2',
       productOrderIds: ['product-2', 'product-1'],
+      theme: {
+        appearance: 'DARK',
+        accentColor: '#ffbd41',
+        typography: 'MODERN',
+      },
     });
   });
 });

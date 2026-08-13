@@ -59,6 +59,11 @@ describe('storefront slice', () => {
       updateCreatorStorefrontConfig({
         featuredProductId: 'sf-download-1',
         productOrderIds: ['sf-download-1', 'sf-course-1'],
+        theme: {
+          appearance: 'DARK',
+          accentColor: '#ffbd41',
+          typography: 'MODERN',
+        },
       }),
     );
 

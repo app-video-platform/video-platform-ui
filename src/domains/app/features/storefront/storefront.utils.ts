@@ -3,6 +3,7 @@ import {
   ProductStatus,
   ProductType,
   PublicStorefront,
+  StorefrontTheme,
   User,
 } from 'core/api/models';
 
@@ -26,6 +27,12 @@ export const storefrontStatusLabels: Record<ProductStatus, string> = {
   HIDDEN: 'Hidden',
 };
 
+export const DEFAULT_STOREFRONT_THEME: StorefrontTheme = {
+  appearance: 'DARK',
+  accentColor: '#ffbd41',
+  typography: 'MODERN',
+};
+
 export const isPublicStorefrontProduct = (product: ProductMinimised) =>
   product.status === 'PUBLISHED';
 
@@ -46,7 +53,10 @@ export const formatStorefrontPrice = (price?: number | 'free') => {
 };
 
 export const getStorefrontDisplayName = (user?: User | null) => {
-  const name = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim();
+  const name = [user?.firstName, user?.lastName]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
   return name || 'Creator';
 };
 
@@ -57,6 +67,7 @@ export const getProfileFromUser = (user?: User | null): StorefrontProfile => ({
   tagline: user?.taglineMission,
   bio: user?.bio,
   website: user?.website,
+  publicEmail: user?.publicEmail || user?.email,
   imageUrl: user?.imageUrl,
   socialLinks: user?.socialLinks,
 });
@@ -112,7 +123,9 @@ export const orderStorefrontProducts = (
   const ordered = orderedIds
     .map((id) => byId.get(id))
     .filter((product): product is StorefrontProduct => Boolean(product));
-  const remaining = products.filter((product) => !orderedIds.includes(product.id));
+  const remaining = products.filter(
+    (product) => !orderedIds.includes(product.id),
+  );
 
   return [...ordered, ...remaining];
 };
@@ -121,8 +134,10 @@ export const getStorefrontViewModel = ({
   profile,
   products,
   featuredProductId,
+  theme,
 }: StorefrontViewModelInput): StorefrontViewModel => {
   const publicProducts = getPublicStorefrontProducts(products);
+
   const validFeaturedId = publicProducts.some(
     (product) => product.id === featuredProductId,
   )
@@ -133,6 +148,7 @@ export const getStorefrontViewModel = ({
     profile,
     products: publicProducts,
     featuredProductId: validFeaturedId,
+    theme,
   };
 };
 
@@ -147,6 +163,7 @@ export const getStorefrontViewModelFromPublicStorefront = (
       tagline: storefront.creator.tagline,
       bio: storefront.creator.bio,
       website: storefront.creator.website,
+      publicEmail: storefront.creator.publicEmail || storefront.creator.email,
       imageUrl: storefront.creator.imageUrl,
       socialLinks: storefront.creator.socialLinks,
     },
@@ -155,4 +172,5 @@ export const getStorefrontViewModelFromPublicStorefront = (
       status: product.status ?? 'PUBLISHED',
     })),
     featuredProductId: storefront.featuredProductId,
+    theme: storefront.theme ?? DEFAULT_STOREFRONT_THEME,
   });
