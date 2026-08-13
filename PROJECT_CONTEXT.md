@@ -58,11 +58,13 @@ Creator/Admin management routes are visually and structurally separated from buy
 
 - `CreatorAppShell` lives in `src/domains/app/layouts/creator-app-shell/creator-app-shell.component.tsx`.
 - Creator navigation is rendered by `SidebarNav` in `src/domains/app/widgets/sidebar-nav/sidebar-nav.component.tsx` using `appRoutes` from `src/core/constants/routes.ts`.
-- Desktop Creator management uses a persistent collapsible sidebar and a separate account/user control.
-- Tablet/mobile Creator management uses a compact top bar with a drawer navigation.
+- Desktop Creator management uses a persistent collapsible sidebar and does not render the marketplace/shared `TopNavbar`.
+- Creator account controls live in the bottom/footer of the Creator sidebar. The footer reuses `GalUserDropdown`; account, logout, and dev-role behavior must not be duplicated in sidebar code.
+- Expanded sidebar account footer shows the user avatar, display name, primary role label, and dropdown affordance. Collapsed/compact sidebar shows an avatar-only account trigger with an accessible label/title.
+- Tablet/mobile Creator management retains the compact top bar with drawer navigation and the existing account dropdown trigger in that mobile top bar.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
 - Routes can request the Creator sidebar collapse through `collapseSidebarOnLoad` route metadata. Product edit routes and the Storefront Builder use this existing shell/sidebar behavior.
-- Marketplace/customer routes still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
+- Marketplace/customer routes such as `/app/explore` still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
 
 Current Creator IA:
 
@@ -455,7 +457,7 @@ Responsive Creator UI should change composition intentionally rather than simply
 
 Implemented examples:
 
-- Creator sidebar becomes compact/collapsible on desktop and a mobile drawer at tablet/mobile widths.
+- Creator sidebar becomes compact/collapsible on desktop; its account footer follows expanded/collapsed presentation, while tablet/mobile retains the existing top-bar plus drawer navigation model.
 - Dashboard metrics change layout across breakpoints and panel order changes when content becomes sequential.
 - Products desktop list/table becomes mobile management cards.
 - Customers desktop/tablet list/table becomes mobile customer cards while preserving the stacked mobile filter controls.
