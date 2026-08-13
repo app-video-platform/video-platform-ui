@@ -32,9 +32,9 @@ const ProductPerformanceSection: React.FC<ProductPerformanceSectionProps> = ({
       {products.map((product, index) => (
         <Link
           key={product.id}
-          to={appRoutes.productsEdit(product.id)}
+          to={appRoutes.productsOverview(product.id)}
           className="analytics-product-ranking__row"
-          aria-label={`Open ${product.name} product workspace`}
+          aria-label={`Open ${product.name} product overview`}
           title={product.name}
         >
           <span className="analytics-product-ranking__rank">{index + 1}</span>

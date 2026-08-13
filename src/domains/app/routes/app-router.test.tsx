@@ -46,6 +46,7 @@ jest.mock('../pages', () => {
     LibraryPage: MockOutletPage,
     Onboarding: makePage('Onboarding'),
     ProductForm: makePage('Product form'),
+    ProductOverview: makePage('Product overview'),
     ProductPage: makePage('Product page'),
     ProductsList: makePage('Products list'),
     SalesPage: makePage('Sales'),
@@ -115,6 +116,16 @@ describe('AppRouter role routing', () => {
     renderRouter([UserRole.CREATOR], '/customers/cust-1');
 
     expect(screen.getByText('Customer detail')).toBeInTheDocument();
+  });
+
+  it('renders the Product Overview route without colliding with Product Workspace routes', () => {
+    renderRouter([UserRole.CREATOR], '/products/product-1');
+
+    expect(screen.getByText('Product overview')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/products/edit/product-1');
+
+    expect(screen.getByText('Product form')).toBeInTheDocument();
   });
 
   it('renders the Creator Storefront route and redirects the legacy preview route', () => {

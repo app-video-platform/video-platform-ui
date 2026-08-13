@@ -36,6 +36,7 @@ import {
   salesStatusOptions,
   subscriptionStateLabel,
 } from './creator-sales.utils';
+import { appRoutes } from 'domains/app/routes/routes';
 
 import './sales-page.styles.scss';
 
@@ -422,8 +423,8 @@ const OrderLedgerRow: React.FC<OrderLedgerRowProps> = ({ order, onOpen }) => {
       <div className="sales-ledger-row__product">
         {order.product.id ? (
           <Link
-            to={`/app/products/edit/${order.product.id}`}
-            aria-label={`Open ${order.product.name} workspace`}
+            to={appRoutes.productsOverview(order.product.id)}
+            aria-label={`Open ${order.product.name} product overview`}
           >
             {productContent}
           </Link>
@@ -500,8 +501,8 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
               <p className="order-detail__primary">{order.product.name}</p>
               <p>{order.product.type}</p>
               {order.product.id && (
-                <Link to={`/app/products/edit/${order.product.id}`}>
-                  Open product workspace
+                <Link to={appRoutes.productsOverview(order.product.id)}>
+                  View product overview
                 </Link>
               )}
             </div>

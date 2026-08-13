@@ -1,5 +1,18 @@
-import { ProductMinimised, ProductStatus, ProductType } from 'core/api/models';
+import {
+  ProductBillingInterval,
+  ProductMinimised,
+  ProductPricingModel,
+  ProductStatus,
+  ProductType,
+} from 'core/api/models';
 import { PRODUCT_TYPE_REGISTRY } from 'core/constants';
+
+interface ProductPricingFields {
+  price?: number | 'free';
+  pricingModel?: ProductPricingModel;
+  billingInterval?: ProductBillingInterval;
+  type?: ProductType;
+}
 
 export type ProductsStatusFilter = 'all' | ProductStatus;
 export type ProductsTypeFilter = 'all' | ProductType;
@@ -51,8 +64,46 @@ export const getProductStatusLabel = (status?: ProductStatus) => {
   return 'Draft';
 };
 
+const billingIntervalLabel: Record<ProductBillingInterval, string> = {
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
+export const formatProductDate = (
+  value?: Date | string | null,
+  fallbackLabel = 'Unavailable',
+) => {
+  if (!value) {
+    return {
+      shortLabel: fallbackLabel,
+      fullLabel: fallbackLabel,
+      iso: undefined,
+    };
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return {
+      shortLabel: fallbackLabel,
+      fullLabel: fallbackLabel,
+      iso: undefined,
+    };
+  }
+
+  return {
+    shortLabel: new Intl.DateTimeFormat('en', {
+      month: 'short',
+      day: 'numeric',
+    }).format(date),
+    fullLabel: new Intl.DateTimeFormat('en', {
+      dateStyle: 'full',
+    }).format(date),
+    iso: date.toISOString(),
+  };
+};
+
 export const formatProductPrice = (
-  product: ProductMinimised,
+  product: ProductPricingFields,
   options: { showInspectionRecurringMembership?: boolean } = {},
 ) => {
   if (product.price === 'free' || product.price === 0) {
@@ -69,10 +120,11 @@ export const formatProductPrice = (
     maximumFractionDigits: Number.isInteger(product.price) ? 0 : 2,
   }).format(product.price);
 
-  if (
-    options.showInspectionRecurringMembership &&
-    product.type === 'MEMBERSHIP'
-  ) {
+  if (product.pricingModel === 'RECURRING' && product.billingInterval) {
+    return `${formatted} / ${billingIntervalLabel[product.billingInterval]}`;
+  }
+
+  if (options.showInspectionRecurringMembership && product.type === 'MEMBERSHIP') {
     return `${formatted} / month`;
   }
 
@@ -81,33 +133,8 @@ export const formatProductPrice = (
 
 export const formatProductUpdatedDate = (product: ProductMinimised) => {
   const value = product.updatedAt ?? product.createdAt;
-  if (!value) {
-    return {
-      shortLabel: 'Not updated',
-      fullLabel: 'No updated date available',
-      iso: undefined,
-    };
-  }
 
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return {
-      shortLabel: 'Not updated',
-      fullLabel: 'No updated date available',
-      iso: undefined,
-    };
-  }
-
-  return {
-    shortLabel: new Intl.DateTimeFormat('en', {
-      month: 'short',
-      day: 'numeric',
-    }).format(date),
-    fullLabel: new Intl.DateTimeFormat('en', {
-      dateStyle: 'full',
-    }).format(date),
-    iso: date.toISOString(),
-  };
+  return formatProductDate(value, 'Not updated');
 };
 
 export const filterAndSortProducts = (

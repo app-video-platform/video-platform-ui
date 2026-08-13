@@ -7,6 +7,7 @@ export const appRoutes = {
   store: (creatorId = ':creatorId') => `/app/store/${creatorId}`,
 
   products: '/app/products',
+  productsOverview: (productId = ':productId') => `/app/products/${productId}`,
   productsCreate: '/app/products/create',
   productsEdit: (id = ':id') => `/app/products/edit/${id}`,
   customers: '/app/customers',

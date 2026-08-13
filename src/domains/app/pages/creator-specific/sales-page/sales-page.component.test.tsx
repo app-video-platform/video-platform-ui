@@ -38,8 +38,8 @@ describe('Creator Sales', () => {
               element={<div>Customer detail route</div>}
             />
             <Route
-              path="/app/products/edit/:productId"
-              element={<div>Product workspace route</div>}
+              path="/app/products/:productId"
+              element={<div>Product overview route</div>}
             />
           </Routes>
         </MemoryRouter>
@@ -195,9 +195,9 @@ describe('Creator Sales', () => {
     ).toHaveAttribute('href', '/app/customers/cust-maya-johnson');
     expect(
       screen.getByRole('link', {
-        name: 'Open Creator Product Growth System workspace',
+        name: 'Open Creator Product Growth System product overview',
       }),
-    ).toHaveAttribute('href', '/app/products/edit/prod-course-growth');
+    ).toHaveAttribute('href', '/app/products/prod-course-growth');
   });
 
   it('renders honest unavailable state when the backend contract is missing', async () => {

@@ -62,7 +62,7 @@ export const creatorDashboardSummaryTestFixture: CreatorDashboardSummary = {
       title: 'Product updated',
       context: 'Launch Toolkit',
       timestamp: 'Yesterday',
-      destinationPath: '/app/products/edit/prod-launch-toolkit',
+      destinationPath: '/app/products/prod-launch-toolkit',
     },
   ],
   topProducts: [
@@ -72,7 +72,7 @@ export const creatorDashboardSummaryTestFixture: CreatorDashboardSummary = {
       type: 'Course',
       revenue: '€1,192',
       revenueShare: 100,
-      destinationPath: '/app/products/edit/prod-course-growth',
+      destinationPath: '/app/products/prod-course-growth',
     },
     {
       id: 'prod-launch-toolkit',
@@ -80,7 +80,7 @@ export const creatorDashboardSummaryTestFixture: CreatorDashboardSummary = {
       type: 'Download',
       revenue: '€392',
       revenueShare: 33,
-      destinationPath: '/app/products/edit/prod-launch-toolkit',
+      destinationPath: '/app/products/prod-launch-toolkit',
     },
   ],
   attentionItems: [

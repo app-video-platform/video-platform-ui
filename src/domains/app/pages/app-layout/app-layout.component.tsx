@@ -15,6 +15,7 @@ const CREATOR_ROUTES = [
   '/app',
   '/app/admin/*',
   '/app/products',
+  '/app/products/:productId',
   '/app/customers/*',
   '/app/sales',
   '/app/analytics',
