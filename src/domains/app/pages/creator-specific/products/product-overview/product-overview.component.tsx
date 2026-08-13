@@ -487,6 +487,15 @@ const ProductOverview: React.FC = () => {
           >
             Edit product
           </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() =>
+              navigate(appRoutes.productsLandingPage(loadedProduct.id))
+            }
+          >
+            Edit landing page
+          </Button>
           {loadedProduct.status === 'PUBLISHED' && (
             <Button
               type="button"

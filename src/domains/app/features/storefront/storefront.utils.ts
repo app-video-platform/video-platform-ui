@@ -33,8 +33,11 @@ export const DEFAULT_STOREFRONT_THEME: StorefrontTheme = {
   typography: 'MODERN',
 };
 
+export const isPublishedProductStatus = (status?: ProductStatus) =>
+  status === 'PUBLISHED';
+
 export const isPublicStorefrontProduct = (product: ProductMinimised) =>
-  product.status === 'PUBLISHED';
+  isPublishedProductStatus(product.status);
 
 export const formatStorefrontPrice = (price?: number | 'free') => {
   if (price === 'free') {

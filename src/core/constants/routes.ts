@@ -78,4 +78,11 @@ export const appRoutes: Route[] = [
     hideFromSidebar: true,
     collapseSidebarOnLoad: true,
   },
+  {
+    path: '/app/products/:productId/landing-page',
+    label: 'Landing Page',
+    icon: IoSettingsOutline,
+    hideFromSidebar: true,
+    collapseSidebarOnLoad: true,
+  },
 ];

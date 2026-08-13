@@ -63,6 +63,7 @@ Creator/Admin management routes are visually and structurally separated from buy
 - Expanded sidebar account footer shows the user avatar, display name, primary role label, and dropdown affordance. Collapsed/compact sidebar shows an avatar-only account trigger with an accessible label/title.
 - Tablet/mobile Creator management retains the compact top bar with drawer navigation and the existing account dropdown trigger in that mobile top bar.
 - Product Overview routes (`/app/products/:productId`) render inside `CreatorAppShell` as Creator/Admin management inspection pages for individual Products.
+- Product Landing Page Builder routes (`/app/products/:productId/landing-page`) render inside `CreatorAppShell` and use route metadata to request sidebar collapse, matching the focused live-editing feel of Storefront Builder while remaining in Creator management IA.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
 - Routes can request the Creator sidebar collapse through `collapseSidebarOnLoad` route metadata. Product edit routes and the Storefront Builder use this existing shell/sidebar behavior.
 - Marketplace/customer routes such as `/app/explore` still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
@@ -132,6 +133,7 @@ Creator/Admin Product Overview is the management home for one Product. Route sep
 - Product Overview: `/app/products/:productId`.
 - Focused Product Workspace: `/app/products/edit/:id`.
 - Legacy/type-bearing Product Workspace path: `/app/products/edit/:type/:id`.
+- Public Product Landing Page: `/app/product/:id` and compatibility path `/app/product/:id/:type`.
 
 Product Overview lives under `src/domains/app/pages/creator-specific/products/product-overview`, renders inside `CreatorAppShell`, and does not use `ProductWorkspaceShell`. Product create/edit Workspace routes continue to render outside `CreatorAppShell`.
 
@@ -143,6 +145,7 @@ Current Product Overview content:
 - Product thumbnail when available, Product name, Product type, semantic Product status, description, and updated date.
 - Compact Product details: status, type, price, created date, and updated date.
 - Primary `Edit product` action to Product Workspace.
+- Secondary `Edit landing page` action to Product Landing Page Builder.
 - Published-only `View public page` action to the existing buyer-facing Product page.
 
 Type-specific read-only summaries:
@@ -152,14 +155,69 @@ Type-specific read-only summaries:
 - `CONSULTATION`: configured details such as duration, meeting method, buffers, max sessions per day, messages/policies, and calendar information when present.
 - `MEMBERSHIP`: generic Product information and configured recurring pricing only.
 
-Product Overview V1 intentionally does not include product-scoped revenue, order counts, customer counts, subscribers/members, conversion, charts, recent orders, ratings/reviews, Storefront visibility controls, access/entitlement management, duplicate/archive, explicit publish/unpublish workflow, landing-page customization, SEO, or new backend APIs. Do not use deterministic mocks to imply those capabilities exist.
+Product Overview V1 intentionally does not include product-scoped revenue, order counts, customer counts, subscribers/members, conversion, charts, recent orders, ratings/reviews, Storefront visibility controls, access/entitlement management, duplicate/archive, explicit publish/unpublish workflow, inline landing-page customization controls, SEO, or new backend APIs. Do not use deterministic mocks to imply those capabilities exist.
 
 Creator product navigation principle:
 
 - Product identity links should generally navigate to Product Overview.
-- Explicit editing/building actions should navigate directly to Product Workspace.
+- Explicit `Edit product` and Product building actions should navigate directly to Product Workspace.
+- Explicit `Edit landing page` actions should navigate to Product Landing Page Builder.
+- Explicit `View public page` actions should navigate to the public Product Landing Page.
 
 This principle currently applies to Creator Products list identities, Creator Dashboard product destinations, Creator Analytics product ranking rows, and Creator Sales product identity links in the ledger and Order Detail. Explicit edit/build actions, such as `Edit product`, builder CTAs, Dashboard attention actions that mean "fix/edit this product", and Admin explicit Edit actions, remain Product Workspace links.
+
+## Product Landing Page V2 Foundation
+
+Public Product Landing Page V2 replaces the legacy placeholder-heavy `ProductPage` presentation behind `/app/product/:id` and `/app/product/:id/:type`.
+
+Current route separation:
+
+- Creator Product Overview: `/app/products/:productId`.
+- Creator Product Landing Page Builder: `/app/products/:productId/landing-page`.
+- Focused Product Workspace: `/app/products/edit/:id` and `/app/products/edit/:type/:id`.
+- Public Product Landing Page: `/app/product/:id`; `/app/product/:id/:type` remains a compatibility path that redirects to the canonical ID-only path when the type segment does not match the loaded Product.
+
+Product Overview and Product Landing Page Builder render within the Creator management architecture. Product Workspace remains the focused editing workspace outside the normal Creator shell. The public Product route owns route params, loading/error/unavailable states, temporary data composition, public visibility checks, and compatibility redirects. It renders the shared `ProductLandingPage` presentation under `src/domains/app/features/product-landing-page`. The authenticated Creator Product Landing Page Builder reuses the same shared presentation as its live preview; Creator-only editing chrome lives around the shared renderer, not inside it.
+
+Current Product Landing Page data boundary:
+
+- Both the public route and Creator builder still use the existing Product service → `getProductById` thunk → Product Redux `currentProduct` path as a temporary frontend source for canonical Product data.
+- The shared presentation consumes a narrow Product Landing Page view model rather than Redux, route params, or raw Product service responses directly.
+- The route clears stale `currentProduct` before loading a route Product ID and only composes the landing page when the loaded Product ID matches the route ID.
+- Product Landing Page config is a narrow backend-pending domain under `src/core/api/models/product-landing-page`, `src/core/api/services/product-landing-page`, and `src/core/store/product-landing-page-store`. Current runtime path is Component → Redux thunk → Product Landing Page service → Axios → production backend or ignored local HTTP mock. Components must not branch directly on `REACT_APP_USE_MOCKS`.
+- Current service shapes are `GET api/products/:productId/landing-page` for public-safe config reads and `GET`/`PATCH api/creator/products/:productId/landing-page` for authenticated Creator reads/writes. Local ignored HTTP mocks support these endpoints under `REACT_APP_USE_MOCKS=true`; do not treat them as production backend implementation.
+- A dedicated public Product read model remains a future backend requirement. That future read model should provide public-safe Product fields, public Creator presentation, persisted landing-page configuration, public visibility enforcement, and checkout/access availability without requiring the buyer-facing route to orchestrate internal Product/User/Storefront reads.
+
+Current public Product Landing Page behavior:
+
+- Renders only `PUBLISHED` Products as public Product pages. `DRAFT` and `HIDDEN` render an unavailable/not-found-style public state. This frontend guard is not a security boundary; production enforcement still belongs in the future public Product read contract.
+- Uses real Product-owned data: Product type, name, description, price, recurring pricing metadata where present, thumbnail/image, and loaded type-specific content.
+- Removes legacy fake Product page claims such as hardcoded creator name, fake ratings/review/customer counts, fake language, fake durations, placeholder includes, hardcoded short description, placeholder-only image behavior, inert `Buy Now`, and inert `Add to Cart`.
+- Shows honest purchase/access unavailable states because checkout, free-product fulfillment, Membership subscription checkout, entitlement/access, and waitlist contracts are not implemented.
+- Inherits the Creator Storefront theme when an existing real Storefront/theme source is available through current frontend architecture; otherwise it falls back to `DEFAULT_STOREFRONT_THEME`. Product-specific theme overrides are not implemented, and this inheritance affects the public Product presentation/Builder preview rather than Creator management chrome.
+- Applies persisted public-safe Product Landing Page config when available, including marketing description, hero layout, supported secondary section visibility, and supported secondary section order. It must still render safely without depending on a Creator-only endpoint.
+- Renders real Creator identity only when available from the existing public Storefront read model or from current authenticated owner profile state. Anonymous/public creator identity must eventually come from the dedicated public Product read model.
+
+Type-specific public summaries:
+
+- `COURSE`: module/section count, lesson count, curriculum outline, lesson titles, and lesson types from loaded Product sections.
+- `DOWNLOAD`: section count, file/resource count where loaded, section outline, and file names only. It does not expose storage URLs or technical file metadata.
+- `CONSULTATION`: public-relevant configured details such as duration, meeting method, session buffers, daily availability, confirmation/cancellation messaging, and connected calendar availability when present.
+- `MEMBERSHIP`: conservative Product-owned Membership positioning and recurring pricing only. It does not claim member counts, subscriber counts, revenue, entitlement state, or Membership feed details.
+
+Creator Product Landing Page Builder current behavior:
+
+- Route `/app/products/:productId/landing-page` is authenticated for Creator/Admin users and is launched from Product Overview via `Edit landing page`.
+- The builder loads canonical Product data, loads the Product Landing Page config, creates a local draft, and maps Product + draft config + Creator/theme inputs into the shared `ProductLandingPage` preview.
+- Draft edits update the live preview immediately and do not PATCH individually. The `Save` action persists the full landing-page config through the backend-pending Creator config service; `Reset` restores the last persisted config/default normalization. Unsaved state is surfaced by enabled/disabled Save/Reset actions, save loading state, and success/error status copy.
+- Config owns only `marketingDescription`, `heroLayout` (`MEDIA_RIGHT`/`MEDIA_LEFT`), supported secondary-section visibility (`ABOUT`, `CONTENTS`, `CREATOR`), and supported secondary-section order for those IDs.
+- Current customization capabilities are limited to additional marketing/about copy, hero media side/layout, supported secondary-section visibility, and supported page-section order. The Builder reorders page sections, not Course modules, Download files, Consultation fields, or other Product content entities.
+- Desktop Builder customization uses a compact controls panel beside the live preview; mobile customization uses the shared `Drawer` infrastructure.
+- Authenticated Builder can render non-public Product states for editing and displays Product status context. Editing a Draft/Hidden Product landing page does not make it publicly available and does not add a publish workflow.
+- Product-owned fields such as name, description, type, status, price, pricing model, currency, thumbnail, and type-specific content remain read-only here and should be edited through Product Workspace.
+- User/Profile-owned Creator display fields and Storefront/theme ownership are not duplicated into Product Landing Page config. Product-specific theme overrides are intentionally not part of Task 2.
+
+Product Landing Page V2 intentionally does not implement galleries, slideshows, promo video/presentation upload, reusable asset library, checkout, Stripe/PayPal, free Product fulfillment, Membership subscriptions, waitlists, entitlement/access, reviews/ratings, Product analytics, SEO, slugs/custom domains, arbitrary page-builder blocks, or new production backend APIs.
 
 Intentional model decisions:
 
@@ -207,6 +265,8 @@ Implemented / reasonably wired:
 - Creator Analytics management area with period-scoped business metrics, performance visualization, product ranking, customer growth, membership health, and payment health.
 - Creator Storefront Builder at `/app/storefront`, where the shared public Storefront presentation is the live editing surface for profile fields, theme, featured product, and product ordering.
 - Public Storefront page at `/app/store/:creatorId` with creator identity/profile information, featured product when applicable, and a customer-facing published-product catalogue.
+- Public Product Landing Page V2 foundation at `/app/product/:id` with a shared public presentation, honest real Product data, frontend `PUBLISHED` visibility guard, Storefront/default theme inheritance, type-specific real-data summaries, and explicit unavailable purchase/access state.
+- Creator Product Landing Page Builder at `/app/products/:productId/landing-page` with shared `ProductLandingPage` live preview, local Save/Reset draft behavior, and backend-pending config contracts for marketing description, hero layout, and supported secondary-section visibility/order.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
@@ -222,9 +282,9 @@ Implemented / reasonably wired:
 
 Partially implemented / placeholder:
 
-- Product detail page has real loading by product ID but still contains placeholder copy, fake rating/language/duration/creator text, and placeholder image.
 - Creator Help navigation destination is disabled because an implementation is not available yet.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
+- Public Product Landing Page still uses the existing Product read path as a temporary source. Product Landing Page config has frontend contracts, Redux state, and ignored local HTTP mocks, but production config persistence, a dedicated production public Product read model, public creator payload, server-enforced visibility, and checkout/access/waitlist state remain unimplemented.
 - Membership included products are limited to existing Course/Download products and persist as Membership feed Product-ID associations through backend-pending contracts.
 - Native Membership Post, Video, and Resource content have backend-pending frontend contracts, services, Redux state, and ignored local HTTP mocks. Native Video/Resource binary upload remains unresolved beyond selected file metadata/asset reference.
 - Membership recurring pricing is Product-owned via backend-pending Product pricing fields: `pricingModel`, `billingInterval`, and `currency`, with Product `price` as the amount source of truth.
@@ -266,6 +326,7 @@ Deliberate temporary implementations:
 - Creator Dashboard runtime data path is Component → Redux → thunk → Dashboard service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Public Storefront runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Creator Storefront Builder config runtime data path is Component → Redux → thunk → Storefront service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
+- Product Landing Page config runtime data path is Component → Redux thunk → Product Landing Page service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`. Public Product route currently applies public-safe landing-page config through this transitional contract, while a dedicated production public Product read model remains the long-term owner of public Product payload, landing config, visibility, and checkout/access availability.
 - Membership domain runtime data path is Component → Redux → thunk → Membership service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
 - Download upload deduping is local to the section editor instance.
 - Membership editor drafts, selected File objects, chooser/picker state, active editor state, and active builder tab remain local UI state.
@@ -518,13 +579,15 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 - Creator management shell and IA centered on Dashboard, Products, Customers, Sales, Analytics, Storefront, plus Settings utility navigation; Help remains disabled and Marketing is removed from the Creator MVP IA.
 - Creator Dashboard, Products, Customers, Sales, Analytics, and Storefront Builder visual redesigns.
 - Public Storefront implementation at `/app/store/:creatorId`, sharing Storefront presentation/view-model logic with the Creator Storefront Builder.
+- Product Landing Page V2 foundation at `/app/product/:id`, replacing the legacy placeholder Product page with a shared honest public Product presentation, frontend `PUBLISHED` guard, and persisted public-safe config application when available.
+- Creator Product Landing Page Builder at `/app/products/:productId/landing-page`, launched from Product Overview and using the shared public landing page as a live preview for narrow landing config edits.
 - Product Overview V1 at `/app/products/:productId`, establishing Product identity navigation to Overview and edit/build navigation to Product Workspace.
 - Focused Product Workspace shell for product editing.
 
 Likely next steps:
 
 - Polish/fix admin product owner filtering UX beyond raw owner ID.
-- Complete the buyer-facing Product detail/landing page using real backend fields; `/app/product/:id` and `/app/product/:id/:type` remain placeholder-heavy and are not production-ready product landing-page functionality.
+- Define the production public Product read model and Product Landing Page config persistence so `/app/product/:id` can stop orchestrating internal Product/User/Storefront reads and can rely on server-enforced public visibility.
 - Implement backend Storefront contracts before relying on production persistence for Storefront configuration; define separate contracts before adding arbitrary page-builder blocks, custom domains, SEO, or analytics.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.
