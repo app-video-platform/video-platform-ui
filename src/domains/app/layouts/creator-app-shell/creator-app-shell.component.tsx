@@ -78,9 +78,6 @@ const CreatorAppShell: React.FC = () => {
       )}
 
       <div className="creator-app-shell__main">
-        <div className="creator-app-shell__account">
-          <GalUserDropdown />
-        </div>
         <main className="creator-app-shell__content">
           <Outlet />
         </main>

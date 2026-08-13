@@ -20,13 +20,6 @@
     position: relative;
   }
 
-  &__account {
-    position: absolute;
-    top: $spacing-5;
-    right: $spacing-6;
-    z-index: var(--z-sticky);
-  }
-
   &__content {
     min-height: 100dvh;
     padding: $spacing-8 $spacing-7 $spacing-8;
@@ -69,8 +62,7 @@
     display: block;
     padding-top: 64px;
 
-    &__sidebar,
-    &__account {
+    &__sidebar {
       display: none;
     }
 

@@ -31,6 +31,10 @@
         }
       }
     }
+
+    .sidebar-nav__account {
+      padding: $spacing-3 0 0;
+    }
   }
 
   .logo-container {
@@ -108,6 +112,13 @@
     }
   }
 
+  &__account {
+    flex: 0 0 auto;
+    margin-top: $spacing-3;
+    padding-top: $spacing-3;
+    border-top: 1px solid var(--border-subtle);
+  }
+
   .sidebar-nav-toggle {
     position: absolute;
     right: -16px;
@@ -168,6 +179,10 @@
     .sidebar-nav-toggle {
       display: none;
     }
+
+    .sidebar-nav__account {
+      padding: $spacing-3 0 0;
+    }
   }
 }
 
@@ -191,6 +206,10 @@
       span {
         display: inline;
       }
+    }
+
+    .sidebar-nav__account {
+      padding: $spacing-3 $spacing-3 0;
     }
   }
 }
