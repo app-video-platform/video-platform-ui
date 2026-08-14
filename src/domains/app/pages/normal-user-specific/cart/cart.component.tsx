@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { ProductMinimised, AppDispatch } from 'core/api/models';
 import { Button } from '@shared/ui';
@@ -8,8 +10,10 @@ import {
   selectShopCartTotal,
   removeProductFromCart,
   moveCartItemToWishlist,
+  clearShoppingCart,
 } from 'core/store/shop-cart';
 import { selectWishlistIds } from 'core/store/wishlist';
+import { enrollInFreeProductAPI } from 'core/api/services';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../../../assets/image-placeholder.png');
 
@@ -17,11 +21,15 @@ import './cart.styles.scss';
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const cartProducts = useSelector(selectAllShopCartProducts);
   const cartTotal = useSelector(selectShopCartTotal);
   const wishlistIds = useSelector(selectWishlistIds);
-
-  console.log('produs', cartProducts);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const containsPaidProducts = cartProducts.some(
+    (product) =>
+      product.price !== 'free' && Number(product.price ?? 0) > 0,
+  );
 
   const handleRemoveFromCart = (prod: ProductMinimised) => {
     if (prod && prod.id) {
@@ -35,10 +43,31 @@ const Cart: React.FC = () => {
     }
   };
 
+  const handleFreeCheckout = async () => {
+    const productIds = cartProducts
+      .map((product) => product.id)
+      .filter((id): id is string => Boolean(id));
+    if (productIds.length === 0 || containsPaidProducts) {
+      return;
+    }
+
+    setCheckingOut(true);
+    try {
+      await Promise.all(productIds.map(enrollInFreeProductAPI));
+      dispatch(clearShoppingCart());
+      toast.success('Products added to your library');
+      navigate('/app/library/all-products');
+    } catch {
+      toast.error('The free products could not be added to your library.');
+    } finally {
+      setCheckingOut(false);
+    }
+  };
+
   return (
     <div className="cart-page">
       <h1 className="cart-page-title">Shopping Cart</h1>
-      {cartProducts ? (
+      {cartProducts.length > 0 ? (
         <>
           <section className="cart-container">
             <div className="cart-container-line">
@@ -96,9 +125,20 @@ const Cart: React.FC = () => {
                 )}
               </h2>
 
-              <Button type="button" variant="primary">
-                Procees to checkout
+              <Button
+                type="button"
+                variant="primary"
+                disabled={containsPaidProducts || checkingOut}
+                onClick={handleFreeCheckout}
+              >
+                {checkingOut ? 'Adding...' : 'Proceed to checkout'}
               </Button>
+              {containsPaidProducts && (
+                <p role="status">
+                  Payment checkout is not available yet. Your cart has been
+                  saved.
+                </p>
+              )}
             </aside>
           </section>
         </>

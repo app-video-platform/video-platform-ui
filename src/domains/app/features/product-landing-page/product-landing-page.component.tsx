@@ -10,12 +10,16 @@ const placeholderImage = require('../../../../assets/image-placeholder.png');
 
 interface ProductLandingPageProps {
   product: ProductLandingPageViewModel;
+  commerceActions?: React.ReactNode;
 }
 
 const pluralize = (count: number, singular: string, plural = `${singular}s`) =>
   `${count} ${count === 1 ? singular : plural}`;
 
-const ProductLandingPage: React.FC<ProductLandingPageProps> = ({ product }) => {
+const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
+  product,
+  commerceActions,
+}) => {
   const priceLabel = product.price.cadence
     ? `${product.price.label} / ${product.price.cadence}`
     : product.price.label;
@@ -236,10 +240,12 @@ const ProductLandingPage: React.FC<ProductLandingPageProps> = ({ product }) => {
           <div>
             <span>Price</span>
             <h2 id="product-purchase-heading">{priceLabel}</h2>
-            <div className="product-landing__unavailable" role="status">
-              <strong>{product.cta.label}</strong>
-              <p>{product.cta.description}</p>
-            </div>
+            {commerceActions ?? (
+              <div className="product-landing__unavailable" role="status">
+                <strong>{product.cta.label}</strong>
+                <p>{product.cta.description}</p>
+              </div>
+            )}
           </div>
         </aside>
       </header>

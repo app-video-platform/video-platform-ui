@@ -1,8 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-
-import { selectAuthUser } from 'core/store/auth-store';
 
 import './library-page.styles.scss';
 
@@ -15,7 +12,6 @@ const TABS = [
 ];
 
 const LibraryPage: React.FC = () => {
-  const user = useSelector(selectAuthUser);
   const { pathname } = useLocation();
 
   const active = (() => {

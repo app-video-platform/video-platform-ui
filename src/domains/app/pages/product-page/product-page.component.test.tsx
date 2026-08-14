@@ -12,6 +12,7 @@ import { AbstractProduct, PublicStorefront } from 'core/api/models';
 import authReducer from 'core/store/auth-store/auth.slice';
 import productLandingPageReducer from 'core/store/product-landing-page-store/product-landing-page.slice';
 import productReducer from 'core/store/product-store/product.slice';
+import shopCartReducer from 'core/store/shop-cart/shop-cart.slice';
 import storefrontReducer from 'core/store/storefront-store/storefront.slice';
 
 import ProductPage from './product-page.component';
@@ -132,6 +133,7 @@ const renderProductPage = (initialEntry = '/app/product/course-1') => {
       auth: authReducer,
       productLandingPage: productLandingPageReducer,
       products: productReducer,
+      shopCart: shopCartReducer,
       storefront: storefrontReducer,
     },
     preloadedState: {
@@ -214,7 +216,8 @@ describe('<ProductPage />', () => {
       .toBeGreaterThan(0);
     expect(screen.getAllByText('Course').length).toBeGreaterThan(0);
     expect(screen.getAllByText('€149').length).toBeGreaterThan(0);
-    expect(screen.getByText('Purchase currently unavailable')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add to cart' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Buy now' })).toBeInTheDocument();
     expect(screen.getByAltText('Creator Product Growth System thumbnail'))
       .toHaveAttribute('src', 'https://cdn.example.com/course.jpg');
 
@@ -283,17 +286,18 @@ describe('<ProductPage />', () => {
 
     renderProductPage();
 
-    expect(await screen.findByText('Purchase currently unavailable')).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Add to cart' }))
+      .toBeInTheDocument();
     expect(screen.queryByText(/Rating:/i)).toBeNull();
     expect(screen.queryByText(/Swahili/i)).toBeNull();
     expect(screen.queryByText(/4733 hours/i)).toBeNull();
     expect(screen.queryByText(/This product includes/i)).toBeNull();
     expect(screen.queryByText(/The One Handed Man/i)).toBeNull();
-    expect(screen.queryByRole('button', { name: /Buy Now/i })).toBeNull();
-    expect(screen.queryByRole('button', { name: /Add to Cart/i })).toBeNull();
+    expect(screen.getByRole('button', { name: /Buy now/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Add to cart/i })).toBeInTheDocument();
   });
 
-  it('renders free Product access as unavailable instead of wiring fake access', async () => {
+  it('renders free Product enrollment', async () => {
     mock.onGet('api/products/download-1').reply(200, downloadProduct);
 
     renderProductPage('/app/product/download-1');
@@ -301,12 +305,13 @@ describe('<ProductPage />', () => {
     expect(await screen.findByRole('heading', { name: 'Launch Assets Pack' }))
       .toBeInTheDocument();
     expect(screen.getAllByText('Free').length).toBeGreaterThan(0);
-    expect(screen.getByText('Access currently unavailable')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Enroll for free' }))
+      .toBeInTheDocument();
     expect(screen.getByText('Planning templates')).toBeInTheDocument();
     expect(screen.getByText('launch-calendar.pdf')).toBeInTheDocument();
   });
 
-  it('renders Membership recurring pricing and unavailable checkout', async () => {
+  it('renders Membership recurring pricing and cart actions', async () => {
     mock.onGet('api/products/membership-1').reply(200, membershipProduct);
 
     renderProductPage('/app/product/membership-1/MEMBERSHIP');
@@ -314,7 +319,8 @@ describe('<ProductPage />', () => {
     expect(await screen.findByRole('heading', { name: 'Creator Lab Membership' }))
       .toBeInTheDocument();
     expect(screen.getAllByText('€19 / month').length).toBeGreaterThan(0);
-    expect(screen.getByText('Membership checkout unavailable')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add to cart' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Buy now' })).toBeInTheDocument();
   });
 
   it('renders representative Course content from loaded sections and lessons', async () => {

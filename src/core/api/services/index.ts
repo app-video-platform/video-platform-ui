@@ -2,6 +2,7 @@ export * from './admin';
 export * from './analytics';
 export * from './auth';
 export * from './calendar';
+export * from './entitlements';
 export * from './customers';
 export * from './dashboard';
 export * from './membership';
