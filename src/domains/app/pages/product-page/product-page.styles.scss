@@ -19,3 +19,41 @@
     line-height: 1.6;
   }
 }
+
+.product-page__commerce-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.product-page__protected-content {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 48px 0 72px;
+
+  h2 {
+    margin-bottom: 24px;
+    letter-spacing: 0;
+  }
+
+  video {
+    width: 100%;
+    max-width: 720px;
+  }
+}
+
+.product-page__lesson {
+  padding: 16px 0;
+  border-top: 1px solid var(--divider-default);
+}
+
+.product-page__download {
+  display: block;
+  margin: 8px 0;
+}
+
+@media (max-width: 640px) {
+  .product-page__protected-content {
+    width: min(100% - 32px, 1120px);
+  }
+}
