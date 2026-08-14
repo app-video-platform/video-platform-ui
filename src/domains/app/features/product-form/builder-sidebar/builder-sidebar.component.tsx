@@ -4,12 +4,12 @@ import clsx from 'clsx';
 import { IconType } from 'react-icons';
 import { TbListDetails, TbSection } from 'react-icons/tb';
 import { IoIosPricetags } from 'react-icons/io';
-import { MdPermMedia } from 'react-icons/md';
+import { MdGroups, MdPermMedia } from 'react-icons/md';
 import { CgDetailsMore } from 'react-icons/cg';
 import { PiRectangleDashed } from 'react-icons/pi';
 
 import { LessonType, ProductType } from 'core/api/models';
-import { GalIcon } from '@shared/ui';
+import { Icon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { LESSON_META } from 'core/constants';
 
@@ -19,6 +19,7 @@ export type BuilderTab =
   | 'basics'
   | 'sections'
   | 'consultation-details'
+  | 'membership-content'
   | 'pricing'
   | 'media';
 
@@ -68,7 +69,12 @@ export const getProductTabs = (productType: ProductType): ProductTab[] => {
   if (productType === 'COURSE' || productType === 'DOWNLOAD') {
     return [
       ...baseTabs,
-      { id: 'sections', label: 'Sections', icon: TbSection, position: 3 },
+      {
+        id: 'sections',
+        label: productType === 'COURSE' ? 'Curriculum' : 'Files',
+        icon: TbSection,
+        position: 3,
+      },
     ];
   }
 
@@ -77,8 +83,20 @@ export const getProductTabs = (productType: ProductType): ProductTab[] => {
       ...baseTabs,
       {
         id: 'consultation-details',
-        label: 'Consultation Details',
+        label: 'Availability',
         icon: CgDetailsMore,
+        position: 3,
+      },
+    ];
+  }
+
+  if (productType === 'MEMBERSHIP') {
+    return [
+      ...baseTabs,
+      {
+        id: 'membership-content',
+        label: 'Content',
+        icon: MdGroups,
         position: 3,
       },
     ];
@@ -117,7 +135,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
   const sortedSections = [...sections].sort((a, b) => a.position - b.position);
 
   return (
-    <aside className="builder-sidebar" aria-label="Product sections">
+    <aside className="builder-sidebar" aria-label="Workspace sections">
       <ul className="builder-sidebar-tabs">
         {productTabs.map((tab) => (
           <React.Fragment key={tab.id}>
@@ -131,7 +149,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
                 aria-controls={`tab-panel-${tab.id}`}
                 onClick={() => onChange(tab.id)}
               >
-                <GalIcon
+                <Icon
                   icon={tab.icon}
                   size={16}
                   color={getCssVar(
@@ -144,7 +162,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
 
             {/* Insert sections + lessons RIGHT AFTER the Sections tab */}
             {tab.id === 'sections' &&
-              productType !== 'CONSULTATION' &&
+              (productType === 'COURSE' || productType === 'DOWNLOAD') &&
               sortedSections.length > 0 && (
                 <>
                   {sortedSections.map((section) => (
@@ -160,7 +178,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
                           }
                         }}
                       >
-                        <GalIcon
+                        <Icon
                           icon={PiRectangleDashed}
                           size={16}
                           color={getCssVar('--text-primary')}
@@ -185,7 +203,7 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
                                     onLessonClick?.(lesson.id);
                                   }}
                                 >
-                                  <GalIcon
+                                  <Icon
                                     icon={
                                       LESSON_META[lesson.type ?? 'ASSIGNMENT']
                                         .icon

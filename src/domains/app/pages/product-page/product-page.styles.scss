@@ -1,40 +1,59 @@
-.product-page {
-  padding: 50px 0;
+.product-page-state {
+  display: grid;
+  place-content: center;
+  min-height: 70vh;
+  padding: 48px 24px;
+  text-align: center;
 
-  .product-banner {
-    display: flex;
-    flex-wrap: nowrap;
-    width: 80%;
-    margin: auto;
-    gap: 40px;
-    justify-content: space-between;
+  h1 {
+    margin: 0 0 12px;
+    color: var(--text-primary);
+    font-size: 2rem;
+    letter-spacing: 0;
   }
 
-  .product-details {
-    width: 80%;
-    margin: auto;
-    padding-top: 50px;
+  p {
+    max-width: 520px;
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
   }
+}
 
-  .cta-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
+.product-page__commerce-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 
-  .lesson-line,
-  .download-line {
-    padding: 12px 0;
-    border-top: 1px solid var(--divider-default);
+.product-page__protected-content {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 48px 0 72px;
+
+  h2 {
+    margin-bottom: 24px;
+    letter-spacing: 0;
   }
 
   video {
     width: 100%;
     max-width: 720px;
   }
+}
 
-  .content-locked {
-    margin-top: 24px;
-    font-weight: 600;
+.product-page__lesson {
+  padding: 16px 0;
+  border-top: 1px solid var(--divider-default);
+}
+
+.product-page__download {
+  display: block;
+  margin: 8px 0;
+}
+
+@media (max-width: 640px) {
+  .product-page__protected-content {
+    width: min(100% - 32px, 1120px);
   }
 }

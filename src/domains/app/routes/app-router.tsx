@@ -12,21 +12,25 @@ import {
   Cart,
   ConsultationTab,
   CoursesTab,
+  CreatorAnalytics,
   CreatorDashboard,
+  CustomerDetail,
   DownloadPackagesTab,
   ExplorePage,
   GalacticaHome,
   LibraryPage,
-  MarketingPage,
   Onboarding,
   ProductForm,
+  ProductLandingPageBuilder,
+  ProductOverview,
   ProductPage,
   ProductsList,
+  CustomersList,
   SalesPage,
   SearchResultsPage,
   SettingsPage,
   StorefrontPage,
-  UserPagePreview,
+  CreatorStorefrontPage,
   WishlistTab,
 } from '../pages';
 import { ProtectedRoute } from '@core/providers';
@@ -112,6 +116,20 @@ const AppRouter: React.FC = () => (
           <Route path="create" element={<ProductForm />} />
           <Route path="edit/:id" element={<ProductForm />} />
           <Route path="edit/:type/:id" element={<ProductForm />} />
+          <Route path=":productId/landing-page" element={<ProductLandingPageBuilder />} />
+          <Route path=":productId" element={<ProductOverview />} />
+        </Route>
+
+        <Route
+          path="customers"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+              <Outlet />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<CustomersList />} />
+          <Route path=":customerId" element={<CustomerDetail />} />
         </Route>
 
         <Route
@@ -124,10 +142,10 @@ const AppRouter: React.FC = () => (
         />
 
         <Route
-          path="marketing"
+          path="analytics"
           element={
             <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
-              <MarketingPage />
+              <CreatorAnalytics />
             </ProtectedRoute>
           }
         />
@@ -152,7 +170,18 @@ const AppRouter: React.FC = () => (
         </Route>
 
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="my-page-preview" element={<UserPagePreview />} />
+        <Route
+          path="storefront"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+              <CreatorStorefrontPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="my-page-preview"
+          element={<Navigate to="/app/storefront" replace />}
+        />
         <Route path="cart" element={<Cart />} />
 
         {/* Fallback inside /app */}

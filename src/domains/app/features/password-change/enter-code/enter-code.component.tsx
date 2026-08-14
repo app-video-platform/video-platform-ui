@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { GalOTPInput, Button } from '@shared/ui';
+import { OTPInput, Button } from '@shared/ui';
 
 import './enter-code.styles.scss';
 
@@ -34,7 +34,7 @@ const EnterCode: React.FC<EnterCodeProps> = ({
         We sent a code to <strong>{emailInput}</strong>
       </p>
       <div className="otp-container">
-        <GalOTPInput value={code} onChange={handleChange} numInputs={4} />
+        <OTPInput value={code} onChange={handleChange} numInputs={4} />
       </div>
       <div className="button-container">
         <Button

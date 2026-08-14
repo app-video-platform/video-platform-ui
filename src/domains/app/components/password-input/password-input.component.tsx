@@ -4,7 +4,7 @@ import { FaEyeSlash, FaEye } from 'react-icons/fa';
 
 import './password-input.styles.scss';
 
-interface GalPasswordInputProps
+interface PasswordInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'value'> {
   value: string;
   label?: string;
@@ -40,7 +40,7 @@ const passwordValidationRules = [
   },
 ];
 
-const PasswordInput: React.FC<GalPasswordInputProps> = ({
+const PasswordInput: React.FC<PasswordInputProps> = ({
   value,
   label,
   required,

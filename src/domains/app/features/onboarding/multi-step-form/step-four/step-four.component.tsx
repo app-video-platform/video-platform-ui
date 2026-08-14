@@ -8,8 +8,8 @@ import { Input } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
 import { SocialMediaLink, SocialPlatforms } from 'core/api/models';
 import {
-  GalLocation,
-  GalSocialMediaInput,
+  LocationSearchPlace,
+  SocialMediaInput,
   OSMLocationSearch,
 } from 'domains/app/components';
 
@@ -53,7 +53,7 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
     }
   }, [user]);
 
-  const handleSelect = (location: GalLocation) => {
+  const handleSelect = (location: LocationSearchPlace) => {
     setValue('city', location.city, {
       shouldValidate: true,
       shouldDirty: true,
@@ -117,7 +117,7 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
       </div>
 
       <div className="social-media-circle-container">
-        <GalSocialMediaInput
+        <SocialMediaInput
           initialSocialLinks={initialLinks}
           onChange={handleSocialMediaChange}
         />

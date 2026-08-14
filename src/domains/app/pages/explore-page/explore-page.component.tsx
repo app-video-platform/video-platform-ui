@@ -6,7 +6,8 @@ import { FaHeart } from 'react-icons/fa';
 
 import { ProductMinimised, AppDispatch } from 'core/api/models';
 import { getAllProductsMinimalAPI } from 'core/api/services';
-import { GalIcon, Button } from '@shared/ui';
+import { Icon, Button } from '@shared/ui';
+import { appRoutes } from '../../routes/routes';
 import {
   selectAllShopCartProducts,
   addProductToCart,
@@ -114,9 +115,9 @@ const ExplorePage: React.FC = () => {
                     title={wished ? 'Remove from wishlist' : 'Add to wishlist'}
                   >
                     {wished ? (
-                      <GalIcon icon={FaHeart} size={22} color="red" />
+                      <Icon icon={FaHeart} size={22} color="red" />
                     ) : (
-                      <GalIcon icon={FaRegHeart} size={22} />
+                      <Icon icon={FaRegHeart} size={22} />
                     )}
                   </button>
                   <div className="product-card-details">
@@ -156,7 +157,7 @@ const ExplorePage: React.FC = () => {
                       type="button"
                       variant="secondary"
                       onClick={() =>
-                        navigate(`/app/product/${product.id}/${product.type}`)
+                        navigate(appRoutes.product(product.id, product.type))
                       }
                     >
                       View Product

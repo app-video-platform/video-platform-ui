@@ -1,0 +1,119 @@
+@use '../../../../styles/index.scss' as *;
+
+.creator-app-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  background:
+    radial-gradient(circle at top left, rgba(var(--brand-secondary-rgb), 0.12), transparent 34rem),
+    var(--surface-canvas);
+
+  &__sidebar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    z-index: var(--z-shell);
+  }
+
+  &__main {
+    min-width: 0;
+    position: relative;
+  }
+
+  &__content {
+    min-height: 100dvh;
+    padding: $spacing-8 $spacing-7 $spacing-8;
+  }
+
+  &__mobile-bar,
+  &__mobile-layer {
+    display: none;
+  }
+
+  &__icon-button,
+  &__drawer-close {
+    background: var(--surface-panel-elevated);
+    border: 1px solid var(--border-subtle);
+
+    &:hover:not(:disabled) {
+      background: var(--surface-interactive);
+      border-color: var(--border-strong);
+    }
+  }
+
+  &__mobile-brand {
+    font-size: 1.35rem;
+    color: var(--text-primary);
+  }
+}
+
+@media (max-width: $bp-laptop) {
+  .creator-app-shell {
+    grid-template-columns: 76px minmax(0, 1fr);
+
+    &__content {
+      padding: $spacing-8 $spacing-5 $spacing-7;
+    }
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .creator-app-shell {
+    display: block;
+    padding-top: 64px;
+
+    &__sidebar {
+      display: none;
+    }
+
+    &__mobile-bar {
+      position: fixed;
+      inset: 0 0 auto;
+      height: 64px;
+      z-index: var(--z-shell);
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: $spacing-3;
+      padding: $spacing-3 $spacing-4;
+      background: rgba(var(--surface-canvas-rgb), 0.92);
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(14px);
+    }
+
+    &__mobile-layer {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: var(--z-overlay);
+    }
+
+    &__scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.58);
+      width: 100%;
+      height: 100%;
+      cursor: default;
+    }
+
+    &__drawer {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: min(84vw, 320px);
+      background: var(--surface-panel);
+      box-shadow: var(--shadow-e3);
+    }
+
+    &__drawer-close {
+      position: absolute;
+      top: $spacing-4;
+      right: $spacing-4;
+      z-index: 1;
+    }
+
+    &__content {
+      padding: $spacing-5 $spacing-4 $spacing-7;
+    }
+  }
+}

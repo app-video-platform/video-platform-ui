@@ -4,6 +4,7 @@ import { MdOutlineTypeSpecimen } from 'react-icons/md';
 import { IoIosPricetags } from 'react-icons/io';
 
 import { ProductStatus, ProductType } from 'core/api/models';
+import { PRODUCT_FILTER_OPTIONS } from 'core/constants';
 import { Filters, FilterSelector } from 'domains/app/components';
 import { SelectOption } from '@shared/ui';
 
@@ -44,9 +45,10 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 
   const TYPE_OPTIONS: SelectOption[] = [
     { label: 'All', value: 'all' },
-    { label: 'Courses', value: 'COURSE' },
-    { label: 'Download Packages', value: 'DOWNLOAD' },
-    { label: 'Consultation Sessions', value: 'CONSULTATION' },
+    ...PRODUCT_FILTER_OPTIONS.map((option) => ({
+      label: option.pluralLabel,
+      value: option.type,
+    })),
   ];
 
   const PRICE_OPTIONS: SelectOption[] = [

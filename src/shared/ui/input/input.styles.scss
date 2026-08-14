@@ -51,7 +51,7 @@ input[type='number'] {
     &:focus {
       outline: none;
       border-color: var(--brand-primary);
-      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+      box-shadow: 0 0 0 2px var(--border-focus);
     }
 
     &.input-error {
@@ -62,11 +62,11 @@ input[type='number'] {
       background: transparent;
       border-color: var(--surface-0);
       pointer-events: none;
-      box-shadow: 0 0 0 2px rgba(var(--surface-0), 0.15);
+      box-shadow: 0 0 0 2px rgba(var(--surface-canvas-rgb), 0.15);
 
       &:focus {
         border-color: var(--surface-0);
-        box-shadow: 0 0 0 2px rgba(var(--surface-0), 0.75);
+        box-shadow: 0 0 0 2px rgba(var(--surface-canvas-rgb), 0.75);
       }
     }
 

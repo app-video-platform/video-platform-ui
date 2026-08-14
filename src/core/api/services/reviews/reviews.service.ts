@@ -15,7 +15,7 @@ POST /products/:productId/reviews           // create review (customer)
 PATCH /reviews/:id                          // customer editing their own rating/comment
 */
 
-/* Creator / admin endpoints (for your Marketing → Reviews tab)
+/* Creator / admin review endpoints
 GET   /creator/reviews?productId=&rating=&status=&search=&page=&pageSize=
 PATCH /creator/reviews/:id/visibility          // hide/unhide
 POST  /creator/reviews/:id/reply               // create reply

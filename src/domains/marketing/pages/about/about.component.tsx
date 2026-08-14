@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
 
-import { GalIcon } from '@shared/ui';
+import { Icon } from '@shared/ui';
 import { CTASection } from '@domains/marketing/shared';
 import {
   DifferentSection,
@@ -71,19 +71,19 @@ const About: React.FC = () => (
       </div>
       <ul className="different-list">
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <Icon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <Icon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <Icon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
         <li className="different-item">
-          <GalIcon icon={FaCheckSquare} color="green" size={24} />
+          <Icon icon={FaCheckSquare} color="green" size={24} />
           Lorem ipsum dolor sit amet senectutem juventus
         </li>
       </ul>

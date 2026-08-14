@@ -353,8 +353,8 @@ const productsSlice = createSlice({
 
     deleteSectionFromStore(state, action: PayloadAction<string>) {
       if (
-        state.currentProduct &&
-        state.currentProduct.type !== 'CONSULTATION'
+        state.currentProduct?.type === 'COURSE' ||
+        state.currentProduct?.type === 'DOWNLOAD'
       ) {
         state.currentProduct.sections = removeSection(
           state.currentProduct.sections,
@@ -494,7 +494,10 @@ const productsSlice = createSlice({
           state.loading = false;
           state.error = null;
 
-          if (state.currentProduct && state.currentProduct.type !== 'CONSULTATION') {
+          if (
+            state.currentProduct?.type === 'COURSE' ||
+            state.currentProduct?.type === 'DOWNLOAD'
+          ) {
             state.currentProduct.sections = replaceSection(
               state.currentProduct.sections,
               action.payload,
@@ -517,7 +520,10 @@ const productsSlice = createSlice({
           state.loading = false;
           state.error = null;
 
-          if (state.currentProduct && state.currentProduct.type !== 'CONSULTATION') {
+          if (
+            state.currentProduct?.type === 'COURSE' ||
+            state.currentProduct?.type === 'DOWNLOAD'
+          ) {
             state.currentProduct.sections = replaceSection(
               state.currentProduct.sections,
               action.payload,
@@ -543,7 +549,10 @@ const productsSlice = createSlice({
           state.loading = false;
           state.error = null;
 
-          if (state.currentProduct && state.currentProduct.type !== 'CONSULTATION') {
+          if (
+            state.currentProduct?.type === 'COURSE' ||
+            state.currentProduct?.type === 'DOWNLOAD'
+          ) {
             state.currentProduct.sections = removeSection(
               state.currentProduct.sections,
               action.payload.sectionId,
@@ -745,5 +754,12 @@ export const createLesson = createCourseLesson;
 export const updateLessonDetails = updateCourseLesson;
 export const deleteLesson = deleteCourseLesson;
 export const getProductByProductId = getProductById;
+
+export const {
+  clearCurrentProduct,
+  deleteProductFromStore,
+  deleteSectionFromStore,
+  deleteLessonFromStore,
+} = productsSlice.actions;
 
 export default productsSlice.reducer;

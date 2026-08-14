@@ -3,6 +3,9 @@ import {
   ProductType,
   ProductStatus,
   ConsultationDetails,
+  ProductBillingInterval,
+  ProductCurrency,
+  ProductPricingModel,
 } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import { BuilderSectionNavItem } from '../builder-sidebar';
@@ -16,11 +19,14 @@ export interface FormErrors {
 export interface ProductDraft {
   // from AbstractProductBase
   id?: string;
-  type: ProductType; // 'COURSE' | 'DOWNLOAD' | 'CONSULTATION'
+  type: ProductType;
   name?: string;
   description?: string;
   status?: ProductStatus;
   price?: 'free' | number;
+  pricingModel?: ProductPricingModel;
+  billingInterval?: ProductBillingInterval;
+  currency?: ProductCurrency;
   userId?: string;
   createdAt?: Date;
   updatedAt?: Date;

@@ -1,1 +1,1 @@
-export { default as GalRichTextEditor } from './gal-rich-text-editor.component';
+export { default as RichTextEditor } from './rich-text-editor.component';

@@ -1,0 +1,55 @@
+@use '../../../styles/index' as *;
+
+.status-badge {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-1;
+  padding: 0 $spacing-3;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-sm;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+
+  &--sm {
+    min-height: 24px;
+    padding: 0 $spacing-2;
+    font-size: 0.6875rem;
+  }
+
+  &--success {
+    color: var(--success);
+    border-color: rgba(var(--success-rgb), 0.35);
+    background: rgba(var(--success-rgb), 0.1);
+  }
+
+  &--warning {
+    color: var(--warning);
+    border-color: rgba(var(--brand-primary-rgb), 0.35);
+    background: rgba(var(--brand-primary-rgb), 0.1);
+  }
+
+  &--danger {
+    color: var(--error);
+    border-color: rgba(var(--error-rgb), 0.35);
+    background: rgba(var(--error-rgb), 0.1);
+  }
+
+  &--info {
+    color: var(--info);
+    border-color: rgba(85, 199, 232, 0.35);
+    background: rgba(85, 199, 232, 0.1);
+  }
+
+  &--neutral {
+    color: var(--text-secondary);
+    border-color: var(--divider-default);
+    background: var(--overlay-hover);
+  }
+}

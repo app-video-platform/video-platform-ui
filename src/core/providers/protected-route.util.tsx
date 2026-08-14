@@ -10,7 +10,7 @@ import {
 } from 'core/store/auth-store';
 import { UserRole } from '../api/models/user/user';
 import { hasAnyRole } from '../api/models/user/role-utils';
-import { GalSpinner } from '@shared/ui';
+import { Spinner } from '@shared/ui';
 
 interface ProtectedRouteProps {
   allowedRoles: UserRole[];
@@ -38,7 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // 3) Otherwise, we either are still loading, or the user is allowed.
   //    In both cases we render the children. If we’re still loading, show a spinner overlay.
-  return authLoading ? <GalSpinner /> : children;
+  return authLoading ? <Spinner /> : children;
 };
 
 export default ProtectedRoute;

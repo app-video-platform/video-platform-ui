@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { Button } from '@shared/ui';
 import { selectAuthUser } from 'core/store/auth-store';
-import { GalNavDropdown, GalUserDropdown } from 'domains/app/components';
+import { NavDropdown, UserDropdown } from 'domains/app/components';
 
 import './nav.styles.scss';
 
@@ -33,7 +33,7 @@ const Navigation: React.FC = () => {
           <li>
             <Link to={'/getting-started'}>Getting Started</Link>
           </li>
-          {/* <GalNavDropdown /> */}
+          {/* <NavDropdown /> */}
 
           <li>
             <Link to={'/contact'}>Contact Us</Link>
@@ -46,7 +46,7 @@ const Navigation: React.FC = () => {
                 <Link className="dashboard-link" to={'/app'}>
                   Go to Dashboard
                 </Link>
-                <GalUserDropdown />
+                <UserDropdown />
               </div>
             ) : (
               <ul className="nav-link-list">

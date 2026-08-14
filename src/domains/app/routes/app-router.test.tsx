@@ -36,21 +36,25 @@ jest.mock('../pages', () => {
     Cart: makePage('Cart'),
     ConsultationTab: makePage('Consultations'),
     CoursesTab: makePage('Courses'),
+    CreatorAnalytics: makePage('Analytics'),
     CreatorDashboard: makePage('Creator dashboard'),
+    CustomerDetail: makePage('Customer detail'),
+    CustomersList: makePage('Customers list'),
     DownloadPackagesTab: makePage('Downloads'),
     ExplorePage: makePage('Explore'),
     GalacticaHome: makePage('User home'),
     LibraryPage: MockOutletPage,
-    MarketingPage: makePage('Marketing'),
     Onboarding: makePage('Onboarding'),
     ProductForm: makePage('Product form'),
+    ProductLandingPageBuilder: makePage('Product landing page builder'),
+    ProductOverview: makePage('Product overview'),
     ProductPage: makePage('Product page'),
     ProductsList: makePage('Products list'),
     SalesPage: makePage('Sales'),
     SearchResultsPage: makePage('Search results'),
     SettingsPage: makePage('Settings'),
     StorefrontPage: makePage('Storefront'),
-    UserPagePreview: makePage('Preview'),
+    CreatorStorefrontPage: makePage('Creator Storefront'),
     WishlistTab: makePage('Wishlist'),
   };
 });
@@ -103,5 +107,45 @@ describe('AppRouter role routing', () => {
     renderRouter([UserRole.ADMIN], '/admin/users');
 
     expect(screen.getByText('Admin users')).toBeInTheDocument();
+  });
+
+  it('renders creator customer routes for creators', () => {
+    renderRouter([UserRole.CREATOR], '/customers');
+
+    expect(screen.getByText('Customers list')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/customers/cust-1');
+
+    expect(screen.getByText('Customer detail')).toBeInTheDocument();
+  });
+
+  it('renders the Product Overview route without colliding with Product Workspace routes', () => {
+    renderRouter([UserRole.CREATOR], '/products/product-1');
+
+    expect(screen.getByText('Product overview')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/products/product-1/landing-page');
+
+    expect(screen.getByText('Product landing page builder')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/products/edit/product-1');
+
+    expect(screen.getByText('Product form')).toBeInTheDocument();
+  });
+
+  it('renders the Creator Storefront route and redirects the legacy preview route', () => {
+    renderRouter([UserRole.CREATOR], '/storefront');
+
+    expect(screen.getByText('Creator Storefront')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/my-page-preview');
+
+    expect(screen.getByText('Creator Storefront')).toBeInTheDocument();
+  });
+
+  it('renders the public Storefront route outside the protected Creator route', () => {
+    renderRouter([UserRole.USER], '/store/creator-1');
+
+    expect(screen.getByText('Storefront')).toBeInTheDocument();
   });
 });

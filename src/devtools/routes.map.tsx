@@ -127,15 +127,6 @@ export const docRoutes: DocRoute[] = [
         },
         id: 'app-sales',
       },
-      {
-        path: 'marketing',
-        meta: {
-          access: 'protected',
-          roles: [UserRole.CREATOR, UserRole.ADMIN],
-        },
-        id: 'app-marketing',
-      },
-
       // User/Admin only
       {
         path: 'library',
@@ -195,12 +186,21 @@ export const docRoutes: DocRoute[] = [
         id: 'app-settings',
       },
       {
+        path: 'storefront',
+        meta: {
+          access: 'protected',
+          roles: [UserRole.ADMIN, UserRole.CREATOR],
+        },
+        id: 'app-storefront-management',
+      },
+      {
         path: 'my-page-preview',
         meta: {
           access: 'protected',
-          roles: [UserRole.ADMIN, UserRole.CREATOR, UserRole.USER],
+          roles: [UserRole.ADMIN, UserRole.CREATOR],
+          notes: 'Legacy redirect to /app/storefront',
         },
-        id: 'app-my-page-preview',
+        id: 'app-my-page-preview-redirect',
       },
       {
         path: 'cart',

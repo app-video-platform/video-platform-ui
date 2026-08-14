@@ -12,10 +12,10 @@ import {
   Textarea,
   UserAvatar,
 } from '@shared/ui';
-import { getProfileNameInitials } from '@shared/utils';
 import { SettingsSection } from '../settings-section';
 import { SocialInput } from '../social-input';
 import { PageHeader } from 'domains/app/components';
+import { PUBLIC_EMAIL_POPOVER_COPY } from '../settings.constants';
 
 export interface ProfileFormData {
   firstName: string;
@@ -250,10 +250,7 @@ const SettingsProfileTab: React.FC = () => {
             />
 
             <InfoPopover className="info-popover" position="left">
-              <span>
-                This is the email showed on your storefront and what your
-                clients can see.
-              </span>
+              <span>{PUBLIC_EMAIL_POPOVER_COPY}</span>
             </InfoPopover>
           </div>
           <Controller

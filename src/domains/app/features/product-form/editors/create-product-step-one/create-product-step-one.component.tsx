@@ -9,7 +9,7 @@ import {
   ProductType,
   AppDispatch,
 } from 'core/api/models';
-import { Button, GalIcon, Input } from '@shared/ui';
+import { Button, Icon, Input } from '@shared/ui';
 import { FormErrors } from 'domains/app/pages';
 import { createProduct } from 'core/store/product-store';
 import { ProductTypeSelector } from 'domains/app/features/product-form/product-type-selector';
@@ -66,7 +66,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
             setField('id', data.id ?? ''); // Ensure the formData is updated with the new ID
             setField('userId', data.userId ?? userId);
             // formData.sections = data.sections || []; // Initialize sections if they exist
-            if (data.type !== 'CONSULTATION') {
+            if (data.type === 'COURSE' || data.type === 'DOWNLOAD') {
               setField('sections', data.sections || []); // Update sections in formData
             }
             setShowRestOfForm(true);
@@ -121,7 +121,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
             className="create-course-continue-button"
             disabled={isDisabled}
           >
-            <GalIcon
+            <Icon
               icon={FaArrowRight}
               color={getCssVar(
                 isDisabled ? '--text-secondary' : '--text-primary',

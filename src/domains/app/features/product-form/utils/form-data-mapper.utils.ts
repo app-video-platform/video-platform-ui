@@ -12,7 +12,10 @@ export const mapFormDataToProductPayload = (
     name: formData.name ?? '',
     description: formData.description,
     price: formData.price,
-    status: 'DRAFT' as const,
+    pricingModel: formData.pricingModel,
+    billingInterval: formData.billingInterval,
+    currency: formData.currency,
+    status: formData.status ?? ('DRAFT' as const),
     userId: formData.userId ?? user?.id,
   };
 
@@ -48,6 +51,12 @@ export const mapFormDataToProductPayload = (
         },
       };
 
+    case 'MEMBERSHIP':
+      return {
+        ...base,
+        type: 'MEMBERSHIP',
+      };
+
     default:
       throw new Error(`Unsupported product type: ${formData.type}`);
   }
@@ -61,6 +70,9 @@ export const getAutosaveSnapshot = (
   name: formData.name,
   description: formData.description,
   price: formData.price,
+  pricingModel: formData.pricingModel,
+  billingInterval: formData.billingInterval,
+  currency: formData.currency,
   status: formData.status,
   // CONSULTATION fields if you want autosave to care about them:
   consultationDetails: formData.consultationDetails,

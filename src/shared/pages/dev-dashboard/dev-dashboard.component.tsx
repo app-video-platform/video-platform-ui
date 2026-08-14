@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { DashboardMDX } from '@shared/utils';
-import { GalUserDropdown } from 'domains/app/components';
+import { UserDropdown } from 'domains/app/components';
 
 import './dev-dashboard.styles.scss';
 
@@ -15,7 +15,7 @@ const DevDashboard: React.FC = () => (
         <Link to={'/app/dashboard'}>Normal Dashboard</Link>
         <Link to={'/'}>Landing page</Link>
       </div>
-      <GalUserDropdown />
+      <UserDropdown />
     </nav>
     <main className="dev-dashboard-main">
       <DashboardMDX />

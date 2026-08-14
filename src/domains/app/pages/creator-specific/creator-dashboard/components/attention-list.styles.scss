@@ -1,0 +1,64 @@
+@use '../../../../../../styles/index.scss' as *;
+
+.attention-list {
+  display: grid;
+  gap: $spacing-3;
+
+  &__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: $spacing-4;
+    align-items: center;
+    padding: $spacing-4;
+    border-radius: $radius-lg;
+    background: var(--surface-app);
+    border: 1px solid var(--border-subtle);
+  }
+
+  &__content {
+    min-width: 0;
+    display: grid;
+    gap: $spacing-1;
+  }
+
+  &__severity {
+    font-size: $app-label-size;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    &--high {
+      color: var(--error);
+    }
+
+    &--medium {
+      color: var(--warning);
+    }
+
+    &--low {
+      color: var(--text-secondary);
+    }
+  }
+
+  h3 {
+    font-size: $app-component-title-size;
+    font-weight: 700;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: $bp-mobile) {
+  .attention-list {
+    &__item {
+      grid-template-columns: minmax(0, 1fr);
+
+      .vp-btn {
+        width: 100%;
+      }
+    }
+  }
+}

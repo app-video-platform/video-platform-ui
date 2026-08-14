@@ -2,13 +2,15 @@ import {
   DownloadProduct,
   CourseProduct,
   ConsultationProduct,
+  MembershipProduct,
   AbstractProductBase,
 } from './product';
 
 export type AbstractProduct =
   | DownloadProduct
   | CourseProduct
-  | ConsultationProduct;
+  | ConsultationProduct
+  | MembershipProduct;
 
 export interface CourseProductResponseDetails {
   sections?: CourseProduct['sections'];
@@ -36,12 +38,17 @@ export type ConsultationProductApiResponse = ConsultationProduct & {
   details?: ConsultationProductResponseDetails | null;
 };
 
+export type MembershipProductApiResponse = MembershipProduct & {
+  details?: null;
+};
+
 export type AbstractProductApiResponse =
   | CourseProductApiResponse
   | DownloadProductApiResponse
-  | ConsultationProductApiResponse;
+  | ConsultationProductApiResponse
+  | MembershipProductApiResponse;
 
-export type ProductType = 'COURSE' | 'DOWNLOAD' | 'CONSULTATION';
+export type ProductType = 'COURSE' | 'DOWNLOAD' | 'CONSULTATION' | 'MEMBERSHIP';
 
 export type ProductStatus = 'DRAFT' | 'PUBLISHED' | 'HIDDEN';
 

@@ -1,68 +1,63 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
-import { selectAuthUser } from 'core/store/auth-store';
-import { ProductMinimised } from 'core/api/models';
-import { getAllProductsMinimalByUserAPI } from 'core/api/services';
+import { AppDispatch, RootState } from 'core/api/models';
+import {
+  fetchPublicStorefront,
+  selectPublicStorefrontByCreatorId,
+  selectPublicStorefrontError,
+  selectPublicStorefrontLoading,
+} from 'core/store/storefront-store';
+import {
+  getStorefrontViewModelFromPublicStorefront,
+  StorefrontPublicPage,
+} from 'domains/app/features/storefront';
 
 import './storefront-page.styles.scss';
 
 const StorefrontPage: React.FC = () => {
   const { creatorId } = useParams();
-  const user = useSelector(selectAuthUser);
-  const [products, setProducts] = useState<ProductMinimised[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const storefrontData = useSelector((state: RootState) =>
+    selectPublicStorefrontByCreatorId(state, creatorId),
+  );
+  const loading = useSelector(selectPublicStorefrontLoading);
+  const error = useSelector(selectPublicStorefrontError);
 
   useEffect(() => {
     if (creatorId) {
-      let isMounted = true; // ↪️ prevent state updates after unmount
-
-      // call your service
-      getAllProductsMinimalByUserAPI(creatorId)
-        .then((data) => {
-          if (isMounted) {
-            setProducts(data);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          if (isMounted) {
-            setError('Failed to load products.');
-          }
-        })
-        .finally(() => {
-          if (isMounted) {
-            setLoading(false);
-          }
-        });
-
-      return () => {
-        isMounted = false;
-      };
+      dispatch(fetchPublicStorefront(creatorId));
     }
-  }, []); // empty deps → runs once on mount
+  }, [creatorId, dispatch]);
 
-  // if (loading) {
-  //   return <p>Loading products…</p>;
-  // }
-  // if (error) {
-  //   return <p>{error}</p>;
-  // }
-
-  return (
-    <div className="storefront-page">
-      <main className="storefront-page-content">
-        <section className="hero">
-          <div className="creator-profile-image" />
-          <div className="hero-content">
-            <h1></h1>
-          </div>
-        </section>
-      </main>
-    </div>
+  const storefront = useMemo(
+    () =>
+      storefrontData
+        ? getStorefrontViewModelFromPublicStorefront(storefrontData)
+        : null,
+    [storefrontData],
   );
+
+  if (loading && !storefront) {
+    return (
+      <main className="storefront-route-state" aria-busy="true">
+        <h1>Loading Storefront</h1>
+        <p>Preparing this creator&apos;s public page.</p>
+      </main>
+    );
+  }
+
+  if (error || !storefront) {
+    return (
+      <main className="storefront-route-state" role="alert">
+        <h1>Storefront unavailable</h1>
+        <p>{error ?? 'Failed to load Storefront.'}</p>
+      </main>
+    );
+  }
+
+  return <StorefrontPublicPage storefront={storefront} />;
 };
 
 export default StorefrontPage;

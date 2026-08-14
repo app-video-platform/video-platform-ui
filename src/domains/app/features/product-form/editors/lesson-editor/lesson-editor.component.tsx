@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSONContent } from '@tiptap/react';
 
-import { GalBoxSelector } from 'domains/app/components';
+import { BoxSelector } from 'domains/app/components';
 import QuizWizard from '../../quiz-wizard/quiz-wizard.component';
 import {
-  GalUppyFileUploader,
-  GalRichTextEditor,
-  GalIcon,
+  UppyFileUploader,
+  RichTextEditor,
+  Icon,
   Button,
   Textarea,
   ExpansionPanel,
@@ -159,7 +159,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     switch (lesson.type) {
       case 'VIDEO':
         return (
-          <GalUppyFileUploader
+          <UppyFileUploader
             onFilesChange={onVideoUploadChange}
             allowedFileTypes={['video/*']}
           />
@@ -168,7 +168,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       case 'ARTICLE':
         return (
           <div className="form-input-group">
-            <GalRichTextEditor
+            <RichTextEditor
               initialContent={contentJSON ?? {}}
               onChange={(json) => setContentJSON(json)}
             />
@@ -200,7 +200,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       header={
         <div className="lesson-editor-header">
           <div className="lesson-title-block">
-            <GalIcon
+            <Icon
               icon={
                 LESSON_META[(lesson.type as LessonType) ?? 'ASSIGNMENT'].icon
               }
@@ -224,7 +224,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     >
       <>
         <div className="lesson-type-selectors">
-          <GalBoxSelector<LessonType>
+          <BoxSelector<LessonType>
             selectedOption={lesson.type}
             selectFor="lesson"
             onSelect={(type) => updateLesson({ type })}

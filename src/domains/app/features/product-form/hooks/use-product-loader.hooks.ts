@@ -45,6 +45,11 @@ export const useProductLoader = ({
           description: product.description ?? '',
           type: product.type ?? 'COURSE',
           price: product.price ?? 'free',
+          pricingModel: product.pricingModel,
+          billingInterval: product.billingInterval,
+          currency: product.currency,
+          status: product.status,
+          imageUrl: product.imageUrl,
           userId: product.userId,
         };
 
@@ -60,6 +65,8 @@ export const useProductLoader = ({
             ...baseData,
             consultationDetails: product.consultationDetails,
           };
+        } else if (product.type === 'MEMBERSHIP') {
+          newData = baseData;
         }
 
         setFormData(newData);

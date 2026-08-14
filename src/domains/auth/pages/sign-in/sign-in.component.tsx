@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { GalGoogleSignInButton, PasswordInput } from 'domains/app/components';
+import { GoogleSignInButton, PasswordInput } from 'domains/app/components';
 import { LoginRequest, AppDispatch } from 'core/api/models';
 import { Input, Button } from '@shared/ui';
 import { signinUser, getUserProfile } from 'core/store/auth-store';
@@ -89,7 +89,7 @@ const SignIn: React.FC = () => {
           </Button>
         </form>
 
-        <GalGoogleSignInButton data-test-id="google-sign-in-button" />
+        <GoogleSignInButton data-test-id="google-sign-in-button" />
 
         <div className="forgot-password-button-container">
           <button

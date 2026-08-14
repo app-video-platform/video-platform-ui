@@ -1,33 +1,62 @@
 :root {
-  /* Base Canvas - Page background	Always */
-  --surface-0: #0f0f2d; /* Near Black */
+  /* App canvas and surfaces */
+  --surface-canvas: #0b0d24;
+  --surface-app: #10122e;
+  --surface-panel: #161836;
+  --surface-panel-elevated: #1d2045;
+  --surface-interactive: #242750;
+  --surface-interactive-hover: #2c315e;
 
-  /* Elevated surfaces */
-  // Cards, containers	Often
-  --surface-1: #151538; /* Deep Cosmic Blue */
-  //Hover, interactive	Medium
-  --surface-2: #1d1d45; /* Space Indigo */
+  /* Backward-compatible aliases */
+  --surface-0: var(--surface-canvas);
+  --surface-1: var(--surface-panel);
+  --surface-2: var(--surface-panel-elevated);
 
-  /* Borders */
+  /* Borders and dividers */
   --border-subtle: rgba(248, 249, 250, 0.06);
   --border-strong: rgba(248, 249, 250, 0.12);
+  --border-focus: rgba(255, 189, 65, 0.64);
+  --border-color: var(--border-subtle);
 
   --text-primary: #f8f9fa; /* Sea Salt */
-  --text-secondary: #c3c0c5; /* French Grey */
+  --text-secondary: #c7c6d1;
   --text-muted: rgba(248, 249, 250, 0.5);
+  --text-inverse: #131527;
 
   --brand-primary: #ffbd41; /* Warm Yellow-Orange */
   --brand-primary-light: #ffd166;
   --brand-primary-dark: #e6a832;
 
-  --brand-secondary: #3a2e6f; /* Muted Galactic Purple */
+  --brand-secondary: #6d5bd0;
+  --brand-secondary-muted: #3a2e6f;
 
   --ambient-cyan: #3bc9db;
 
-  --success: #00a878;
-  --error: #bd1e1e;
-  --warning: #fcab10;
-  --info: #3bc9db;
+  --success: #1fc493;
+  --error: #f06464;
+  --warning: #ffbd41;
+  --info: #55c7e8;
+  --danger: var(--error);
+
+  /* Data visualization */
+  --chart-grid: rgba(248, 249, 250, 0.08);
+  --chart-axis: rgba(248, 249, 250, 0.18);
+  --chart-tick: rgba(248, 249, 250, 0.62);
+  --chart-tooltip-surface: rgba(29, 32, 69, 0.96);
+  --chart-tooltip-border: rgba(248, 249, 250, 0.14);
+  --chart-tooltip-text: var(--text-primary);
+  --chart-series-1: #55c7e8;
+  --chart-series-2: #ffbd41;
+  --chart-series-3: #8bd17c;
+  --chart-series-4: #b69cff;
+  --chart-series-positive: var(--success);
+  --chart-series-negative: var(--error);
+  --chart-series-neutral: var(--text-secondary);
+
+  --chart-series-1-rgb: 85, 199, 232;
+  --chart-series-2-rgb: 255, 189, 65;
+  --chart-series-3-rgb: 139, 209, 124;
+  --chart-series-4-rgb: 182, 156, 255;
 
   --divider-subtle: rgba(248, 249, 250, 0.06);
   --divider-default: rgba(248, 249, 250, 0.1);
@@ -44,12 +73,21 @@
   /* Focus ring */
   --focus-ring: rgba(255, 189, 65, 0.6);
 
+  /* RGB channels for alpha composition in SCSS/CSS */
+  --surface-canvas-rgb: 11, 13, 36;
+  --surface-panel-rgb: 22, 24, 54;
+  --surface-panel-elevated-rgb: 29, 32, 69;
+  --brand-primary-rgb: 255, 189, 65;
+  --brand-secondary-rgb: 109, 91, 208;
+  --success-rgb: 31, 196, 147;
+  --error-rgb: 240, 100, 100;
+
   /* Shadows */
 
   --shadow-e1: 0 8px 24px rgba(0, 0, 0, 0.35);
   --shadow-e2: 0 14px 40px rgba(0, 0, 0, 0.45);
   --shadow-e3: 0 24px 70px rgba(0, 0, 0, 0.6);
-  --shadow-ambient-purple: 0 0 60px rgba(58, 46, 111, 0.18);
+  --shadow-ambient-purple: 0 0 60px rgba(109, 91, 208, 0.14);
   --shadow-ambient-warm: 0 0 40px rgba(255, 189, 65, 0.25);
   --shadow-button-primary:
     0 10px 30px rgba(0, 0, 0, 0.45), 0 0 30px rgba(255, 189, 65, 0.35);
@@ -65,6 +103,13 @@
   --overlay-nebula: 0.65;
   --overlay-stars: 0.22;
   --overlay-grain: 0.08;
+
+  /* Layering */
+  --z-dropdown: 30;
+  --z-sticky: 50;
+  --z-shell: 80;
+  --z-overlay: 100;
+  --z-modal: 120;
 }
 
 /*

@@ -39,12 +39,15 @@ const Tabs: React.FC<TabsProps> = ({
 
   return (
     <div className="tabs">
-      <div className="tabs-header">
+      <div className="tabs-header" role="tablist">
         {items.map((item, idx) => {
           const isActive = idx === currentIndex;
           return (
             <button
               key={idx}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
               onClick={() => handleClick(idx)}
               className={clsx('tab-button', { 'tab-button__active': isActive })}
             >
@@ -55,7 +58,9 @@ const Tabs: React.FC<TabsProps> = ({
         <div className="tab-button tab-full-space" />
       </div>
 
-      <div className="tab-content">{items[currentIndex]?.content}</div>
+      <div className="tab-content" role="tabpanel">
+        {items[currentIndex]?.content}
+      </div>
     </div>
   );
 };

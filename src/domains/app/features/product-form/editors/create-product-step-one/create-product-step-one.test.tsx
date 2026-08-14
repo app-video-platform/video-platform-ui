@@ -28,7 +28,7 @@ import { createProduct } from 'core/store/product-store';
 
 // ── 3) MOCK child components ────────────────────────────────────────────────
 
-// 3.1. Barrel @shared/ui: Input, Button, GalIcon
+// 3.1. Barrel @shared/ui: Input, Button, Icon
 jest.mock('@shared/ui', () => ({
   __esModule: true,
   Input: ({
@@ -89,7 +89,7 @@ jest.mock('@shared/ui', () => ({
       </button>
     );
   },
-  GalIcon: () => <span data-testid="gal-icon" />,
+  Icon: () => <span data-testid="icon" />,
 }));
 
 // 3.2. ProductTypeSelector: simple stub that can set type to COURSE
@@ -116,6 +116,13 @@ jest.mock('@features/product-form/product-type-selector', () => ({
         onClick={() => onChange('CONSULTATION')}
       >
         CONSULTATION
+      </button>
+      <button
+        data-testid="type-MEMBERSHIP"
+        style={{ fontWeight: value === 'MEMBERSHIP' ? 'bold' : 'normal' }}
+        onClick={() => onChange('MEMBERSHIP')}
+      >
+        MEMBERSHIP
       </button>
     </div>
   ),
@@ -310,6 +317,66 @@ describe('<CreateProductStepOne />', () => {
     expect(setShowRestMock).toHaveBeenCalledWith(true);
     // Loading reset to false
     expect(setShowLoadingMock).toHaveBeenCalledWith(false);
+
+    jest.useRealTimers();
+  });
+
+  it('creates Membership without initializing sections', async () => {
+    jest.useFakeTimers();
+
+    const fakeThunkSymbol = Symbol('fakeThunk');
+    mockedCreateProduct.mockReturnValue(fakeThunkSymbol as any);
+
+    fakeDispatch.mockImplementation((action) => {
+      expect(action).toBe(fakeThunkSymbol);
+      return {
+        unwrap: () =>
+          Promise.resolve({
+            id: 'membership-id-123',
+            type: 'MEMBERSHIP',
+          }),
+      };
+    });
+
+    const filledFormData: ProductDraft = {
+      ...baseFormData,
+      name: 'Founders Club',
+      type: 'MEMBERSHIP',
+      sections: undefined,
+    };
+
+    render(
+      <CreateProductStepOne
+        formData={filledFormData}
+        setField={setFieldMock}
+        errors={{}}
+        showRestOfForm={false}
+        userId="user-1"
+        setShowLoadingRestOfForm={setShowLoadingMock}
+        setShowRestOfForm={setShowRestMock}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('btn-continue'));
+
+    await act(async () => {
+      jest.advanceTimersByTime(500);
+    });
+
+    expect(mockedCreateProduct).toHaveBeenCalledWith({
+      name: 'Founders Club',
+      type: 'MEMBERSHIP',
+      userId: 'user-1',
+      status: 'DRAFT',
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(setFieldMock).toHaveBeenCalledWith('id', 'membership-id-123');
+    expect(setFieldMock).not.toHaveBeenCalledWith('sections', expect.anything());
+    expect(setShowRestMock).toHaveBeenCalledWith(true);
 
     jest.useRealTimers();
   });
