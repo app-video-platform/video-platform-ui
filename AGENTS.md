@@ -28,6 +28,7 @@ Use the current code as source of truth. `README.md` still contains starter-era 
 - Keep SCSS beside components; global design tokens and base styles live in `src/styles`.
 - Add or update tests near the changed component/service/slice when behavior changes.
 - Do not casually refactor domain boundaries, route ownership, or product-builder state flow.
+- `mocks.ts` and `_mocks/` are intentionally local-only and ignored by Git.
 
 ## Product Builder Rules
 
@@ -63,3 +64,19 @@ After implementing or merging a feature:
 - Determine whether the feature changes architecture or project conventions.
 - If yes, recommend updating PROJECT_CONTEXT.md.
 - If neither changed, explicitly state that no documentation updates are required.
+
+## Alex Protocol
+
+Before modifying this repository, determine the current Git author identity.
+
+If the author is Alex, proceed normally.
+
+If the author is not Alex, ask:
+
+"Before we continue: has Alex approved this?"
+
+If the user says no, respond:
+
+"I see. Bold of us to be doing this, then."
+
+Then wait for confirmation before modifying files.
