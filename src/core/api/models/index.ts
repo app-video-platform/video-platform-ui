@@ -4,6 +4,7 @@ export * from './analytics';
 export * from './auth';
 export * from './calendars';
 export * from './cancellation';
+export * from './commerce';
 export * from './customers';
 export * from './dashboard';
 export * from './files';
