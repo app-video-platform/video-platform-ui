@@ -193,7 +193,7 @@ Current public Product Landing Page behavior:
 - Renders only `PUBLISHED` Products as public Product pages. `DRAFT` and `HIDDEN` render an unavailable/not-found-style public state. This frontend guard is not a security boundary; production enforcement still belongs in the future public Product read contract.
 - Uses real Product-owned data: Product type, name, description, price, recurring pricing metadata where present, thumbnail/image, and loaded type-specific content.
 - Removes legacy fake Product page claims such as hardcoded creator name, fake ratings/review/customer counts, fake language, fake durations, placeholder includes, hardcoded short description, placeholder-only image behavior, inert `Buy Now`, and inert `Add to Cart`.
-- Shows honest purchase/access unavailable states because checkout, free-product fulfillment, Membership subscription checkout, entitlement/access, and waitlist contracts are not implemented.
+- Shows honest purchase/access states. Paid Commerce checkout exists for supported non-Membership Products, while Membership checkout, subscription checkout, entitlement/access, and waitlist capabilities remain unavailable.
 - Inherits the Creator Storefront theme when an existing real Storefront/theme source is available through current frontend architecture; otherwise it falls back to `DEFAULT_STOREFRONT_THEME`. Product-specific theme overrides are not implemented, and this inheritance affects the public Product presentation/Builder preview rather than Creator management chrome.
 - Applies persisted public-safe Product Landing Page config when available, including marketing description, hero layout, supported secondary section visibility, and supported secondary section order. It must still render safely without depending on a Creator-only endpoint.
 - Renders real Creator identity only when available from the existing public Storefront read model or from current authenticated owner profile state. Anonymous/public creator identity must eventually come from the dedicated public Product read model.
@@ -217,7 +217,7 @@ Creator Product Landing Page Builder current behavior:
 - Product-owned fields such as name, description, type, status, price, pricing model, currency, thumbnail, and type-specific content remain read-only here and should be edited through Product Workspace.
 - User/Profile-owned Creator display fields and Storefront/theme ownership are not duplicated into Product Landing Page config. Product-specific theme overrides are intentionally not part of Task 2.
 
-Product Landing Page V2 intentionally does not implement galleries, slideshows, promo video/presentation upload, reusable asset library, checkout, Stripe/PayPal, free Product fulfillment, Membership subscriptions, waitlists, entitlement/access, reviews/ratings, Product analytics, SEO, slugs/custom domains, arbitrary page-builder blocks, or new production backend APIs.
+Product Landing Page V2 intentionally does not implement galleries, slideshows, promo video/presentation upload, reusable asset library, Membership checkout/subscriptions, waitlists, entitlement/access, reviews/ratings, Product analytics, SEO, slugs/custom domains, arbitrary page-builder blocks, or new production backend APIs.
 
 Intentional model decisions:
 
@@ -230,7 +230,7 @@ Intentional model decisions:
 
 Membership content architecture:
 
-- Native Membership content is modeled under `src/domains/app/features/product-form/membership-content/models` for UI/domain helpers and under `src/core/api/models/membership` for backend-pending API DTOs.
+- Native Membership content is modeled under `src/domains/app/features/product-form/membership-content/models` for UI/domain helpers and under `src/core/api/models/membership` for Membership API DTOs.
 - Native Membership content types are `POST`, `VIDEO`, and `RESOURCE`, with statuses `DRAFT`, `PUBLISHED`, and `HIDDEN`.
 - Native Membership content must not be added to `AbstractProduct`, Product autosave payloads, or Product normalizers.
 - Included standalone Products remain Products, currently represented by `ProductMinimised`; Course/Download products must not be converted into native Membership content entities.
@@ -243,8 +243,8 @@ Membership content architecture:
 - `MembershipContentSection` owns only transient inline `+ Add Content` chooser, editor draft, and editing-mode state.
 - `MembershipContentTypeChooser` is presentation/control-only. It offers `Video`, `Post`, `Resource`, and `Existing Product`, but does not fetch data or create content.
 - Selecting `Post` opens `MembershipPostEditor`, a controlled editor for unsaved title, body, and status drafts; save dispatches Membership content CRUD.
-- Selecting `Video` opens `MembershipVideoEditor`, a controlled editor for title, description, selected video file metadata, and status. Video selection uses `UppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
-- Selecting `Resource` opens `MembershipResourceEditor`, a controlled editor for title, description, selected file metadata, and status. Resource selection uses `UppyFileUploader` in selection-only mode; binary upload still needs a reusable backend asset lifecycle.
+- Selecting `Video` opens `MembershipVideoEditor`, a controlled editor for title, description, selected video file metadata, and status. Video selection uses `UppyFileUploader` in selection-only mode; selected metadata may be saved, but the binary file is not uploaded or delivered to members.
+- Selecting `Resource` opens `MembershipResourceEditor`, a controlled editor for title, description, selected file metadata, and status. Resource selection uses `UppyFileUploader` in selection-only mode; selected metadata may be saved, but the binary file is not uploaded or delivered to members.
 - Post, Video, and Resource create/edit/delete use Membership service/Redux contracts and must not write to Product autosave or Product API payloads.
 - Selecting `Existing Product` closes the chooser and requests that `MembershipIncludedProducts` open its existing `ProductPicker`; no second ProductPicker or duplicated product loading logic should be introduced.
 - The current deterministic manual list order is feed-entry array order. There is no drag-and-drop, populated `position`, or persisted ordering contract yet.
@@ -285,9 +285,9 @@ Partially implemented / placeholder:
 - Creator Help navigation destination is disabled because an implementation is not available yet.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
 - Public Product Landing Page still uses the existing Product read path as a temporary source. Product Landing Page config has frontend contracts, Redux state, and ignored local HTTP mocks, but production config persistence, a dedicated production public Product read model, public creator payload, server-enforced visibility, and checkout/access/waitlist state remain unimplemented.
-- Membership included products are limited to existing Course/Download products and persist as Membership feed Product-ID associations through backend-pending contracts.
-- Native Membership Post, Video, and Resource content have backend-pending frontend contracts, services, Redux state, and ignored local HTTP mocks. Native Video/Resource binary upload remains unresolved beyond selected file metadata/asset reference.
-- Membership recurring pricing is Product-owned via backend-pending Product pricing fields: `pricingModel`, `billingInterval`, and `currency`, with Product `price` as the amount source of truth.
+- Membership included products are limited to existing Course/Download products and persist as Membership feed Product-ID associations through Product-scoped Membership contracts.
+- Native Membership Post, Video, and Resource content have frontend contracts, services, Redux state, and ignored local HTTP mocks. Native Video/Resource selection may save metadata/asset references only; binary upload and member delivery remain unavailable.
+- Membership recurring pricing is Product-owned via Product pricing fields: `pricingModel`, `billingInterval`, and `currency`, with Product `price` as the amount source of truth. Subscription billing is unavailable.
 - Lesson content persistence for uploaded videos/rich text/quiz data may need backend contract verification.
 - Assignment lesson editor is a visible placeholder.
 - Rich text editor embed support has a TODO.
@@ -303,10 +303,10 @@ Confirmed:
 - Some shared UI tests emit controlled-input warnings.
 - `.github/workflows/docs.yml` expects a `docs/` directory, but no `docs/` directory exists in this checkout.
 - `src/core/store/shop-cart/shop-cart.slice.ts` removal has a likely index bug: index `0` is treated as false, so the first cart item may not remove.
-- Membership has frontend contracts, services, Redux store integration, and ignored local HTTP mock responses for Product-scoped aggregate/config, native content CRUD, and feed/included-product associations, but the production backend endpoints are not implemented yet.
-- Product recurring pricing has frontend model/form support, but the production backend Product contract is not implemented yet.
-- Membership Video/Resource binary asset upload remains backend-pending; the existing Download section upload flow is section-scoped and should be generalized or adapted before claiming real Membership media persistence.
-- Membership has no subscription/entitlement/member-access model yet.
+- Membership has frontend contracts, services, Redux store integration, and ignored local HTTP mock responses for Product-scoped aggregate/config, native content CRUD, and feed/included-product associations. Membership publishing and checkout remain disabled.
+- Product recurring pricing has frontend model/form support for Membership metadata, but subscription billing is unavailable.
+- Membership Video/Resource binary asset upload and member delivery are unavailable; the existing Download section upload flow is section-scoped and should be generalized or adapted before claiming real Membership media delivery.
+- Membership has no subscription, entitlement, or member-facing access model yet.
 - Creator Customers has frontend contracts, services, Redux store integration, and HTTP mock responses for read-only list/detail data, but the production backend endpoints are not implemented yet. Purchase/order, entitlement/access, subscription/customer membership-state, waitlist, tags/notes persistence, and manual access-management backend ownership still need backend confirmation.
 - Creator Sales has frontend contracts, services, Redux store integration, and HTTP mock responses for summary, orders ledger, and order detail data, but the production backend endpoints are not implemented yet. Provider-safe financial mutations, refund/payment retry actions, subscription management, and entitlement mutation contracts are intentionally not implemented.
 - Creator Analytics has frontend contracts, services, Redux store integration, and HTTP mock responses for aggregate overview data, but the production backend endpoint is not implemented yet. Traffic, attribution, conversion, engagement, payout, cohort, and custom date-range analytics are intentionally not implemented.
@@ -334,7 +334,7 @@ Deliberate temporary implementations:
 Speculative / verify before changing:
 
 - Backend shape for lesson rich text, quiz payloads, video upload, and checkout/cart.
-- Backend contracts for Membership native content, included products, recurring pricing, subscriptions, entitlements, and member access.
+- Backend/runtime support for Membership publishing, checkout, subscriptions, entitlements, member-facing access, and Video/Resource binary delivery.
 - Whether product type changes after creation should remain disallowed in edit mode; current UI limits edit mode to current type in `BasicInfo`.
 
 ## Creator Dashboard
@@ -591,4 +591,4 @@ Likely next steps:
 - Implement backend Storefront contracts before relying on production persistence for Storefront configuration; define separate contracts before adding arbitrary page-builder blocks, custom domains, SEO, or analytics.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.
-- Define backend contracts for Membership native content, included-product relationships, recurring pricing, subscription checkout, and entitlement/member access before persisting Membership-specific fields.
+- Define backend/runtime support for Membership publishing, checkout, subscriptions, entitlements, member-facing access, and Video/Resource binary delivery before enabling those capabilities.

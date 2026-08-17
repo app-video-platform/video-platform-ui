@@ -39,8 +39,9 @@ Use the current code as source of truth. `README.md` still contains starter-era 
 - `COURSE` and `DOWNLOAD` are section-based. `CONSULTATION` uses consultation-specific details. `MEMBERSHIP` has its own builder path/content tab and must not fall into generic “non-consultation = section-based” logic.
 - Keep frontend draft state (`ProductDraft`, blank sections/lessons, local Membership UI state) separate from backend DTOs.
 - Do not include sections in product autosave snapshots; sections, lessons, and download files have separate APIs/autosave flows.
-- Membership included-product relationships are currently frontend-only. Recurring Membership pricing is currently frontend-only.
-- Unsupported Membership fields must not be invented in backend DTOs/API payloads. Do not introduce Membership persistence contracts without confirmed backend support.
+- Membership content, included-product relationships, feed metadata, and recurring-pricing metadata use the existing Product-scoped/frontend contracts; keep unsupported fields out of Product autosave payloads.
+- Membership publishing and checkout remain disabled. Subscriptions, entitlements, and member-facing Membership access are unavailable.
+- Membership Video/Resource selection may save metadata only; binary files are not uploaded or delivered to members.
 - Do not invent product-type-specific backend endpoints when generic `api/products/...` endpoints already exist.
 
 ## Validation Commands

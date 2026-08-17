@@ -8,7 +8,6 @@ import {
   MembershipFeedUpdateRequest,
 } from 'core/api/models';
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED
 export const getMembershipAggregateAPI = async (productId: string) => {
   const response = await httpClient.get<MembershipAggregate>(
     `api/products/${productId}/membership`,
@@ -18,7 +17,6 @@ export const getMembershipAggregateAPI = async (productId: string) => {
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED
 export const updateMembershipConfigAPI = async (
   productId: string,
   payload: MembershipConfigUpdateRequest,
@@ -32,7 +30,6 @@ export const updateMembershipConfigAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED
 export const createMembershipContentAPI = async (
   productId: string,
   payload: MembershipContentCreateRequest,
@@ -46,7 +43,6 @@ export const createMembershipContentAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED
 export const updateMembershipContentAPI = async (
   productId: string,
   contentId: string,
@@ -61,7 +57,6 @@ export const updateMembershipContentAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED
 export const deleteMembershipContentAPI = async (
   productId: string,
   contentId: string,
@@ -74,7 +69,6 @@ export const deleteMembershipContentAPI = async (
   return contentId;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED
 export const updateMembershipFeedAPI = async (
   productId: string,
   payload: MembershipFeedUpdateRequest,

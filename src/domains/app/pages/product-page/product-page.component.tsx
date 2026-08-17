@@ -134,6 +134,7 @@ const ProductPage: React.FC = () => {
   const numericPrice =
     loadedProduct?.price === 'free' ? 0 : Number(loadedProduct?.price ?? 0);
   const isFree = numericPrice === 0;
+  const isMembershipProduct = loadedProduct?.type === 'MEMBERSHIP';
   const isInCart = Boolean(loadedProduct?.id && cartIds.has(loadedProduct.id));
 
   const toSummary = (): ProductMinimised | null => {
@@ -245,6 +246,10 @@ const ProductPage: React.FC = () => {
       onClick={handleEnroll}
     >
       {enrolling ? 'Adding...' : 'Enroll for free'}
+    </Button>
+  ) : isMembershipProduct ? (
+    <Button type="button" variant="primary" disabled>
+      Membership checkout unavailable
     </Button>
   ) : (
     <div className="product-page__commerce-actions">

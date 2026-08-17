@@ -89,9 +89,7 @@ describe('<ProductHeader />', () => {
     ).toBeDisabled();
   });
 
-  it('keeps ready Membership Publish non-persistent and informational', () => {
-    const alertSpy = jest.spyOn(window, 'alert').mockImplementation();
-
+  it('keeps ready Membership Publish disabled and informational', () => {
     render(
       <ProductHeader
         formData={{ type: 'MEMBERSHIP', name: 'Founders Club' } as any}
@@ -113,13 +111,15 @@ describe('<ProductHeader />', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Publish' }));
+    expect(screen.getByRole('button', { name: 'Publish' })).toBeDisabled();
+    fireEvent.click(screen.getAllByRole('button')[0]);
 
-    expect(alertSpy).toHaveBeenCalledWith(
-      'Membership publishing will be enabled once Membership persistence is available.',
-    );
-
-    alertSpy.mockRestore();
+    expect(
+      screen.getByText(
+        'Membership publishing is not available yet. Content metadata can be saved, but ' +
+          'subscriptions, entitlements, and member access are unavailable.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('leaves non-Membership Publish rendering on the existing path', () => {

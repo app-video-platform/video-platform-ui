@@ -311,7 +311,7 @@ describe('<ProductPage />', () => {
     expect(screen.getByText('launch-calendar.pdf')).toBeInTheDocument();
   });
 
-  it('renders Membership recurring pricing and cart actions', async () => {
+  it('renders Membership recurring pricing with checkout disabled', async () => {
     mock.onGet('api/products/membership-1').reply(200, membershipProduct);
 
     renderProductPage('/app/product/membership-1/MEMBERSHIP');
@@ -319,8 +319,11 @@ describe('<ProductPage />', () => {
     expect(await screen.findByRole('heading', { name: 'Creator Lab Membership' }))
       .toBeInTheDocument();
     expect(screen.getAllByText('€19 / month').length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: 'Add to cart' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Buy now' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Membership checkout unavailable' }),
+    ).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'Add to cart' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Buy now' })).toBeNull();
   });
 
   it('renders representative Course content from loaded sections and lessons', async () => {

@@ -107,6 +107,13 @@ export const validatePaidCart = (
     };
   }
 
+  if (products.some((product) => product.type === 'MEMBERSHIP')) {
+    return {
+      valid: false,
+      message: 'Membership checkout is not available yet.',
+    };
+  }
+
   const productIds = products
     .map((product) => product.id)
     .filter((id): id is string => Boolean(id));

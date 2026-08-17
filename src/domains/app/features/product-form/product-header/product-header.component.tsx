@@ -68,7 +68,7 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
   });
   const isMembership = formData.type === 'MEMBERSHIP';
   const membershipPublishMessage =
-    'Membership publishing will be enabled once Membership persistence is available.';
+    'Membership publishing is not available yet. Content metadata can be saved, but subscriptions, entitlements, and member access are unavailable.';
   const handleMembershipPublishClick = () => {
     window.alert(membershipPublishMessage);
   };
@@ -168,7 +168,7 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
               <Button
                 type="button"
                 variant="primary"
-                disabled={!membershipReadiness?.canPublish}
+                disabled
                 onClick={handleMembershipPublishClick}
               >
                 Publish

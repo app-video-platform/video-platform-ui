@@ -95,6 +95,12 @@ describe('cart checkout utils', () => {
     ).toBe('Only published products can be checked out.');
   });
 
+  it('rejects Membership products before paid Commerce checkout', () => {
+    expect(
+      validatePaidCart([paidProduct({ type: 'MEMBERSHIP' })]).message,
+    ).toBe('Membership checkout is not available yet.');
+  });
+
   it('reuses the idempotency key for an unchanged cart and rotates it when the cart changes', () => {
     const randomUUID = mockCryptoRandomUUID(['key-a', 'key-b']);
 
