@@ -78,7 +78,7 @@ describe('StorefrontPublicPage', () => {
     ).toHaveAttribute('href', 'mailto:hello@maya.example.com');
   });
 
-  it('falls back to creator email when public email is absent in the public read model', () => {
+  it('does not fall back to creator login email when public email is absent', () => {
     render(
       <MemoryRouter>
         <StorefrontPublicPage
@@ -95,8 +95,8 @@ describe('StorefrontPublicPage', () => {
     );
 
     expect(
-      screen.getByRole('link', { name: 'login@maya.example.com' }),
-    ).toHaveAttribute('href', 'mailto:login@maya.example.com');
+      screen.queryByRole('link', { name: 'login@maya.example.com' }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders a graceful empty state when no products are published', () => {

@@ -63,6 +63,16 @@ describe('SidebarNav', () => {
     expect(screen.queryByRole('link', { name: /admin/i })).toBeNull();
   });
 
+  it('hides Creator-only operational routes for admins', () => {
+    renderSidebar([UserRole.ADMIN]);
+
+    expect(screen.queryByRole('link', { name: /customers/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /sales/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /analytics/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /storefront/i })).toBeNull();
+    expect(screen.getByRole('link', { name: /admin/i })).toBeInTheDocument();
+  });
+
   it('uses the Creator MVP navigation and omits removed marketplace items', () => {
     renderSidebar([UserRole.CREATOR]);
 

@@ -8,7 +8,6 @@ import {
 } from 'core/api/models';
 import { buildQueryString } from '../utils/query-string';
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Sales summary contract.
 export const getCreatorSalesSummaryAPI = async (
   query: CreatorSalesSummaryQuery = {},
 ): Promise<CreatorSalesSummary> => {
@@ -24,7 +23,6 @@ export const getCreatorSalesSummaryAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Orders ledger contract.
 export const getCreatorOrdersPageAPI = async (
   query: CreatorOrdersQuery = {},
 ): Promise<CreatorOrdersPage> => {
@@ -43,7 +41,6 @@ export const getCreatorOrdersPageAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Order detail contract.
 export const getCreatorOrderDetailAPI = async (
   orderId: string,
 ): Promise<SalesOrderDetail> => {

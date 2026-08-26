@@ -28,10 +28,27 @@ export interface SalesCustomerSummary {
 }
 
 export interface SalesProductSummary {
-  id?: string;
+  id: string;
   name: string;
   type: SalesProductType;
   thumbnailUrl?: string;
+}
+
+export type SalesAccessResultLabel =
+  | 'No access granted'
+  | 'Access granted'
+  | 'Access revoked';
+
+export interface SalesAccessResult {
+  state: SalesAccessState;
+  label: SalesAccessResultLabel;
+  detail?: string;
+}
+
+export interface CreatorSalesOrderItem {
+  product: SalesProductSummary;
+  amountCents: number;
+  access: SalesAccessResult;
 }
 
 export interface SalesRefundDetail {
@@ -66,7 +83,9 @@ export interface SalesOrderListItem {
   amountCents: number;
   currency: string;
   customer: SalesCustomerSummary;
-  product: SalesProductSummary;
+  items?: CreatorSalesOrderItem[];
+  product?: SalesProductSummary;
+  access?: SalesAccessResult;
 }
 
 export interface SalesOrderDetail extends SalesOrderListItem {
@@ -75,11 +94,6 @@ export interface SalesOrderDetail extends SalesOrderListItem {
   transactionId?: string;
   paymentDate?: string;
   summaryRows: SalesOrderSummaryRow[];
-  access: {
-    state: SalesAccessState;
-    label: string;
-    detail?: string;
-  };
   refund?: SalesRefundDetail;
   failure?: SalesFailureDetail;
   subscription?: SalesSubscriptionContext;

@@ -57,6 +57,7 @@ export const accessSourceLabel: Record<CustomerAccessSource, string> = {
   purchased: 'Purchased',
   membership: 'Membership',
   manual: 'Manual grant',
+  free: 'Free enrollment',
 };
 
 export const purchaseStatusLabel: Record<CustomerPurchaseStatus, string> = {

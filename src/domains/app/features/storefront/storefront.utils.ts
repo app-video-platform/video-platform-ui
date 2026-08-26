@@ -70,7 +70,7 @@ export const getProfileFromUser = (user?: User | null): StorefrontProfile => ({
   tagline: user?.taglineMission,
   bio: user?.bio,
   website: user?.website,
-  publicEmail: user?.publicEmail || user?.email,
+  publicEmail: user?.publicEmail,
   imageUrl: user?.imageUrl,
   socialLinks: user?.socialLinks,
 });
@@ -166,7 +166,7 @@ export const getStorefrontViewModelFromPublicStorefront = (
       tagline: storefront.creator.tagline,
       bio: storefront.creator.bio,
       website: storefront.creator.website,
-      publicEmail: storefront.creator.publicEmail || storefront.creator.email,
+      publicEmail: storefront.creator.publicEmail,
       imageUrl: storefront.creator.imageUrl,
       socialLinks: storefront.creator.socialLinks,
     },

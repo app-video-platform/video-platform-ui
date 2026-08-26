@@ -5,7 +5,6 @@ import {
 } from 'core/api/models';
 import { buildQueryString } from '../utils/query-string';
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Analytics overview contract.
 export const getCreatorAnalyticsOverviewAPI = async (
   query: CreatorAnalyticsOverviewQuery = {},
 ): Promise<CreatorAnalyticsOverview> => {

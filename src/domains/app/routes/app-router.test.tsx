@@ -120,6 +120,18 @@ describe('AppRouter role routing', () => {
     expect(screen.getByText('Customer detail')).toBeInTheDocument();
   });
 
+  it.each([
+    ['/customers', 'Customers list'],
+    ['/customers/cust-1', 'Customer detail'],
+    ['/sales', 'Sales'],
+    ['/analytics', 'Analytics'],
+    ['/storefront', 'Creator Storefront'],
+  ])('does not render Creator-only %s route for admins', (path, pageText) => {
+    renderRouter([UserRole.ADMIN], path);
+
+    expect(screen.queryByText(pageText)).toBeNull();
+  });
+
   it('renders the Product Overview route without colliding with Product Workspace routes', () => {
     renderRouter([UserRole.CREATOR], '/products/product-1');
 

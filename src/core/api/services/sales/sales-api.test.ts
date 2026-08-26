@@ -66,7 +66,14 @@ describe('sales-api', () => {
       amountCents: 1000,
       currency: 'EUR',
       customer: { name: 'Customer', email: 'customer@example.test' },
-      product: { name: 'Product', type: 'Course' },
+      product: { id: 'prod-1', name: 'Product', type: 'Course' },
+      items: [
+        {
+          product: { id: 'prod-1', name: 'Product', type: 'Course' },
+          amountCents: 1000,
+          access: { state: 'granted', label: 'Access granted' },
+        },
+      ],
       summaryRows: [],
       access: { state: 'granted', label: 'Access granted' },
     });

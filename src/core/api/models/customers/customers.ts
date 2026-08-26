@@ -13,7 +13,11 @@ export type CustomerMembershipState =
   | 'none';
 
 export type CustomerAccessStatus = 'active' | 'expired' | 'revoked';
-export type CustomerAccessSource = 'purchased' | 'membership' | 'manual';
+export type CustomerAccessSource =
+  | 'purchased'
+  | 'membership'
+  | 'manual'
+  | 'free';
 export type CustomerPurchaseStatus = 'paid' | 'refunded' | 'failed';
 
 export type CreatorCustomerProductType =

@@ -34,20 +34,36 @@ const baseOrders: SalesOrder[] = [
     orderedAt: '2026-08-10T14:32:00.000Z',
     status: 'paid',
     type: 'one-time',
-    amountCents: 14900,
+    amountCents: 19800,
     currency: 'EUR',
     customer: {
       id: 'cust-maya-johnson',
       name: 'Maya Johnson',
       email: 'maya.johnson@example.test',
     },
-    product: productGrowth,
+    items: [
+      {
+        product: productGrowth,
+        amountCents: 14900,
+        access: { state: 'granted', label: 'Access granted' },
+      },
+      {
+        product: launchToolkit,
+        amountCents: 4900,
+        access: {
+          state: 'revoked',
+          label: 'Access revoked',
+          detail: 'Refund removed access to the download package.',
+        },
+      },
+    ],
+    product: membershipLab,
     provider: 'Stripe',
     paymentMethod: 'Visa ending 4242',
     transactionId: 'pi_3QcreatorPaid124',
     paymentDate: '2026-08-10T14:32:00.000Z',
-    summaryRows: [{ label: 'Total', amountCents: 14900 }],
-    access: { state: 'granted', label: 'Access granted' },
+    summaryRows: [{ label: 'Total', amountCents: 19800 }],
+    access: { state: 'none', label: 'No access granted' },
   },
   {
     id: 'ORD-2026-00123',
@@ -224,8 +240,17 @@ const listItem = (order: SalesOrder): SalesOrderListItem => ({
   amountCents: order.amountCents,
   currency: order.currency,
   customer: order.customer,
+  items: order.items,
   product: order.product,
+  access: order.access,
 });
+
+const getOrderProducts = (order: SalesOrder) =>
+  order.items?.length
+    ? order.items.map((item) => item.product)
+    : order.product
+      ? [order.product]
+      : [];
 
 const getParam = (url: string, key: string) =>
   new URL(url, 'http://localhost').searchParams.get(key);
@@ -303,7 +328,8 @@ export const registerCreatorSalesTestMocks = (mock: MockAdapter) => {
         order.customer.name.toLowerCase().includes(search) ||
         order.customer.email.toLowerCase().includes(search);
       const matchesStatus = !status || order.status === status;
-      const matchesProduct = !product || order.product.id === product;
+      const matchesProduct = !product ||
+        getOrderProducts(order).some((item) => item.id === product);
       const generatedOrderNumber = order.id.startsWith('ORD-2026-000')
         ? Number(order.id.slice(-2))
         : null;

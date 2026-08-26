@@ -5,7 +5,6 @@ import {
   PublicStorefront,
 } from 'core/api/models';
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: public Storefront read-model contract.
 export const getPublicStorefrontAPI = async (
   creatorId: string,
 ): Promise<PublicStorefront> => {
@@ -17,7 +16,6 @@ export const getPublicStorefrontAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Storefront config contract.
 export const getCreatorStorefrontConfigAPI =
   async (): Promise<CreatorStorefrontConfig> => {
     const response = await httpClient.get<CreatorStorefrontConfig>(
@@ -28,7 +26,6 @@ export const getCreatorStorefrontConfigAPI =
     return response.data;
   };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Storefront config update contract.
 export const updateCreatorStorefrontConfigAPI = async (
   payload: CreatorStorefrontConfigUpdateRequest,
 ): Promise<CreatorStorefrontConfig> => {

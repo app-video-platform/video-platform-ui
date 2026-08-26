@@ -6,7 +6,6 @@ import {
 } from 'core/api/models';
 import { buildQueryString } from '../utils/query-string';
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Customers list contract.
 export const getCreatorCustomersPageAPI = async (
   query: CreatorCustomersQuery = {},
 ): Promise<CreatorCustomersPage> => {
@@ -24,7 +23,6 @@ export const getCreatorCustomersPageAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: creator Customer detail contract.
 export const getCreatorCustomerDetailAPI = async (
   customerId: string,
 ): Promise<CreatorCustomerDetail> => {

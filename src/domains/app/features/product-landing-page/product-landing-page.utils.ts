@@ -61,10 +61,11 @@ export const normalizeProductLandingPageConfig = (
   productId: string,
   config?: Partial<ProductLandingPageConfig> | null,
 ): ProductLandingPageConfig => {
-  const visibleSections = (
-    config?.visibleSections ??
-    DEFAULT_PRODUCT_LANDING_PAGE_CONFIG.visibleSections
-  ).filter((section): section is ProductLandingPageSectionId =>
+  const hasVisibleSections = Array.isArray(config?.visibleSections);
+  const visibleSectionSource = hasVisibleSections && config?.visibleSections
+    ? config.visibleSections
+    : DEFAULT_PRODUCT_LANDING_PAGE_CONFIG.visibleSections;
+  const visibleSections = visibleSectionSource.filter((section): section is ProductLandingPageSectionId =>
     PRODUCT_LANDING_PAGE_SECTIONS.includes(section as ProductLandingPageSectionId),
   );
   const orderedKnownSections = (
@@ -85,10 +86,7 @@ export const normalizeProductLandingPageConfig = (
     marketingDescription: config?.marketingDescription ?? '',
     heroLayout:
       config?.heroLayout ?? DEFAULT_PRODUCT_LANDING_PAGE_CONFIG.heroLayout,
-    visibleSections:
-      visibleSections.length > 0
-        ? visibleSections
-        : DEFAULT_PRODUCT_LANDING_PAGE_CONFIG.visibleSections,
+    visibleSections,
     sectionOrder,
     updatedAt: config?.updatedAt,
   };
@@ -205,8 +203,7 @@ const getProductLandingCreator = ({
       bio: publicStorefront.creator.bio,
       imageUrl: publicStorefront.creator.imageUrl,
       website: publicStorefront.creator.website,
-      publicEmail:
-        publicStorefront.creator.publicEmail ?? publicStorefront.creator.email,
+      publicEmail: publicStorefront.creator.publicEmail,
     };
   }
 

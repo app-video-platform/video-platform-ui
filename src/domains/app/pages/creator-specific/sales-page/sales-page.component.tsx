@@ -7,7 +7,12 @@ import { SiStatuspal } from 'react-icons/si';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Drawer, Input, Select, SelectOption, StatusBadge } from '@shared/ui';
-import { AppDispatch, SalesOrderDetail, SalesOrderListItem } from 'core/api/models';
+import {
+  AppDispatch,
+  CreatorSalesOrderItem,
+  SalesOrderDetail,
+  SalesOrderListItem,
+} from 'core/api/models';
 import {
   clearCurrentOrder,
   fetchCreatorOrderDetail,
@@ -28,6 +33,7 @@ import {
   formatSalesDateTime,
   formatSalesMoney,
   formatSalesShortDate,
+  getSalesOrderItems,
   orderStatusLabel,
   orderStatusTone,
   orderTypeLabel,
@@ -47,6 +53,12 @@ const trendSymbol: Record<string, string> = {
   down: '↓',
   flat: '—',
 };
+
+const accessStateTone = {
+  granted: 'success',
+  revoked: 'warning',
+  none: 'neutral',
+} as const;
 
 const SalesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -382,16 +394,11 @@ interface OrderLedgerRowProps {
 }
 
 const OrderLedgerRow: React.FC<OrderLedgerRowProps> = ({ order, onOpen }) => {
+  const items = getSalesOrderItems(order);
   const customerContent = (
     <>
       <span className="sales-ledger-row__primary">{order.customer.name}</span>
       <span>{order.customer.email}</span>
-    </>
-  );
-  const productContent = (
-    <>
-      <span className="sales-ledger-row__primary">{order.product.name}</span>
-      <span>{order.product.type}</span>
     </>
   );
 
@@ -420,16 +427,17 @@ const OrderLedgerRow: React.FC<OrderLedgerRowProps> = ({ order, onOpen }) => {
         )}
       </div>
 
-      <div className="sales-ledger-row__product">
-        {order.product.id ? (
-          <Link
-            to={appRoutes.productsOverview(order.product.id)}
-            aria-label={`Open ${order.product.name} product overview`}
-          >
-            {productContent}
-          </Link>
+      <div className="sales-ledger-row__product sales-order-items">
+        {items.length > 0 ? (
+          items.map((item, index) => (
+            <SalesOrderItemSummary
+              key={`${item.product.id}-${index}`}
+              item={item}
+              currency={order.currency}
+            />
+          ))
         ) : (
-          <span className="sales-ledger-row__stack">{productContent}</span>
+          <span className="sales-ledger-row__stack">No product data</span>
         )}
       </div>
 
@@ -462,6 +470,11 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
     return null;
   }
 
+  const items = getSalesOrderItems(order);
+  const membershipItem = items.find(
+    (item) => item.product.type === 'Membership',
+  );
+
   return (
     <Drawer
       open={open}
@@ -492,21 +505,20 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
           )}
         </DetailSection>
 
-        <DetailSection title="Product">
-          <div className="order-detail-product">
-            {order.product.thumbnailUrl && (
-              <img src={order.product.thumbnailUrl} alt="" aria-hidden="true" />
-            )}
-            <div>
-              <p className="order-detail__primary">{order.product.name}</p>
-              <p>{order.product.type}</p>
-              {order.product.id && (
-                <Link to={appRoutes.productsOverview(order.product.id)}>
-                  View product overview
-                </Link>
-              )}
+        <DetailSection title="Items">
+          {items.length > 0 ? (
+            <div className="order-detail-items">
+              {items.map((item, index) => (
+                <SalesOrderItemDetail
+                  key={`${item.product.id}-${index}`}
+                  item={item}
+                  currency={order.currency}
+                />
+              ))}
             </div>
-          </div>
+          ) : (
+            <p>No order items are available.</p>
+          )}
         </DetailSection>
 
         <DetailSection title="Payment">
@@ -530,16 +542,11 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
           />
         </DetailSection>
 
-        <DetailSection title="Access">
-          <p className="order-detail__primary">{order.access.label}</p>
-          {order.access.detail && <p>{order.access.detail}</p>}
-        </DetailSection>
-
         {order.subscription && (
           <DetailSection title="Subscription">
             <DefinitionList
               rows={[
-                ['Membership', order.product.name],
+                ['Membership', membershipItem?.product.name],
                 [
                   'Billing price',
                   `${formatSalesMoney(
@@ -564,7 +571,6 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                 ],
                 ['Refund date', formatSalesDateTime(order.refund.refundedAt)],
                 ['Reason', order.refund.reason],
-                ['Access result', order.access.label],
               ]}
             />
           </DetailSection>
@@ -583,6 +589,69 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
     </Drawer>
   );
 };
+
+const SalesOrderItemSummary: React.FC<{
+  item: CreatorSalesOrderItem;
+  currency: string;
+}> = ({ item, currency }) => {
+  const productLabel = (
+    <>
+      <span className="sales-ledger-row__primary">{item.product.name}</span>
+      <span>
+        {item.product.type} · {formatSalesMoney(item.amountCents, currency)}
+      </span>
+    </>
+  );
+
+  return (
+    <div className="sales-order-item">
+      {item.product.id ? (
+        <Link
+          to={appRoutes.productsOverview(item.product.id)}
+          aria-label={`Open ${item.product.name} product overview`}
+          className="sales-order-item__link"
+        >
+          {productLabel}
+        </Link>
+      ) : (
+        <span className="sales-ledger-row__stack">{productLabel}</span>
+      )}
+      <StatusBadge
+        label={item.access.label}
+        tone={accessStateTone[item.access.state]}
+        size="sm"
+      />
+    </div>
+  );
+};
+
+const SalesOrderItemDetail: React.FC<{
+  item: CreatorSalesOrderItem;
+  currency: string;
+}> = ({ item, currency }) => (
+  <article className="order-detail-product">
+    {item.product.thumbnailUrl && (
+      <img src={item.product.thumbnailUrl} alt="" aria-hidden="true" />
+    )}
+    <div>
+      <p className="order-detail__primary">{item.product.name}</p>
+      <p>
+        {item.product.type} · {formatSalesMoney(item.amountCents, currency)}
+      </p>
+      <StatusBadge
+        label={item.access.label}
+        tone={accessStateTone[item.access.state]}
+        size="sm"
+      />
+      {item.access.detail && <p>{item.access.detail}</p>}
+      {item.product.id && (
+        <Link to={appRoutes.productsOverview(item.product.id)}>
+          View product overview
+        </Link>
+      )}
+    </div>
+  </article>
+);
 
 const DetailSection: React.FC<{ title: string; children: React.ReactNode }> = ({
   title,
