@@ -95,6 +95,29 @@ describe('Creator Sales', () => {
     expect(within(ledger).getByText('Failed')).toBeInTheDocument();
   });
 
+  it('filters by a product that appears as a later item in a multi-product order', async () => {
+    renderSales();
+
+    await screen.findByText('56 orders');
+    fireEvent.change(screen.getByLabelText('Search customer, email, or order ID'), {
+      target: { value: 'maya.johnson' },
+    });
+    fireEvent.change(screen.getByLabelText('Filter orders by product'), {
+      target: { value: 'prod-launch-toolkit' },
+    });
+
+    expect(await screen.findByText('1 order')).toBeInTheDocument();
+    const openButton = screen.getByRole('button', {
+      name: 'Open ORD-2026-00124 order detail',
+    });
+    const row = openButton.closest('article');
+    expect(row).not.toBeNull();
+    expect(within(row as HTMLElement).getByText('Maya Johnson'))
+      .toBeInTheDocument();
+    expect(within(row as HTMLElement).getByText('Launch Toolkit'))
+      .toBeInTheDocument();
+  });
+
   it('filters by period and sorts by amount', async () => {
     renderSales();
 
@@ -145,7 +168,20 @@ describe('Creator Sales', () => {
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('Order #ORD-2026-00124')).toBeInTheDocument();
-    expect(screen.getByText('Access granted')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Items' })).toBeInTheDocument();
+    expect(screen.getAllByText('Creator Product Growth System').length)
+      .toBeGreaterThan(0);
+    expect(screen.getAllByText('Launch Toolkit').length).toBeGreaterThan(0);
+    expect(screen.getByRole('dialog')).toHaveTextContent('€149');
+    expect(screen.getByRole('dialog')).toHaveTextContent('€49');
+    expect(screen.getAllByText('Access granted').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Access revoked').length).toBeGreaterThan(0);
+    expect(
+      screen.getByText('Refund removed access to the download package.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Access' })).toBeNull();
+    expect(within(screen.getByRole('dialog')).queryByText('No access granted'))
+      .toBeNull();
     expect(
       screen.getByRole('link', { name: 'View customer' }),
     ).toHaveAttribute('href', '/app/customers/cust-maya-johnson');
@@ -187,6 +223,33 @@ describe('Creator Sales', () => {
     expect(within(dialog).getByText(/Retry scheduled/)).toBeInTheDocument();
   });
 
+  it('renders every multi-product order item in the ledger without using disagreeing compatibility fields', async () => {
+    renderSales();
+
+    const openButton = await screen.findByRole('button', {
+      name: 'Open ORD-2026-00124 order detail',
+    });
+    const row = openButton.closest('article');
+
+    expect(row).not.toBeNull();
+    expect(within(row as HTMLElement).getByText('Creator Product Growth System'))
+      .toBeInTheDocument();
+    expect(within(row as HTMLElement).getByText('Launch Toolkit'))
+      .toBeInTheDocument();
+    expect(within(row as HTMLElement).getByText('Course · €149'))
+      .toBeInTheDocument();
+    expect(within(row as HTMLElement).getByText('Download · €49'))
+      .toBeInTheDocument();
+    expect(within(row as HTMLElement).getByText('€198')).toBeInTheDocument();
+    expect(within(row as HTMLElement).getByText('Access granted'))
+      .toBeInTheDocument();
+    expect(within(row as HTMLElement).getByText('Access revoked'))
+      .toBeInTheDocument();
+    expect(within(row as HTMLElement).queryByText('Creator Systems Lab'))
+      .toBeNull();
+    expect(within(row as HTMLElement).queryByText('No access granted')).toBeNull();
+  });
+
   it('links customer and product identities from ledger rows', async () => {
     renderSales();
 
@@ -198,6 +261,19 @@ describe('Creator Sales', () => {
         name: 'Open Creator Product Growth System product overview',
       }),
     ).toHaveAttribute('href', '/app/products/prod-course-growth');
+  });
+
+  it('renders singular compatibility product and access fields when items are unavailable', async () => {
+    renderSales('/app/sales?order=ORD-2026-00123');
+
+    const dialog = await screen.findByRole('dialog');
+
+    expect(within(dialog).getByRole('heading', { name: 'Items' }))
+      .toBeInTheDocument();
+    expect(within(dialog).getAllByText('Creator Systems Lab').length)
+      .toBeGreaterThan(0);
+    expect(dialog).toHaveTextContent('Membership · €39');
+    expect(within(dialog).getByText('Access granted')).toBeInTheDocument();
   });
 
   it('renders honest unavailable state when the backend contract is missing', async () => {

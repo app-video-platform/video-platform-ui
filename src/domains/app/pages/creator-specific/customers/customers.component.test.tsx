@@ -196,6 +196,7 @@ describe('Creator Customers', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Access' }));
     expect(screen.getByRole('heading', { name: 'Access' })).toBeInTheDocument();
     expect(screen.getByText('Manual grant')).toBeInTheDocument();
+    expect(screen.getByText('Free enrollment')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Notes' }));
     expect(screen.getByRole('heading', { name: 'Notes' })).toBeInTheDocument();

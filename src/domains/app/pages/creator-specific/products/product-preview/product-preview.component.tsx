@@ -5,8 +5,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, StatusBadge, StatusBadgeTone } from '@shared/ui';
 import {
   AppDispatch,
+  hasRole,
   ProductStatus,
   RootState,
+  UserRole,
 } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import {
@@ -24,9 +26,12 @@ import {
 } from 'core/store/product-landing-page-store';
 import {
   fetchCreatorStorefrontConfig,
+  fetchPublicStorefront,
   selectCreatorStorefrontConfig,
   selectCreatorStorefrontConfigError,
   selectCreatorStorefrontConfigLoading,
+  selectPublicStorefrontByCreatorId,
+  selectPublicStorefrontLoading,
 } from 'core/store/storefront-store';
 import {
   getProductLandingPageViewModel,
@@ -52,8 +57,9 @@ const ProductPreview: React.FC = () => {
   const productLoading = useSelector(selectProductsLoading);
   const productError = useSelector(selectProductsError);
   const creatorStorefrontConfig = useSelector(selectCreatorStorefrontConfig);
-  const storefrontLoading = useSelector(selectCreatorStorefrontConfigLoading);
-  const storefrontError = useSelector(selectCreatorStorefrontConfigError);
+  const creatorStorefrontLoading = useSelector(selectCreatorStorefrontConfigLoading);
+  const creatorStorefrontError = useSelector(selectCreatorStorefrontConfigError);
+  const publicStorefrontLoading = useSelector(selectPublicStorefrontLoading);
   const landingPageConfig = useSelector((state: RootState) =>
     selectCreatorProductLandingPageConfigByProductId(state, productId),
   );
@@ -64,10 +70,17 @@ const ProductPreview: React.FC = () => {
     selectCreatorProductLandingPageConfigError,
   );
   const loadedProduct = product?.id === productId ? product : null;
-
-  useEffect(() => {
-    dispatch(fetchCreatorStorefrontConfig());
-  }, [dispatch]);
+  const isCreatorOwner = Boolean(
+    loadedProduct?.userId &&
+      user?.id === loadedProduct.userId &&
+      hasRole(user?.roles, UserRole.CREATOR),
+  );
+  const shouldUsePublicStorefront = Boolean(
+    loadedProduct?.userId && !isCreatorOwner,
+  );
+  const publicStorefront = useSelector((state: RootState) =>
+    selectPublicStorefrontByCreatorId(state, loadedProduct?.userId),
+  );
 
   useEffect(() => {
     dispatch(clearCurrentProduct());
@@ -78,6 +91,21 @@ const ProductPreview: React.FC = () => {
     }
   }, [dispatch, productId]);
 
+  useEffect(() => {
+    if (!loadedProduct?.userId) {
+      return;
+    }
+
+    if (isCreatorOwner) {
+      dispatch(fetchCreatorStorefrontConfig());
+      return;
+    }
+
+    if (!publicStorefront) {
+      dispatch(fetchPublicStorefront(loadedProduct.userId));
+    }
+  }, [dispatch, isCreatorOwner, loadedProduct, publicStorefront]);
+
   const viewModel = useMemo(() => {
     if (!loadedProduct) {
       return null;
@@ -86,10 +114,21 @@ const ProductPreview: React.FC = () => {
     return getProductLandingPageViewModel({
       product: loadedProduct,
       currentUser: user,
-      creatorStorefrontTheme: creatorStorefrontConfig?.theme,
+      publicStorefront: shouldUsePublicStorefront ? publicStorefront : undefined,
+      creatorStorefrontTheme: isCreatorOwner
+        ? creatorStorefrontConfig?.theme
+        : undefined,
       landingPageConfig,
     });
-  }, [creatorStorefrontConfig?.theme, landingPageConfig, loadedProduct, user]);
+  }, [
+    creatorStorefrontConfig?.theme,
+    isCreatorOwner,
+    landingPageConfig,
+    loadedProduct,
+    publicStorefront,
+    shouldUsePublicStorefront,
+    user,
+  ]);
 
   const handleBackToWorkspace = () => {
     if (loadedProduct?.id ?? productId) {
@@ -112,7 +151,11 @@ const ProductPreview: React.FC = () => {
     );
   }
 
-  const loadError = productError ?? landingPageConfigError ?? storefrontError;
+  const storefrontLoading = isCreatorOwner
+    ? creatorStorefrontLoading
+    : publicStorefrontLoading && shouldUsePublicStorefront && !publicStorefront;
+  const loadError = productError ?? landingPageConfigError ??
+    (isCreatorOwner ? creatorStorefrontError : null);
 
   if (
     ((productLoading || landingPageConfigLoading || storefrontLoading) &&

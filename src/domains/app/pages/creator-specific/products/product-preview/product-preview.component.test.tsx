@@ -8,7 +8,13 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 
 import httpClient from 'core/api/http-client';
-import { AbstractProduct, ProductStatus, UserRole } from 'core/api/models';
+import {
+  AbstractProduct,
+  ProductStatus,
+  PublicStorefront,
+  User,
+  UserRole,
+} from 'core/api/models';
 import authReducer from 'core/store/auth-store/auth.slice';
 import productLandingPageReducer from 'core/store/product-landing-page-store/product-landing-page.slice';
 import productReducer from 'core/store/product-store/product.slice';
@@ -52,7 +58,44 @@ const LocationProbe = () => {
   return <span data-testid="location">{location.pathname}</span>;
 };
 
-const renderPreview = (productId = 'draft-product') => {
+const publicStorefront: PublicStorefront = {
+  id: 'storefront-1',
+  creator: {
+    id: 'creator-1',
+    displayName: 'Maya Chen',
+    title: 'Creator strategist',
+    bio: 'Helps creators package useful products.',
+  },
+  featuredProductId: undefined,
+  products: [],
+  theme: {
+    appearance: 'LIGHT',
+    accentColor: '#0ea5e9',
+    typography: 'FRIENDLY',
+  },
+};
+
+const creatorUser: User = {
+  id: 'creator-1',
+  firstName: 'Maya',
+  lastName: 'Chen',
+  email: 'maya@example.test',
+  roles: [UserRole.CREATOR],
+  onboardingCompleted: true,
+  title: 'Creator strategist',
+  bio: 'Helps creators package useful products.',
+};
+
+const adminUser: User = {
+  id: 'admin-1',
+  firstName: 'Ada',
+  lastName: 'Admin',
+  email: 'admin@example.test',
+  roles: [UserRole.ADMIN],
+  onboardingCompleted: true,
+};
+
+const renderPreview = (productId = 'draft-product', authUser: User = creatorUser) => {
   const testStore = configureStore({
     reducer: {
       auth: authReducer,
@@ -62,16 +105,7 @@ const renderPreview = (productId = 'draft-product') => {
     },
     preloadedState: {
       auth: {
-        user: {
-          id: 'creator-1',
-          firstName: 'Maya',
-          lastName: 'Chen',
-          email: 'maya@example.test',
-          roles: [UserRole.CREATOR],
-          onboardingCompleted: true,
-          title: 'Creator strategist',
-          bio: 'Helps creators package useful products.',
-        },
+        user: authUser,
         loading: false,
         error: null,
         isUserLoggedIn: true,
@@ -184,6 +218,11 @@ describe('<ProductPreview />', () => {
     ).toBe(true);
     expect(
       mock.history.get.some((request) =>
+        request.url === 'api/creator/storefront',
+      ),
+    ).toBe(true);
+    expect(
+      mock.history.get.some((request) =>
         request.url === `api/products/${product.id}/landing-page`,
       ),
     ).toBe(false);
@@ -192,6 +231,59 @@ describe('<ProductPreview />', () => {
         request.url === 'api/storefronts/creator-1',
       ),
     ).toBe(false);
+  });
+
+  it('loads the Product owner public Storefront theme for Administrator preview', async () => {
+    const product = makeProduct('DRAFT');
+    mock.onGet(`api/products/${product.id}`).reply(200, product);
+    mock.onGet('api/storefronts/creator-1').reply(200, publicStorefront);
+
+    const { container } = renderPreview(product.id, adminUser);
+
+    expect(
+      await screen.findByRole('heading', { name: product.name }),
+    ).toBeInTheDocument();
+    expect(await screen.findByText('Maya Chen')).toBeInTheDocument();
+    expect(
+      mock.history.get.some((request) =>
+        request.url === 'api/creator/storefront',
+      ),
+    ).toBe(false);
+    expect(
+      mock.history.get.some((request) =>
+        request.url === 'api/storefronts/creator-1',
+      ),
+    ).toBe(true);
+
+    const landing = container.querySelector('.product-landing');
+    expect(landing).toHaveClass('product-landing--light');
+    expect(landing).toHaveClass('product-landing--type-friendly');
+    expect(landing).toHaveStyle('--product-landing-accent: #0ea5e9');
+  });
+
+  it('falls back to the default Storefront theme when Administrator public theme lookup fails', async () => {
+    const product = makeProduct('HIDDEN');
+    mock.onGet(`api/products/${product.id}`).reply(200, product);
+    mock.onGet('api/storefronts/creator-1').reply(404, {
+      message: 'Public Storefront unavailable.',
+    });
+
+    const { container } = renderPreview(product.id, adminUser);
+
+    expect(
+      await screen.findByRole('heading', { name: product.name }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Public Storefront unavailable.')).toBeNull();
+    expect(
+      mock.history.get.some((request) =>
+        request.url === 'api/creator/storefront',
+      ),
+    ).toBe(false);
+
+    const landing = container.querySelector('.product-landing');
+    expect(landing).toHaveClass('product-landing--dark');
+    expect(landing).toHaveClass('product-landing--type-modern');
+    expect(landing).toHaveStyle('--product-landing-accent: #ffbd41');
   });
 
   it('returns to the Product workspace from the preview wrapper', async () => {

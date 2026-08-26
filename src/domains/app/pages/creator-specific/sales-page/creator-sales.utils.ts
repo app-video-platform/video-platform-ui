@@ -2,7 +2,9 @@ import { SelectOption } from '@shared/ui';
 import { StatusBadgeTone } from '@shared/ui/status-badge';
 
 import {
+  CreatorSalesOrderItem,
   SalesOrder,
+  SalesOrderListItem,
   SalesOrderStatus,
   SalesOrderType,
   SalesProductType,
@@ -134,13 +136,33 @@ export const formatSalesDateTime = (value?: string) => {
   }).format(new Date(timestamp));
 };
 
+export const getSalesOrderItems = (
+  order: SalesOrder | SalesOrderListItem,
+): CreatorSalesOrderItem[] => {
+  if (order.items?.length) {
+    return order.items;
+  }
+
+  if (order.product && order.access) {
+    return [
+      {
+        product: order.product,
+        amountCents: order.amountCents,
+        access: order.access,
+      },
+    ];
+  }
+
+  return [];
+};
+
 export const getSalesProductOptions = (orders: SalesOrder[]): SelectOption[] => {
   const productMap = new Map<string, string>();
 
   orders.forEach((order) => {
-    if (order.product.id) {
-      productMap.set(order.product.id, order.product.name);
-    }
+    getSalesOrderItems(order).forEach((item) => {
+      productMap.set(item.product.id, item.product.name);
+    });
   });
 
   return Array.from(productMap.entries()).map(([value, label]) => ({
@@ -167,7 +189,10 @@ export const filterAndSortSalesOrders = (
     const matchesStatus =
       filterForm.status === 'all' || order.status === filterForm.status;
     const matchesProduct =
-      filterForm.product === 'all' || order.product.id === filterForm.product;
+      filterForm.product === 'all' ||
+      getSalesOrderItems(order).some(
+        (item) => item.product.id === filterForm.product,
+      );
 
     return matchesPeriod && matchesSearch && matchesStatus && matchesProduct;
   });

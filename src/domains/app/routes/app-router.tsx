@@ -125,7 +125,7 @@ const AppRouter: React.FC = () => (
         <Route
           path="customers"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR]}>
               <Outlet />
             </ProtectedRoute>
           }
@@ -137,7 +137,7 @@ const AppRouter: React.FC = () => (
         <Route
           path="sales"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR]}>
               <SalesPage />
             </ProtectedRoute>
           }
@@ -146,7 +146,7 @@ const AppRouter: React.FC = () => (
         <Route
           path="analytics"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR]}>
               <CreatorAnalytics />
             </ProtectedRoute>
           }
@@ -175,7 +175,7 @@ const AppRouter: React.FC = () => (
         <Route
           path="storefront"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.CREATOR, UserRole.ADMIN]}>
+            <ProtectedRoute allowedRoles={[UserRole.CREATOR]}>
               <CreatorStorefrontPage />
             </ProtectedRoute>
           }

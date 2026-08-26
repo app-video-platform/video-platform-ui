@@ -56,7 +56,7 @@ Local API mocks are maintained source under `src/core/api/_mocks.ts` and `src/co
 
 Shared mock state owns the current Creator identity and canonical Products, including Product CRUD, owner/user product queries, summaries, search, Product presentation media, Course/Download sections, Course lessons, and Download file metadata. Product thumbnail upload uses the existing Product image endpoint; thumbnail removal, gallery images, and Product promo video use narrow backend-pending Product media endpoints in local mocks. Download file uploads use the normal presign → direct upload → confirm flow, but mock presigned URLs use a local `mock-upload://download-section/...` protocol that the shared upload helper short-circuits in mock mode because direct `fetch` storage PUTs cannot be intercepted by Axios Mock Adapter. This simulates the upload protocol without binary persistence or a new production contract.
 
-Storefront, Product Landing Page, and Membership mocks remain backend-pending frontend contracts. Storefront config and public reads are stateful and derive Product identity from canonical Product mocks where appropriate. Product Landing Page config persists per Product ID with defaults for unsaved Products. Membership aggregate/config/content/feed mocks remain Product-scoped and must not be merged into generic Product DTOs.
+Dashboard, Sales, Customers, Analytics, Storefront, and Product Landing Page config/read APIs are backend-supported. Their local mocks remain deterministic development fallbacks under `REACT_APP_USE_MOCKS=true`. Storefront config and public reads are stateful and derive Product identity from canonical Product mocks where appropriate. Product Landing Page config persists per Product ID with defaults for unsaved Products. Membership aggregate/config/content/feed mocks remain Product-scoped and must not be merged into generic Product DTOs.
 
 Mock mode is intentionally strict: unmatched API requests return a local `501` with a clear “No local mock is registered” message instead of passing through to the real backend. Explicit exceptions should be registered as their own handlers. External Google OAuth is not simulated; calendar connect returns a mock-safe authorization URL placeholder rather than pretending to complete provider OAuth.
 
@@ -72,14 +72,15 @@ Creator/Admin management routes are visually and structurally separated from buy
 - Tablet/mobile Creator management retains the compact top bar with drawer navigation and the existing account dropdown trigger in that mobile top bar.
 - Product Overview routes (`/app/products/:productId`) render inside `CreatorAppShell` as Creator/Admin management inspection pages for individual Products.
 - Product Landing Page Builder routes (`/app/products/:productId/landing-page`) render inside `CreatorAppShell` and use route metadata to request sidebar collapse, matching the focused live-editing feel of Storefront Builder while remaining in Creator management IA.
-- Product private preview routes (`/app/products/:productId/preview`) are authenticated Creator/Admin management routes that render the shared customer-facing Product Landing Page presentation for Draft, Hidden, and Published Products. They are creator-only previews and must not be treated as public visibility.
+- Product private preview routes (`/app/products/:productId/preview`) are authenticated Creator/Admin management routes that render the shared customer-facing Product Landing Page presentation for Draft, Hidden, and Published Products. They are authenticated management previews and must not be treated as public visibility.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
 - Routes can request the Creator sidebar collapse through `collapseSidebarOnLoad` route metadata. Product edit routes and the Storefront Builder use this existing shell/sidebar behavior.
 - Marketplace/customer routes such as `/app/explore` still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
 
 Current Creator IA:
 
-- Functional management destinations: Dashboard (`/app`), Products (`/app/products`), Customers (`/app/customers`), Sales (`/app/sales`), Analytics (`/app/analytics`), Storefront (`/app/storefront`), Settings (`/app/settings`).
+- Functional Creator destinations: Dashboard (`/app`), Products (`/app/products`), Customers (`/app/customers`), Sales (`/app/sales`), Analytics (`/app/analytics`), Storefront (`/app/storefront`), Settings (`/app/settings`).
+- Sales, Customers, Analytics, and Storefront are Creator-only routes. Admins should not be routed to those surfaces because the corresponding backend endpoints intentionally return `403`.
 - Intentionally disabled sidebar destinations: Help (`/app/help`).
 - Admin appears as a utility route for admin users only.
 - Marketing, Messages, and Reviews are not part of the current Creator MVP navigation. Reviews code still exists under marketing/reviews services/features, but it is not exposed as a Creator IA destination.
@@ -307,8 +308,9 @@ Current Product Landing Page data boundary:
 - The public route, Creator builder, and private preview still use the existing Product service → `getProductById` thunk → Product Redux `currentProduct` path as a temporary frontend source for canonical Product data.
 - The shared presentation consumes a narrow Product Landing Page view model rather than Redux, route params, or raw Product service responses directly.
 - The route clears stale `currentProduct` before loading a route Product ID and only composes the landing page when the loaded Product ID matches the route ID.
-- Product Landing Page config is a narrow backend-pending domain under `src/core/api/models/product-landing-page`, `src/core/api/services/product-landing-page`, and `src/core/store/product-landing-page-store`. Current runtime path is Component → Redux thunk → Product Landing Page service → Axios → production backend or ignored local HTTP mock. Components must not branch directly on `REACT_APP_USE_MOCKS`.
-- Current service shapes are `GET api/products/:productId/landing-page` for public-safe config reads and `GET`/`PATCH api/creator/products/:productId/landing-page` for authenticated Creator reads/writes. Local ignored HTTP mocks support these endpoints under `REACT_APP_USE_MOCKS=true`; do not treat them as production backend implementation.
+- Product Landing Page config is a narrow backend-supported domain under `src/core/api/models/product-landing-page`, `src/core/api/services/product-landing-page`, and `src/core/store/product-landing-page-store`. Current runtime path is Component → Redux thunk → Product Landing Page service → Axios → production backend or ignored local HTTP mock. Components must not branch directly on `REACT_APP_USE_MOCKS`.
+- Current service shapes are `GET api/products/:productId/landing-page` for public-safe config reads and `GET`/`PATCH api/creator/products/:productId/landing-page` for authenticated Creator reads/writes. Local ignored HTTP mocks support these endpoints under `REACT_APP_USE_MOCKS=true` as development fallbacks.
+- Explicit `visibleSections: []` is preserved as an intentional empty selection; default sections are applied only when `visibleSections` is absent.
 - A dedicated public Product read model remains a future backend requirement. That future read model should provide public-safe Product fields, public Creator presentation, persisted landing-page configuration, public visibility enforcement, and checkout/access availability without requiring the buyer-facing route to orchestrate internal Product/User/Storefront reads.
 
 Current public Product Landing Page behavior:
@@ -325,8 +327,9 @@ Current private Product Preview behavior:
 
 - Route `/app/products/:productId/preview` is authenticated for Creator/Admin users and is launched from the Product Workspace Preview action.
 - Draft, Hidden, and Published Products can render in private preview once they have a Product ID. This does not make Draft/Hidden Products public.
-- The preview loads authenticated Product data, creator Product Landing Page config, Creator Storefront theme config, and current authenticated user profile data, then maps them into the shared `ProductLandingPage` view model.
-- The preview intentionally avoids public Product Landing Page config and public Storefront endpoints so preview availability is not coupled to customer/public visibility.
+- Creator-owner preview loads authenticated Product data, creator Product Landing Page config, Creator Storefront theme config, and current authenticated user profile data, then maps them into the shared `ProductLandingPage` view model.
+- Administrator preview uses the Product owner's public Storefront data/theme when available and falls back to defaults rather than calling the Creator-only Storefront endpoint.
+- The preview intentionally avoids public Product Landing Page config and avoids the Creator-only Storefront endpoint for non-owner previews so preview availability is not coupled to customer/public visibility or Admin access to Creator-only APIs.
 - The preview wrapper shows lifecycle status and a Back to workspace action. Loading, unavailable, and config/storefront load errors are handled in the wrapper rather than inside the shared landing-page presentation.
 
 Type-specific public summaries:
@@ -340,7 +343,7 @@ Creator Product Landing Page Builder current behavior:
 
 - Route `/app/products/:productId/landing-page` is authenticated for Creator/Admin users and is launched from Product Overview via `Edit landing page`.
 - The builder loads canonical Product data, loads the Product Landing Page config, creates a local draft, and maps Product + draft config + Creator/theme inputs into the shared `ProductLandingPage` preview.
-- Draft edits update the live preview immediately and do not PATCH individually. The `Save` action persists the full landing-page config through the backend-pending Creator config service; `Reset` restores the last persisted config/default normalization. Unsaved state is surfaced by enabled/disabled Save/Reset actions, save loading state, and success/error status copy.
+- Draft edits update the live preview immediately and do not PATCH individually. The `Save` action persists the full landing-page config through the backend-supported Creator config service; `Reset` restores the last persisted config/default normalization. Unsaved state is surfaced by enabled/disabled Save/Reset actions, save loading state, and success/error status copy.
 - Config owns only `marketingDescription`, `heroLayout` (`MEDIA_RIGHT`/`MEDIA_LEFT`), supported secondary-section visibility (`ABOUT`, `CONTENTS`, `CREATOR`), and supported secondary-section order for those IDs.
 - Current customization capabilities are limited to additional marketing/about copy, hero media side/layout, supported secondary-section visibility, and supported page-section order. The Builder reorders page sections, not Course modules, Download files, Consultation fields, or other Product content entities.
 - Desktop Builder customization uses a compact controls panel beside the live preview; mobile customization uses the shared `Drawer` infrastructure.
@@ -397,7 +400,7 @@ Implemented / reasonably wired:
 - Creator Storefront Builder at `/app/storefront`, where the shared public Storefront presentation is the live editing surface for profile fields, theme, featured product, and product ordering.
 - Public Storefront page at `/app/store/:creatorId` with creator identity/profile information, featured product when applicable, and a customer-facing published-product catalogue.
 - Public Product Landing Page V2 foundation at `/app/product/:id` with a shared public presentation, honest real Product data, frontend `PUBLISHED` visibility guard, Storefront/default theme inheritance, type-specific real-data summaries, and explicit unavailable purchase/access state.
-- Creator Product Landing Page Builder at `/app/products/:productId/landing-page` with shared `ProductLandingPage` live preview, local Save/Reset draft behavior, and backend-pending config contracts for marketing description, hero layout, and supported secondary-section visibility/order.
+- Creator Product Landing Page Builder at `/app/products/:productId/landing-page` with shared `ProductLandingPage` live preview, local Save/Reset draft behavior, and backend-supported config contracts for marketing description, hero layout, and supported secondary-section visibility/order.
 - Creator Private Product Preview at `/app/products/:productId/preview` with shared `ProductLandingPage` rendering for Draft, Hidden, and Published Products behind Creator/Admin auth, while the public Product route remains `PUBLISHED`-guarded.
 - Product create/edit builder for course/download/consultation/membership basics.
 - Product Workspace Phase 1 shell/navigation redesign with lifecycle status, autosave/pending-save feedback, Product-type-aware Readiness destination, Preview/Publish foundations, and create-to-edit route replacement after Draft creation.
@@ -420,7 +423,7 @@ Partially implemented / placeholder:
 
 - Creator Help navigation destination is disabled because an implementation is not available yet.
 - Cart/wishlist exist mostly frontend-side/localStorage; persistence/checkout contract is not clearly backend-backed.
-- Public Product Landing Page still uses the existing Product read path as a temporary source. Product Landing Page config has frontend contracts, Redux state, and ignored local HTTP mocks, but production config persistence, a dedicated production public Product read model, public creator payload, server-enforced visibility, and checkout/access/waitlist state remain unimplemented.
+- Public Product Landing Page still uses the existing Product read path as a temporary source. Product Landing Page config has backend-supported frontend contracts, Redux state, and ignored local HTTP mocks, but a dedicated production public Product read model, public creator payload, server-enforced visibility, and waitlist state remain unimplemented.
 - Membership included products are limited to existing Course/Download products and persist as Membership feed Product-ID associations through Product-scoped Membership contracts.
 - Native Membership Post, Video, and Resource content have frontend contracts, services, Redux state, and ignored local HTTP mocks. Native Video/Resource selection may save metadata/asset references only; binary upload and member delivery remain unavailable.
 - Membership recurring pricing is Product-owned via Product pricing fields: `pricingModel`, `billingInterval`, and `currency`, with Product `price` as the amount source of truth. Subscription billing is unavailable.
@@ -445,17 +448,17 @@ Confirmed:
 - Product recurring pricing has frontend model/form support for Membership metadata, but subscription billing is unavailable.
 - Membership Video/Resource binary asset upload and member delivery are unavailable; the existing Download section upload flow is section-scoped and should be generalized or adapted before claiming real Membership media delivery.
 - Membership has no subscription, entitlement, or member-facing access model yet.
-- Creator Customers has frontend contracts, services, Redux store integration, and HTTP mock responses for read-only list/detail data, but the production backend endpoints are not implemented yet. Purchase/order, entitlement/access, subscription/customer membership-state, waitlist, tags/notes persistence, and manual access-management backend ownership still need backend confirmation.
-- Creator Sales has frontend contracts, services, Redux store integration, and HTTP mock responses for summary, orders ledger, and order detail data, but the production backend endpoints are not implemented yet. Provider-safe financial mutations, refund/payment retry actions, subscription management, and entitlement mutation contracts are intentionally not implemented.
-- Creator Analytics has frontend contracts, services, Redux store integration, and HTTP mock responses for aggregate overview data, but the production backend endpoint is not implemented yet. Traffic, attribution, conversion, engagement, payout, cohort, and custom date-range analytics are intentionally not implemented.
-- Creator Storefront has frontend contracts, services, Redux store integration, and HTTP mock responses for the public read model and Creator configuration, but the production backend endpoints are not implemented yet. Storefront theme/config fields are frontend-wired through the backend-pending Storefront contracts; arbitrary page-builder blocks, custom-domain, SEO, and Storefront analytics contracts are intentionally not implemented.
+- Creator Customers has backend-supported frontend contracts, services, Redux store integration, and HTTP mock responses for read-only list/detail data. Editable CRM actions, notes/tags persistence, and manual access-management contracts are intentionally not implemented.
+- Creator Sales has backend-supported frontend contracts, services, Redux store integration, and HTTP mock responses for summary, orders ledger, and order detail data. Provider-safe financial mutations, refund/payment retry actions, subscription management, and entitlement mutation contracts are intentionally not implemented.
+- Creator Analytics has backend-supported frontend contracts, services, Redux store integration, and HTTP mock responses for aggregate overview data. Traffic, attribution, conversion, engagement, payout, cohort, and custom date-range analytics are intentionally not implemented.
+- Creator Storefront has backend-supported frontend contracts, services, Redux store integration, and HTTP mock responses for the public read model and Creator configuration. Arbitrary page-builder blocks, custom-domain, SEO, and Storefront analytics contracts are intentionally not implemented.
 
 Deliberate temporary implementations:
 
 - `REACT_APP_USE_MOCKS` can load ignored local `src/core/api/_mocks.ts`.
 - `REACT_APP_USE_MOCKS=true` also enables deterministic Creator visual-inspection data for authenticated Creator identity, Products, Dashboard, Analytics, Storefront, and Membership. Customers, Sales, Analytics, Dashboard, Storefront, and Membership use Redux/services/Axios and receive deterministic data from ignored local HTTP mocks rather than feature-level fixture branches. Production must not fake unsupported Creator business metrics, customer records, sales/order/payment records, analytics aggregates, storefront configuration, membership content/feed state, or customer-domain states.
 - Blank section/lesson drafts exist locally until enough data is present for backend creation.
-- Creator Dashboard uses a frontend contract, service, Redux store integration, and ignored local HTTP mock response for the aggregate summary. When the backend contract is unavailable, Dashboard metric panels intentionally render unavailable business states rather than fabricated values.
+- Creator Dashboard uses a backend-supported frontend contract, service, Redux store integration, and ignored local HTTP mock response for the aggregate summary.
 - Creator product identity navigation now prefers Product Overview (`/app/products/{productId}`), with explicit editing/building actions kept on Product Workspace (`/app/products/edit/{productId}`).
 - Creator Products inspection fixtures currently come through ignored local mock data in `src/core/api/_mocks.ts` when mocks are enabled.
 - Creator Customers runtime data path is Component → Redux → thunk → Customer service → Axios → backend or ignored local HTTP mock; components do not branch on `REACT_APP_USE_MOCKS`.
@@ -492,8 +495,8 @@ Implemented Dashboard concepts:
 
 Important data rule:
 
-- The Dashboard is an aggregate read model. Metrics/business states not yet supported by production APIs may be represented only by deterministic development-only HTTP mock data when `REACT_APP_USE_MOCKS=true`.
-- Production must not fake those values. With mocks off or when the backend contract is unavailable, the dashboard renders unavailable states.
+- The Dashboard is a backend-supported aggregate read model for the currently implemented summary metrics, recent activity, top products, and needs-attention panels.
+- Do not invent Dashboard metrics or business states beyond the current read model. Local deterministic data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`.
 
 ## Creator Sales Management
 
@@ -523,16 +526,17 @@ Current Sales domain model:
 - Order statuses represented by the frontend are `Paid`, `Failed`, `Refunded`, and `Pending`.
 - Order types represented by the frontend are `One-time`, `Subscription`, and `Renewal`.
 - Refunds are represented as status/context on the original order, not as a separate Creator-facing refund entity or refund ledger.
-- The Order Detail drawer is read-only. It can show order amount/type/date, customer, product, payment facts, order summary, access outcome, subscription context, refund context, and failed-payment context when fixture data contains those fields.
+- Sales Orders support authoritative multi-Product `items[]`; each item carries Product identity, line amount, and its own access result.
+- Singular `product` and top-level `access` are compatibility fields only. When `items[]` is present, Sales list/detail UI renders the item list rather than merging or trusting stale singular fields.
+- The Order Detail drawer is read-only. It can show order amount/type/date, customer, itemized products, payment facts, order summary, item access outcomes, subscription context, refund context, and failed-payment context when data contains those fields.
 - Sales explains access consequences but does not expose entitlement grant/revoke controls.
 - Sales shows subscription context for recurring Membership charges but does not expose subscription-management actions.
 - Sales does not currently include charts, analytics, payouts, invoices, tax reporting, disputes, export tooling, refunds-as-actions, manual retries, or provider administration.
 
 Important Sales boundary:
 
-- Current Sales read data flows through frontend contracts/services/Redux and Axios. Local deterministic data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`.
-- The current frontend defines backend-pending read contracts for Sales summary, Orders page, and Order detail, but does not define provider-safe financial mutations, refund/payment retry actions, subscription management, or entitlement mutation contracts.
-- With mocks off or when backend contracts are unavailable, Sales renders an unavailable state rather than fabricated financial data.
+- Current Sales read data flows through backend-supported frontend contracts/services/Redux and Axios. Local deterministic data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`.
+- The current frontend defines read contracts for Sales summary, Orders page, and Order detail, but does not define provider-safe financial mutations, refund/payment retry actions, subscription management, or entitlement mutation contracts.
 - Do not introduce production APIs or financial mutation behavior merely to support the current inspection UI.
 
 ## Creator Analytics
@@ -542,7 +546,7 @@ The Creator Analytics area is implemented under `src/domains/app/pages/creator-s
 Routes and shell integration:
 
 - Analytics workspace: `/app/analytics`.
-- The route is protected for Creator/Admin users.
+- The route is protected for Creator users only.
 - Analytics is part of the Creator management navigation and renders inside `CreatorAppShell`.
 
 Current Analytics page patterns:
@@ -567,19 +571,18 @@ Current Analytics architecture:
 
 Important Analytics boundary:
 
-- Current Analytics read data flows through a frontend contract/service/Redux and Axios. Local deterministic data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`.
-- The current frontend defines a backend-pending read contract for `api/creator/analytics/overview` with 7d/30d/90d period queries.
+- Current Analytics read data flows through a backend-supported frontend contract/service/Redux and Axios. Local deterministic data exists only behind ignored HTTP mocks when `REACT_APP_USE_MOCKS=true`.
+- The current frontend defines the `api/creator/analytics/overview` read contract with 7d/30d/90d period queries. Backend confirmed no Analytics response-shape changes are required for the current UI.
 - Mock totals and comparisons are local visual-inspection values and are not product contracts. Do not preserve specific mock revenue/order/customer/membership numbers as meaningful behavior in documentation or tests unless a test is explicitly covering deterministic inspection rendering.
-- With mocks off or when the backend contract is unavailable, Analytics renders an unavailable state rather than fabricated analytics data.
 - Do not infer traffic, conversion, attribution, payout, tax, course-engagement, cohort, custom date-range, or other analytics capabilities from the current page.
 
 ## Creator Storefront
 
-Storefront V2 is split between an authenticated Creator/Admin Storefront Builder and a public customer-facing Storefront. Both routes share Storefront view-model utilities and the `StorefrontPublicPage` presentation under `src/domains/app/features/storefront`.
+Storefront V2 is split between an authenticated Creator-only Storefront Builder and a public customer-facing Storefront. Both routes share Storefront view-model utilities and the `StorefrontPublicPage` presentation under `src/domains/app/features/storefront`.
 
 Routes and shell integration:
 
-- Creator/Admin Storefront Builder: `/app/storefront`.
+- Creator-only Storefront Builder: `/app/storefront`.
 - Public buyer-facing Storefront route: `/app/store/:creatorId`.
 - Legacy `/app/my-page-preview` redirects to `/app/storefront`; the old `user-page-preview` implementation has been removed.
 - Storefront Builder renders inside `CreatorAppShell`, and the `/app/storefront` route uses `collapseSidebarOnLoad` route metadata so the Creator sidebar collapses with the same shell/sidebar pattern used by builder-style routes.
@@ -593,7 +596,7 @@ Current Storefront Builder patterns:
 - Public-facing profile fields are editable inline where implemented: display name, title, tagline, bio, website, and public email. Inline editors use edit buttons, Save/Cancel actions, existing shared input/textarea/button/popover primitives, and `updateUserDetails` from the Auth/User profile flow.
 - Avatar/image inline editing is not implemented. The Settings image UI does not currently expose a clean reusable persisted upload flow for Storefront Builder to reuse.
 - Public profile information reuses existing User/Profile fields instead of introducing a separate Storefront profile model. Storefront config must not duplicate display name, title, tagline, bio, website, image, social links, or public email.
-- `publicEmail` is User/Profile-owned. The Storefront view model uses `publicEmail` when set and falls back to the login email when no separate public email is configured. Settings and Storefront share the same public-email concept and the same info-popover copy: "This is the email shown on your storefront. It can be different from the email you use to sign in."
+- `publicEmail` is User/Profile-owned. The Storefront view model exposes email only when `publicEmail` is explicitly configured; login/account email is not used as a public fallback. Settings and Storefront share the same public-email concept and the same info-popover copy: "This is the email shown on your storefront. It can be different from the email you use to sign in."
 - Storefront-owned configuration is edited as one local draft containing `theme`, `featuredProductId`, and `productOrderIds`.
 - Theme, featured-product, and ordering changes update the rendered builder immediately but do not PATCH individually.
 - `Save changes` persists the full draft Storefront config through `PATCH api/creator/storefront`; `Reset changes` restores the last persisted Redux config.
@@ -621,8 +624,8 @@ Current public Storefront patterns:
 
 Current Storefront data boundary:
 
-- The public Storefront route uses the backend-pending `api/storefronts/:creatorId` read-model contract through Redux/services/Axios. The backend should return public creator presentation fields, public products, featured product ID, and persisted theme rather than requiring the buyer-facing page to orchestrate User, Product, and Storefront config requests.
-- Creator Storefront Builder uses the backend-pending `api/creator/storefront` config contract through Redux/services/Axios. The config owns only `theme`, `featuredProductId`, and `productOrderIds`.
+- The public Storefront route uses the backend-supported `api/storefronts/:creatorId` read-model contract through Redux/services/Axios. The backend returns public creator presentation fields, public products, featured product ID, and persisted theme so the buyer-facing page does not orchestrate User, Product, and Storefront config requests.
+- Creator Storefront Builder uses the backend-supported `api/creator/storefront` config contract through Redux/services/Axios. The config owns only `theme`, `featuredProductId`, and `productOrderIds`, and the route remains Creator-only because the backend intentionally returns `403` for Admin callers.
 - Storefront service functions live under `src/core/api/services/storefront`, thunks/state live in `src/core/store/storefront-store/storefront.slice.ts`, and selectors are intentionally kept in `src/core/store/storefront-store/storefront.selectors.ts`.
 - Product remains the owner of catalogue/product data, statuses, prices, thumbnails, and public visibility eligibility.
 - User/Profile remains the owner of public profile identity and contact fields, including `publicEmail`.
@@ -680,11 +683,12 @@ Current Customer Detail patterns:
 
 Important customer-domain boundary:
 
-- Purchases, Access, Notes, tags, waitlist information, spend/order values, membership customer state, and other customer-domain business data are currently deterministic inspection fixtures, not production-backed Creator customer APIs.
+- Creator Customers read APIs are backend-supported for the current list/detail surfaces.
+- Customer access can include `free` access source values, displayed as `Free enrollment`.
 - Access state must not imply grant/revoke controls until backend access-management contracts exist.
 - Notes/tags must not imply editable CRM persistence until a notes/tags API exists.
 - Do not infer fake CRM actions, fake communication features, fake persistence, fake access management, or speculative customer operations from the UI.
-- Customer fixtures are gated behind `REACT_APP_USE_MOCKS=true`; production must not fabricate unsupported Customer business data.
+- Local deterministic Customer fixtures are gated behind `REACT_APP_USE_MOCKS=true`; production must not fabricate unsupported Customer business data.
 
 Reusable Customers-local patterns include `CustomerAvatar`, `CustomerStatusBadge`, `CustomerManagementRow`, and customer formatting/filtering utilities in `creator-customers.utils.ts`. Keep these Customer-specific unless another area has a concrete need; do not introduce a generalized CRM/data-grid layer prematurely.
 
@@ -725,8 +729,8 @@ Recent Git history includes admin role/product ownership work, Membership fronte
 Likely next steps:
 
 - Polish/fix admin product owner filtering UX beyond raw owner ID.
-- Define the production public Product read model and Product Landing Page config persistence so `/app/product/:id` can stop orchestrating internal Product/User/Storefront reads and can rely on server-enforced public visibility.
-- Implement backend Storefront contracts before relying on production persistence for Storefront configuration; define separate contracts before adding arbitrary page-builder blocks, custom domains, SEO, or analytics.
+- Define the production public Product read model so `/app/product/:id` can stop orchestrating internal Product/User/Storefront reads and can rely on server-enforced public visibility.
+- Define separate Storefront contracts before adding arbitrary page-builder blocks, custom domains, SEO, or analytics.
 - Fix known warnings and cart removal bug.
 - Verify product builder contracts for lesson content, quiz persistence, media upload, and consultation scheduling.
 - Define backend/runtime support for Membership publishing, checkout, subscriptions, entitlements, member-facing access, and Video/Resource binary delivery before enabling those capabilities.

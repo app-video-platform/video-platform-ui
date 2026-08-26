@@ -4,7 +4,6 @@ import {
   ProductLandingPageConfigUpdateRequest,
 } from 'core/api/models';
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: public Product Landing Page config.
 export const getPublicProductLandingPageConfigAPI = async (
   productId: string,
 ): Promise<ProductLandingPageConfig> => {
@@ -15,7 +14,6 @@ export const getPublicProductLandingPageConfigAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: Creator Product Landing Page config.
 export const getCreatorProductLandingPageConfigAPI = async (
   productId: string,
 ): Promise<ProductLandingPageConfig> => {
@@ -27,7 +25,6 @@ export const getCreatorProductLandingPageConfigAPI = async (
   return response.data;
 };
 
-// BACKEND CONTRACT NOT YET IMPLEMENTED: Creator Product Landing Page config update.
 export const updateCreatorProductLandingPageConfigAPI = async (
   productId: string,
   payload: ProductLandingPageConfigUpdateRequest,

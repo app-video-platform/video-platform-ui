@@ -62,6 +62,14 @@ const customers: CreatorCustomer[] = [
         source: 'manual',
         grantedAt: '2026-07-15T09:00:00.000Z',
       },
+      {
+        id: 'access-maya-product-growth',
+        productName: 'Creator Product Growth System',
+        productType: 'Course',
+        status: 'active',
+        source: 'free',
+        grantedAt: '2026-08-10T14:32:00.000Z',
+      },
     ],
     notes: [
       {

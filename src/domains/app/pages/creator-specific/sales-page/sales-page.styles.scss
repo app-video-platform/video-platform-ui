@@ -201,6 +201,24 @@
   }
 }
 
+.sales-order-items {
+  display: grid;
+  gap: $spacing-2;
+  min-width: 0;
+}
+
+.sales-order-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: $spacing-2;
+  align-items: center;
+  min-width: 0;
+
+  &__link {
+    min-width: 0;
+  }
+}
+
 .sales-state {
   display: flex;
   min-height: 18rem;
@@ -331,6 +349,11 @@
     min-width: 0;
     gap: $spacing-1;
   }
+}
+
+.order-detail-items {
+  display: grid;
+  gap: $spacing-3;
 }
 
 .order-detail-definition-list {
@@ -490,6 +513,10 @@
       grid-area: type;
       padding: 0;
     }
+  }
+
+  .sales-order-item {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
