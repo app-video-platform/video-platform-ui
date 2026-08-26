@@ -5,6 +5,7 @@ import { AppDispatch, ProductMinimised, ProductType } from 'core/api/models';
 import {
   getProductSummariesByOwner,
 } from 'core/store/product-store';
+import { Drawer } from '@shared/ui';
 import { ProductPicker } from '../product-picker';
 import MembershipContentList from './membership-content-list.component';
 import {
@@ -30,15 +31,16 @@ interface MembershipIncludedProductsProps {
   productPickerRequest?: number;
   isContentListHidden?: boolean;
   // eslint-disable-next-line no-unused-vars
-  onAddProducts: (productIds: string[], addedAt: string) => void;
+  onAddProducts: (productIds: string[], addedAt: string) => Promise<void> | void;
   // eslint-disable-next-line no-unused-vars
-  onRemoveProduct: (productId?: string) => void;
+  onRemoveProduct: (productId?: string) => Promise<void> | void;
   // eslint-disable-next-line no-unused-vars
-  onMoveFeedEntry: (entryId: string, direction: 'UP' | 'DOWN') => void;
+  onMoveFeedEntry: (entryId: string, direction: 'UP' | 'DOWN') => Promise<void> | void;
   // eslint-disable-next-line no-unused-vars
   onEditContent?: (contentId: string) => void;
   // eslint-disable-next-line no-unused-vars
-  onDeleteContent?: (contentId: string) => void;
+  onDeleteContent?: (contentId: string) => Promise<void> | void;
+  onAddContent?: () => void;
 }
 
 const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
@@ -59,9 +61,12 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
   onMoveFeedEntry,
   onEditContent,
   onDeleteContent,
+  onAddContent,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [pickerError, setPickerError] = useState<string | null>(null);
+  const [isAddingProducts, setIsAddingProducts] = useState(false);
   const previousProductPickerRequest = useRef(0);
   const includedProductIds = includedProductEntries.map(
     (entry) => entry.productId,
@@ -95,9 +100,22 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
       product.id !== currentProductId,
   ).length;
 
-  const handleConfirmProducts = (selectedIds: string[]) => {
-    onAddProducts(selectedIds, new Date().toISOString());
-    setIsPickerOpen(false);
+  const handleConfirmProducts = async (selectedIds: string[]) => {
+    setPickerError(null);
+    setIsAddingProducts(true);
+
+    try {
+      await onAddProducts(selectedIds, new Date().toISOString());
+      setIsPickerOpen(false);
+    } catch (error) {
+      setPickerError(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Product inclusion failed. Try again.',
+      );
+    } finally {
+      setIsAddingProducts(false);
+    }
   };
 
   return (
@@ -123,6 +141,7 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
           onMoveFeedEntry={onMoveFeedEntry}
           onEditContent={onEditContent}
           onDeleteContent={onDeleteContent}
+          onAddContent={onAddContent}
         />
       )}
 
@@ -132,7 +151,22 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
         </p>
       )}
 
-      {isPickerOpen && (
+      <Drawer
+        open={isPickerOpen}
+        title="Include existing Products"
+        onClose={() => setIsPickerOpen(false)}
+        closeLabel="Close Product picker"
+        className="membership-content-drawer"
+      >
+        <p className="membership-included-products__picker-help">
+          Choose Courses or Downloads to include with this Membership. The
+          original Products remain separate.
+        </p>
+        {pickerError && (
+          <p className="membership-content-editor__error" role="alert">
+            {pickerError}
+          </p>
+        )}
         <ProductPicker
           products={productSummaries ?? []}
           selectedIds={[]}
@@ -142,8 +176,10 @@ const MembershipIncludedProducts: React.FC<MembershipIncludedProductsProps> = ({
           )}
           onConfirm={handleConfirmProducts}
           onCancel={() => setIsPickerOpen(false)}
+          confirmLabel="Add to Membership"
+          isConfirming={isAddingProducts}
         />
-      )}
+      </Drawer>
     </section>
   );
 };

@@ -31,6 +31,7 @@ interface UppyFileUploaderProps {
    */
   disableImporters?: boolean;
   uploadMode?: 'UPLOAD' | 'SELECT_ONLY';
+  note?: string;
 }
 
 const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
@@ -41,6 +42,7 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
   maxFileSize = 5 * 1024 * 1024, // default to 5 MB
   disableImporters = false,
   uploadMode = 'UPLOAD',
+  note,
 }) => {
   // Use state to hold the Uppy instance so that re-render occurs when it’s created
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,7 +148,7 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
               : ['GoogleDrive', 'Dropbox', 'OneDrive', 'Url', 'Unsplash']
           }
           height={disableImporters ? 200 : 200}
-          note="Images only, up to 5MB"
+          note={note}
           hideUploadButton={true}
           proudlyDisplayPoweredByUppy={true}
         />

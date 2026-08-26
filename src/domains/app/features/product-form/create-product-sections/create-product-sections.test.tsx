@@ -3,7 +3,13 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  cleanup,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // ── 1) MOCK SectionEditor with UPDATED PROPS ────────────────────────────────
@@ -12,23 +18,33 @@ jest.mock('../editors/section-editor/section-editor.component', () => ({
   default: ({
     index,
     section,
-    onRemove,
     showRemoveButton,
+    onRequestDelete,
+    onConfirmDelete,
   }: {
     index: number;
     section: { id: string; title: string; description?: string };
-    onRemove: (idx: number) => void;
+    onRequestDelete?: () => void;
+    onConfirmDelete?: () => void;
     showRemoveButton: boolean;
   }) => (
     <div data-testid={`section-editor-${index}`}>
       <span data-testid={`section-title-${index}`}>{section.title}</span>
       {showRemoveButton && (
-        <button
-          data-testid={`remove-button-${index}`}
-          onClick={() => onRemove(index)}
-        >
-          Remove
-        </button>
+        <>
+          <button
+            data-testid={`remove-button-${index}`}
+            onClick={onRequestDelete}
+          >
+            Delete
+          </button>
+          <button
+            data-testid={`confirm-remove-button-${index}`}
+            onClick={onConfirmDelete}
+          >
+            Confirm delete
+          </button>
+        </>
       )}
     </div>
   ),
@@ -61,6 +77,36 @@ jest.mock('@shared/ui', () => ({
       </button>
     );
   },
+  Icon: () => <span data-testid="icon" />,
+  Input: ({ label, value, onChange, error }: any) => (
+    <label>
+      {label}
+      <input value={value} onChange={onChange} aria-invalid={!!error} />
+    </label>
+  ),
+  Textarea: ({ label, value, onChange }: any) => (
+    <label>
+      {label}
+      <textarea value={value} onChange={onChange} />
+    </label>
+  ),
+}));
+
+jest.mock('react-redux', () => ({
+  __esModule: true,
+  useDispatch: () =>
+    jest.fn(() => ({
+      unwrap: () =>
+        Promise.resolve({
+          id: 'created-section',
+          title: 'Created section',
+          description: '',
+          position: 1,
+          lessons: [],
+          files: [],
+        }),
+    })),
+  useSelector: () => ({ id: 'creator-1' }),
 }));
 
 // ── 3) IMPORT component + type under test ───────────────────────────────────
@@ -108,7 +154,7 @@ describe('<CreateProductSections />', () => {
     expect(screen.queryByTestId('remove-button-0')).not.toBeInTheDocument();
   });
 
-  it('renders multiple SectionEditors and shows remove buttons, and removing calls onSectionsChange with updated list', () => {
+  it('renders multiple SectionEditors and shows remove buttons, and confirmed deletion calls onSectionsChange with updated list', async () => {
     const initial = createSections(3);
     const onSectionsChange = jest.fn();
 
@@ -130,8 +176,9 @@ describe('<CreateProductSections />', () => {
     }
 
     fireEvent.click(screen.getByTestId('remove-button-1'));
+    fireEvent.click(screen.getByTestId('confirm-remove-button-1'));
 
-    expect(onSectionsChange).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onSectionsChange).toHaveBeenCalledTimes(1));
     const updated = onSectionsChange.mock.calls[0][0] as SectionDraft[];
 
     expect(updated).toHaveLength(2);
@@ -139,7 +186,7 @@ describe('<CreateProductSections />', () => {
     expect(updated[1].title).toBe('Section 3');
   });
 
-  it('clicking “Add Section” calls onSectionsChange with an appended blank section', () => {
+  it('creates a section explicitly before adding it to the controlled list', async () => {
     const initial = createSections(2);
     const onSectionsChange = jest.fn();
 
@@ -154,9 +201,13 @@ describe('<CreateProductSections />', () => {
 
     expect(screen.queryAllByTestId(/section-editor-/)).toHaveLength(2);
 
-    fireEvent.click(screen.getByTestId('btn-add-section'));
+    fireEvent.click(screen.getByRole('button', { name: /add section/i }));
+    fireEvent.change(screen.getByLabelText('Section title'), {
+      target: { value: 'Created section' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /create section/i }));
 
-    expect(onSectionsChange).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onSectionsChange).toHaveBeenCalledTimes(1));
     const updated = onSectionsChange.mock.calls[0][0] as SectionDraft[];
 
     expect(updated).toHaveLength(3);
@@ -164,8 +215,8 @@ describe('<CreateProductSections />', () => {
     expect(updated[1].title).toBe('Section 2');
 
     const newSection = updated[2];
-    expect(newSection.id).toBe('');
-    expect(newSection.title).toBe('');
+    expect(newSection.id).toBe('created-section');
+    expect(newSection.title).toBe('Created section');
     expect(newSection.description).toBe('');
     expect(newSection.position).toBe(3);
   });

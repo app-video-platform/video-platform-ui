@@ -8,6 +8,7 @@ import {
   PresignedUrlResponseDto,
   UploadDownloadSectionFileRequest,
 } from 'core/api/models';
+import { uploadToStorageTarget } from '../uploads';
 
 export const getPresignedUrlAPI = async (
   productId: string,
@@ -38,19 +39,12 @@ export const uploadToPresignedUrl = async (
   file: File,
 ) => {
   try {
-    const response = await fetch(presignedUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': file.type,
-      },
-      body: file,
+    return await uploadToStorageTarget({
+      uploadUrl: presignedUrl,
+      file,
+      mockProtocolPrefix: 'mock-upload://download-section/',
+      failureMessage: 'File upload to presigned URL failed',
     });
-
-    if (!response.ok) {
-      throw new Error('File upload to presigned URL failed');
-    }
-
-    return response;
   } catch (error) {
     console.error('Error uploading to presigned URL:', error);
     throw error;

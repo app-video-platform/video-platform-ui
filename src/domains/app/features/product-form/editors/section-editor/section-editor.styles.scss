@@ -1,44 +1,206 @@
 @use '../../../../../../styles/index.scss' as *;
 
-.section-editor {
-  margin-bottom: $spacing-8;
-  // background-color: var(--surface-1);
-  padding: 0 $spacing-5 $spacing-5;
+.section-editor.content-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  padding: $spacing-4;
+  border: 1px solid var(--border-subtle);
   border-radius: $radius-md;
-  position: relative;
+  background: rgba(var(--surface-panel-rgb), 0.38);
+}
 
-  .section-divider {
-    display: inline-flex;
-    width: calc(100% - 52px);
-    align-items: center;
-    position: absolute;
-    top: -15px;
+.content-group__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-4;
+}
 
-    .divider-title {
-      font-size: 14px;
-      font-family: $font-heading;
-      color: var(--text-primary);
-    }
+.content-group__identity {
+  display: flex;
+  min-width: 0;
+  gap: $spacing-3;
 
-    .divider-line {
-      height: 1px;
-      flex: 1;
-      background-color: var(--text-secondary);
-    }
+  > div {
+    min-width: 0;
+  }
+}
+
+.content-group__eyebrow {
+  display: block;
+  margin-bottom: $spacing-1;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.content-group__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: $spacing-2;
+}
+
+.section-description {
+  max-width: 44rem;
+}
+
+.content-group__confirm,
+.lesson-row__confirm,
+.file-row__confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  border: 1px solid rgba(var(--error-rgb), 0.35);
+  border-radius: $radius-md;
+  background: rgba(var(--error-rgb), 0.08);
+
+  strong,
+  p {
+    margin: 0;
   }
 
-  .section-header-line {
+  p,
+  span {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+
+  > div:last-child {
     display: flex;
-    width: 100%;
-    justify-content: space-between;
+    gap: $spacing-2;
+  }
+}
 
-    .section-title-block {
-      display: inline-flex;
-      gap: $spacing-4;
-    }
+.content-group__error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.875rem;
+}
+
+.content-group__empty {
+  padding: $spacing-4;
+  border: 1px dashed var(--border-subtle);
+  border-radius: $radius-md;
+
+  h4,
+  p {
+    margin: 0;
   }
 
-  .section-description {
-    max-width: 800px;
+  h4 {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+
+  p {
+    margin-top: $spacing-1;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.download-specific-fields {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.download-upload {
+  max-width: 42rem;
+}
+
+.download-uploaded-files {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.file-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-sm;
+  background: var(--surface-0);
+}
+
+.file-row__type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  padding: $spacing-1 $spacing-2;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-sm;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.file-row__details {
+  min-width: 0;
+
+  strong,
+  span {
+    display: block;
+  }
+
+  strong {
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 840px) {
+  .content-group__header {
+    flex-direction: column;
+  }
+
+  .content-group__meta {
+    justify-content: flex-start;
+  }
+
+  .file-row {
+    grid-template-columns: auto minmax(0, 1fr);
+
+    > button,
+    .file-row__confirm {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .section-editor.content-group {
+    padding: $spacing-3;
+  }
+
+  .content-group__meta,
+  .content-group__confirm,
+  .lesson-row__confirm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .content-group__confirm > div:last-child,
+  .lesson-row__confirm > div:last-child,
+  .file-row__confirm {
+    flex-direction: column;
   }
 }

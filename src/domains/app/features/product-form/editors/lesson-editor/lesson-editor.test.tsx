@@ -67,6 +67,17 @@ jest.mock('@shared/ui', () => ({
       {children}
     </button>
   ),
+  Drawer: ({ open, title, children }: any) =>
+    open ? (
+      <div role="dialog">
+        <div>{title}</div>
+        {children}
+      </div>
+    ) : null,
+  Icon: () => <span data-testid="icon" />,
+  StatusBadge: ({ label }: { label: string }) => <span>{label}</span>,
+  RadioGroup: ({ children }: any) => <div>{children}</div>,
+  Radio: ({ label }: any) => <span>{label}</span>,
   ExpansionPanel: ({
     header,
     children,
@@ -122,7 +133,6 @@ jest.mock('@shared/ui', () => ({
       RichText
     </div>
   ),
-  Icon: () => <span data-testid="icon" />,
 }));
 
 // ── 4) MOCK BoxSelector from @components ───────────────────────────
@@ -254,7 +264,7 @@ describe('<LessonEditor />', () => {
     changeLessonMock = jest.fn();
   });
 
-  it('deletes a new (unsaved) lesson by calling removeLessonFromList immediately', () => {
+  it('deletes a new (unsaved) lesson by calling removeLessonFromList after confirmation', () => {
     const newLesson: CourseLesson = {
       ...baseLesson,
       id: '',
@@ -272,10 +282,11 @@ describe('<LessonEditor />', () => {
       />,
     );
 
-    const removeBtn = screen.getByTestId('btn-remove');
+    const removeBtn = screen.getByRole('button', { name: /^delete$/i });
     expect(removeBtn).toBeInTheDocument();
 
     fireEvent.click(removeBtn);
+    fireEvent.click(screen.getByRole('button', { name: /delete lesson/i }));
 
     expect(mockedDeleteLesson).not.toHaveBeenCalled();
     expect(removeLessonMock).toHaveBeenCalledWith(2);
@@ -308,7 +319,11 @@ describe('<LessonEditor />', () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getByTestId('btn-remove'));
+      fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /delete lesson/i }));
     });
 
     expect(mockedDeleteLesson).toHaveBeenCalledWith({

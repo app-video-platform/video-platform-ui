@@ -6,6 +6,8 @@ import {
   ProductBillingInterval,
   ProductCurrency,
   ProductPricingModel,
+  ProductGalleryImage,
+  ProductPromoVideo,
 } from 'core/api/models';
 import { selectAuthUser } from 'core/store/auth-store';
 import { BuilderSectionNavItem } from '../builder-sidebar';
@@ -13,6 +15,7 @@ import { BuilderSectionNavItem } from '../builder-sidebar';
 export interface FormErrors {
   name?: string;
   type?: string;
+  price?: string;
   api?: string;
 }
 
@@ -31,6 +34,8 @@ export interface ProductDraft {
   createdAt?: Date;
   updatedAt?: Date;
   imageUrl?: string;
+  galleryImages?: ProductGalleryImage[];
+  promoVideo?: ProductPromoVideo | null;
 
   // for COURSES + DOWNLOADS (optional in the form)
   sections?: SectionDraft[];
@@ -73,5 +78,7 @@ export interface UseProductFormFacadeResult {
   handleSidebarLessonClick: (lessonId: string) => void;
   sidebarSections: BuilderSectionNavItem[] | undefined;
   isAutosaving: boolean;
+  hasPendingAutosave: boolean;
+  flushAutosave: () => Promise<void>;
   lastSavedAt: Date | null;
 }

@@ -20,6 +20,40 @@ const ProductTypeSelector: React.FC<ProductTypeSelectorProps> = ({
       onChange(type);
     }
   };
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    type: ProductType,
+  ) => {
+    const currentIndex = PRODUCT_CREATE_OPTIONS.findIndex(
+      (item) => item.type === type,
+    );
+    const lastIndex = PRODUCT_CREATE_OPTIONS.length - 1;
+
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      handleSelect(type);
+      return;
+    }
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      const nextType = PRODUCT_CREATE_OPTIONS[
+        currentIndex === lastIndex ? 0 : currentIndex + 1
+      ].type;
+
+      handleSelect(nextType);
+      return;
+    }
+
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const previousType = PRODUCT_CREATE_OPTIONS[
+        currentIndex === 0 ? lastIndex : currentIndex - 1
+      ].type;
+
+      handleSelect(previousType);
+    }
+  };
 
   return (
     <div className="product-type-selector">
@@ -45,19 +79,10 @@ const ProductTypeSelector: React.FC<ProductTypeSelectorProps> = ({
                 (isSelected ? ' product-type-option--selected' : '')
               }
               onClick={() => handleSelect(item.type)}
+              onKeyDown={(event) => handleKeyDown(event, item.type)}
               role="radio"
               aria-checked={isSelected}
             >
-              {/* hidden native radio for accessibility / forms if needed */}
-              <input
-                type="radio"
-                name="productType"
-                value={item.type}
-                checked={isSelected}
-                onChange={() => handleSelect(item.type)}
-                className="product-type-option__input"
-              />
-
               <div className="product-type-option__orb">
                 <div className="product-type-option__orb-inner">
                   {/* Replace these with real icons if you want */}

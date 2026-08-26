@@ -7,6 +7,28 @@ import { ProductSection } from './section';
 export type ProductPricingModel = 'ONE_TIME' | 'RECURRING';
 export type ProductBillingInterval = 'MONTH' | 'YEAR';
 export type ProductCurrency = 'EUR';
+export type ProductMediaStatus = 'UPLOADING' | 'PROCESSING' | 'READY' | 'FAILED';
+
+export interface ProductGalleryImage {
+  id: string;
+  url: string;
+  fileName?: string;
+  fileType?: string;
+  size?: number;
+  position: number;
+  altText?: string;
+  status?: ProductMediaStatus;
+}
+
+export interface ProductPromoVideo {
+  id: string;
+  url?: string;
+  fileName?: string;
+  fileType?: string;
+  size?: number;
+  status: ProductMediaStatus;
+  thumbnailUrl?: string;
+}
 
 export interface AbstractProductBase {
   id: string;
@@ -22,6 +44,8 @@ export interface AbstractProductBase {
   createdAt?: Date;
   updatedAt?: Date;
   imageUrl?: string;
+  galleryImages?: ProductGalleryImage[];
+  promoVideo?: ProductPromoVideo | null;
   sections?: ProductSection[];
   consultationDetails?: ConsultationDetails;
 }
@@ -50,12 +74,33 @@ export interface ConsultationDetails {
   durationMinutes?: number;
   meetingMethod?: MeetingMethod;
   customLocation?: string;
+  weeklyAvailability?: ConsultationDayAvailability[];
   bufferBeforeMinutes?: number;
   bufferAfterMinutes?: number;
   maxSessionsPerDay?: number;
   confirmationMessage?: string;
   cancellationPolicy?: string;
   connectedCalendars?: ConnectedCalendar[];
+}
+
+export type ConsultationWeekday =
+  | 'MONDAY'
+  | 'TUESDAY'
+  | 'WEDNESDAY'
+  | 'THURSDAY'
+  | 'FRIDAY'
+  | 'SATURDAY'
+  | 'SUNDAY';
+
+export interface ConsultationAvailabilityWindow {
+  startTime: string;
+  endTime: string;
+}
+
+export interface ConsultationDayAvailability {
+  day: ConsultationWeekday;
+  enabled: boolean;
+  windows: ConsultationAvailabilityWindow[];
 }
 
 export interface ProductMinimised {

@@ -23,6 +23,12 @@ const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
   const priceLabel = product.price.cadence
     ? `${product.price.label} / ${product.price.cadence}`
     : product.price.label;
+  const readyPromoVideo =
+    product.promoVideo?.status === 'READY' && product.promoVideo.url
+      ? product.promoVideo
+      : null;
+  const hasPresentationMedia =
+    product.galleryImages.length > 0 || Boolean(readyPromoVideo);
 
   const renderTypeSummary = () => {
     if (product.summary.type === 'COURSE') {
@@ -251,6 +257,43 @@ const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
       </header>
 
       <main className="product-landing__body">
+        {hasPresentationMedia && (
+          <section
+            className="product-landing__section product-landing__media"
+            aria-labelledby="product-media-heading"
+          >
+            <div className="product-landing__section-heading">
+              <span>Media</span>
+              <h2 id="product-media-heading">Product preview</h2>
+              <p>Customer-facing presentation media from this Product.</p>
+            </div>
+
+            {readyPromoVideo && (
+              <video
+                className="product-landing__promo-video"
+                src={readyPromoVideo.url}
+                controls
+                aria-label={`${product.name} promo video`}
+              />
+            )}
+
+            {product.galleryImages.length > 0 && (
+              <div className="product-landing__gallery">
+                {product.galleryImages.map((image, index) => (
+                  <img
+                    key={image.id}
+                    src={image.url}
+                    alt={
+                      image.altText ||
+                      `${product.name} gallery image ${index + 1}`
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
         {product.sections.map((section) => (
           <React.Fragment key={section}>
             {renderPageSection(section)}

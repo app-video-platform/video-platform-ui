@@ -37,6 +37,12 @@ const Input: React.FC<InputProps> = ({
   handleSuffixClick,
   ...otherProps
 }) => {
+  const {
+    ['aria-describedby']: ariaDescribedBy,
+    ...inputProps
+  } = otherProps;
+  const errorId = error && inputProps.name ? `${inputProps.name}-error` : undefined;
+  const describedBy = [ariaDescribedBy, errorId].filter(Boolean).join(' ') || undefined;
   const inputClass = clsx('input-field', {
     'input-error': error,
     'input-with-prefix': prefixIcon,
@@ -47,7 +53,7 @@ const Input: React.FC<InputProps> = ({
   return (
     <div className={clsx('input-wrapper', className)}>
       {label && (
-        <label htmlFor={otherProps.name} className="input-label">
+        <label htmlFor={inputProps.name} className="input-label">
           {label}
         </label>
       )}
@@ -62,10 +68,12 @@ const Input: React.FC<InputProps> = ({
         )}
         <input
           className={inputClass}
-          {...otherProps}
+          {...inputProps}
           required={required}
-          id={otherProps.name}
-          data-testid={`input-${otherProps.name}`}
+          id={inputProps.name}
+          data-testid={`input-${inputProps.name}`}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
           value={value}
           maxLength={maxLength}
           type={type}
@@ -84,7 +92,11 @@ const Input: React.FC<InputProps> = ({
           </button>
         )}
       </div>
-      {error && <span className="input-error-message">{error}</span>}
+      {error && (
+        <span id={errorId} className="input-error-message">
+          {error}
+        </span>
+      )}
     </div>
   );
 };

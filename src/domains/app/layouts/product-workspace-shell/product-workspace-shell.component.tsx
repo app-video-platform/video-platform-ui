@@ -1,13 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiArrowLeft, HiDotsVertical } from 'react-icons/hi';
+import { FiExternalLink } from 'react-icons/fi';
 
 import { ProductStatus, ProductType } from 'core/api/models';
 import { PRODUCT_TYPE_REGISTRY } from 'core/constants';
-import { Button, Icon, StatusChip } from '@shared/ui';
+import { Button, Icon, StatusBadge, StatusBadgeTone } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { SavingIndicator } from 'domains/app/components';
 import { SaveStatus } from 'domains/app/features/product-form';
+import { appRoutes } from 'domains/app/routes/routes';
 
 import './product-workspace-shell.styles.scss';
 
@@ -18,11 +20,31 @@ interface ProductWorkspaceShellProps {
   isEditMode: boolean;
   showWorkspace: boolean;
   saveStatus: SaveStatus;
+  hasPendingAutosave?: boolean;
   canPublish?: boolean;
   publishDisabledReason?: string;
+  isPublishing?: boolean;
+  canPreview?: boolean;
+  previewDisabledReason?: string;
+  publishHelpText?: string;
+  onBack?: () => Promise<void> | void;
+  onPreview?: () => void;
+  onPublish?: () => void;
   navigation?: React.ReactNode;
   children: React.ReactNode;
 }
+
+const statusTone: Record<ProductStatus, StatusBadgeTone> = {
+  DRAFT: 'neutral',
+  PUBLISHED: 'success',
+  HIDDEN: 'warning',
+};
+
+const statusLabel: Record<ProductStatus, string> = {
+  DRAFT: 'Draft',
+  PUBLISHED: 'Published',
+  HIDDEN: 'Hidden',
+};
 
 const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
   productType,
@@ -31,8 +53,16 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
   isEditMode,
   showWorkspace,
   saveStatus,
+  hasPendingAutosave = false,
   canPublish = true,
   publishDisabledReason,
+  isPublishing = false,
+  canPreview = false,
+  previewDisabledReason,
+  publishHelpText,
+  onBack,
+  onPreview,
+  onPublish,
   navigation,
   children,
 }) => {
@@ -46,6 +76,14 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
   const title =
     productTitle?.trim() ||
     (isEditMode ? 'Untitled product' : 'Create product');
+  const handleBack = async () => {
+    if (onBack) {
+      await onBack();
+      return;
+    }
+
+    navigate(appRoutes.products);
+  };
 
   return (
     <div className="product-workspace-shell">
@@ -55,7 +93,7 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
             type="button"
             variant="tertiary"
             className="product-workspace-shell__back"
-            onClick={() => navigate('/app/products')}
+            onClick={handleBack}
           >
             <Icon
               icon={HiArrowLeft}
@@ -71,13 +109,40 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
             </span>
             <h1>{title}</h1>
           </div>
-          {productStatus && <StatusChip status={productStatus} />}
+          {productStatus && (
+            <StatusBadge
+              label={statusLabel[productStatus]}
+              tone={statusTone[productStatus]}
+              size="sm"
+            />
+          )}
         </div>
 
         {showWorkspace && (
           <div className="product-workspace-shell__actions">
-            <SavingIndicator status={saveStatus} size="sm" />
-            <Button type="button" variant="secondary" disabled>
+            <div className="product-workspace-shell__save-state" aria-live="polite">
+              {hasPendingAutosave && saveStatus === 'idle' ? (
+                <span>Unsaved changes</span>
+              ) : (
+                <SavingIndicator status={saveStatus} size="sm" />
+              )}
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={!canPreview}
+              title={!canPreview ? previewDisabledReason : undefined}
+              onClick={onPreview}
+              trailingIcon={
+                canPreview ? (
+                  <Icon
+                    icon={FiExternalLink}
+                    size={15}
+                    color="currentColor"
+                  />
+                ) : undefined
+              }
+            >
               Preview
             </Button>
             <Button
@@ -86,6 +151,7 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
               size="icon"
               className="product-workspace-shell__overflow"
               aria-label="More product actions"
+              title="More product actions are planned for a later Product Builder phase."
               disabled
             >
               <Icon
@@ -95,15 +161,22 @@ const ProductWorkspaceShell: React.FC<ProductWorkspaceShellProps> = ({
               />
             </Button>
             <Button
-              type="submit"
-              form="product-builder-form"
+              type="button"
               variant="primary"
-              disabled={!canPublish}
+              disabled={!canPublish || isPublishing}
               title={!canPublish ? publishDisabledReason : undefined}
+              loading={isPublishing}
+              aria-busy={isPublishing}
+              onClick={onPublish}
             >
-              Publish
+              {productStatus === 'PUBLISHED' ? 'Published' : 'Publish'}
             </Button>
           </div>
+        )}
+        {showWorkspace && publishHelpText && (
+          <p className="product-workspace-shell__action-note">
+            {publishHelpText}
+          </p>
         )}
       </header>
 

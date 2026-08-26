@@ -7,59 +7,53 @@ import BasicInfo from './basic-info.component';
 jest.mock('@shared/ui', () => ({
   __esModule: true,
   Input: ({
+    label,
+    name,
     value,
+    error,
     onChange,
   }: {
+    label?: string;
+    name?: string;
     value?: string;
+    error?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   }) => (
-    <input
-      data-testid="basic-info-title"
-      value={value ?? ''}
-      onChange={onChange}
-    />
+    <label>
+      {label}
+      <input
+        data-testid={`input-${name}`}
+        value={value ?? ''}
+        aria-invalid={Boolean(error)}
+        onChange={onChange}
+      />
+      {error && <span>{error}</span>}
+    </label>
   ),
   Textarea: ({
+    label,
+    name,
     value,
     onChange,
   }: {
+    label?: string;
+    name?: string;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   }) => (
-    <textarea
-      data-testid="basic-info-description"
-      value={value ?? ''}
-      onChange={onChange}
-    />
-  ),
-}));
-
-jest.mock('domains/app/components', () => ({
-  __esModule: true,
-  BoxSelector: ({
-    availableOptions,
-    onSelect,
-  }: {
-    availableOptions?: string[];
-    onSelect: (value: any) => void;
-  }) => (
-    <div data-testid="product-type-selector">
-      {availableOptions?.map((option) => (
-        <button
-          key={option}
-          type="button"
-          data-testid={`product-type-${option}`}
-          onClick={() => onSelect(option)}
-        >
-          {option}
-        </button>
-      ))}
-    </div>
+    <label>
+      {label}
+      <textarea
+        data-testid={`textarea-${name}`}
+        value={value ?? ''}
+        onChange={onChange}
+      />
+    </label>
   ),
 }));
 
 describe('<BasicInfo />', () => {
-  it('shows all product type options outside edit mode', () => {
+  it('renders Product name, description, and type context', () => {
     render(
       <BasicInfo
         formData={
@@ -73,13 +67,15 @@ describe('<BasicInfo />', () => {
       />,
     );
 
-    expect(screen.getByTestId('product-type-COURSE')).toBeInTheDocument();
-    expect(screen.getByTestId('product-type-CONSULTATION')).toBeInTheDocument();
-    expect(screen.getByTestId('product-type-DOWNLOAD')).toBeInTheDocument();
-    expect(screen.getByTestId('product-type-MEMBERSHIP')).toBeInTheDocument();
+    expect(screen.getByLabelText('Course name')).toHaveValue('How to cook');
+    expect(screen.getByLabelText('Course description')).toHaveValue('desc');
+    expect(screen.getByText('Course')).toBeInTheDocument();
+    expect(screen.getByText('Read-only')).toBeInTheDocument();
   });
 
-  it('shows only the current product type option in edit mode', () => {
+  it('updates name and description through setField', () => {
+    const setField = jest.fn();
+
     render(
       <BasicInfo
         formData={
@@ -89,22 +85,22 @@ describe('<BasicInfo />', () => {
             description: 'desc',
           } as any
         }
-        setField={jest.fn()}
-        showOnlyCurrentType
+        setField={setField}
       />,
     );
 
-    expect(screen.getByTestId('product-type-COURSE')).toBeInTheDocument();
-    expect(
-      screen.queryByTestId('product-type-CONSULTATION'),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByTestId('product-type-DOWNLOAD')).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId('product-type-MEMBERSHIP'),
-    ).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Course name'), {
+      target: { value: 'New name' },
+    });
+    fireEvent.change(screen.getByLabelText('Course description'), {
+      target: { value: 'New description' },
+    });
+
+    expect(setField).toHaveBeenCalledWith('name', 'New name');
+    expect(setField).toHaveBeenCalledWith('description', 'New description');
   });
 
-  it('still routes selection through setField for the current type', () => {
+  it('does not expose Product type switching in edit mode', () => {
     const setField = jest.fn();
 
     render(
@@ -120,8 +116,53 @@ describe('<BasicInfo />', () => {
       />,
     );
 
-    fireEvent.click(screen.getByTestId('product-type-DOWNLOAD'));
+    expect(screen.queryByTestId('product-type-selector')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /course/i })).not
+      .toBeInTheDocument();
+    expect(setField).not.toHaveBeenCalledWith('type', expect.anything());
+  });
 
-    expect(setField).toHaveBeenCalledWith('type', 'DOWNLOAD');
+  it.each([
+    ['COURSE', 'Course name'],
+    ['DOWNLOAD', 'Download name'],
+    ['CONSULTATION', 'Consultation name'],
+    ['MEMBERSHIP', 'Membership name'],
+  ])('uses shared type-aware copy for %s', (type, label) => {
+    render(
+      <BasicInfo
+        formData={
+          {
+            type,
+            name: 'Product',
+            description: '',
+          } as any
+        }
+        setField={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText(label)).toBeInTheDocument();
+  });
+
+  it('shows field validation without treating backend errors as field errors', () => {
+    render(
+      <BasicInfo
+        formData={
+          {
+            type: 'COURSE',
+            name: '',
+            description: '',
+          } as any
+        }
+        errors={{
+          name: 'Product name is required.',
+          api: 'Autosave failed.',
+        }}
+        setField={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Product name is required.')).toBeInTheDocument();
+    expect(screen.queryByText('Autosave failed.')).not.toBeInTheDocument();
   });
 });

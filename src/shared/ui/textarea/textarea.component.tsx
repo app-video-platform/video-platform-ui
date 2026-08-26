@@ -26,6 +26,13 @@ const Textarea: React.FC<TextareaProps> = ({
   error,
   ...otherProps
 }) => {
+  const {
+    ['aria-describedby']: ariaDescribedBy,
+    ...textareaProps
+  } = otherProps;
+  const errorId =
+    error && textareaProps.name ? `${textareaProps.name}-error` : undefined;
+  const describedBy = [ariaDescribedBy, errorId].filter(Boolean).join(' ') || undefined;
   const ref = useRef<HTMLTextAreaElement>(null);
 
   // After each render where `value` changed, adjust height
@@ -40,13 +47,20 @@ const Textarea: React.FC<TextareaProps> = ({
 
   return (
     <div className={clsx('textarea-wrapper', className)}>
-      {label && <label className="input-label">{label}</label>}
+      {label && (
+        <label htmlFor={textareaProps.name} className="input-label">
+          {label}
+        </label>
+      )}
       <div className="textarea-wrapper">
         <textarea
-          className={clsx('textarea-field', { block })}
+          className={clsx('textarea-field', { block, 'input-error': error })}
           ref={ref}
           value={value}
-          {...otherProps}
+          {...textareaProps}
+          id={textareaProps.name}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
           maxLength={maxLength}
         />
         {isMaxLengthShown && (
@@ -56,7 +70,11 @@ const Textarea: React.FC<TextareaProps> = ({
         )}
       </div>
 
-      {error && <span className="input-error-message">{error}</span>}
+      {error && (
+        <span id={errorId} className="input-error-message">
+          {error}
+        </span>
+      )}
     </div>
   );
 };

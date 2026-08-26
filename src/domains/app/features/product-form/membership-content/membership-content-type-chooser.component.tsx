@@ -1,6 +1,14 @@
 import React from 'react';
+import {
+  HiDocumentText,
+  HiFolderAdd,
+  HiPlay,
+  HiPlusCircle,
+} from 'react-icons/hi';
+import { IconType } from 'react-icons';
 
-import { Button } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
+import { getCssVar } from '@shared/utils';
 import { MembershipContentChooserSelection } from './models';
 
 interface MembershipContentTypeChooserProps {
@@ -13,26 +21,31 @@ const CONTENT_OPTIONS: Array<{
   selection: MembershipContentChooserSelection;
   label: string;
   description: string;
+  icon: IconType;
 }> = [
-  {
-    selection: 'VIDEO',
-    label: 'Video',
-    description: 'Upload a member-only video',
-  },
   {
     selection: 'POST',
     label: 'Post',
-    description: 'Publish a text update',
+    description: 'Publish a written update for members.',
+    icon: HiDocumentText,
+  },
+  {
+    selection: 'VIDEO',
+    label: 'Video',
+    description: 'Select a member-only video file.',
+    icon: HiPlay,
   },
   {
     selection: 'RESOURCE',
     label: 'Resource',
-    description: 'Share a downloadable file',
+    description: 'Select a downloadable file for members.',
+    icon: HiFolderAdd,
   },
   {
     selection: 'EXISTING_PRODUCT',
     label: 'Existing Product',
-    description: 'Include an existing Course or Download',
+    description: 'Include an existing Course or Download.',
+    icon: HiPlusCircle,
   },
 ];
 
@@ -48,6 +61,13 @@ const MembershipContentTypeChooser: React.FC<
           className="membership-content-type-chooser__option"
           onClick={() => onSelect(option.selection)}
         >
+          <span className="membership-content-type-chooser__option-icon">
+            <Icon
+              icon={option.icon}
+              size={18}
+              color={getCssVar('--brand-primary')}
+            />
+          </span>
           <span>{option.label}</span>
           <small>{option.description}</small>
         </button>

@@ -5,7 +5,9 @@ import {
   AbstractProductApiResponse,
   AbstractProductBase,
   CreateProductPayload,
+  ProductGalleryImage,
   ProductMinimised,
+  ProductPromoVideo,
 } from 'core/api/models';
 import {
   normalizeProductResponse,
@@ -196,6 +198,89 @@ export const addImageToProductAPI = async (image: File, productId: string) => {
     return response.data;
   } catch (error) {
     console.error(`Error adding image to product with id ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const removeImageFromProductAPI = async (productId: string) => {
+  try {
+    await httpClient.delete(`api/products/image?productId=${productId}`);
+    return productId;
+  } catch (error) {
+    console.error(`Error removing image from product with id ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const addProductGalleryImageAPI = async (
+  productId: string,
+  image: File,
+): Promise<ProductGalleryImage> => {
+  try {
+    const response = await httpClient.post<ProductGalleryImage>(
+      `api/products/${productId}/media/gallery`,
+      image,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error adding gallery image to product ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const removeProductGalleryImageAPI = async (
+  productId: string,
+  imageId: string,
+) => {
+  try {
+    await httpClient.delete(
+      `api/products/${productId}/media/gallery/${imageId}`,
+    );
+    return { productId, imageId };
+  } catch (error) {
+    console.error(`Error removing gallery image ${imageId}:`, error);
+    throw error;
+  }
+};
+
+export const reorderProductGalleryImagesAPI = async (
+  productId: string,
+  imageIds: string[],
+): Promise<ProductGalleryImage[]> => {
+  try {
+    const response = await httpClient.put<ProductGalleryImage[]>(
+      `api/products/${productId}/media/gallery/order`,
+      { imageIds },
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error reordering gallery images for ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const addProductPromoVideoAPI = async (
+  productId: string,
+  video: File,
+): Promise<ProductPromoVideo> => {
+  try {
+    const response = await httpClient.post<ProductPromoVideo>(
+      `api/products/${productId}/media/promo-video`,
+      video,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error adding promo video to product ${productId}:`, error);
+    throw error;
+  }
+};
+
+export const removeProductPromoVideoAPI = async (productId: string) => {
+  try {
+    await httpClient.delete(`api/products/${productId}/media/promo-video`);
+    return productId;
+  } catch (error) {
+    console.error(`Error removing promo video from product ${productId}:`, error);
     throw error;
   }
 };

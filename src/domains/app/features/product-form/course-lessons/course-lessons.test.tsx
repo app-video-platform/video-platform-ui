@@ -3,7 +3,13 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  cleanup,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // ── 1) MOCK LessonEditor ────────────────────────────────────────────────────────────
@@ -63,6 +69,31 @@ jest.mock('@shared/ui', () => ({
     </button>
   ),
   Icon: () => <span data-testid="icon" />,
+  Input: ({ label, value, onChange, error }: any) => (
+    <label>
+      {label}
+      <input value={value} onChange={onChange} aria-invalid={!!error} />
+    </label>
+  ),
+  RadioGroup: ({ children }: any) => <div>{children}</div>,
+  Radio: ({ label }: any) => <span>{label}</span>,
+}));
+
+jest.mock('react-redux', () => ({
+  __esModule: true,
+  useDispatch: () =>
+    jest.fn(() => ({
+      unwrap: () =>
+        Promise.resolve({
+          id: 'created-lesson',
+          title: 'Created lesson',
+          description: '',
+          type: 'VIDEO',
+          sectionId: 'section-abc',
+          position: 1,
+        }),
+    })),
+  useSelector: () => ({ id: 'creator-1' }),
 }));
 
 // ── 3) Import the component under test ──────────────────────────────────────────────
@@ -98,7 +129,7 @@ describe('<CourseLessons />', () => {
     );
 
     // Should render the header
-    expect(screen.getByText('Course Lessons')).toBeInTheDocument();
+    expect(screen.getByText('Lessons')).toBeInTheDocument();
 
     // No lesson-editor-* elements
     expect(screen.queryByTestId(/lesson-editor-/)).not.toBeInTheDocument();
@@ -127,7 +158,7 @@ describe('<CourseLessons />', () => {
     }
   });
 
-  it('adds a new blank lesson when the “Add Lesson” button is clicked (via onLessonsChange)', () => {
+  it('creates a lesson explicitly before adding it to the controlled list', async () => {
     const initialLessons = makeLessons(1);
     const onLessonsChange = jest.fn();
 
@@ -143,18 +174,19 @@ describe('<CourseLessons />', () => {
     // Initially, one lesson-editor-0
     expect(screen.getByTestId('lesson-editor-0')).toBeInTheDocument();
 
-    // Click the “Add Lesson” button
-    fireEvent.click(screen.getByTestId('btn-add-lesson'));
+    fireEvent.click(screen.getByRole('button', { name: /add lesson/i }));
+    fireEvent.change(screen.getByLabelText('Lesson title'), {
+      target: { value: 'Created lesson' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /create lesson/i }));
 
-    // Component is controlled → we assert onLessonsChange was called correctly
-    expect(onLessonsChange).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onLessonsChange).toHaveBeenCalledTimes(1));
     const updatedLessons = onLessonsChange.mock.calls[0][0] as any[];
 
     expect(updatedLessons).toHaveLength(2);
     // First lesson is unchanged
     expect(updatedLessons[0].title).toBe('Lesson 1');
-    // New lesson is blank with correct sectionId
-    expect(updatedLessons[1].title).toBe('');
+    expect(updatedLessons[1].title).toBe('Created lesson');
     expect(updatedLessons[1].description).toBe('');
     expect(updatedLessons[1].sectionId).toBe(sectionId);
   });

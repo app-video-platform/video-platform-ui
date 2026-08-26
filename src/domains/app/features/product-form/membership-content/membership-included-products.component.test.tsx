@@ -147,14 +147,14 @@ describe('<MembershipIncludedProducts />', () => {
   it('renders the local empty state before products are selected', () => {
     renderIncludedProducts();
 
-    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
+    expect(screen.getByText('Start your member feed')).toBeInTheDocument();
   });
 
-  it('opens the inline picker and adds selected products locally', async () => {
+  it('opens the Product picker drawer and adds selected products locally', async () => {
     renderIncludedProducts({ productPickerRequest: 1 });
 
     fireEvent.click(screen.getByLabelText('Select Course One'));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Membership' }));
 
     await waitFor(() => {
       expect(screen.getByText('Course One')).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe('<MembershipIncludedProducts />', () => {
     });
 
     fireEvent.click(screen.getByLabelText('Select Course One'));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Membership' }));
 
     rerenderIncludedProducts(2);
 
@@ -184,8 +184,13 @@ describe('<MembershipIncludedProducts />', () => {
     });
 
     fireEvent.click(screen.getByLabelText('Select Course One'));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Membership' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Remove Course One from Membership' }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Remove from Membership' }),
+    );
     rerenderIncludedProducts(2);
 
     expect(screen.getByLabelText('Select Course One')).toBeInTheDocument();

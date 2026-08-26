@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-vars */
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 let isRefreshing = false;
 let failedQueue: Array<{
@@ -36,7 +36,7 @@ export function attachRefreshTokenInterceptor(httpClient: AxiosInstance) {
         // If the request was the refresh endpoint itself, just reject:
         if (
           originalRequest.url &&
-          originalRequest.url.includes('/api/auth/refresh')
+          originalRequest.url.includes('api/auth/refresh')
         ) {
           return Promise.reject(error);
         }
@@ -49,7 +49,7 @@ export function attachRefreshTokenInterceptor(httpClient: AxiosInstance) {
             .then((token) => {
               // Once refreshed, retry the original
               originalRequest.headers!['Authorization'] = `Bearer ${token}`;
-              return axios(originalRequest);
+              return httpClient.request(originalRequest);
             })
             .catch((err) => Promise.reject(err));
         }
@@ -58,9 +58,9 @@ export function attachRefreshTokenInterceptor(httpClient: AxiosInstance) {
         isRefreshing = true;
 
         return new Promise((resolve, reject) => {
-          axios
+          httpClient
             .post(
-              `${process.env.REACT_APP_BASE_PATH}api/auth/refresh`,
+              'api/auth/refresh',
               {},
               { withCredentials: true }
             )
@@ -72,7 +72,7 @@ export function attachRefreshTokenInterceptor(httpClient: AxiosInstance) {
 
               // Retry original request
               originalRequest.headers!['Authorization'] = `Bearer ${newToken}`;
-              resolve(axios(originalRequest));
+              resolve(httpClient.request(originalRequest));
             })
             .catch((err) => {
               processQueue(err, null);

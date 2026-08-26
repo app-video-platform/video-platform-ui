@@ -40,11 +40,6 @@ export const useProductActions = ({
 
     dispatch(updateProductDetails(productData))
       .unwrap()
-      .then((data) => {
-        if (data) {
-          window.alert('Product updated successfully!');
-        }
-      })
       .catch((error) => {
         console.error('Error updating course product:', error);
         setErrors({

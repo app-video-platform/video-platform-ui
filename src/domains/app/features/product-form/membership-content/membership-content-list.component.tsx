@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { Button, StatusChip } from '@shared/ui';
+import { Button, StatusBadge, StatusBadgeTone } from '@shared/ui';
 import { ProductMinimised } from 'core/api/models';
 import { PRODUCT_TYPE_REGISTRY } from 'core/constants';
 import {
   createMembershipContentListItems,
-  MEMBERSHIP_CONTENT_TYPE_ICONS,
   MEMBERSHIP_CONTENT_TYPE_LABELS,
   MembershipContentItem,
   MembershipContentListItem,
@@ -19,22 +18,61 @@ interface MembershipContentListProps {
   orderingMode?: MembershipOrderingMode;
   includedProducts: readonly ProductMinimised[];
   // eslint-disable-next-line no-unused-vars
-  onRemoveProduct?: (productId?: string) => void;
+  onRemoveProduct?: (productId?: string) => Promise<void> | void;
   // eslint-disable-next-line no-unused-vars
-  onMoveFeedEntry?: (entryId: string, direction: 'UP' | 'DOWN') => void;
+  onMoveFeedEntry?: (entryId: string, direction: 'UP' | 'DOWN') => Promise<void> | void;
   // eslint-disable-next-line no-unused-vars
   onEditContent?: (contentId: string) => void;
   // eslint-disable-next-line no-unused-vars
-  onDeleteContent?: (contentId: string) => void;
+  onDeleteContent?: (contentId: string) => Promise<void> | void;
+  onAddContent?: () => void;
 }
 
 const getProductTitle = (product: ProductMinimised) =>
   product.title ?? 'Untitled product';
 
+const membershipStatusTone: Record<string, StatusBadgeTone> = {
+  DRAFT: 'warning',
+  PUBLISHED: 'success',
+  HIDDEN: 'neutral',
+};
+
+const membershipStatusLabel: Record<string, string> = {
+  DRAFT: 'Draft',
+  PUBLISHED: 'Published',
+  HIDDEN: 'Hidden',
+};
+
+const productStatusLabel: Record<string, string> = {
+  DRAFT: 'Draft product',
+  PUBLISHED: 'Published product',
+  HIDDEN: 'Hidden product',
+};
+
+const contentInitial: Record<MembershipContentItem['type'], string> = {
+  POST: 'P',
+  VIDEO: 'V',
+  RESOURCE: 'R',
+};
+
 const canManageNativeContent = (content: MembershipContentItem) =>
   content.type === 'POST' ||
   content.type === 'VIDEO' ||
   content.type === 'RESOURCE';
+
+const getContentSummary = (content: MembershipContentItem) => {
+  if (content.type === 'POST') {
+    return content.body;
+  }
+
+  if (content.description) {
+    return content.description;
+  }
+
+  return content.type === 'VIDEO'
+    ? content.video.fileName
+    : content.file.fileName;
+};
 
 interface MembershipNativeContentRowProps {
   item: Extract<MembershipContentListItem, { kind: 'CONTENT' }>;
@@ -42,7 +80,7 @@ interface MembershipNativeContentRowProps {
   // eslint-disable-next-line no-unused-vars
   onEditContent?: (contentId: string) => void;
   // eslint-disable-next-line no-unused-vars
-  onDeleteContent?: (contentId: string) => void;
+  onDeleteContent?: (contentId: string) => Promise<void> | void;
 }
 
 const MembershipNativeContentRow: React.FC<MembershipNativeContentRowProps> = ({
@@ -52,36 +90,94 @@ const MembershipNativeContentRow: React.FC<MembershipNativeContentRowProps> = ({
   onDeleteContent,
 }) => {
   const { content } = item;
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const contentTypeLabel = MEMBERSHIP_CONTENT_TYPE_LABELS[content.type];
+  const contentSummary = getContentSummary(content);
+
+  const handleConfirmDelete = async () => {
+    if (!onDeleteContent) {
+      return;
+    }
+
+    setDeleteError(null);
+    setIsDeleting(true);
+
+    try {
+      await onDeleteContent(content.id);
+      setIsConfirmingDelete(false);
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error && error.message
+          ? error.message
+          : `${contentTypeLabel} deletion failed. Try again.`,
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div
       key={item.entry.entryId}
-      className="membership-content-list-item"
+      className="membership-content-list-item membership-content-list-item--native"
     >
-      <div className="membership-content-list-item__media">
-        <span>{MEMBERSHIP_CONTENT_TYPE_ICONS[content.type]}</span>
+      <div className="membership-content-list-item__media" aria-hidden="true">
+        <span>{contentInitial[content.type]}</span>
       </div>
       <div className="membership-content-list-item__content">
-        <h4>{content.title}</h4>
+        <h4 title={content.title}>{content.title}</h4>
         <div className="membership-content-list-item__meta">
-          <span>{MEMBERSHIP_CONTENT_TYPE_LABELS[content.type]}</span>
-          <span className="membership-content-list-item__status">
-            {content.status}
-          </span>
+          <span>{contentTypeLabel}</span>
+          <StatusBadge
+            label={membershipStatusLabel[content.status]}
+            tone={membershipStatusTone[content.status]}
+            size="sm"
+          />
         </div>
-        {content.type === 'POST' && <p>{content.body}</p>}
-        {content.type !== 'POST' && content.description && (
-          <p>{content.description}</p>
-        )}
-        {content.type === 'VIDEO' && (
+        <p>{contentSummary}</p>
+        {content.type === 'VIDEO' && content.description && (
           <p className="membership-content-list-item__file">
-            {content.video.fileName}
+            Selected file: {content.video.fileName}
           </p>
         )}
-        {content.type === 'RESOURCE' && (
+        {content.type === 'RESOURCE' && content.description && (
           <p className="membership-content-list-item__file">
-            {content.file.fileName}
+            Selected file: {content.file.fileName}
           </p>
+        )}
+        {isConfirmingDelete && (
+          <div className="membership-content-list-item__confirm" role="alertdialog">
+            <p>
+              {`Delete ${contentTypeLabel.toLowerCase()} "${content.title}"? This removes it from this Membership feed.`}
+            </p>
+            {deleteError && (
+              <p className="membership-content-list-item__error" role="alert">
+                {deleteError}
+              </p>
+            )}
+            <div>
+              <Button
+                type="button"
+                variant="tertiary"
+                size="sm"
+                onClick={() => setIsConfirmingDelete(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                loading={isDeleting}
+                onClick={handleConfirmDelete}
+              >
+                Delete {contentTypeLabel}
+              </Button>
+            </div>
+          </div>
         )}
       </div>
       <div className="membership-content-list-item__actions">
@@ -92,6 +188,8 @@ const MembershipNativeContentRow: React.FC<MembershipNativeContentRowProps> = ({
               <Button
                 type="button"
                 variant="secondary"
+                size="sm"
+                aria-label={`Edit ${content.title}`}
                 onClick={() => onEditContent(content.id)}
               >
                 Edit
@@ -101,7 +199,9 @@ const MembershipNativeContentRow: React.FC<MembershipNativeContentRowProps> = ({
               <Button
                 type="button"
                 variant="remove"
-                onClick={() => onDeleteContent(content.id)}
+                size="sm"
+                aria-label={`Delete ${contentTypeLabel} ${content.title}`}
+                onClick={() => setIsConfirmingDelete(true)}
               >
                 Delete
               </Button>
@@ -117,36 +217,95 @@ interface MembershipIncludedProductRowProps {
   item: Extract<MembershipContentListItem, { kind: 'PRODUCT' }>;
   orderingControls?: React.ReactNode;
   // eslint-disable-next-line no-unused-vars
-  onRemoveProduct?: (productId?: string) => void;
+  onRemoveProduct?: (productId?: string) => Promise<void> | void;
 }
 
 const MembershipIncludedProductRow: React.FC<
   MembershipIncludedProductRowProps
 > = ({ item, orderingControls, onRemoveProduct }) => {
   const { product } = item;
+  const [isConfirmingRemove, setIsConfirmingRemove] = useState(false);
+  const [removeError, setRemoveError] = useState<string | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
   const typeConfig = product.type
     ? PRODUCT_TYPE_REGISTRY[product.type]
     : undefined;
+  const productTitle = getProductTitle(product);
+
+  const handleConfirmRemove = async () => {
+    if (!onRemoveProduct) {
+      return;
+    }
+
+    setRemoveError(null);
+    setIsRemoving(true);
+
+    try {
+      await onRemoveProduct(product.id);
+      setIsConfirmingRemove(false);
+    } catch (error) {
+      setRemoveError(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Product removal failed. Try again.',
+      );
+    } finally {
+      setIsRemoving(false);
+    }
+  };
 
   return (
     <div
       key={item.entry.entryId}
-      className="membership-content-list-item"
+      className="membership-content-list-item membership-content-list-item--product"
     >
       <div className="membership-content-list-item__media">
         {product.imageUrl ? (
-          <img src={product.imageUrl} alt={getProductTitle(product)} />
+          <img src={product.imageUrl} alt={productTitle} />
         ) : (
           <span>{typeConfig?.displayIcon}</span>
         )}
       </div>
       <div className="membership-content-list-item__content">
-        <h4>{getProductTitle(product)}</h4>
+        <h4 title={productTitle}>{productTitle}</h4>
         <div className="membership-content-list-item__meta">
           <span>{typeConfig?.label ?? product.type}</span>
-          <StatusChip status={product.status ?? 'DRAFT'} />
+          <StatusBadge label="Included" tone="info" size="sm" />
+          <span>{productStatusLabel[product.status ?? 'DRAFT']}</span>
         </div>
         {product.description && <p>{product.description}</p>}
+        {isConfirmingRemove && (
+          <div className="membership-content-list-item__confirm" role="alertdialog">
+            <p>
+              {`Remove "${productTitle}" from this Membership? The original Product will not be deleted.`}
+            </p>
+            {removeError && (
+              <p className="membership-content-list-item__error" role="alert">
+                {removeError}
+              </p>
+            )}
+            <div>
+              <Button
+                type="button"
+                variant="tertiary"
+                size="sm"
+                onClick={() => setIsConfirmingRemove(false)}
+                disabled={isRemoving}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                loading={isRemoving}
+                onClick={handleConfirmRemove}
+              >
+                Remove from Membership
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
       <div className="membership-content-list-item__actions">
         {orderingControls}
@@ -154,7 +313,9 @@ const MembershipIncludedProductRow: React.FC<
           <Button
             type="button"
             variant="remove"
-            onClick={() => onRemoveProduct(product.id)}
+            size="sm"
+            aria-label={`Remove ${productTitle} from Membership`}
+            onClick={() => setIsConfirmingRemove(true)}
           >
             Remove
           </Button>
@@ -166,14 +327,16 @@ const MembershipIncludedProductRow: React.FC<
 
 interface MembershipOrderingControlsProps {
   entryId: string;
+  targetLabel: string;
   isFirst: boolean;
   isLast: boolean;
   // eslint-disable-next-line no-unused-vars
-  onMoveFeedEntry?: (entryId: string, direction: 'UP' | 'DOWN') => void;
+  onMoveFeedEntry?: (entryId: string, direction: 'UP' | 'DOWN') => Promise<void> | void;
 }
 
 const MembershipOrderingControls: React.FC<MembershipOrderingControlsProps> = ({
   entryId,
+  targetLabel,
   isFirst,
   isLast,
   onMoveFeedEntry,
@@ -187,7 +350,9 @@ const MembershipOrderingControls: React.FC<MembershipOrderingControlsProps> = ({
       <Button
         type="button"
         variant="secondary"
+        size="sm"
         disabled={isFirst}
+        aria-label={`Move ${targetLabel} up`}
         onClick={() => onMoveFeedEntry(entryId, 'UP')}
       >
         Move Up
@@ -195,7 +360,9 @@ const MembershipOrderingControls: React.FC<MembershipOrderingControlsProps> = ({
       <Button
         type="button"
         variant="secondary"
+        size="sm"
         disabled={isLast}
+        aria-label={`Move ${targetLabel} down`}
         onClick={() => onMoveFeedEntry(entryId, 'DOWN')}
       >
         Move Down
@@ -213,6 +380,7 @@ const MembershipContentList: React.FC<MembershipContentListProps> = ({
   onMoveFeedEntry,
   onEditContent,
   onDeleteContent,
+  onAddContent,
 }) => {
   const listItems = useMemo(
     () =>
@@ -227,9 +395,18 @@ const MembershipContentList: React.FC<MembershipContentListProps> = ({
 
   if (listItems.length === 0) {
     return (
-      <p className="membership-content-list__empty">
-        No membership content yet.
-      </p>
+      <div className="membership-content-list__empty">
+        <h4>Start your member feed</h4>
+        <p>
+          Add posts, videos, resources, or include existing Courses and
+          Downloads for active members.
+        </p>
+        {onAddContent && (
+          <Button type="button" variant="primary" onClick={onAddContent}>
+            Add your first content
+          </Button>
+        )}
+      </div>
     );
   }
 
@@ -240,6 +417,11 @@ const MembershipContentList: React.FC<MembershipContentListProps> = ({
           orderingMode === 'MANUAL' ? (
             <MembershipOrderingControls
               entryId={item.entry.entryId}
+              targetLabel={
+                item.kind === 'CONTENT'
+                  ? item.content.title
+                  : getProductTitle(item.product)
+              }
               isFirst={index === 0}
               isLast={index === listItems.length - 1}
               onMoveFeedEntry={onMoveFeedEntry}

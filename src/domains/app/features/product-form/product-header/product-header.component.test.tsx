@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useSelector } from 'react-redux';
 
@@ -85,11 +85,11 @@ describe('<ProductHeader />', () => {
     expect(screen.getByText('Not ready to publish')).toBeInTheDocument();
     expect(screen.getByText('Set a valid recurring price.')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Publish' }),
+      screen.getByRole('button', { name: 'Publish from Readiness' }),
     ).toBeDisabled();
   });
 
-  it('keeps ready Membership Publish disabled and informational', () => {
+  it('keeps ready Membership Publish non-persistent and informational', () => {
     render(
       <ProductHeader
         formData={{ type: 'MEMBERSHIP', name: 'Founders Club' } as any}
@@ -111,15 +111,15 @@ describe('<ProductHeader />', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Publish' })).toBeDisabled();
-    fireEvent.click(screen.getAllByRole('button')[0]);
+    const publishButton = screen.getByRole('button', {
+      name: 'Publish from Readiness',
+    });
 
-    expect(
-      screen.getByText(
-        'Membership publishing is not available yet. Content metadata can be saved, but ' +
-          'subscriptions, entitlements, and member access are unavailable.',
-      ),
-    ).toBeInTheDocument();
+    expect(publishButton).toBeDisabled();
+    expect(publishButton).toHaveAttribute(
+      'title',
+      'Use the Product Workspace Readiness destination to publish when blockers are resolved.',
+    );
   });
 
   it('leaves non-Membership Publish rendering on the existing path', () => {

@@ -1,16 +1,133 @@
 @use '../../../../../styles/index.scss' as *;
 
+.course-lessons {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
 .course-lessons-header {
   display: flex;
-  width: 100%;
-  // justify-content: left;
-  margin: $spacing-6 0 $spacing-3;
-  align-items: center;
-  gap: $spacing-7;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-3;
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h3 {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  p {
+    margin-top: $spacing-1;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
 }
 
 .add-lesson-button {
   display: inline-flex;
   gap: $spacing-2;
-  width: 200px;
+}
+
+.course-lessons__empty,
+.course-lessons__create {
+  padding: $spacing-4;
+  border: 1px dashed var(--border-subtle);
+  border-radius: $radius-md;
+  background: rgba(var(--surface-panel-elevated-rgb), 0.24);
+}
+
+.course-lessons__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $spacing-2;
+
+  h4,
+  p {
+    margin: 0;
+  }
+
+  h4 {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.course-lessons__create {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+
+  h4,
+  p {
+    margin: 0;
+  }
+
+  h4 {
+    color: var(--text-primary);
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.course-lessons__type-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.course-lessons__create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-2;
+}
+
+.course-lessons__list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.course-lessons__error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 760px) {
+  .course-lessons-header {
+    flex-direction: column;
+  }
+
+  .course-lessons__type-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .course-lessons-header > button,
+  .course-lessons__empty > button {
+    width: 100%;
+  }
+
+  .course-lessons__create-actions {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
 }

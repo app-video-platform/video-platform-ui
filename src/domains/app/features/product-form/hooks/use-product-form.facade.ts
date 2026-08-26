@@ -67,7 +67,12 @@ export const useProductFormFacade = (): UseProductFormFacadeResult => {
   });
 
   // 3) autosave
-  const { isAutosaving, lastSavedAt } = useProductAutosave({
+  const {
+    isAutosaving,
+    hasPendingAutosave,
+    lastSavedAt,
+    flushAutosave,
+  } = useProductAutosave({
     formData,
     user,
     showRestOfForm,
@@ -113,6 +118,8 @@ export const useProductFormFacade = (): UseProductFormFacadeResult => {
     handleSidebarLessonClick,
     sidebarSections,
     isAutosaving,
+    hasPendingAutosave,
+    flushAutosave,
     lastSavedAt,
   };
 };

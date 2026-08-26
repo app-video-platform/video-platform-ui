@@ -2,20 +2,18 @@
 
 .product-workspace-shell {
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at top right, rgba(var(--brand-secondary-rgb), 0.14), transparent 36rem),
-    var(--surface-canvas);
+  background: var(--surface-canvas);
 
   &__header {
     position: sticky;
     top: 0;
     z-index: var(--z-shell);
-    min-height: 76px;
-    display: flex;
+    min-height: 72px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
-    gap: $spacing-5;
-    padding: $spacing-4 $spacing-6;
+    gap: $spacing-4;
+    padding: $spacing-3 $spacing-6;
     background: rgba(var(--surface-canvas-rgb), 0.92);
     border-bottom: 1px solid var(--border-subtle);
     backdrop-filter: blur(16px);
@@ -42,6 +40,7 @@
 
     h1 {
       max-width: clamp(16rem, 38vw, 44rem);
+      margin: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -60,6 +59,22 @@
     letter-spacing: 0.04em;
   }
 
+  &__save-state {
+    display: flex;
+    min-width: 7rem;
+    justify-content: flex-end;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+  }
+
+  &__action-note {
+    grid-column: 2;
+    margin: -$spacing-2 0 0;
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+    text-align: right;
+  }
+
   &__overflow {
     min-width: 40px;
     width: 40px;
@@ -68,8 +83,8 @@
 
   &__body {
     display: grid;
-    grid-template-columns: 264px minmax(0, 1fr);
-    gap: $spacing-6;
+    grid-template-columns: 248px minmax(0, 1fr);
+    gap: $spacing-5;
     align-items: flex-start;
     padding: $spacing-6;
   }
@@ -81,13 +96,14 @@
 
   &__content {
     min-width: 0;
+    max-width: 1180px;
   }
 }
 
 @media (max-width: $bp-laptop) {
   .product-workspace-shell {
     &__body {
-      grid-template-columns: 220px minmax(0, 1fr);
+      grid-template-columns: 216px minmax(0, 1fr);
       gap: $spacing-4;
       padding: $spacing-5;
     }
@@ -103,7 +119,7 @@
     &__header {
       min-height: auto;
       align-items: flex-start;
-      flex-direction: column;
+      grid-template-columns: 1fr;
       gap: $spacing-3;
       padding: $spacing-3 $spacing-4;
     }
@@ -118,6 +134,17 @@
       justify-content: flex-start;
     }
 
+    &__save-state {
+      justify-content: flex-start;
+      min-width: 0;
+    }
+
+    &__action-note {
+      grid-column: 1;
+      margin-top: -$spacing-1;
+      text-align: left;
+    }
+
     &__meta h1 {
       max-width: min(72vw, 28rem);
       font-size: 1rem;
@@ -130,7 +157,7 @@
 
     &__nav {
       position: sticky;
-      top: 116px;
+      top: 128px;
       z-index: var(--z-sticky);
       margin: 0 0 $spacing-4;
       overflow-x: auto;

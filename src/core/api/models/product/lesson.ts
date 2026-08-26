@@ -22,6 +22,7 @@ export interface LessonCreate {
   productId: string;
   videoUrl?: string;
   content?: string;
+  quiz?: QuizDraft;
   description: string;
   position?: number;
 }

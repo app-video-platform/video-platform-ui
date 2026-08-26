@@ -67,6 +67,8 @@ jest.mock('@shared/ui', () => ({
       {children}
     </button>
   ),
+  Icon: () => <span data-testid="icon" />,
+  StatusBadge: ({ label }: { label: string }) => <span>{label}</span>,
   // Simple ExpansionPanel stub that just renders header + children
   ExpansionPanel: ({
     header,
@@ -119,8 +121,6 @@ jest.mock('@shared/ui', () => ({
       Upload File
     </button>
   ),
-  // Icon stub
-  Icon: () => <span data-testid="icon" />,
 }));
 
 // ── 4) MOCK EditableTitle (local import) ───────────────────────────
@@ -244,7 +244,7 @@ describe('<SectionEditor />', () => {
   });
 
   // --- Removing a new (unsaved) section ----------------------------
-  it('removes a new (unsaved) section immediately', () => {
+  it('removes a new (unsaved) section after confirmation', () => {
     render(
       <SectionEditor
         index={5}
@@ -257,17 +257,18 @@ describe('<SectionEditor />', () => {
       />,
     );
 
-    const removeBtn = screen.getByTestId('btn-remove');
+    const removeBtn = screen.getByRole('button', { name: /^delete$/i });
     expect(removeBtn).toBeInTheDocument();
 
     fireEvent.click(removeBtn);
+    fireEvent.click(screen.getByRole('button', { name: /delete section/i }));
 
     expect(mockedDeleteSection).not.toHaveBeenCalled();
     expect(removeParentMock).toHaveBeenCalledWith(5);
   });
 
-  // --- Removing an existing section via thunk ----------------------
-  it('removes an existing section via thunk then parent callback', async () => {
+  // --- Removing an existing section through the confirmed parent callback ---
+  it('requests confirmed removal for an existing section without dispatching section deletion itself', async () => {
     const existing: SectionDraft = {
       id: 'to-remove',
       title: 'Title',
@@ -276,13 +277,6 @@ describe('<SectionEditor />', () => {
       lessons: [],
       files: [],
     };
-
-    const fakeThunk = Symbol('fakeThunk');
-    mockedDeleteSection.mockReturnValue(fakeThunk as any);
-
-    fakeDispatch.mockImplementation((action: any) => ({
-      unwrap: () => Promise.resolve({}),
-    }));
 
     render(
       <SectionEditor
@@ -297,19 +291,15 @@ describe('<SectionEditor />', () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getByTestId('btn-remove'));
+      fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
     });
-
-    expect(mockedDeleteSection).toHaveBeenCalledWith({
-      productId: 'pid-1',
-      sectionId: 'to-remove',
-    });
-    expect(fakeDispatch).toHaveBeenCalledWith(fakeThunk);
 
     await act(async () => {
-      await Promise.resolve();
+      fireEvent.click(screen.getByRole('button', { name: /delete section/i }));
     });
 
+    expect(mockedDeleteSection).not.toHaveBeenCalled();
+    expect(fakeDispatch).not.toHaveBeenCalled();
     expect(removeParentMock).toHaveBeenCalledWith(7);
   });
 
@@ -516,7 +506,11 @@ describe('<SectionEditor />', () => {
     );
 
     await act(async () => {
-      fireEvent.click(screen.getAllByTestId('btn-remove')[1]);
+      fireEvent.click(screen.getByRole('button', { name: /^remove$/i }));
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /^remove$/i }));
       await Promise.resolve();
     });
 

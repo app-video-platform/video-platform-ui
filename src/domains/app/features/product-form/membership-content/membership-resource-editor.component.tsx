@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, UppyFileUploader, Input, Select, Textarea } from '@shared/ui';
 import {
@@ -13,8 +13,11 @@ interface MembershipResourceEditorProps {
   value: MembershipResourceDraft;
   // eslint-disable-next-line no-unused-vars
   onChange: (value: MembershipResourceDraft) => void;
-  onSave: () => void;
+  onSave: () => Promise<void> | void;
   onCancel: () => void;
+  isSaving?: boolean;
+  saveError?: string | null;
+  saveLabel?: string;
 }
 
 const RESOURCE_ALLOWED_FILE_TYPES = [
@@ -41,8 +44,15 @@ const MembershipResourceEditor: React.FC<MembershipResourceEditorProps> = ({
   onChange,
   onSave,
   onCancel,
+  isSaving = false,
+  saveError,
+  saveLabel = 'Save',
 }) => {
-  const canSave = isValidResourceDraft(value);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const titleError =
+    hasSubmitted && !value.title.trim() ? 'Enter a resource title.' : undefined;
+  const fileError =
+    hasSubmitted && !value.file ? 'Select a resource file.' : undefined;
 
   const handleFilesChange = (files: File[]) => {
     const selectedFile = files[0];
@@ -53,6 +63,16 @@ const MembershipResourceEditor: React.FC<MembershipResourceEditorProps> = ({
     });
   };
 
+  const handleSave = () => {
+    setHasSubmitted(true);
+
+    if (!isValidResourceDraft(value)) {
+      return;
+    }
+
+    onSave();
+  };
+
   return (
     <div className="membership-resource-editor">
       <Input
@@ -60,6 +80,7 @@ const MembershipResourceEditor: React.FC<MembershipResourceEditorProps> = ({
         label="Title"
         value={value.title}
         placeholder="Resource title"
+        error={titleError}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
           onChange({ ...value, title: event.target.value })
         }
@@ -77,7 +98,12 @@ const MembershipResourceEditor: React.FC<MembershipResourceEditorProps> = ({
       />
 
       <div className="membership-resource-editor__file">
-        <label>File</label>
+        <div className="membership-content-editor__field-heading">
+          <span id="membership-resource-file-label">Selected file</span>
+          <small>
+            File upload will be connected when media storage is available.
+          </small>
+        </div>
         <UppyFileUploader
           allowedFileTypes={RESOURCE_ALLOWED_FILE_TYPES}
           maxNumberOfFiles={1}
@@ -86,6 +112,11 @@ const MembershipResourceEditor: React.FC<MembershipResourceEditorProps> = ({
           uploadMode="SELECT_ONLY"
           onFilesChange={handleFilesChange}
         />
+        {fileError && (
+          <span className="input-error-message" role="alert">
+            {fileError}
+          </span>
+        )}
         {value.file && (
           <p className="membership-resource-editor__selected">
             Selected file: {value.file.fileName} (
@@ -107,17 +138,28 @@ const MembershipResourceEditor: React.FC<MembershipResourceEditorProps> = ({
         }
       />
 
+      {saveError && (
+        <p className="membership-content-editor__error" role="alert">
+          {saveError}
+        </p>
+      )}
+
       <div className="membership-resource-editor__actions">
-        <Button type="button" variant="tertiary" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="tertiary"
+          onClick={onCancel}
+          disabled={isSaving}
+        >
           Cancel
         </Button>
         <Button
           type="button"
           variant="primary"
-          onClick={onSave}
-          disabled={!canSave}
+          onClick={handleSave}
+          loading={isSaving}
         >
-          Save
+          {saveLabel}
         </Button>
       </div>
     </div>

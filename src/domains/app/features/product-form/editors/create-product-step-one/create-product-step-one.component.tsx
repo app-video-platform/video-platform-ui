@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
 import clsx from 'clsx';
 
@@ -13,8 +14,9 @@ import { Button, Icon, Input } from '@shared/ui';
 import { FormErrors } from 'domains/app/pages';
 import { createProduct } from 'core/store/product-store';
 import { ProductTypeSelector } from 'domains/app/features/product-form/product-type-selector';
-import { getCssVar } from '@shared/utils';
+import { extractErrorMessage, getCssVar } from '@shared/utils';
 import { ProductDraft } from 'domains/app/features/product-form/models';
+import { appRoutes } from 'domains/app/routes/routes';
 
 import './create-product-step-one.styles.scss';
 
@@ -41,12 +43,18 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
   setShowRestOfForm,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const { name, type } = formData;
-    if (!name) {
+    if (!name || !type || isSubmitting) {
       return;
     }
+
+    setCreateError(null);
+    setIsSubmitting(true);
     setShowLoadingRestOfForm(true);
 
     const newProductPayload: CreateProductPayload = {
@@ -57,39 +65,46 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
       status: 'DRAFT',
     };
 
-    setTimeout(() => {
-      dispatch(createProduct(newProductPayload))
-        .unwrap()
-        .then((data) => {
-          if (data) {
-            // formData.id = data.id; // Set the product ID in formData
-            setField('id', data.id ?? ''); // Ensure the formData is updated with the new ID
-            setField('userId', data.userId ?? userId);
-            // formData.sections = data.sections || []; // Initialize sections if they exist
-            if (data.type === 'COURSE' || data.type === 'DOWNLOAD') {
-              setField('sections', data.sections || []); // Update sections in formData
-            }
-            setShowRestOfForm(true);
-          }
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error('Error creating product:', error);
-        })
-        .finally(() => {
-          setShowLoadingRestOfForm(false);
-        });
-    }, 500);
+    try {
+      const data = await dispatch(createProduct(newProductPayload)).unwrap();
+
+      if (!data) {
+        setCreateError('Product could not be created. Please try again.');
+        return;
+      }
+
+      setField('id', data.id ?? '');
+      setField('userId', data.userId ?? userId);
+      if (data.type === 'COURSE' || data.type === 'DOWNLOAD') {
+        setField('sections', data.sections || []);
+      }
+      setShowRestOfForm(true);
+      if (data.id) {
+        navigate(appRoutes.productsEdit(data.id), { replace: true });
+      }
+    } catch (error) {
+      setCreateError(
+        typeof error === 'string' ? error : extractErrorMessage(error),
+      );
+    } finally {
+      setShowLoadingRestOfForm(false);
+      setIsSubmitting(false);
+    }
   };
 
-  const isDisabled = !formData.name || !formData.type;
+  const isDisabled = !formData.name || !formData.type || isSubmitting;
   const readOnly = showRestOfForm;
 
   return (
     <div className={clsx('step-one', { 'step-one__readonly': readOnly })}>
       <ProductTypeSelector
         value={formData.type}
-        onChange={(type) => !readOnly && setField('type', type)}
+        onChange={(type) => {
+          if (!readOnly) {
+            setCreateError(null);
+            setField('type', type);
+          }
+        }}
       />
 
       {errors.type && <p className="error-text-red">{errors.type}</p>}
@@ -99,12 +114,14 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
         <Input
           type="text"
           name="name"
+          aria-label="Product title"
           value={formData.name ?? ''}
           readOnly={readOnly}
           className="title-input"
-          onChange={(e: { target: { value: string } }) =>
-            setField('name', e.target.value)
-          }
+          onChange={(e: { target: { value: string } }) => {
+            setCreateError(null);
+            setField('name', e.target.value);
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault(); // optional
@@ -120,6 +137,7 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
             onClick={() => handleContinue()}
             className="create-course-continue-button"
             disabled={isDisabled}
+            aria-label="Continue to Product workspace"
           >
             <Icon
               icon={FaArrowRight}
@@ -130,6 +148,11 @@ const CreateProductStepOne: React.FC<CreateProductStepOneProps> = ({
           </Button>
         )}
       </div>
+      {createError && (
+        <p className="error-text-red" role="alert">
+          {createError}
+        </p>
+      )}
       {errors.name && <p className="error-text-red">{errors.name}</p>}
     </div>
   );

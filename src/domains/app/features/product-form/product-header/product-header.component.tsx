@@ -68,10 +68,7 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
   });
   const isMembership = formData.type === 'MEMBERSHIP';
   const membershipPublishMessage =
-    'Membership publishing is not available yet. Content metadata can be saved, but subscriptions, entitlements, and member access are unavailable.';
-  const handleMembershipPublishClick = () => {
-    window.alert(membershipPublishMessage);
-  };
+    'Use the Product Workspace Readiness destination to publish when blockers are resolved.';
 
   const renderMembershipReadiness = () => {
     if (!membershipReadiness) {
@@ -169,9 +166,9 @@ const ProductHeader: React.FC<ProductHeaderProps> = ({
                 type="button"
                 variant="primary"
                 disabled
-                onClick={handleMembershipPublishClick}
+                title={membershipPublishMessage}
               >
-                Publish
+                Publish from Readiness
               </Button>
             ) : (
               <Button variant="primary">Publish</Button>

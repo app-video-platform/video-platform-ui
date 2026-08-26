@@ -10,6 +10,7 @@ import {
   fireEvent,
   waitFor,
   cleanup,
+  act,
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -27,10 +28,37 @@ const mockProductStoreState = {
     saveError: null as string | null,
   },
 };
+const mockNavigate = jest.fn();
+const mockUpdateProductDetailsUnwrap = jest.fn(() =>
+  Promise.resolve({ status: 'PUBLISHED' }),
+);
+const mockDispatch = jest.fn(() => ({
+  unwrap: mockUpdateProductDetailsUnwrap,
+}));
+
+jest.mock('react-router-dom', () => ({
+  __esModule: true,
+  useNavigate: () => mockNavigate,
+}));
 
 // ── 1) Mock @shared/ui (UppyFileUploader) ────────────────────────────
 jest.mock('@shared/ui', () => ({
   __esModule: true,
+  Button: ({
+    children,
+    onClick,
+    type,
+    variant,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    type?: 'button' | 'submit';
+    variant?: string;
+  }) => (
+    <button type={type ?? 'button'} data-variant={variant} onClick={onClick}>
+      {children}
+    </button>
+  ),
   UppyFileUploader: ({
     onFilesChange,
   }: {
@@ -46,7 +74,7 @@ jest.mock('@shared/ui', () => ({
 
 jest.mock('react-redux', () => ({
   __esModule: true,
-  useDispatch: jest.fn(() => jest.fn()),
+  useDispatch: jest.fn(() => mockDispatch),
   useSelector: jest.fn((selector) => selector(mockProductStoreState)),
 }));
 
@@ -54,7 +82,55 @@ jest.mock('react-redux', () => ({
 const mockUseProductFormFacade = jest.fn();
 const mockUseProductFormAnimation = jest.fn();
 const mockProductWorkspaceShell = jest.fn();
+const mockProductMediaSection = jest.fn();
 const mockUseGlobalSaveStatus = jest.fn(() => 'idle');
+const mockEvaluateProductReadiness = jest.fn(
+  ({
+    formData,
+    recurringPricing,
+    membershipNativeContentItems = [],
+    membershipIncludedProducts = [],
+    isMembershipLoading = false,
+  }: any) => ({
+    blockers:
+      isMembershipLoading || formData.price === 0 || recurringPricing?.amount === 0
+        ? [
+          {
+            id: 'mock-blocker',
+            severity: 'BLOCKER',
+            title: 'Mock blocker',
+            description: 'Resolve mock blocker.',
+            destination: 'pricing',
+          },
+        ]
+        : [],
+    warnings: formData.imageUrl
+      ? []
+      : [
+        {
+          id: 'missing-thumbnail',
+          severity: 'WARNING',
+          title: 'Add a thumbnail',
+          description: 'Products with thumbnails are easier to recognize.',
+          destination: 'media',
+        },
+      ],
+    isReadyToPublish:
+      !isMembershipLoading &&
+      Boolean(formData.name?.trim()) &&
+      (formData.type !== 'MEMBERSHIP' ||
+        (
+          recurringPricing?.amount > 0 &&
+          (membershipNativeContentItems.some(
+            (item: any) => item.status === 'PUBLISHED',
+          ) ||
+            membershipIncludedProducts.some(
+              (product: any) => product.status === 'PUBLISHED',
+            ))
+        )),
+    isEvaluating: isMembershipLoading,
+  }),
+);
 const mockEvaluateMembershipReadiness = jest.fn(
   ({
     formData,
@@ -98,6 +174,8 @@ jest.mock('domains/app/features/product-form', () => ({
   useProductFormAnimation: (...args: any[]) =>
     mockUseProductFormAnimation(...args),
   useGlobalSaveStatus: () => mockUseGlobalSaveStatus(),
+  evaluateProductReadiness: (input: any) =>
+    mockEvaluateProductReadiness(input),
   evaluateMembershipReadiness: (input: any) =>
     mockEvaluateMembershipReadiness(input),
   resolveMembershipIncludedProducts: (
@@ -125,6 +203,35 @@ jest.mock('domains/app/features/product-form', () => ({
 
   // basic info tab stub
   BasicInfo: () => <div data-testid="basic-info">BasicInfo</div>,
+  ProductPricingSection: ({
+    formData,
+    onMembershipRecurringPricingChange,
+  }: {
+    formData: { price: number; currency?: string; billingInterval?: string };
+    onMembershipRecurringPricingChange: (value: {
+      amount: number;
+      currency: string;
+      interval: string;
+    }) => void;
+  }) => (
+    <>
+      <div data-testid="product-pricing-section">
+        ProductPricingSection (price: {String(formData.price)})
+      </div>
+      <button
+        data-testid="set-valid-membership-price"
+        onClick={() =>
+          onMembershipRecurringPricingChange({
+            amount: 25,
+            currency: 'EUR',
+            interval: 'MONTH',
+          })
+        }
+      >
+        Set valid price
+      </button>
+    </>
+  ),
 
   // consultation details tab stub
   ConsultationDetailsSection: () => (
@@ -133,6 +240,29 @@ jest.mock('domains/app/features/product-form', () => ({
 
   MembershipContentSection: () => (
     <div data-testid="membership-content">Included Products</div>
+  ),
+
+  ProductMediaSection: (props: any) => {
+    mockProductMediaSection(props);
+    return <div data-testid="product-media-section">ProductMediaSection</div>;
+  },
+
+  ProductReadinessSection: ({
+    result,
+    publishError,
+    onNavigateToDestination,
+  }: any) => (
+    <div data-testid="product-readiness-section">
+      <h3>Readiness</h3>
+      <div>{result.isReadyToPublish ? 'Ready to publish' : 'Blockers'}</div>
+      {publishError && <div role="alert">{publishError}</div>}
+      <button
+        data-testid="readiness-go-pricing"
+        onClick={() => onNavigateToDestination('pricing')}
+      >
+        Go to Pricing
+      </button>
+    </div>
   ),
 
   // sections editor stub
@@ -185,6 +315,12 @@ jest.mock('domains/app/features/product-form', () => ({
       </button>
       <button data-testid="tab-media" onClick={() => onChange('media')}>
         Media
+      </button>
+      <button
+        data-testid="tab-readiness"
+        onClick={() => onChange('readiness')}
+      >
+        Readiness
       </button>
       <button
         data-testid="sidebar-section-link"
@@ -305,6 +441,8 @@ const makeFacadeState = (overrides: Partial<any> = {}) => ({
   handleSidebarLessonClick: jest.fn(),
   sidebarSections: [],
   isAutosaving: false,
+  hasPendingAutosave: false,
+  flushAutosave: jest.fn(() => Promise.resolve()),
   lastSavedAt: null,
   ...overrides,
 });
@@ -333,6 +471,35 @@ describe('<ProductForm />', () => {
         isEditMode: true,
       }),
     );
+  });
+
+  it('passes lifecycle, preview, and pending autosave state to ProductWorkspaceShell', async () => {
+    const state = makeFacadeState({
+      formData: {
+        id: 'published-1',
+        name: 'Published Product',
+        description: '',
+        type: 'COURSE',
+        status: 'PUBLISHED',
+        price: 42,
+        sections: [],
+      },
+      hasPendingAutosave: true,
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          productStatus: 'PUBLISHED',
+          hasPendingAutosave: true,
+          canPreview: true,
+        }),
+      );
+    });
   });
 
   it('shows step-one hero when user is present but showRestOfForm is false', () => {
@@ -377,17 +544,17 @@ describe('<ProductForm />', () => {
 
     render(<ProductForm />);
 
-    // Wait until builder/sections show up (activeTab is set via effect)
+    // New Products now start in Basics, then creators can move into type-specific tabs.
     await waitFor(() => {
       expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
-      expect(screen.getByTestId('create-sections')).toBeInTheDocument();
+      expect(screen.getByTestId('basic-info')).toBeInTheDocument();
     });
 
     // Hero step-one should not be rendered when showRestOfForm is true
     expect(screen.queryByTestId('step-one-continue')).not.toBeInTheDocument();
   });
 
-  it('clicking Pricing tab shows the PriceSelector panel', async () => {
+  it('clicking Pricing tab shows the shared pricing panel', async () => {
     const state = makeFacadeState({
       showRestOfForm: true,
       formData: {
@@ -404,7 +571,7 @@ describe('<ProductForm />', () => {
 
     render(<ProductForm />);
 
-    // Wait for builder to appear (activeTab initially "sections")
+    // Wait for builder to appear.
     await waitFor(() => {
       expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
     });
@@ -412,14 +579,13 @@ describe('<ProductForm />', () => {
     // Click the "Pricing" tab in our mocked sidebar
     fireEvent.click(screen.getByTestId('tab-pricing'));
 
-    // Now the pricing panel should show our PriceSelector stub
-    expect(screen.getByTestId('price-selector')).toBeInTheDocument();
+    expect(screen.getByTestId('product-pricing-section')).toBeInTheDocument();
     // And sections panel should be gone
     expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
   });
 
   it.each(['COURSE', 'DOWNLOAD', 'CONSULTATION'])(
-    'uses the legacy PriceSelector for %s pricing',
+    'uses the shared ProductPricingSection for %s pricing',
     async (productType) => {
       const state = makeFacadeState({
         showRestOfForm: true,
@@ -443,7 +609,7 @@ describe('<ProductForm />', () => {
 
       fireEvent.click(screen.getByTestId('tab-pricing'));
 
-      expect(screen.getByTestId('price-selector')).toBeInTheDocument();
+      expect(screen.getByTestId('product-pricing-section')).toBeInTheDocument();
       expect(
         screen.queryByTestId('recurring-price-selector'),
       ).not.toBeInTheDocument();
@@ -472,14 +638,11 @@ describe('<ProductForm />', () => {
 
     fireEvent.click(screen.getByTestId('tab-pricing'));
 
-    expect(screen.getByTestId('recurring-price-selector')).toBeInTheDocument();
-    expect(screen.getByTestId('recurring-price-selector')).toHaveTextContent(
-      '25 EUR MONTH',
-    );
+    expect(screen.getByTestId('product-pricing-section')).toBeInTheDocument();
     expect(screen.queryByTestId('price-selector')).not.toBeInTheDocument();
   });
 
-  it('passes derived Membership readiness to ProductWorkspaceShell publish state', async () => {
+  it('keeps Membership Publish disabled even when readiness is satisfied', async () => {
     mockProductStoreState.membership.byProductId['membership-1'] = {
       productId: 'membership-1',
       config: { productId: 'membership-1', orderingMode: 'NEWEST_FIRST' },
@@ -511,10 +674,10 @@ describe('<ProductForm />', () => {
     render(<ProductForm />);
 
     await waitFor(() => {
-      expect(mockEvaluateMembershipReadiness).toHaveBeenCalledWith(
+      expect(mockEvaluateProductReadiness).toHaveBeenCalledWith(
         expect.objectContaining({
           formData: state.formData,
-          nativeContentItems: expect.arrayContaining([
+          membershipNativeContentItems: expect.arrayContaining([
             expect.objectContaining({ status: 'PUBLISHED' }),
           ]),
         }),
@@ -524,8 +687,18 @@ describe('<ProductForm />', () => {
     expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
       expect.objectContaining({
         canPublish: false,
+        publishDisabledReason: 'Membership publishing is not available yet.',
+        publishHelpText: expect.stringContaining('Membership publishing is not available yet'),
       }),
     );
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    expect(mockUpdateProductDetailsUnwrap).not.toHaveBeenCalled();
   });
 
   it('updates Membership readiness when recurring pricing becomes valid', async () => {
@@ -551,7 +724,7 @@ describe('<ProductForm />', () => {
     fireEvent.click(screen.getByTestId('set-valid-membership-price'));
 
     await waitFor(() => {
-      expect(mockEvaluateMembershipReadiness).toHaveBeenLastCalledWith(
+      expect(mockEvaluateProductReadiness).toHaveBeenLastCalledWith(
         expect.objectContaining({
           recurringPricing: expect.objectContaining({ amount: 25 }),
         }),
@@ -597,8 +770,8 @@ describe('<ProductForm />', () => {
     const view = render(<ProductForm />);
 
     await waitFor(() => {
-      expect(mockEvaluateMembershipReadiness).toHaveBeenCalledWith(
-        expect.objectContaining({ nativeContentItems: [] }),
+      expect(mockEvaluateProductReadiness).toHaveBeenCalledWith(
+        expect.objectContaining({ membershipNativeContentItems: [] }),
       );
     });
 
@@ -607,9 +780,9 @@ describe('<ProductForm />', () => {
     view.rerender(<ProductForm />);
 
     await waitFor(() => {
-      expect(mockEvaluateMembershipReadiness).toHaveBeenLastCalledWith(
+      expect(mockEvaluateProductReadiness).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          nativeContentItems: expect.arrayContaining([
+          membershipNativeContentItems: expect.arrayContaining([
             expect.objectContaining({ status: 'PUBLISHED' }),
           ]),
         }),
@@ -654,9 +827,9 @@ describe('<ProductForm />', () => {
     render(<ProductForm />);
 
     await waitFor(() => {
-      expect(mockEvaluateMembershipReadiness).toHaveBeenCalledWith(
+      expect(mockEvaluateProductReadiness).toHaveBeenCalledWith(
         expect.objectContaining({
-          includedProducts: [
+          membershipIncludedProducts: [
             expect.objectContaining({
               id: 'download-1',
               status: 'PUBLISHED',
@@ -696,7 +869,7 @@ describe('<ProductForm />', () => {
     );
   });
 
-  it('when showRestOfForm is true for a MEMBERSHIP, shows membership content after effect', async () => {
+  it('when showRestOfForm is true for a MEMBERSHIP, starts on Basics after effect', async () => {
     const state = makeFacadeState({
       showRestOfForm: true,
       formData: {
@@ -714,17 +887,15 @@ describe('<ProductForm />', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
-      expect(screen.getByTestId('membership-content')).toBeInTheDocument();
+      expect(screen.getByTestId('basic-info')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Included Products')).toBeInTheDocument();
-    expect(screen.getByTestId('active-tab')).toHaveTextContent(
-      'membership-content',
-    );
+    expect(screen.queryByText('Included Products')).not.toBeInTheDocument();
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('basics');
     expect(screen.queryByTestId('create-sections')).not.toBeInTheDocument();
   });
 
-  it('clicking Media tab shows the image uploader (UppyFileUploader)', async () => {
+  it('clicking Media tab shows the Product media destination', async () => {
     const state = makeFacadeState({
       showRestOfForm: true,
       formData: {
@@ -747,7 +918,481 @@ describe('<ProductForm />', () => {
 
     fireEvent.click(screen.getByTestId('tab-media'));
 
-    expect(screen.getByTestId('file-uploader')).toBeInTheDocument();
+    expect(screen.getByTestId('product-media-section')).toBeInTheDocument();
+  });
+
+  it('appends multiple gallery uploads from the latest form state', async () => {
+    const firstImage = {
+      id: 'gallery-1',
+      url: 'https://cdn.example.com/one.jpg',
+      position: 1,
+    };
+    const secondImage = {
+      id: 'gallery-2',
+      url: 'https://cdn.example.com/two.jpg',
+      position: 2,
+    };
+    (mockUpdateProductDetailsUnwrap as jest.Mock)
+      .mockResolvedValueOnce({ image: firstImage })
+      .mockResolvedValueOnce({ image: secondImage });
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'prod-1',
+        name: 'Course Name',
+        description: '',
+        type: 'COURSE',
+        price: 99,
+        galleryImages: [],
+        sections: [],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('tab-media'));
+
+    await waitFor(() => {
+      expect(mockProductMediaSection).toHaveBeenLastCalledWith(
+        expect.objectContaining({ onAddGalleryImage: expect.any(Function) }),
+      );
+    });
+
+    await act(async () => {
+      await mockProductMediaSection.mock.calls[
+        mockProductMediaSection.mock.calls.length - 1
+      ][0].onAddGalleryImage(
+        new File(['one'], 'one.jpg', { type: 'image/jpeg' }),
+      );
+      await mockProductMediaSection.mock.calls[
+        mockProductMediaSection.mock.calls.length - 1
+      ][0].onAddGalleryImage(
+        new File(['two'], 'two.jpg', { type: 'image/jpeg' }),
+      );
+    });
+
+    const galleryStateUpdates = state.setFormData.mock.calls
+      .map(([update]: [unknown]) => update)
+      .filter((update: unknown) => typeof update === 'function') as Array<
+        (currentFormData: typeof state.formData) => typeof state.formData
+      >;
+    const nextState = galleryStateUpdates.reduce(
+      (currentFormData, update) => update(currentFormData),
+      state.formData,
+    );
+
+    expect((nextState as any).galleryImages).toEqual([firstImage, secondImage]);
+  });
+
+  it('clicking Readiness tab shows the readiness foundation', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'prod-1',
+        name: 'Course Name',
+        description: '',
+        type: 'COURSE',
+        price: 0,
+        sections: [],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('builder-sidebar')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('tab-readiness'));
+
+    expect(screen.getByRole('heading', { name: 'Readiness', level: 2 }))
+      .toBeInTheDocument();
+    expect(screen.getByTestId('product-readiness-section')).toBeInTheDocument();
+  });
+
+  it('Publish flushes pending Product autosave before publishing', async () => {
+    const handleSubmitMock = jest.fn((e?: React.FormEvent) => {
+      e?.preventDefault();
+    });
+    const flushAutosave = jest.fn(() => Promise.resolve());
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      handleSubmit: handleSubmitMock,
+      flushAutosave,
+      formData: {
+        id: 'course-1',
+        name: 'Ready Course',
+        description: '',
+        type: 'COURSE',
+        price: 25,
+        sections: [
+          {
+            id: 'section-1',
+            title: 'Intro',
+            position: 1,
+            lessons: [
+              {
+                id: 'lesson-1',
+                title: 'Welcome',
+                sectionId: 'section-1',
+                description: '',
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+        expect.objectContaining({ onPublish: expect.any(Function) }),
+      );
+    });
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    await waitFor(() => {
+      expect(flushAutosave).toHaveBeenCalled();
+      expect(handleSubmitMock).not.toHaveBeenCalled();
+      expect(mockDispatch).toHaveBeenCalled();
+      expect(state.setField).toHaveBeenCalledWith('status', 'PUBLISHED');
+    });
+  });
+
+  it('keeps Membership Publish disabled when known blockers exist', async () => {
+    const handleSubmitMock = jest.fn((e?: React.FormEvent) => {
+      e?.preventDefault();
+    });
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      handleSubmit: handleSubmitMock,
+      formData: {
+        id: 'membership-1',
+        name: 'Founders Club',
+        description: '',
+        type: 'MEMBERSHIP',
+        price: 0,
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          canPublish: false,
+          publishDisabledReason: 'Membership publishing is not available yet.',
+          onPublish: expect.any(Function),
+        }),
+      );
+    });
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    expect(handleSubmitMock).not.toHaveBeenCalled();
+    expect(mockUpdateProductDetailsUnwrap).not.toHaveBeenCalled();
+  });
+
+  it('Publish allows warnings when there are no blockers', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'course-1',
+        name: 'Ready Course',
+        description: '',
+        type: 'COURSE',
+        price: 25,
+        imageUrl: undefined,
+        sections: [
+          {
+            id: 'section-1',
+            title: 'Intro',
+            position: 1,
+            lessons: [
+              {
+                id: 'lesson-1',
+                title: 'Welcome',
+                sectionId: 'section-1',
+                description: '',
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    expect(mockEvaluateProductReadiness).toHaveBeenCalled();
+    expect(mockDispatch).toHaveBeenCalled();
+    expect(state.setField).toHaveBeenCalledWith('status', 'PUBLISHED');
+  });
+
+  it('failed Publish stays retryable and shows Readiness feedback', async () => {
+    mockUpdateProductDetailsUnwrap.mockRejectedValueOnce(new Error('nope'));
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'course-1',
+        name: 'Ready Course',
+        description: '',
+        type: 'COURSE',
+        price: 25,
+        sections: [
+          {
+            id: 'section-1',
+            title: 'Intro',
+            position: 1,
+            lessons: [
+              {
+                id: 'lesson-1',
+                title: 'Welcome',
+                sectionId: 'section-1',
+                description: '',
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    expect(state.setField).not.toHaveBeenCalledWith('status', 'PUBLISHED');
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Publish failed');
+    });
+
+    expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        canPublish: true,
+        isPublishing: false,
+      }),
+    );
+  });
+
+  it('prevents duplicate Publish while already publishing', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'course-1',
+        name: 'Ready Course',
+        description: '',
+        type: 'COURSE',
+        price: 25,
+        sections: [
+          {
+            id: 'section-1',
+            title: 'Intro',
+            position: 1,
+            lessons: [
+              {
+                id: 'lesson-1',
+                title: 'Welcome',
+                sectionId: 'section-1',
+                description: '',
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    let resolvePublish: (value: { status: 'PUBLISHED' }) => void = jest.fn();
+    mockUpdateProductDetailsUnwrap.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolvePublish = resolve;
+      }),
+    );
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    const publish = mockProductWorkspaceShell.mock.calls[
+      mockProductWorkspaceShell.mock.calls.length - 1
+    ][0].onPublish;
+
+    await act(async () => {
+      void publish();
+    });
+
+    await waitFor(() => {
+      expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+        expect.objectContaining({ isPublishing: true }),
+      );
+    });
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    expect(mockUpdateProductDetailsUnwrap).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolvePublish({ status: 'PUBLISHED' });
+    });
+  });
+
+  it('does not expose an active Publish action for an already published Product', async () => {
+    mockUseProductFormFacade.mockReturnValue(
+      makeFacadeState({
+        showRestOfForm: true,
+        formData: {
+          id: 'published-1',
+          name: 'Published Product',
+          description: '',
+          type: 'COURSE',
+          price: 25,
+          status: 'PUBLISHED',
+        },
+      }),
+    );
+
+    render(<ProductForm />);
+
+    expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        canPublish: false,
+        publishDisabledReason: 'This Product is already published.',
+      }),
+    );
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    expect(mockUpdateProductDetailsUnwrap).not.toHaveBeenCalled();
+  });
+
+  it('Preview navigates to the private Product preview for published Products', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'published-1',
+        name: 'Published Product',
+        description: '',
+        type: 'COURSE',
+        status: 'PUBLISHED',
+        price: 0,
+        sections: [],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+        expect.objectContaining({ onPreview: expect.any(Function) }),
+      );
+    });
+
+    mockProductWorkspaceShell.mock.calls[
+      mockProductWorkspaceShell.mock.calls.length - 1
+    ][0].onPreview();
+
+    expect(mockNavigate).toHaveBeenCalledWith('/app/products/published-1/preview');
+  });
+
+  it('enables private Preview for Draft Products once they have an ID', async () => {
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'draft-1',
+        name: 'Draft Product',
+        description: '',
+        type: 'COURSE',
+        status: 'DRAFT',
+        price: 0,
+        sections: [],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          canPreview: true,
+          previewDisabledReason: undefined,
+          onPreview: expect.any(Function),
+        }),
+      );
+    });
+
+    mockProductWorkspaceShell.mock.calls[
+      mockProductWorkspaceShell.mock.calls.length - 1
+    ][0].onPreview();
+
+    expect(mockNavigate).toHaveBeenCalledWith('/app/products/draft-1/preview');
+  });
+
+  it('Back flushes pending Product autosave before leaving the workspace', async () => {
+    const flushAutosave = jest.fn(() => Promise.resolve());
+    const state = makeFacadeState({ flushAutosave });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await waitFor(() => {
+      expect(mockProductWorkspaceShell).toHaveBeenLastCalledWith(
+        expect.objectContaining({ onBack: expect.any(Function) }),
+      );
+    });
+
+    await mockProductWorkspaceShell.mock.calls[
+      mockProductWorkspaceShell.mock.calls.length - 1
+    ][0].onBack();
+
+    expect(flushAutosave).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith('/app/products');
   });
 
   it('submitting the form calls handleSubmit from the facade', async () => {
