@@ -8,7 +8,9 @@ import {
   CreateProductPayload,
   FileDownloadProductResponse,
   LessonCreate,
+  ProductGalleryImage,
   ProductMinimised,
+  ProductPromoVideo,
   ProductSection,
   ProductSectionCreateRequest,
   ProductSectionUpdateRequest,
@@ -18,6 +20,8 @@ import {
 } from 'core/api/models';
 import {
   addImageToProductAPI,
+  addProductGalleryImageAPI,
+  addProductPromoVideoAPI,
   createLessonAPI,
   createProductAPI,
   createSectionAPI,
@@ -28,6 +32,10 @@ import {
   getAllProductsByUserIdAPI,
   getProductByIdAPI,
   getProductsByOwnerAPI,
+  removeImageFromProductAPI,
+  removeProductGalleryImageAPI,
+  removeProductPromoVideoAPI,
+  reorderProductGalleryImagesAPI,
   updateLessonDetailsAPI,
   updateProductDetailsAPI,
   updateSectionDetailsAPI,
@@ -120,6 +128,22 @@ const removeFile = (
   files: FileDownloadProductResponse[] | undefined,
   fileId: string,
 ) => files?.filter((file) => file.id !== fileId) ?? [];
+
+const updateProductImage = (
+  product: AbstractProduct | ProductMinimised,
+  productId: string,
+  imageUrl?: string,
+) => {
+  if (product.id === productId) {
+    product.imageUrl = imageUrl;
+  }
+};
+
+const getOrderedGalleryImages = (images: ProductGalleryImage[]) =>
+  images
+    .slice()
+    .sort((first, second) => first.position - second.position)
+    .map((image, index) => ({ ...image, position: index + 1 }));
 
 export const createProduct = createAsyncThunk<
   AbstractProduct,
@@ -300,19 +324,109 @@ export const getProductSummariesByOwner = createAsyncThunk<
 });
 
 export const addImageToProduct = createAsyncThunk<
-  string,
+  { productId: string; imageUrl: string },
   { productId: string; image: File },
   { rejectValue: string }
 >(
   'products/addImageToProduct',
   async ({ productId, image }, { rejectWithValue }) => {
     try {
-      return await addImageToProductAPI(image, productId);
+      const imageUrl = await addImageToProductAPI(image, productId);
+      return { productId, imageUrl };
     } catch (error: unknown) {
       return rejectWithValue(extractErrorMessage(error));
     }
   },
 );
+
+export const removeImageFromProduct = createAsyncThunk<
+  { productId: string },
+  { productId: string },
+  { rejectValue: string }
+>('products/removeImageFromProduct', async ({ productId }, { rejectWithValue }) => {
+  try {
+    await removeImageFromProductAPI(productId);
+    return { productId };
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
+  }
+});
+
+export const addProductGalleryImage = createAsyncThunk<
+  { productId: string; image: ProductGalleryImage },
+  { productId: string; image: File },
+  { rejectValue: string }
+>(
+  'products/addProductGalleryImage',
+  async ({ productId, image }, { rejectWithValue }) => {
+    try {
+      const galleryImage = await addProductGalleryImageAPI(productId, image);
+      return { productId, image: galleryImage };
+    } catch (error: unknown) {
+      return rejectWithValue(extractErrorMessage(error));
+    }
+  },
+);
+
+export const removeProductGalleryImage = createAsyncThunk<
+  { productId: string; imageId: string },
+  { productId: string; imageId: string },
+  { rejectValue: string }
+>(
+  'products/removeProductGalleryImage',
+  async ({ productId, imageId }, { rejectWithValue }) => {
+    try {
+      return await removeProductGalleryImageAPI(productId, imageId);
+    } catch (error: unknown) {
+      return rejectWithValue(extractErrorMessage(error));
+    }
+  },
+);
+
+export const reorderProductGalleryImages = createAsyncThunk<
+  { productId: string; images: ProductGalleryImage[] },
+  { productId: string; imageIds: string[] },
+  { rejectValue: string }
+>(
+  'products/reorderProductGalleryImages',
+  async ({ productId, imageIds }, { rejectWithValue }) => {
+    try {
+      const images = await reorderProductGalleryImagesAPI(productId, imageIds);
+      return { productId, images };
+    } catch (error: unknown) {
+      return rejectWithValue(extractErrorMessage(error));
+    }
+  },
+);
+
+export const addProductPromoVideo = createAsyncThunk<
+  { productId: string; promoVideo: ProductPromoVideo },
+  { productId: string; video: File },
+  { rejectValue: string }
+>(
+  'products/addProductPromoVideo',
+  async ({ productId, video }, { rejectWithValue }) => {
+    try {
+      const promoVideo = await addProductPromoVideoAPI(productId, video);
+      return { productId, promoVideo };
+    } catch (error: unknown) {
+      return rejectWithValue(extractErrorMessage(error));
+    }
+  },
+);
+
+export const removeProductPromoVideo = createAsyncThunk<
+  { productId: string },
+  { productId: string },
+  { rejectValue: string }
+>('products/removeProductPromoVideo', async ({ productId }, { rejectWithValue }) => {
+  try {
+    await removeProductPromoVideoAPI(productId);
+    return { productId };
+  } catch (error: unknown) {
+    return rejectWithValue(extractErrorMessage(error));
+  }
+});
 
 export const getProductById = createAsyncThunk<
   AbstractProduct,
@@ -419,13 +533,147 @@ const productsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(addImageToProduct.fulfilled, (state) => {
+      .addCase(addImageToProduct.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        if (state.currentProduct?.id === action.payload.productId) {
+          state.currentProduct.imageUrl = action.payload.imageUrl;
+        }
+        state.products?.forEach((product) =>
+          updateProductImage(
+            product,
+            action.payload.productId,
+            action.payload.imageUrl,
+          ),
+        );
+        state.productSummaries?.forEach((product) =>
+          updateProductImage(
+            product,
+            action.payload.productId,
+            action.payload.imageUrl,
+          ),
+        );
       })
       .addCase(addImageToProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Error uploading image';
+      })
+
+      .addCase(removeImageFromProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeImageFromProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        if (state.currentProduct?.id === action.payload.productId) {
+          state.currentProduct.imageUrl = undefined;
+        }
+        state.products?.forEach((product) =>
+          updateProductImage(product, action.payload.productId, undefined),
+        );
+        state.productSummaries?.forEach((product) =>
+          updateProductImage(product, action.payload.productId, undefined),
+        );
+      })
+      .addCase(removeImageFromProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error removing image';
+      })
+
+      .addCase(addProductGalleryImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addProductGalleryImage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        if (state.currentProduct?.id === action.payload.productId) {
+          const galleryImages = state.currentProduct.galleryImages ?? [];
+          state.currentProduct.galleryImages = getOrderedGalleryImages([
+            ...galleryImages,
+            action.payload.image,
+          ]);
+        }
+      })
+      .addCase(addProductGalleryImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error adding gallery image';
+      })
+
+      .addCase(removeProductGalleryImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeProductGalleryImage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        if (state.currentProduct?.id === action.payload.productId) {
+          state.currentProduct.galleryImages = getOrderedGalleryImages(
+            (state.currentProduct.galleryImages ?? []).filter(
+              (image) => image.id !== action.payload.imageId,
+            ),
+          );
+        }
+      })
+      .addCase(removeProductGalleryImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error removing gallery image';
+      })
+
+      .addCase(reorderProductGalleryImages.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(reorderProductGalleryImages.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        if (state.currentProduct?.id === action.payload.productId) {
+          state.currentProduct.galleryImages = getOrderedGalleryImages(
+            action.payload.images,
+          );
+        }
+      })
+      .addCase(reorderProductGalleryImages.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error reordering gallery images';
+      })
+
+      .addCase(addProductPromoVideo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addProductPromoVideo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        if (state.currentProduct?.id === action.payload.productId) {
+          state.currentProduct.promoVideo = action.payload.promoVideo;
+        }
+      })
+      .addCase(addProductPromoVideo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error adding promo video';
+      })
+
+      .addCase(removeProductPromoVideo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeProductPromoVideo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+
+        if (state.currentProduct?.id === action.payload.productId) {
+          state.currentProduct.promoVideo = null;
+        }
+      })
+      .addCase(removeProductPromoVideo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error removing promo video';
       })
 
       .addCase(createProduct.pending, (state) => {

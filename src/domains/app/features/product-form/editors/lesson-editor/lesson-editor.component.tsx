@@ -1,32 +1,33 @@
 /* eslint-disable indent */
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useMemo, useState } from 'react';
 import { JSONContent } from '@tiptap/react';
+import {
+  HiArrowDown,
+  HiArrowUp,
+  HiOutlinePencil,
+  HiOutlineTrash,
+} from 'react-icons/hi';
 
-import { BoxSelector } from 'domains/app/components';
 import QuizWizard from '../../quiz-wizard/quiz-wizard.component';
 import {
-  UppyFileUploader,
-  RichTextEditor,
-  Icon,
   Button,
+  Drawer,
+  Icon,
+  Radio,
+  RadioGroup,
+  RichTextEditor,
+  StatusBadge,
   Textarea,
-  ExpansionPanel,
+  UppyFileUploader,
 } from '@shared/ui';
-import {
-  CourseLesson,
-  LessonCreate,
-  LessonType,
-  AppDispatch,
-} from 'core/api/models';
+import { AppDispatch, CourseLesson, LessonType } from 'core/api/models';
+import { deleteCourseLesson } from 'core/store/product-store';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectAuthUser } from 'core/store/auth-store';
-import {
-  createCourseLesson,
-  deleteCourseLesson,
-} from 'core/store/product-store';
 import { EditableTitle } from '../editable-title';
 import { LESSON_META } from 'core/constants';
 import { useLessonAutosave } from 'domains/app/features/product-form/hooks';
+import { getCssVar } from '@shared/utils';
 
 import './lesson-editor.styles.scss';
 
@@ -39,7 +40,66 @@ interface LessonEditorProps {
   removeLessonFromList: (index: number) => void;
   // eslint-disable-next-line no-unused-vars
   onChange: (index: number, lesson: CourseLesson) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
 }
+
+const editableLessonTypes: Array<{
+  type: LessonType;
+  label: string;
+  description: string;
+}> = [
+  {
+    type: 'VIDEO',
+    label: 'Video',
+    description: 'Use for lessons centered on a video asset.',
+  },
+  {
+    type: 'ARTICLE',
+    label: 'Article',
+    description: 'Use for written lessons with rich text content.',
+  },
+  {
+    type: 'QUIZ',
+    label: 'Quiz',
+    description: 'Use for MVP single-choice, multi-choice, and true/false checks.',
+  },
+];
+
+const getTypeLabel = (type?: LessonType) => {
+  switch (type) {
+    case 'VIDEO':
+      return 'Video';
+    case 'ARTICLE':
+      return 'Article';
+    case 'QUIZ':
+      return 'Quiz';
+    default:
+      return 'Lesson';
+  }
+};
+
+const parseArticleContent = (content?: string): JSONContent | undefined => {
+  if (!content) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(content) as JSONContent;
+  } catch {
+    return {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: content }],
+        },
+      ],
+    };
+  }
+};
 
 const LessonEditor: React.FC<LessonEditorProps> = ({
   lesson,
@@ -48,16 +108,20 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
   sectionId,
   removeLessonFromList,
   onChange,
+  onMoveUp = () => undefined,
+  onMoveDown = () => undefined,
+  canMoveUp = false,
+  canMoveDown = false,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
-
-  const [uploadedVideo, setUploadedVideo] = useState<File | null>(null);
-  const [contentJSON, setContentJSON] = React.useState<JSONContent | null>(
-    null,
-  );
-
-  const [isLessonCreated, setIsLessonCreated] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [videoFileName, setVideoFileName] = useState<string | null>(null);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [operationError, setOperationError] = useState<string | null>(null);
+  const videoBackendPendingMessage =
+    'Course video asset persistence is backend-pending; this records the ' +
+    'intended video lesson state without pretending the file is uploaded.';
 
   const { isAutosaving, lastSavedAt } = useLessonAutosave({
     lesson,
@@ -67,110 +131,84 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     dispatch,
   });
 
-  useEffect(() => {
-    if (isLessonCreated) {
-      return;
-    }
-    if (lesson && lesson.id) {
-      setIsLessonCreated(true);
-    }
-    if (!lesson.id && lesson.type && lesson.title) {
-      handleCreateLesson();
-    }
-  }, [lesson]);
+  const articleInitialContent = useMemo(
+    () => parseArticleContent(lesson.content),
+    [lesson.id],
+  );
 
   const updateLesson = (patch: Partial<CourseLesson>) => {
     const next: CourseLesson = {
       ...lesson,
       ...patch,
+      productId,
+      sectionId,
     };
     onChange(index, next);
   };
 
-  const handleCreateLesson = () => {
-    // Logic to create a new lesson
-    if (!user || !user.id) {
-      console.error('User ID is not available');
+  const handleDeleteLesson = () => {
+    if (!lesson.id) {
+      removeLessonFromList(index);
       return;
     }
 
-    if (!lesson.title) {
-      window.alert('Lesson title is required');
-      return;
-    }
-    if (!lesson.type) {
-      window.alert('Lesson type is required');
-      return;
-    }
-
-    const createLessonPayload: LessonCreate = {
-      title: lesson.title,
-      type: lesson.type, //Default to VIDEO if not specified
-      description: lesson.description ?? '',
-      position: index + 1,
-      productId,
-      sectionId,
-    };
-
-    dispatch(createCourseLesson(createLessonPayload))
+    dispatch(
+      deleteCourseLesson({
+        productId,
+        sectionId,
+        lessonId: lesson.id,
+      }),
+    )
       .unwrap()
-      .then((response) => {
-        updateLesson({
-          ...response,
-          productId,
-          sectionId: response.sectionId ?? sectionId,
-        });
-        setIsLessonCreated(true);
+      .then(() => {
+        removeLessonFromList(index);
+      })
+      .catch((error) => {
+        setOperationError(
+          typeof error === 'string'
+            ? error
+            : 'Could not delete this lesson. Try again.',
+        );
       });
   };
 
   const onVideoUploadChange = (files: File[]) => {
-    setUploadedVideo(files[0] || null);
+    const file = files[0] ?? null;
+    setVideoFileName(file?.name ?? null);
+    if (file) {
+      updateLesson({
+        videoUrl: `pending-video-asset://${encodeURIComponent(file.name)}`,
+      });
+    }
   };
 
-  const handleDeleteLesson = () => {
-    if (!user || !user.id) {
-      console.error('User ID is not available for deletion');
-      return;
-    }
-    if (lesson.id) {
-      dispatch(
-        deleteCourseLesson({
-          productId,
-          sectionId,
-          lessonId: lesson.id,
-        }),
-      )
-        .unwrap()
-        .then(() => {
-          console.info('Lesson deleted successfully');
-          removeLessonFromList(index);
-        })
-        .catch((error) => {
-          console.error('Failed to delete lesson:', error);
-        });
-    } else {
-      removeLessonFromList(index);
-      console.warn('No lesson ID found, removing from list only');
-    }
+  const handleArticleChange = (json: JSONContent) => {
+    updateLesson({ content: JSON.stringify(json) });
   };
 
   const renderContentField = () => {
     switch (lesson.type) {
       case 'VIDEO':
         return (
-          <UppyFileUploader
-            onFilesChange={onVideoUploadChange}
-            allowedFileTypes={['video/*']}
-          />
+          <div className="lesson-drawer__backend-note">
+            <UppyFileUploader
+              onFilesChange={onVideoUploadChange}
+              allowedFileTypes={['video/*']}
+            />
+            <p>
+              {videoFileName
+                ? `${videoFileName} is selected for this lesson. Durable Course video upload remains backend-pending.`
+                : videoBackendPendingMessage}
+            </p>
+          </div>
         );
 
       case 'ARTICLE':
         return (
           <div className="form-input-group">
             <RichTextEditor
-              initialContent={contentJSON ?? {}}
-              onChange={(json) => setContentJSON(json)}
+              initialContent={articleInitialContent}
+              onChange={handleArticleChange}
             />
           </div>
         );
@@ -178,82 +216,175 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       case 'QUIZ':
         return <QuizWizard lesson={lesson} updateLesson={updateLesson} />;
 
-      case 'ASSIGNMENT':
-        return (
-          <div className="assignment-editor-placeholder">
-            <p>Assignment editor will go here.</p>
-          </div>
-        );
-
       default:
-        //If no valid type is selected, return null or a message
-        return null;
+        return (
+          <p className="lesson-drawer__backend-note">
+            Choose Video, Article, or Quiz for this MVP Course lesson.
+          </p>
+        );
     }
   };
 
+  const lessonType = lesson.type ?? 'VIDEO';
+  const typeLabel = getTypeLabel(lesson.type);
+  const meta = LESSON_META[lessonType];
+  const lessonTitle = lesson.title || `Untitled lesson ${index + 1}`;
+
   return (
-    <ExpansionPanel
-      className="lesson-editor"
-      id={`lesson-${lesson.id}`}
-      defaultExpanded={true}
-      hideToggle={!lesson.id}
-      header={
-        <div className="lesson-editor-header">
-          <div className="lesson-title-block">
+    <div className="lesson-editor" id={`lesson-${lesson.id ?? index}`}>
+      <div className="lesson-row">
+        <span className="lesson-row__type">
+          <Icon icon={meta.icon} color={meta.color} size={18} />
+          <span>{typeLabel}</span>
+        </span>
+        <div className="lesson-row__title">
+          <strong>{lessonTitle}</strong>
+          {lesson.description && <span>{lesson.description}</span>}
+        </div>
+        <StatusBadge
+          label={isAutosaving ? 'Saving' : lastSavedAt ? 'Saved' : 'Draft'}
+          tone={isAutosaving ? 'info' : 'neutral'}
+          size="sm"
+        />
+        <div className="lesson-row__actions">
+          <Button
+            type="button"
+            variant="tertiary"
+            size="sm"
+            onClick={onMoveUp}
+            disabled={!canMoveUp}
+            aria-label={`Move ${lessonTitle} up`}
+          >
+            <Icon icon={HiArrowUp} size={16} color={getCssVar('--text-primary')} />
+            <span>Up</span>
+          </Button>
+          <Button
+            type="button"
+            variant="tertiary"
+            size="sm"
+            onClick={onMoveDown}
+            disabled={!canMoveDown}
+            aria-label={`Move ${lessonTitle} down`}
+          >
             <Icon
-              icon={
-                LESSON_META[(lesson.type as LessonType) ?? 'ASSIGNMENT'].icon
-              }
-              color={
-                LESSON_META[(lesson.type as LessonType) ?? 'ASSIGNMENT'].color
-              }
-              size={24}
+              icon={HiArrowDown}
+              size={16}
+              color={getCssVar('--text-primary')}
             />
-            <EditableTitle
-              value={lesson.title ?? ''}
-              placeholder={`Untitled lesson ${index + 1}`}
-              onChange={(title: string) => updateLesson({ title })}
-              small
+            <span>Down</span>
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsDrawerOpen(true)}
+            aria-label={`Edit ${lessonTitle}`}
+          >
+            <Icon
+              icon={HiOutlinePencil}
+              size={16}
+              color={getCssVar('--text-primary')}
             />
-          </div>
-          <Button type="button" onClick={handleDeleteLesson} variant="remove">
-            Remove
+            <span>Edit</span>
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={() => setIsConfirmingDelete(true)}
+            aria-label={`Delete ${lessonTitle}`}
+          >
+            <Icon
+              icon={HiOutlineTrash}
+              size={16}
+              color={getCssVar('--text-primary')}
+            />
+            <span>Delete</span>
           </Button>
         </div>
-      }
-    >
-      <>
-        <div className="lesson-type-selectors">
-          <BoxSelector<LessonType>
-            selectedOption={lesson.type}
-            selectFor="lesson"
-            onSelect={(type) => updateLesson({ type })}
-            availableOptions={['VIDEO', 'ARTICLE', 'QUIZ']} // Example lesson types
-            disabledOptions={[]} //Add any disabled options if needed
+      </div>
+
+      {operationError && (
+        <p className="lesson-row__error" role="alert">
+          {operationError}
+        </p>
+      )}
+
+      {isConfirmingDelete && (
+        <div className="lesson-row__confirm" role="alertdialog">
+          <div>
+            <strong>Delete {lessonTitle}?</strong>
+            <p>This removes the lesson from this Course section.</p>
+          </div>
+          <div>
+            <Button
+              type="button"
+              variant="tertiary"
+              onClick={() => setIsConfirmingDelete(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="button" variant="danger" onClick={handleDeleteLesson}>
+              Delete lesson
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <Drawer
+        open={isDrawerOpen}
+        title={
+          <div className="lesson-drawer__title">
+            <span>{typeLabel}</span>
+            <strong>{lessonTitle}</strong>
+          </div>
+        }
+        onClose={() => setIsDrawerOpen(false)}
+        closeLabel={`Close ${lessonTitle} editor`}
+        className="lesson-editor-drawer"
+      >
+        <div className="lesson-drawer">
+          <EditableTitle
+            value={lesson.title ?? ''}
+            placeholder={`Untitled lesson ${index + 1}`}
+            onChange={(title: string) => updateLesson({ title })}
           />
-        </div>
-        <div className="content-field">
-          {isLessonCreated && (
-            <>
-              <Textarea
-                value={lesson.description ?? ''}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  updateLesson({ description: e.target.value })
-                }
-                placeholder="Write a short description for this lesson..."
-                isMaxLengthShown={true}
-                maxLength={250}
-                className="lesson-description"
-                block
+
+          <RadioGroup
+            name={`edit-lesson-type-${lesson.id ?? index}`}
+            label="Lesson type"
+            value={lessonType}
+            onChange={(type) => updateLesson({ type: type as LessonType })}
+            className="lesson-drawer__types"
+          >
+            {editableLessonTypes.map((option) => (
+              <Radio
+                key={option.type}
+                value={option.type}
+                label={option.label}
+                description={option.description}
               />
-              <div className="lesson-content-wrapper">
-                {renderContentField()}
-              </div>
-            </>
-          )}
+            ))}
+          </RadioGroup>
+
+          <Textarea
+            label="Lesson description"
+            name={`lesson-description-${lesson.id ?? index}`}
+            value={lesson.description ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              updateLesson({ description: e.target.value })
+            }
+            placeholder="Write a short description for this lesson."
+            block
+          />
+
+          <section className="lesson-drawer__content">
+            <h3>{typeLabel} content</h3>
+            {renderContentField()}
+          </section>
         </div>
-      </>
-    </ExpansionPanel>
+      </Drawer>
+    </div>
   );
 };
 

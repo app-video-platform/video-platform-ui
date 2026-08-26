@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, UppyFileUploader, Input, Select, Textarea } from '@shared/ui';
 import {
@@ -13,8 +13,11 @@ interface MembershipVideoEditorProps {
   value: MembershipVideoDraft;
   // eslint-disable-next-line no-unused-vars
   onChange: (value: MembershipVideoDraft) => void;
-  onSave: () => void;
+  onSave: () => Promise<void> | void;
   onCancel: () => void;
+  isSaving?: boolean;
+  saveError?: string | null;
+  saveLabel?: string;
 }
 
 const VIDEO_ALLOWED_FILE_TYPES = ['video/*'];
@@ -28,8 +31,15 @@ const MembershipVideoEditor: React.FC<MembershipVideoEditorProps> = ({
   onChange,
   onSave,
   onCancel,
+  isSaving = false,
+  saveError,
+  saveLabel = 'Save',
 }) => {
-  const canSave = isValidVideoDraft(value);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const titleError =
+    hasSubmitted && !value.title.trim() ? 'Enter a video title.' : undefined;
+  const videoError =
+    hasSubmitted && !value.video ? 'Select a video file.' : undefined;
 
   const handleFilesChange = (files: File[]) => {
     const selectedVideo = files[0];
@@ -40,6 +50,16 @@ const MembershipVideoEditor: React.FC<MembershipVideoEditorProps> = ({
     });
   };
 
+  const handleSave = () => {
+    setHasSubmitted(true);
+
+    if (!isValidVideoDraft(value)) {
+      return;
+    }
+
+    onSave();
+  };
+
   return (
     <div className="membership-video-editor">
       <Input
@@ -47,6 +67,7 @@ const MembershipVideoEditor: React.FC<MembershipVideoEditorProps> = ({
         label="Title"
         value={value.title}
         placeholder="Video title"
+        error={titleError}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
           onChange({ ...value, title: event.target.value })
         }
@@ -64,7 +85,12 @@ const MembershipVideoEditor: React.FC<MembershipVideoEditorProps> = ({
       />
 
       <div className="membership-video-editor__video">
-        <label>Video</label>
+        <div className="membership-content-editor__field-heading">
+          <span id="membership-video-file-label">Selected video</span>
+          <small>
+            Video upload will be connected when media storage is available.
+          </small>
+        </div>
         <UppyFileUploader
           allowedFileTypes={VIDEO_ALLOWED_FILE_TYPES}
           maxNumberOfFiles={1}
@@ -73,9 +99,14 @@ const MembershipVideoEditor: React.FC<MembershipVideoEditorProps> = ({
           uploadMode="SELECT_ONLY"
           onFilesChange={handleFilesChange}
         />
+        {videoError && (
+          <span className="input-error-message" role="alert">
+            {videoError}
+          </span>
+        )}
         {value.video && (
           <p className="membership-video-editor__selected">
-            Selected video: {value.video.fileName} (
+            Selected file: {value.video.fileName} (
             {formatMembershipFileSize(value.video.size)})
           </p>
         )}
@@ -94,17 +125,28 @@ const MembershipVideoEditor: React.FC<MembershipVideoEditorProps> = ({
         }
       />
 
+      {saveError && (
+        <p className="membership-content-editor__error" role="alert">
+          {saveError}
+        </p>
+      )}
+
       <div className="membership-video-editor__actions">
-        <Button type="button" variant="tertiary" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="tertiary"
+          onClick={onCancel}
+          disabled={isSaving}
+        >
           Cancel
         </Button>
         <Button
           type="button"
           variant="primary"
-          onClick={onSave}
-          disabled={!canSave}
+          onClick={handleSave}
+          loading={isSaving}
         >
-          Save
+          {saveLabel}
         </Button>
       </div>
     </div>

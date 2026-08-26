@@ -1,34 +1,176 @@
 @use '../../../../../styles/index.scss' as *;
 
 .consultation-details {
-  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+  width: 100%;
+  max-width: 980px;
+}
 
-  .inline-fields {
-    display: inline-flex;
-    width: 100%;
+.consultation-settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  padding: $spacing-5;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-lg;
+  background: var(--surface-panel);
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     gap: $spacing-4;
-  }
 
-  .sentence-field {
-    display: inline-flex;
-    width: 100%;
-    gap: $spacing-2;
-    margin-top: $spacing-4;
-    margin-left: $spacing-2;
+    h3 {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: $spacing-1 0 0;
+      color: var(--text-secondary);
+      font-size: $size-small;
+      line-height: 1.5;
+    }
+  }
+}
+
+.consultation-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-4;
+
+  &--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.consultation-details__note,
+.consultation-details__error {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: $size-small;
+  line-height: 1.5;
+}
+
+.consultation-details__error {
+  color: var(--error);
+}
+
+.weekly-availability {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.availability-day {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.35fr) minmax(0, 1fr);
+  gap: $spacing-4;
+  padding: $spacing-4;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-md;
+  background: var(--surface-panel-elevated);
+
+  &__summary {
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: $spacing-3;
+  }
 
-    .sentence-input {
-      width: 80px;
-    }
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-2;
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
 
-    .info-popover {
-      margin-left: $spacing-4;
+    input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--brand-primary);
     }
   }
 
+  &__ranges {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+  }
+}
+
+.availability-range {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(130px, 1fr) auto;
+  gap: $spacing-3;
+  align-items: end;
+}
+
+.calendar-empty-state,
+.calendar-status {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  padding: $spacing-4;
+  border: 1px solid var(--border-color);
+  border-radius: $radius-md;
+  background: var(--surface-panel-elevated);
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  span,
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: $size-small;
+    line-height: 1.5;
+  }
+}
+
+.calendar-status-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: $spacing-3;
+}
+
+.cancellation-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-3;
+}
+
+@media (max-width: $bp-laptop) {
+  .consultation-settings-grid,
+  .consultation-settings-grid--three,
   .cancellation-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: $bp-tablet) {
+  .consultation-settings-section {
+    padding: $spacing-4;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .availability-day,
+  .availability-range {
+    grid-template-columns: 1fr;
+  }
+
+  .availability-day__summary {
+    align-items: flex-start;
   }
 }

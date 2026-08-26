@@ -49,6 +49,7 @@ jest.mock('../pages', () => {
     ProductLandingPageBuilder: makePage('Product landing page builder'),
     ProductOverview: makePage('Product overview'),
     ProductPage: makePage('Product page'),
+    ProductPreview: makePage('Product preview'),
     ProductsList: makePage('Products list'),
     SalesPage: makePage('Sales'),
     SearchResultsPage: makePage('Search results'),
@@ -127,6 +128,10 @@ describe('AppRouter role routing', () => {
     renderRouter([UserRole.CREATOR], '/products/product-1/landing-page');
 
     expect(screen.getByText('Product landing page builder')).toBeInTheDocument();
+
+    renderRouter([UserRole.CREATOR], '/products/product-1/preview');
+
+    expect(screen.getByText('Product preview')).toBeInTheDocument();
 
     renderRouter([UserRole.CREATOR], '/products/edit/product-1');
 

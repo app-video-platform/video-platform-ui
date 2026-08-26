@@ -232,7 +232,7 @@ const renderSwitchableMembershipContent = () => {
           Pricing
         </button>
         <button type="button" onClick={() => setIsContentTabOpen(true)}>
-          Membership Content
+          Membership content hub
         </button>
         {isContentTabOpen && (
           <MembershipContentSection
@@ -282,10 +282,10 @@ afterEach(() => {
 });
 
 describe('<MembershipContentSection />', () => {
-  it('+ Add Content opens the chooser', () => {
+  it('+ Add content opens the chooser', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
 
     expect(screen.getByRole('button', { name: /Video/i })).toBeInTheDocument();
     expect(
@@ -296,7 +296,7 @@ describe('<MembershipContentSection />', () => {
   it('selecting Post switches to POST creation mode', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
 
     expect(screen.getByPlaceholderText('Post title')).toBeInTheDocument();
@@ -308,7 +308,7 @@ describe('<MembershipContentSection />', () => {
   it('selecting Video switches to VIDEO creation mode', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Video/i }));
 
     expect(screen.getByPlaceholderText('Video title')).toBeInTheDocument();
@@ -323,7 +323,7 @@ describe('<MembershipContentSection />', () => {
   it('selecting Resource switches to RESOURCE creation mode', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Resource/i }));
 
     expect(screen.getByPlaceholderText('Resource title')).toBeInTheDocument();
@@ -338,18 +338,18 @@ describe('<MembershipContentSection />', () => {
   it('cancelling native creation returns to the content list', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.queryByPlaceholderText('Post title')).not.toBeInTheDocument();
-    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
+    expect(screen.getByText('Start your member feed')).toBeInTheDocument();
   });
 
   it('selecting Existing Product opens the current ProductPicker flow', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Existing Product/i }));
 
     expect(screen.getByPlaceholderText('Search products...')).toBeInTheDocument();
@@ -361,26 +361,26 @@ describe('<MembershipContentSection />', () => {
   it('chooser does not alter existing included products', async () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Existing Product/i }));
     fireEvent.click(screen.getByLabelText('Select Course One'));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Membership' }));
 
     await waitFor(() => {
       expect(screen.getByText('Course One')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.getByText('Course One')).toBeInTheDocument();
   });
 
-  it('saved Post survives switching away from and back to Membership Content', () => {
+  it('saved Post survives switching away from and back to Membership content hub', () => {
     renderSwitchableMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Persistent post' },
@@ -394,7 +394,7 @@ describe('<MembershipContentSection />', () => {
     expect(screen.queryByText('Persistent post')).not.toBeInTheDocument();
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Membership Content' }),
+      screen.getByRole('button', { name: 'Membership content hub' }),
     );
 
     expect(screen.getByText('Persistent post')).toBeInTheDocument();
@@ -403,13 +403,13 @@ describe('<MembershipContentSection />', () => {
     ).toBeInTheDocument();
   });
 
-  it('included Product survives switching away from and back to Membership Content', async () => {
+  it('included Product survives switching away from and back to Membership content hub', async () => {
     renderSwitchableMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Existing Product/i }));
     fireEvent.click(screen.getByLabelText('Select Course One'));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Membership' }));
 
     await waitFor(() => {
       expect(screen.getByText('Course One')).toBeInTheDocument();
@@ -419,25 +419,25 @@ describe('<MembershipContentSection />', () => {
     expect(screen.queryByText('Course One')).not.toBeInTheDocument();
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Membership Content' }),
+      screen.getByRole('button', { name: 'Membership content hub' }),
     );
 
     expect(screen.getByText('Course One')).toBeInTheDocument();
   });
 
-  it('manual ordering mode and sequence survive switching away from Membership Content', async () => {
+  it('manual ordering mode and sequence survive switching away from Membership content hub', async () => {
     renderSwitchableMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Existing Product/i }));
     fireEvent.click(screen.getByLabelText('Select Course One'));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Membership' }));
 
     await waitFor(() => {
       expect(screen.getByText('Course One')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Manual post' },
@@ -450,7 +450,7 @@ describe('<MembershipContentSection />', () => {
     expect(getRenderedContentTitles()).toEqual(['Manual post', 'Course One']);
 
     fireEvent.click(screen.getByRole('radio', { name: 'Manual' }));
-    fireEvent.click(screen.getAllByRole('button', { name: 'Move Down' })[0]);
+    fireEvent.click(screen.getAllByRole('button', { name: /Move .* down/ })[0]);
 
     expect(getRenderedContentTitles()).toEqual(['Course One', 'Manual post']);
 
@@ -458,7 +458,7 @@ describe('<MembershipContentSection />', () => {
     expect(screen.queryByText('Course One')).not.toBeInTheDocument();
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Membership Content' }),
+      screen.getByRole('button', { name: 'Membership content hub' }),
     );
 
     expect(screen.getByRole('radio', { name: 'Manual' })).toBeChecked();
@@ -468,16 +468,16 @@ describe('<MembershipContentSection />', () => {
   it('newly added native content appears first in NEWEST_FIRST', async () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Existing Product/i }));
     fireEvent.click(screen.getByLabelText('Select Course One'));
-    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add to Membership' }));
 
     await waitFor(() => {
       expect(screen.getByText('Course One')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Newest post' },
@@ -494,7 +494,7 @@ describe('<MembershipContentSection />', () => {
   it('saving creates a local Post and renders it in the unified list', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'First member post' },
@@ -506,13 +506,13 @@ describe('<MembershipContentSection />', () => {
 
     expect(screen.getByText('First member post')).toBeInTheDocument();
     expect(screen.getByText('Welcome to the membership.')).toBeInTheDocument();
-    expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    expect(screen.getByText('Draft')).toBeInTheDocument();
   });
 
   it('saving creates a local Video and renders it in the unified list', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Video/i }));
     fireEvent.change(screen.getByPlaceholderText('Video title'), {
       target: { value: 'First member video' },
@@ -528,14 +528,14 @@ describe('<MembershipContentSection />', () => {
 
     expect(screen.getByText('First member video')).toBeInTheDocument();
     expect(screen.getByText('A private walkthrough.')).toBeInTheDocument();
-    expect(screen.getByText('member-video.mp4')).toBeInTheDocument();
-    expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    expect(screen.getByText(/member-video\.mp4/)).toBeInTheDocument();
+    expect(screen.getByText('Draft')).toBeInTheDocument();
   });
 
   it('saving creates a local Resource and renders it in the unified list', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Resource/i }));
     fireEvent.change(screen.getByPlaceholderText('Resource title'), {
       target: { value: 'First member resource' },
@@ -553,14 +553,14 @@ describe('<MembershipContentSection />', () => {
 
     expect(screen.getByText('First member resource')).toBeInTheDocument();
     expect(screen.getByText('A private worksheet.')).toBeInTheDocument();
-    expect(screen.getByText('member-resource.pdf')).toBeInTheDocument();
-    expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    expect(screen.getByText(/member-resource\.pdf/)).toBeInTheDocument();
+    expect(screen.getByText('Draft')).toBeInTheDocument();
   });
 
   it('saving a published Post renders its status', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Published post' },
@@ -574,13 +574,13 @@ describe('<MembershipContentSection />', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(screen.getByText('Published post')).toBeInTheDocument();
-    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    expect(screen.getByText('Published')).toBeInTheDocument();
   });
 
   it('Edit opens existing Post values and saving updates the Post', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Original post' },
@@ -589,7 +589,7 @@ describe('<MembershipContentSection />', () => {
       target: { value: 'Original body' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Original post' }));
 
     expect(screen.getByDisplayValue('Original post')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Original body')).toBeInTheDocument();
@@ -610,7 +610,7 @@ describe('<MembershipContentSection />', () => {
   it('Edit opens existing Video values and saving updates the Video', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Video/i }));
     fireEvent.change(screen.getByPlaceholderText('Video title'), {
       target: { value: 'Original video' },
@@ -623,13 +623,15 @@ describe('<MembershipContentSection />', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Select video file' }));
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Original video' }));
 
     expect(screen.getByDisplayValue('Original video')).toBeInTheDocument();
     expect(
       screen.getByDisplayValue('Original description'),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Selected video: member-video\.mp4/)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/Selected file: member-video\.mp4/).length,
+    ).toBeGreaterThan(0);
 
     fireEvent.change(screen.getByPlaceholderText('Video title'), {
       target: { value: 'Updated video' },
@@ -650,7 +652,7 @@ describe('<MembershipContentSection />', () => {
   it('Edit opens existing Resource values and saving updates the Resource', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Resource/i }));
     fireEvent.change(screen.getByPlaceholderText('Resource title'), {
       target: { value: 'Original resource' },
@@ -665,15 +667,17 @@ describe('<MembershipContentSection />', () => {
       screen.getByRole('button', { name: 'Select resource file' }),
     );
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Edit Original resource' }),
+    );
 
     expect(screen.getByDisplayValue('Original resource')).toBeInTheDocument();
     expect(
       screen.getByDisplayValue('Original description'),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Selected file: member-resource\.pdf/),
-    ).toBeInTheDocument();
+      screen.getAllByText(/Selected file: member-resource\.pdf/).length,
+    ).toBeGreaterThan(0);
 
     fireEvent.change(screen.getByPlaceholderText('Resource title'), {
       target: { value: 'Updated resource' },
@@ -694,7 +698,7 @@ describe('<MembershipContentSection />', () => {
   it('Cancel Edit leaves original Post unchanged', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Keep me' },
@@ -703,7 +707,7 @@ describe('<MembershipContentSection />', () => {
       target: { value: 'Original body' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Keep me' }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Do not keep me' },
     });
@@ -716,14 +720,16 @@ describe('<MembershipContentSection />', () => {
   it('Cancel Edit leaves original Video unchanged', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Video/i }));
     fireEvent.change(screen.getByPlaceholderText('Video title'), {
       target: { value: 'Keep this video' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Select video file' }));
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Edit Keep this video' }),
+    );
     fireEvent.change(screen.getByPlaceholderText('Video title'), {
       target: { value: 'Do not keep this video' },
     });
@@ -736,7 +742,7 @@ describe('<MembershipContentSection />', () => {
   it('Cancel Edit leaves original Resource unchanged', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Resource/i }));
     fireEvent.change(screen.getByPlaceholderText('Resource title'), {
       target: { value: 'Keep this resource' },
@@ -745,7 +751,9 @@ describe('<MembershipContentSection />', () => {
       screen.getByRole('button', { name: 'Select resource file' }),
     );
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Edit Keep this resource' }),
+    );
     fireEvent.change(screen.getByPlaceholderText('Resource title'), {
       target: { value: 'Do not keep this resource' },
     });
@@ -760,7 +768,7 @@ describe('<MembershipContentSection />', () => {
   it('Delete removes Post', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Post/i }));
     fireEvent.change(screen.getByPlaceholderText('Post title'), {
       target: { value: 'Delete me' },
@@ -769,32 +777,38 @@ describe('<MembershipContentSection />', () => {
       target: { value: 'Temporary body' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Delete Post Delete me' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Post' }));
 
     expect(screen.queryByText('Delete me')).not.toBeInTheDocument();
-    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
+    expect(screen.getByText('Start your member feed')).toBeInTheDocument();
   });
 
   it('Delete removes Video', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Video/i }));
     fireEvent.change(screen.getByPlaceholderText('Video title'), {
       target: { value: 'Delete video' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Select video file' }));
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Delete Video Delete video' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Video' }));
 
     expect(screen.queryByText('Delete video')).not.toBeInTheDocument();
-    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
+    expect(screen.getByText('Start your member feed')).toBeInTheDocument();
   });
 
   it('Delete removes Resource', () => {
     renderMembershipContent();
 
-    fireEvent.click(screen.getByRole('button', { name: '+ Add Content' }));
+    fireEvent.click(screen.getByRole('button', { name: '+ Add content' }));
     fireEvent.click(screen.getByRole('button', { name: /Resource/i }));
     fireEvent.change(screen.getByPlaceholderText('Resource title'), {
       target: { value: 'Delete resource' },
@@ -803,17 +817,20 @@ describe('<MembershipContentSection />', () => {
       screen.getByRole('button', { name: 'Select resource file' }),
     );
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Delete Resource Delete resource' }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Resource' }));
 
     expect(screen.queryByText('Delete resource')).not.toBeInTheDocument();
-    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
+    expect(screen.getByText('Start your member feed')).toBeInTheDocument();
   });
 
   it('content list renders normally when no creation mode is active', () => {
     renderMembershipContent();
 
-    expect(screen.getByText('Membership Content')).toBeInTheDocument();
-    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
+    expect(screen.getByText('Membership content hub')).toBeInTheDocument();
+    expect(screen.getByText('Start your member feed')).toBeInTheDocument();
     expect(screen.queryByText(/editor coming next/i)).not.toBeInTheDocument();
   });
 });

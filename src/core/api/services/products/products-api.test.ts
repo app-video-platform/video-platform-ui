@@ -20,6 +20,12 @@ import {
   fetchProducts,
   getAllProductsMinimalByUserAPI,
   addImageToProductAPI,
+  removeImageFromProductAPI,
+  addProductGalleryImageAPI,
+  removeProductGalleryImageAPI,
+  reorderProductGalleryImagesAPI,
+  addProductPromoVideoAPI,
+  removeProductPromoVideoAPI,
   getPresignedUrlAPI,
   uploadToPresignedUrl,
   confirmFileUploadAPI,
@@ -496,6 +502,79 @@ describe('Products API', () => {
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
         'api/products/image?productId=p1',
         file,
+      );
+    });
+
+    it('removeImageFromProductAPI DELETEs by productId', async () => {
+      mockedHttpClient.delete.mockResolvedValueOnce({ data: undefined });
+
+      await expect(removeImageFromProductAPI('p1')).resolves.toBe('p1');
+      expect(mockedHttpClient.delete).toHaveBeenCalledWith(
+        'api/products/image?productId=p1',
+      );
+    });
+
+    it('Product gallery APIs use the backend-pending Product media paths', async () => {
+      const file = new File(['abc'], 'gallery.jpg', { type: 'image/jpeg' });
+      const image = {
+        id: 'gallery-1',
+        url: 'https://cdn/gallery.jpg',
+        position: 1,
+        status: 'READY',
+      };
+      mockedHttpClient.post.mockResolvedValueOnce({ data: image });
+      mockedHttpClient.put.mockResolvedValueOnce({ data: [image] });
+      mockedHttpClient.delete.mockResolvedValueOnce({ data: undefined });
+
+      await expect(addProductGalleryImageAPI('p1', file)).resolves.toEqual(image);
+      expect(mockedHttpClient.post).toHaveBeenCalledWith(
+        'api/products/p1/media/gallery',
+        file,
+      );
+
+      await expect(
+        reorderProductGalleryImagesAPI('p1', ['gallery-1']),
+      ).resolves.toEqual([image]);
+      expect(mockedHttpClient.put).toHaveBeenCalledWith(
+        'api/products/p1/media/gallery/order',
+        {
+          imageIds: ['gallery-1'],
+        },
+      );
+
+      await expect(
+        removeProductGalleryImageAPI('p1', 'gallery-1'),
+      ).resolves.toEqual({
+        productId: 'p1',
+        imageId: 'gallery-1',
+      });
+      expect(mockedHttpClient.delete).toHaveBeenCalledWith(
+        'api/products/p1/media/gallery/gallery-1',
+      );
+    });
+
+    it('Product promo video APIs use the backend-pending Product media paths', async () => {
+      const file = new File(['video'], 'promo.mp4', { type: 'video/mp4' });
+      const promoVideo = {
+        id: 'promo-1',
+        url: 'https://cdn/promo.mp4',
+        fileName: 'promo.mp4',
+        status: 'READY',
+      };
+      mockedHttpClient.post.mockResolvedValueOnce({ data: promoVideo });
+      mockedHttpClient.delete.mockResolvedValueOnce({ data: undefined });
+
+      await expect(addProductPromoVideoAPI('p1', file)).resolves.toEqual(
+        promoVideo,
+      );
+      expect(mockedHttpClient.post).toHaveBeenCalledWith(
+        'api/products/p1/media/promo-video',
+        file,
+      );
+
+      await expect(removeProductPromoVideoAPI('p1')).resolves.toBe('p1');
+      expect(mockedHttpClient.delete).toHaveBeenCalledWith(
+        'api/products/p1/media/promo-video',
       );
     });
 

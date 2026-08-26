@@ -48,6 +48,7 @@ export const mapFormDataToProductPayload = (
           durationMinutes: Number(consDetails?.durationMinutes),
           maxSessionsPerDay: Number(consDetails?.maxSessionsPerDay),
           meetingMethod: consDetails?.meetingMethod,
+          weeklyAvailability: consDetails?.weeklyAvailability,
         },
       };
 

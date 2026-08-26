@@ -51,7 +51,13 @@ describe('product listeners', () => {
         {} as any,
       ),
     );
-    store.dispatch(addImageToProduct.fulfilled('Image updated', 'req-3', {} as any));
+    store.dispatch(
+      addImageToProduct.fulfilled(
+        { productId: 'product-1', imageUrl: 'https://cdn.example.com/image.jpg' },
+        'req-3',
+        {} as any,
+      ),
+    );
 
     await Promise.resolve();
 
@@ -68,7 +74,7 @@ describe('product listeners', () => {
       }),
       expect.objectContaining({
         title: 'Image Upload',
-        message: 'Image updated',
+        message: 'Product image updated successfully!',
         type: 'SUCCESS',
       }),
     ]);

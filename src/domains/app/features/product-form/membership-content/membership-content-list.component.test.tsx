@@ -104,7 +104,10 @@ describe('<MembershipContentList />', () => {
       />,
     );
 
-    expect(screen.getByText('No membership content yet.')).toBeInTheDocument();
+    expect(screen.getByText('Start your member feed')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Add posts, videos, resources/i),
+    ).toBeInTheDocument();
   });
 
   it('renders an included Course using registry-driven metadata', () => {
@@ -146,7 +149,7 @@ describe('<MembershipContentList />', () => {
 
     expect(screen.getByText('Member update')).toBeInTheDocument();
     expect(screen.getByText('Post')).toBeInTheDocument();
-    expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    expect(screen.getByText('Draft')).toBeInTheDocument();
   });
 
   it('renders a native Video with filename metadata', () => {
@@ -160,8 +163,8 @@ describe('<MembershipContentList />', () => {
 
     expect(screen.getByText('Member video')).toBeInTheDocument();
     expect(screen.getByText('Video')).toBeInTheDocument();
-    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
-    expect(screen.getByText('member-video.mp4')).toBeInTheDocument();
+    expect(screen.getByText('Published')).toBeInTheDocument();
+    expect(screen.getByText(/member-video\.mp4/)).toBeInTheDocument();
   });
 
   it('exposes edit and delete actions for native Video items', () => {
@@ -178,8 +181,14 @@ describe('<MembershipContentList />', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Member video' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Delete Video Member video' }),
+    );
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(
+      'Delete video "Member video"?',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Video' }));
 
     expect(onEditContent).toHaveBeenCalledWith('video-1');
     expect(onDeleteContent).toHaveBeenCalledWith('video-1');
@@ -196,8 +205,8 @@ describe('<MembershipContentList />', () => {
 
     expect(screen.getByText('Member resource')).toBeInTheDocument();
     expect(screen.getByText('Resource')).toBeInTheDocument();
-    expect(screen.getByText('HIDDEN')).toBeInTheDocument();
-    expect(screen.getByText('member-resource.pdf')).toBeInTheDocument();
+    expect(screen.getByText('Hidden')).toBeInTheDocument();
+    expect(screen.getByText(/member-resource\.pdf/)).toBeInTheDocument();
   });
 
   it('exposes edit and delete actions for native Resource items', () => {
@@ -214,8 +223,16 @@ describe('<MembershipContentList />', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Edit Member resource' }),
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Delete Resource Member resource' }),
+    );
+    expect(screen.getByRole('alertdialog')).toHaveTextContent(
+      'Delete resource "Member resource"?',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Resource' }));
 
     expect(onEditContent).toHaveBeenCalledWith('resource-1');
     expect(onDeleteContent).toHaveBeenCalledWith('resource-1');
@@ -385,9 +402,12 @@ describe('<MembershipContentList />', () => {
       />,
     );
 
-    const moveUpButtons = screen.getAllByRole('button', { name: 'Move Up' });
+    const moveUpButtons = [
+      screen.getByRole('button', { name: 'Move Member update up' }),
+      screen.getByRole('button', { name: 'Move Launch Course up' }),
+    ];
     const moveDownButtons = screen.getAllByRole('button', {
-      name: 'Move Down',
+      name: /Move .* down/,
     });
 
     expect(moveUpButtons[0]).toBeDisabled();

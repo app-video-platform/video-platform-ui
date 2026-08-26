@@ -12,6 +12,13 @@ import {
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+const mockNavigate = jest.fn();
+
+jest.mock('react-router-dom', () => ({
+  __esModule: true,
+  useNavigate: () => mockNavigate,
+}));
+
 // ── 1) MOCK react-redux ─────────────────────────────────────────────────────
 jest.mock('react-redux', () => ({
   __esModule: true,
@@ -247,8 +254,6 @@ describe('<CreateProductStepOne />', () => {
   });
 
   it('clicking Continue sets loading state and dispatches createProduct, then sets fields and rest-of-form', async () => {
-    jest.useFakeTimers();
-
     const fakeThunkSymbol = Symbol('fakeThunk');
     mockedCreateProduct.mockReturnValue(fakeThunkSymbol as any);
 
@@ -292,11 +297,6 @@ describe('<CreateProductStepOne />', () => {
     // Loading set to true immediately
     expect(setShowLoadingMock).toHaveBeenCalledWith(true);
 
-    // Advance 500ms timeout
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-
     // createProduct called with correct payload (no description, status 'DRAFT')
     expect(mockedCreateProduct).toHaveBeenCalledWith({
       name: 'Test Course',
@@ -317,13 +317,12 @@ describe('<CreateProductStepOne />', () => {
     expect(setShowRestMock).toHaveBeenCalledWith(true);
     // Loading reset to false
     expect(setShowLoadingMock).toHaveBeenCalledWith(false);
-
-    jest.useRealTimers();
+    expect(mockNavigate).toHaveBeenCalledWith('/app/products/edit/new-id-123', {
+      replace: true,
+    });
   });
 
   it('creates Membership without initializing sections', async () => {
-    jest.useFakeTimers();
-
     const fakeThunkSymbol = Symbol('fakeThunk');
     mockedCreateProduct.mockReturnValue(fakeThunkSymbol as any);
 
@@ -359,10 +358,6 @@ describe('<CreateProductStepOne />', () => {
 
     fireEvent.click(screen.getByTestId('btn-continue'));
 
-    await act(async () => {
-      jest.advanceTimersByTime(500);
-    });
-
     expect(mockedCreateProduct).toHaveBeenCalledWith({
       name: 'Founders Club',
       type: 'MEMBERSHIP',
@@ -377,8 +372,46 @@ describe('<CreateProductStepOne />', () => {
     expect(setFieldMock).toHaveBeenCalledWith('id', 'membership-id-123');
     expect(setFieldMock).not.toHaveBeenCalledWith('sections', expect.anything());
     expect(setShowRestMock).toHaveBeenCalledWith(true);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/app/products/edit/membership-id-123',
+      { replace: true },
+    );
+  });
 
-    jest.useRealTimers();
+  it('shows an inline error and preserves the create step when creation fails', async () => {
+    const fakeThunkSymbol = Symbol('fakeThunk');
+    mockedCreateProduct.mockReturnValue(fakeThunkSymbol as any);
+    fakeDispatch.mockImplementation((action) => {
+      expect(action).toBe(fakeThunkSymbol);
+      return {
+        unwrap: () => Promise.reject('Create failed'),
+      };
+    });
+
+    render(
+      <CreateProductStepOne
+        formData={{
+          ...baseFormData,
+          name: 'Retryable Course',
+          type: 'COURSE',
+        }}
+        setField={setFieldMock}
+        errors={{}}
+        showRestOfForm={false}
+        userId="user-1"
+        setShowLoadingRestOfForm={setShowLoadingMock}
+        setShowRestOfForm={setShowRestMock}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('btn-continue'));
+
+    await screen.findByRole('alert');
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Create failed');
+    expect(setShowRestMock).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(setShowLoadingMock).toHaveBeenLastCalledWith(false);
   });
 
   it('does NOT call createProduct if name is empty', () => {

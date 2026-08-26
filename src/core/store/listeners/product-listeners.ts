@@ -32,7 +32,7 @@ export const setupProductListeners = (
     effect: async (action, listenerApi) => {
       listenerApi.dispatch(
         addNotification({
-          message: action.payload,
+          message: 'Product image updated successfully!',
           type: 'SUCCESS',
           title: 'Image Upload',
         })

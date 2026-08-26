@@ -1,0 +1,66 @@
+@use '../../../../../styles/index.scss' as *;
+
+.product-pricing-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+}
+
+.product-pricing-section__modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.product-pricing-section__amount-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 18rem) 5rem;
+  gap: $spacing-3;
+  align-items: start;
+}
+
+.product-pricing-section__currency {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.15rem;
+  margin-top: 1.45rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.product-pricing-section__intervals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 12rem));
+  margin-top: $spacing-4;
+}
+
+.product-pricing-section__summary {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  max-width: 38rem;
+  padding: $spacing-4;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: rgba(var(--surface-panel-rgb), 0.52);
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-primary);
+  }
+}
+
+@media (max-width: 720px) {
+  .product-pricing-section__amount-grid,
+  .product-pricing-section__intervals {
+    grid-template-columns: 1fr;
+  }
+
+  .product-pricing-section__currency {
+    min-height: 2.75rem;
+    margin-top: 0;
+  }
+}

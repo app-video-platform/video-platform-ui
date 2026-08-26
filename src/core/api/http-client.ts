@@ -29,8 +29,8 @@ console.info('[USE_MOCKS]', process.env.REACT_APP_USE_MOCKS);
 if (process.env.REACT_APP_USE_MOCKS === 'true') {
   // We use require() here so that when this file is bundled for production,
   // it won’t accidentally pull in the mock module.
-  // The mock‐file itself (_mocks.ts) is in .gitignore, so it never ends up in repo.
-  // If `_mocks.ts` doesn’t exist on disk, this “require” will silently fail.
+  // Local mocks are maintained source and should remain registered through the
+  // shared API client so components keep using the production service path.
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { setupMocks } = require('./_mocks');

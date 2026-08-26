@@ -1,15 +1,129 @@
 @use '../../../../../styles/index.scss' as *;
 
 .basic-info {
-  padding: 0 $spacing-2;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-5;
+  max-width: 46rem;
+}
 
-  .product-type-selectors {
-    margin: $spacing-5 0;
+.product-config-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  padding: $spacing-5;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: rgba(var(--surface-panel-rgb), 0.44);
+}
 
-    .type-selectors-label {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: $spacing-1;
+.product-config-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+
+  h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  p {
+    max-width: 38rem;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+.product-config-fields {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.product-config-help,
+.product-config-error {
+  margin: -$spacing-1 0 $spacing-2 $spacing-3;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.product-config-help {
+  color: var(--text-secondary);
+}
+
+.product-config-error {
+  color: var(--error);
+}
+
+.basic-info__type-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: $spacing-3;
+  align-items: center;
+  max-width: 38rem;
+  padding: $spacing-4;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-md;
+  background: var(--surface-0);
+
+  strong,
+  span {
+    display: block;
+  }
+
+  strong {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  span {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+}
+
+.basic-info__type-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(var(--brand-primary-rgb), 0.28);
+  border-radius: $radius-md;
+  background: rgba(var(--brand-primary-rgb), 0.08);
+  font-size: 1.25rem;
+}
+
+.basic-info__type-lock {
+  padding: $spacing-1 $spacing-2;
+  border: 1px solid var(--border-subtle);
+  border-radius: $radius-sm;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .basic-info,
+  .product-config-section {
+    max-width: none;
+  }
+
+  .product-config-section {
+    padding: $spacing-4;
+  }
+
+  .basic-info__type-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+
+    .basic-info__type-lock {
+      grid-column: 1 / -1;
+      justify-self: start;
     }
   }
 }

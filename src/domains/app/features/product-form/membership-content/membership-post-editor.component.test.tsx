@@ -80,9 +80,9 @@ describe('<MembershipPostEditor />', () => {
       status: 'DRAFT',
     });
 
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
+    expect(screen.getByText('Enter a post title.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 

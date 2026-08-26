@@ -1,6 +1,8 @@
 import {
   ProductLandingPageHeroLayout,
   ProductLandingPageSectionId,
+  ProductGalleryImage,
+  ProductPromoVideo,
   ProductType,
   StorefrontTheme,
 } from 'core/api/models';
@@ -84,6 +86,8 @@ export interface ProductLandingPageViewModel {
   description?: string;
   imageUrl?: string;
   imageAlt: string;
+  galleryImages: ProductGalleryImage[];
+  promoVideo?: ProductPromoVideo | null;
   price: ProductLandingPriceViewModel;
   cta: ProductLandingCtaViewModel;
   theme: StorefrontTheme;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, Input, Select, Textarea } from '@shared/ui';
 import {
@@ -11,8 +11,11 @@ interface MembershipPostEditorProps {
   value: MembershipPostDraft;
   // eslint-disable-next-line no-unused-vars
   onChange: (value: MembershipPostDraft) => void;
-  onSave: () => void;
+  onSave: () => Promise<void> | void;
   onCancel: () => void;
+  isSaving?: boolean;
+  saveError?: string | null;
+  saveLabel?: string;
 }
 
 const isValidPostDraft = (value: MembershipPostDraft) =>
@@ -23,8 +26,25 @@ const MembershipPostEditor: React.FC<MembershipPostEditorProps> = ({
   onChange,
   onSave,
   onCancel,
+  isSaving = false,
+  saveError,
+  saveLabel = 'Save',
 }) => {
-  const canSave = isValidPostDraft(value);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const titleError =
+    hasSubmitted && !value.title.trim() ? 'Enter a post title.' : undefined;
+  const bodyError =
+    hasSubmitted && !value.body.trim() ? 'Write the member-only post body.' : undefined;
+
+  const handleSave = () => {
+    setHasSubmitted(true);
+
+    if (!isValidPostDraft(value)) {
+      return;
+    }
+
+    onSave();
+  };
 
   return (
     <div className="membership-post-editor">
@@ -33,6 +53,7 @@ const MembershipPostEditor: React.FC<MembershipPostEditorProps> = ({
         label="Title"
         value={value.title}
         placeholder="Post title"
+        error={titleError}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
           onChange({ ...value, title: event.target.value })
         }
@@ -44,6 +65,7 @@ const MembershipPostEditor: React.FC<MembershipPostEditorProps> = ({
         value={value.body}
         placeholder="Write a member-only update"
         block
+        error={bodyError}
         onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
           onChange({ ...value, body: event.target.value })
         }
@@ -62,17 +84,28 @@ const MembershipPostEditor: React.FC<MembershipPostEditorProps> = ({
         }
       />
 
+      {saveError && (
+        <p className="membership-content-editor__error" role="alert">
+          {saveError}
+        </p>
+      )}
+
       <div className="membership-post-editor__actions">
-        <Button type="button" variant="tertiary" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="tertiary"
+          onClick={onCancel}
+          disabled={isSaving}
+        >
           Cancel
         </Button>
         <Button
           type="button"
           variant="primary"
-          onClick={onSave}
-          disabled={!canSave}
+          onClick={handleSave}
+          loading={isSaving}
         >
-          Save
+          {saveLabel}
         </Button>
       </div>
     </div>

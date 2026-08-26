@@ -1,4 +1,7 @@
 import productReducer, {
+  addImageToProduct,
+  addProductGalleryImage,
+  addProductPromoVideo,
   createCourseLesson,
   createProductSection,
   deleteCourseLesson,
@@ -6,6 +9,10 @@ import productReducer, {
   deleteProduct,
   deleteProductSection,
   getProductSummariesByOwner,
+  removeImageFromProduct,
+  removeProductGalleryImage,
+  removeProductPromoVideo,
+  reorderProductGalleryImages,
   updateCourseLesson,
   updateProductSection,
   uploadDownloadSectionFile,
@@ -398,5 +405,190 @@ describe('product slice', () => {
     expect(afterDelete.currentProduct?.sections?.[0]?.files).toEqual([
       expect.objectContaining({ id: 'file-2' }),
     ]);
+  });
+
+  it('updates Product thumbnail state across current product, products, and summaries', () => {
+    const initialState = {
+      ...makeState(),
+      currentProduct: { id: 'p1', name: 'Product', type: 'COURSE' },
+      products: [
+        { id: 'p1', name: 'Product', type: 'COURSE' },
+        { id: 'p2', name: 'Other', type: 'DOWNLOAD', imageUrl: 'keep.jpg' },
+      ],
+      productSummaries: [
+        { id: 'p1', title: 'Product' },
+        { id: 'p2', title: 'Other', imageUrl: 'keep.jpg' },
+      ],
+    } as any;
+
+    const afterUpload = productReducer(
+      initialState,
+      addImageToProduct.fulfilled(
+        {
+          productId: 'p1',
+          imageUrl: 'https://cdn.example.com/thumb.jpg',
+        },
+        'req-thumb',
+        {
+          productId: 'p1',
+          image: new File(['thumb'], 'thumb.jpg', { type: 'image/jpeg' }),
+        },
+      ),
+    );
+
+    expect(afterUpload.currentProduct?.imageUrl).toBe(
+      'https://cdn.example.com/thumb.jpg',
+    );
+    expect(afterUpload.products?.find((product: any) => product.id === 'p1'))
+      .toEqual(expect.objectContaining({
+        imageUrl: 'https://cdn.example.com/thumb.jpg',
+      }));
+    expect(
+      afterUpload.productSummaries?.find((product: any) => product.id === 'p1'),
+    ).toEqual(expect.objectContaining({
+      imageUrl: 'https://cdn.example.com/thumb.jpg',
+    }));
+
+    const afterRemove = productReducer(
+      afterUpload,
+      removeImageFromProduct.fulfilled(
+        { productId: 'p1' },
+        'req-remove-thumb',
+        { productId: 'p1' },
+      ),
+    );
+
+    expect(afterRemove.currentProduct?.imageUrl).toBeUndefined();
+    expect(afterRemove.products?.find((product: any) => product.id === 'p1'))
+      .toEqual(expect.objectContaining({
+        imageUrl: undefined,
+      }));
+    expect(
+      afterRemove.productSummaries?.find((product: any) => product.id === 'p1'),
+    ).toEqual(expect.objectContaining({
+      imageUrl: undefined,
+    }));
+  });
+
+  it('updates Product gallery and promo video state on media thunks', () => {
+    const initialState = {
+      ...makeState(),
+      currentProduct: {
+        id: 'p1',
+        name: 'Product',
+        type: 'COURSE',
+        galleryImages: [
+          {
+            id: 'gallery-1',
+            url: 'https://cdn.example.com/one.jpg',
+            position: 1,
+          },
+        ],
+      },
+    } as any;
+    const secondImage = {
+      id: 'gallery-2',
+      url: 'https://cdn.example.com/two.jpg',
+      position: 2,
+      status: 'READY' as const,
+    };
+
+    const afterGalleryAdd = productReducer(
+      initialState,
+      addProductGalleryImage.fulfilled(
+        { productId: 'p1', image: secondImage },
+        'req-gallery',
+        {
+          productId: 'p1',
+          image: new File(['two'], 'two.jpg', { type: 'image/jpeg' }),
+        },
+      ),
+    );
+
+    expect(afterGalleryAdd.currentProduct?.galleryImages).toEqual([
+      expect.objectContaining({ id: 'gallery-1', position: 1 }),
+      expect.objectContaining({ id: 'gallery-2', position: 2 }),
+    ]);
+
+    const afterGalleryReorder = productReducer(
+      afterGalleryAdd,
+      reorderProductGalleryImages.fulfilled(
+        {
+          productId: 'p1',
+          images: [
+            { ...secondImage, position: 1 },
+            {
+              id: 'gallery-1',
+              url: 'https://cdn.example.com/one.jpg',
+              position: 2,
+            },
+          ],
+        },
+        'req-reorder-gallery',
+        {
+          productId: 'p1',
+          imageIds: ['gallery-2', 'gallery-1'],
+        },
+      ),
+    );
+
+    expect(
+      afterGalleryReorder.currentProduct?.galleryImages?.map(
+        (image: any) => image.id,
+      ),
+    ).toEqual(['gallery-2', 'gallery-1']);
+
+    const afterGalleryRemove = productReducer(
+      afterGalleryReorder,
+      removeProductGalleryImage.fulfilled(
+        {
+          productId: 'p1',
+          imageId: 'gallery-2',
+        },
+        'req-remove-gallery',
+        {
+          productId: 'p1',
+          imageId: 'gallery-2',
+        },
+      ),
+    );
+
+    expect(afterGalleryRemove.currentProduct?.galleryImages).toEqual([
+      expect.objectContaining({ id: 'gallery-1', position: 1 }),
+    ]);
+
+    const promoVideo = {
+      id: 'promo-1',
+      url: 'https://cdn.example.com/promo.mp4',
+      fileName: 'promo.mp4',
+      status: 'READY' as const,
+    };
+    const afterPromoUpload = productReducer(
+      afterGalleryRemove,
+      addProductPromoVideo.fulfilled(
+        {
+          productId: 'p1',
+          promoVideo,
+        },
+        'req-promo',
+        {
+          productId: 'p1',
+          video: new File(['promo'], 'promo.mp4', { type: 'video/mp4' }),
+        },
+      ),
+    );
+
+    expect(afterPromoUpload.currentProduct?.promoVideo).toEqual(promoVideo);
+
+    const afterPromoRemove = productReducer(
+      afterPromoUpload,
+      removeProductPromoVideo.fulfilled(
+        { productId: 'p1' },
+        'req-remove-promo',
+        { productId: 'p1' },
+      ),
+    );
+
+    expect(afterPromoRemove.currentProduct?.promoVideo).toBeNull();
   });
 });

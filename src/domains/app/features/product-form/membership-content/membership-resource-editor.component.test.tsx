@@ -100,9 +100,9 @@ describe('<MembershipResourceEditor />', () => {
       title: '  ',
     });
 
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
+    expect(screen.getByText('Enter a resource title.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 
@@ -112,9 +112,9 @@ describe('<MembershipResourceEditor />', () => {
       file: null,
     });
 
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
+    expect(screen.getByText('Select a resource file.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 

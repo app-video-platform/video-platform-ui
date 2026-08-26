@@ -35,11 +35,11 @@ export const useProductFormState = () => {
   const validateForm = () => {
     const newErrors: FormErrors = {};
 
-    if (!formData.name) {
-      newErrors.name = 'Mai mai mai, vezi ca asta o fi required candva!';
+    if (!formData.name?.trim()) {
+      newErrors.name = 'Product name is required.';
     }
     if (!formData.type) {
-      newErrors.type = 'Fara asta nu poti mere mai departe!';
+      newErrors.type = 'Choose a Product type to continue.';
     }
 
     setErrors(newErrors);

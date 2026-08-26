@@ -5,7 +5,7 @@ Generated from repository state:
 Branch: main
 Commit: b9f5510
 
-Last reviewed: 2026-08-12
+Last reviewed: 2026-08-13
 
 # How to use this document
 
@@ -52,6 +52,14 @@ State is centralized in `src/core/store/store.ts` with slices for auth, admin, p
 
 API services live under `src/core/api/services`; DTO/model types live under `src/core/api/models`. `http-client.ts` configures Axios with `REACT_APP_BASE_PATH`, credentials, CSRF injection, refresh-token retry, and optional local mocks when `REACT_APP_USE_MOCKS=true`.
 
+Local API mocks are maintained source under `src/core/api/_mocks.ts` and `src/core/api/_mocks/`. With `REACT_APP_USE_MOCKS=true`, domain-specific mock registrations attach to the shared Axios client so UI code still follows Component → Redux/thunk → API service → shared client. The mock layer is a deterministic in-memory development backend for frontend-owned flows; state resets on full application reload.
+
+Shared mock state owns the current Creator identity and canonical Products, including Product CRUD, owner/user product queries, summaries, search, Product presentation media, Course/Download sections, Course lessons, and Download file metadata. Product thumbnail upload uses the existing Product image endpoint; thumbnail removal, gallery images, and Product promo video use narrow backend-pending Product media endpoints in local mocks. Download file uploads use the normal presign → direct upload → confirm flow, but mock presigned URLs use a local `mock-upload://download-section/...` protocol that the shared upload helper short-circuits in mock mode because direct `fetch` storage PUTs cannot be intercepted by Axios Mock Adapter. This simulates the upload protocol without binary persistence or a new production contract.
+
+Storefront, Product Landing Page, and Membership mocks remain backend-pending frontend contracts. Storefront config and public reads are stateful and derive Product identity from canonical Product mocks where appropriate. Product Landing Page config persists per Product ID with defaults for unsaved Products. Membership aggregate/config/content/feed mocks remain Product-scoped and must not be merged into generic Product DTOs.
+
+Mock mode is intentionally strict: unmatched API requests return a local `501` with a clear “No local mock is registered” message instead of passing through to the real backend. Explicit exceptions should be registered as their own handlers. External Google OAuth is not simulated; calendar connect returns a mock-safe authorization URL placeholder rather than pretending to complete provider OAuth.
+
 ## Authenticated Creator Management Architecture
 
 Creator/Admin management routes are visually and structurally separated from buyer/marketplace routes in `src/domains/app/pages/app-layout/app-layout.component.tsx`.
@@ -64,6 +72,7 @@ Creator/Admin management routes are visually and structurally separated from buy
 - Tablet/mobile Creator management retains the compact top bar with drawer navigation and the existing account dropdown trigger in that mobile top bar.
 - Product Overview routes (`/app/products/:productId`) render inside `CreatorAppShell` as Creator/Admin management inspection pages for individual Products.
 - Product Landing Page Builder routes (`/app/products/:productId/landing-page`) render inside `CreatorAppShell` and use route metadata to request sidebar collapse, matching the focused live-editing feel of Storefront Builder while remaining in Creator management IA.
+- Product private preview routes (`/app/products/:productId/preview`) are authenticated Creator/Admin management routes that render the shared customer-facing Product Landing Page presentation for Draft, Hidden, and Published Products. They are creator-only previews and must not be treated as public visibility.
 - Product builder routes (`/app/products/create`, `/app/products/edit/*`, and `/app/admin/products/create`) intentionally render outside `CreatorAppShell` so editing can use a focused product workspace.
 - Routes can request the Creator sidebar collapse through `collapseSidebarOnLoad` route metadata. Product edit routes and the Storefront Builder use this existing shell/sidebar behavior.
 - Marketplace/customer routes such as `/app/explore` still use the older `TopNavbar` shell; the marketplace Explore/Search experience is not part of the Creator management IA. The public Storefront route intentionally bypasses both Creator management chrome and the older marketplace chrome.
@@ -118,13 +127,124 @@ Flow:
 
 Product workspace terminology:
 
-- Shared tabs: Basics, Pricing, Media.
+- Shared tabs: Basics, Pricing, Media, Readiness.
 - Course section tab: Curriculum.
 - Download section tab: Files.
 - Consultation tab: Availability.
 - Membership tab: Content.
 
+Product Builder Redesign Phase 1 establishes the focused Product Workspace foundation without redesigning nested Product editors yet.
+
+- The Product Workspace remains outside `CreatorAppShell` and uses `ProductWorkspaceShell` as the persistent focused editing shell.
+- The header shows Back to Products, Product type/title, lifecycle status, autosave state, Preview, a minimal disabled overflow placeholder, and Publish.
+- The frontend lifecycle model is `DRAFT → PUBLISHED ⇄ HIDDEN` using existing `ProductStatus`.
+- Product editing remains autosave-first. Product autosave now exposes a narrow pending/flush contract so intentional workspace Back and Publish actions can flush debounced Product detail changes before continuing; if a flush fails, Back asks before leaving.
+- Create remains two-step: `CreateProductStepOne` creates a backend `DRAFT` Product first, then replaces the route with `/app/products/edit/:id` so the Creator is editing a real Draft Product rather than staying on `/create`.
+- Product-type-aware workspace navigation is centralized through `BuilderSidebar`/`getProductTabs`: Course uses Basics, Pricing, Curriculum, Media, Readiness; Download uses Basics, Pricing, Files, Media, Readiness; Consultation uses Basics, Pricing, Availability, Media, Readiness; Membership uses Basics, Pricing, Content, Media, Readiness.
+- Each active destination renders in a consistent canvas hierarchy with a concise heading, supporting description, and the existing editor content. Nested editors such as `BasicInfo`, pricing controls, Course/Download sections, Consultation fields, Membership content, and media upload are intentionally not comprehensively redesigned in Phase 1.
+- Readiness is now a stable workspace destination for every Product type. Membership reuses its existing readiness evaluator for known blockers/warnings. Other Product types show an honest readiness shell explaining that type-specific publish validation is pending for later Product Builder phases.
+- Publish remains the intended MVP lifecycle action. Phase 1 keeps it first-class and routes known Membership blockers to Readiness, but the current temporary implementation still submits through the existing Product update flow rather than claiming production-complete publish/status validation.
+- Preview is represented as the intended Creator-only preview of the customer-facing Product experience using current Product state, including Draft/Hidden Products. Phase 8A implements the authenticated frontend route for this behavior at `/app/products/:productId/preview`; production authorization/server-side preview read enforcement remains backend-owned.
+- Desktop keeps persistent left workspace navigation and a wide editing canvas. Tablet/mobile adapt the existing builder navigation into a compact horizontal/tab-style workspace nav so shell chrome does not squeeze the editor.
+
+Product Builder Redesign Phase 2 redesigns shared Product configuration only.
+
+- Newly created Products now land on the Basics destination after the `/app/products/create` → `/app/products/edit/:id` route replacement, regardless of Product type.
+- `BasicInfo` is the shared Product identity surface for Course, Download, Consultation, and Membership. It uses Product-type-aware name/description labels and shows Product type as read-only after Draft creation because type drives workspace structure and should not change in edit mode.
+- Shared Pricing now lives in `ProductPricingSection` inside `src/domains/app/features/product-form`. Course and Download support Free or One-time pricing, Consultation supports One-time pricing, and Membership supports Recurring monthly/yearly pricing. The current Product model supports EUR only.
+- Free pricing is represented by Product `price: 'free'`. Paid and recurring Products require a positive amount; empty or invalid paid input is treated as incomplete rather than silently becoming a valid zero-price Product.
+- Membership recurring pricing still uses Product-owned backend-pending fields: `price`, `pricingModel`, `billingInterval`, and `currency`. Membership content, included Products, subscriptions, entitlements, and member access remain separate backend-pending contracts.
+- Phase 2 does not redesign Course Curriculum, Download Files, Consultation Availability, Membership Content, Media, Readiness rules, Publish lifecycle validation, or private preview.
+
 Individual product types share `ProductWorkspaceShell`, while their domain-specific editors remain separate inside `src/domains/app/features/product-form`.
+
+Product Builder Redesign Phase 3 redesigns section-based Course and Download content management only.
+
+- The shared Product Section architecture remains the grouping model: Courses present sections as Curriculum sections containing lessons, while Downloads present sections as Files file groups containing customer deliverables.
+- Entity creation is explicit. Course/Download sections are created through an Add section/Add file group creation surface; Course lessons are created through an Add lesson surface with a required title and an MVP lesson type. Typing into blank rows no longer silently creates persisted sections or lessons.
+- Course Curriculum now uses a scan-friendly hierarchy: compact section/group headers, compact lesson rows, visible lesson type text, local save/error feedback, and a shared Drawer for focused lesson editing so the outline stays readable.
+- Supported MVP Course lesson types in the builder are Video, Article, and Quiz. `ASSIGNMENT` remains in the broader model but is not exposed as a Phase 3 MVP Course workflow.
+- Course lesson editing persists supported fields through the current lesson service/state path. Article rich-text content maps to `CourseLesson.content` as serialized editor JSON. Quiz configuration uses the existing MVP quiz draft model and is carried through the frontend/mock lesson payload; production backend support for this payload still needs confirmation. Video lesson title/type/description and intended selected-asset state are represented, but durable Course video upload/storage remains backend-pending and must not be presented as a completed production upload contract.
+- Course sections and lessons support Move up/Move down ordering using the existing `position` field. The UI updates immediately and attempts to persist moved entity positions through the existing section/lesson update paths.
+- Course section and lesson deletion use inline confirmation. Section deletion copy makes clear that contained lessons are removed with the section; lesson deletion uses a concise destructive confirmation.
+- Download Files uses Product sections as file groups with Download-specific language. File groups support create, rename, description, Move up/Move down ordering through section positions, and destructive confirmation.
+- Download file upload keeps the production-shaped presign -> direct upload -> confirm lifecycle through `product-download-files-api`. Local mock mode simulates this lifecycle with `mock-upload://download-section/...` presigned URLs and preserves confirmed file metadata in canonical Product state. The UI shows compact file rows with file type, name, size, and upload status, and file removal requires confirmation.
+- Download file ordering is upload-order-only in the current frontend/model. There is no persisted file position or renaming contract, so Phase 3 does not invent file reordering or file metadata editing.
+- Nested content save state is local to sections, lessons, uploads, and destructive actions. Product header autosave remains Product-detail focused and should not be treated as a guarantee that nested content mutations succeeded.
+- Phase 3 does not redesign Consultation Availability, Membership Content, Media, final Readiness rules, checkout/entitlements, private preview, publish validation, Course drip scheduling, free-preview lessons, certificates, student analytics, file renaming, or advanced quiz/question-bank behavior.
+
+Product Builder Redesign Phase 4 redesigns Consultation Availability configuration only.
+
+- Consultation remains inside the shared Product Workspace and uses Product-owned `consultationDetails`; there is no separate Consultation builder shell, store, or product-type-specific persistence endpoint.
+- The Availability destination is now a structured settings surface with sections for Session, Weekly availability, Calendar, Scheduling rules, Client communication, and Cancellation.
+- Session configuration supports the existing Meeting Method values: Zoom, Google Meet, Phone, and Other. The custom location/instructions field appears only for Other. Zoom and Google Meet are represented as intended delivery methods; automatic video-conference room creation remains integration/backend-pending.
+- Weekly availability is modeled on `consultationDetails.weeklyAvailability` as day-level availability with enabled state and one or more `{ startTime, endTime }` windows. The frontend default for new Consultation Products is Monday-Friday 09:00-17:00 and weekends unavailable. This is a neutral frontend starting configuration, not backend business logic.
+- Weekly availability validation is local to the Availability UI: enabled days require at least one range, start must be before end, and overlapping ranges are surfaced as errors. The Product Builder still does not implement the customer booking engine or final Readiness blockers.
+- Scheduling rules group existing Product-owned Consultation fields: buffer before, buffer after, and maximum sessions per day.
+- Client communication owns the existing confirmation message as customer-facing post-booking copy. The builder does not claim automated email delivery.
+- Cancellation uses the existing cancellation policy options and remains Product-owned configuration. Cancellation execution, refunds, rescheduling, no-show handling, and appointment management are outside Phase 4.
+- Calendar integration is account-owned today. The Product builder displays connected calendar state from `consultationDetails.connectedCalendars` when present and routes Creators to `/app/settings?tab=calendar` to manage account-level calendars. There is no Product-level calendar selection contract yet. Calendar OAuth remains external/backend-pending; mock mode keeps the existing mock-safe authorization placeholder convention.
+- Mock mode supports Consultation availability persistence through the generic Product PATCH/GET flow. The new weekly availability fields are frontend/backend-pending production contract fields carried in the Product payload and preserved by local mocks.
+- Future customer booking-slot computation remains backend/customer-flow work that must combine weekly availability, connected calendar busy time, duration, buffers, maximum sessions per day, and existing bookings.
+- Phase 4 does not redesign Membership Content, Media, final Readiness/Publish, private Preview, customer booking UI, checkout/payment, appointment management, reminders, date-specific exceptions, holidays/time off, timezone selection, group sessions, round-robin scheduling, or advanced booking notice/window rules.
+
+Product Builder Redesign Phase 5 redesigns Membership Content only.
+
+- Membership remains inside the shared Product Workspace. Basics and recurring Pricing are Product-owned; Membership content, included-product relationships, feed ordering, and native Membership content CRUD stay in the separate Membership domain contracts/store.
+- The Content destination is now a compact Membership content hub with a unified feed, clear empty state, semantic status badges, and a primary `+ Add content` action. It does not introduce a separate Membership builder shell.
+- Add Content uses the shared Drawer pattern. Creators can add native Post, Video, or Resource content, or include an existing Course/Download Product. The chooser and editors are contextual workspace interactions rather than full destinations.
+- Native Post, Video, and Resource editors are controlled drawer editors with inline validation and localized operation errors. Invalid saves reveal field-specific errors; save failures keep the draft open for retry.
+- Video and Resource selection remains metadata-only through `UppyFileUploader` selection mode. Durable Membership media upload/storage and reusable asset lifecycle are still backend/Media-phase pending, so the UI must not claim production binary persistence.
+- Included Products are limited to existing Course and Download Products. They remain standalone Products represented in the Membership feed by Product-ID associations; removing an included Product removes only the Membership relationship and never deletes the original Product.
+- Feed ordering remains Membership-owned. `NEWEST_FIRST` derives display order from Membership feed `addedAt`; `MANUAL` persists explicit feed positions and exposes accessible Move up/Move down controls.
+- Native content deletion and included-product removal use inline confirmations with explicit copy. Destructive action errors are shown locally and do not roll back unrelated Product draft state.
+- Membership mutations run through Membership Redux thunks/services and local HTTP mocks, not Product autosave payloads. Product header autosave remains Product-detail focused; Membership operations surface their own pending/error states.
+- Mock mode supports Product-scoped Membership aggregate/config/content/feed round trips for the redesigned hub. Components still follow Component → Redux → thunk → Membership service → Axios → backend or ignored local HTTP mock, with no component-level mock branching.
+- The hub is responsive: desktop uses dense scannable feed rows and drawer editors, while mobile stacks row metadata/actions and relies on the shared Drawer mobile treatment.
+- Accessibility expectations include labeled chooser/editor controls, semantic status labels, named edit/delete/remove/move actions, dialog semantics from `Drawer`, inline validation tied to controls where shared fields support it, and confirmation surfaces that do not rely on color alone.
+- Phase 5 does not redesign Media, final Readiness/Publish, private Preview, customer Membership pages, subscription checkout, entitlements/access, appointment/customer booking flows, or production Membership media upload.
+
+Product Builder Redesign Phase 6 redesigns Product Media only.
+
+- Media remains a shared Product Workspace destination for Course, Download, Consultation, and Membership. It owns Product presentation media only: the Product thumbnail, optional Product gallery images, and optional Product-level promo video.
+- Product Media explicitly does not own Course lesson videos/assets, Download deliverable files, Membership Video/Resource entries, Storefront profile images, Landing Page configuration, or reusable account-level media library assets.
+- The thumbnail flow uses the existing `POST api/products/image?productId=...` upload path and updates canonical Product `imageUrl` in Redux/form state after upload. Thumbnail removal uses a narrow backend-pending `DELETE api/products/image?productId=...` contract and is supported by local mocks.
+- Gallery images are modeled as Product-owned `galleryImages` with ID, URL, file metadata, position, optional alt text, and upload/processing status. Gallery add/remove/reorder use backend-pending Product media endpoints under `api/products/:productId/media/gallery` and are preserved by local mocks.
+- Product promo video is modeled as an optional Product-owned `promoVideo` with ID, optional URL, file metadata, status, and optional thumbnail URL. It is customer-facing presentation media, not Course or Membership content. Promo video add/remove use backend-pending Product media endpoints under `api/products/:productId/media/promo-video` and are preserved by local mocks.
+- The Media destination has structured sections for Thumbnail, Gallery, and Promo video, with upload status, inline operation errors, empty states, preview surfaces, and accessible named actions. It uses the existing Uppy wrapper for file selection.
+- Product Landing Page consumes canonical Product media directly. Ready gallery images and a READY promo video are rendered in the shared landing page presentation when present. Landing Page config does not copy media fields.
+- Storefront continues to consume canonical Product thumbnail/image data for Product cards; gallery and promo video are not duplicated into Storefront config.
+- Product media operations are immediate Product-owned mutations, not generic Product detail PATCH/autosave snapshots. Header autosave remains Product-detail focused; section/lesson/download/membership/media operations report their own local pending/error state.
+- The shared upload lifecycle helper exists only to avoid duplicating direct-storage upload behavior and mock-protocol short-circuiting. It does not create a reusable Media Library, video transcoding pipeline, or production binary storage contract.
+- Mock mode supports create Product -> configure Media -> fetch Product again with thumbnail/gallery/promo state retained. Mock media URLs and statuses are local development behavior; production persistence for gallery, promo video, and thumbnail removal remains backend-pending.
+- Phase 6 does not redesign final Readiness/Publish, private Preview, customer checkout/access, Course lesson media persistence, Download file management beyond compatibility with the shared upload helper, Membership durable binary media upload, Storefront profile media, contextual one-off media inside other editors, or a reusable Media Library.
+
+Product Builder Redesign Phase 7 implements Readiness and temporary Publish behavior for the MVP Product Workspace.
+
+- Readiness is now a shared Product Builder architecture under `product-readiness`, with pure deterministic evaluators that return blockers, warnings, ready state, and evaluating/loading state. The same evaluator feeds the Readiness destination and the Publish action.
+- Blockers prevent frontend Publish. Warnings are shown separately and never block Publish. Ready state means the current frontend checks passed; it does not imply server-side validation has run.
+- Shared blockers require a trimmed Product name and Product-type-valid pricing. Course and Download support Free or positive one-time pricing; Consultation requires a positive one-time price; Membership requires positive recurring pricing with monthly or yearly billing.
+- Shared warnings include missing Product thumbnail. Gallery images and promo video remain optional presentation media.
+- Course readiness requires at least one section and at least one lesson. It does not claim durable Course video media readiness because Course lesson binary persistence remains backend-pending.
+- Download readiness requires at least one persisted/confirmed file object across Download file groups. Empty file groups do not make a Download ready.
+- Consultation readiness requires valid duration, meeting method, custom location/instructions when meeting method is Other, at least one valid weekly availability range, and no invalid/overlapping availability ranges. Missing connected calendar is a warning only because account calendar integration is not required for production Publish yet.
+- Membership readiness uses the shared evaluator with Membership aggregate/content/feed inputs. It requires valid recurring pricing and at least one published native content item or published included Product. Draft native content is a warning. Published Membership Video/Resource items carry an honest backend-pending durable-media warning when present.
+- Readiness issue actions navigate to existing Product Workspace destinations: Basics, Pricing, Curriculum/Files, Availability, Content, and Media. No issue-specific routes were introduced.
+- Publish first flushes pending Product autosave through `flushAutosave()`, then reuses the shared readiness result. If blockers exist or required Membership readiness data is still loading, Publish selects Readiness and shows inline feedback instead of using `window.alert`.
+- If no blockers exist, Publish uses the current temporary Product update architecture to PATCH the Product with `status: PUBLISHED`. The workspace header reflects the updated status after persistence. Already-published Products show a non-active Published state; Unpublish is not implemented.
+- Publish state prevents duplicate requests and surfaces retryable inline errors on failure without changing local status falsely.
+- Backend Publish remains future-authoritative for lifecycle transitions, server-side validation, persisted nested-content readiness, billing readiness, entitlement/access readiness, media readiness, and cross-resource invariants. The frontend evaluator is Creator guidance and immediate UX only.
+- Phase 7 does not implement Unpublish, scheduling, approvals, backend Publish endpoints, checkout, entitlement/access execution, billing execution, Course media expansion, Membership media expansion, Media Library, or broad final cleanup. Private Draft/Hidden Preview is implemented separately in Phase 8A.
+
+Product Builder Redesign Phase 8A implements Private Preview only.
+
+- The focused Product Workspace Preview action now opens `/app/products/:productId/preview` for any saved Product ID, including `DRAFT`, `HIDDEN`, and `PUBLISHED` statuses. Unsaved/create-step Products still cannot preview until a Product ID exists.
+- The private preview route is protected by the existing Creator/Admin products route boundary and reuses the shared `ProductLandingPage` presentation. It does not create a separate preview renderer or duplicate landing-page presentation logic.
+- Private preview loads canonical Product data through the authenticated Product read path, creator Product Landing Page config through the creator config thunk, and Creator Storefront theme/profile context through the Creator storefront config/current user path. It intentionally does not call public Storefront or public Product Landing Page config endpoints.
+- Draft and Hidden Products render in private preview without changing the public `/app/product/:id` guard. Public Product pages still require `PUBLISHED` frontend visibility and must eventually be backed by server-enforced public visibility.
+- The preview wrapper adds creator-only chrome with Product lifecycle status and a Back to workspace action. This chrome lives outside the shared landing-page presentation so customer-facing rendering remains reusable.
+- Product Overview keeps `View public page` as a published-only action. It does not use the private preview route for public visibility.
+- Phase 8A does not implement final Product Builder polish/refinement, mobile-specific preview tooling, customer checkout/access, entitlement logic, preview share links, public visibility backend enforcement, or production preview authorization beyond the current authenticated frontend route boundary.
 
 ## Product Overview V1
 
@@ -133,6 +253,7 @@ Creator/Admin Product Overview is the management home for one Product. Route sep
 - Product Overview: `/app/products/:productId`.
 - Focused Product Workspace: `/app/products/edit/:id`.
 - Legacy/type-bearing Product Workspace path: `/app/products/edit/:type/:id`.
+- Private Product Preview: `/app/products/:productId/preview`.
 - Public Product Landing Page: `/app/product/:id` and compatibility path `/app/product/:id/:type`.
 
 Product Overview lives under `src/domains/app/pages/creator-specific/products/product-overview`, renders inside `CreatorAppShell`, and does not use `ProductWorkspaceShell`. Product create/edit Workspace routes continue to render outside `CreatorAppShell`.
@@ -163,6 +284,7 @@ Creator product navigation principle:
 - Explicit `Edit product` and Product building actions should navigate directly to Product Workspace.
 - Explicit `Edit landing page` actions should navigate to Product Landing Page Builder.
 - Explicit `View public page` actions should navigate to the public Product Landing Page.
+- Explicit workspace `Preview` actions should navigate to the authenticated private Product Preview route.
 
 This principle currently applies to Creator Products list identities, Creator Dashboard product destinations, Creator Analytics product ranking rows, and Creator Sales product identity links in the ledger and Order Detail. Explicit edit/build actions, such as `Edit product`, builder CTAs, Dashboard attention actions that mean "fix/edit this product", and Admin explicit Edit actions, remain Product Workspace links.
 
@@ -174,14 +296,15 @@ Current route separation:
 
 - Creator Product Overview: `/app/products/:productId`.
 - Creator Product Landing Page Builder: `/app/products/:productId/landing-page`.
+- Creator Private Product Preview: `/app/products/:productId/preview`.
 - Focused Product Workspace: `/app/products/edit/:id` and `/app/products/edit/:type/:id`.
 - Public Product Landing Page: `/app/product/:id`; `/app/product/:id/:type` remains a compatibility path that redirects to the canonical ID-only path when the type segment does not match the loaded Product.
 
-Product Overview and Product Landing Page Builder render within the Creator management architecture. Product Workspace remains the focused editing workspace outside the normal Creator shell. The public Product route owns route params, loading/error/unavailable states, temporary data composition, public visibility checks, and compatibility redirects. It renders the shared `ProductLandingPage` presentation under `src/domains/app/features/product-landing-page`. The authenticated Creator Product Landing Page Builder reuses the same shared presentation as its live preview; Creator-only editing chrome lives around the shared renderer, not inside it.
+Product Overview, Product Landing Page Builder, and Private Product Preview render within the Creator management route architecture. Product Workspace remains the focused editing workspace outside the normal Creator shell. The public Product route owns route params, loading/error/unavailable states, temporary data composition, public visibility checks, and compatibility redirects. It renders the shared `ProductLandingPage` presentation under `src/domains/app/features/product-landing-page`. The authenticated Creator Product Landing Page Builder and Private Product Preview reuse the same shared presentation; Creator-only editing/preview chrome lives around the shared renderer, not inside it.
 
 Current Product Landing Page data boundary:
 
-- Both the public route and Creator builder still use the existing Product service → `getProductById` thunk → Product Redux `currentProduct` path as a temporary frontend source for canonical Product data.
+- The public route, Creator builder, and private preview still use the existing Product service → `getProductById` thunk → Product Redux `currentProduct` path as a temporary frontend source for canonical Product data.
 - The shared presentation consumes a narrow Product Landing Page view model rather than Redux, route params, or raw Product service responses directly.
 - The route clears stale `currentProduct` before loading a route Product ID and only composes the landing page when the loaded Product ID matches the route ID.
 - Product Landing Page config is a narrow backend-pending domain under `src/core/api/models/product-landing-page`, `src/core/api/services/product-landing-page`, and `src/core/store/product-landing-page-store`. Current runtime path is Component → Redux thunk → Product Landing Page service → Axios → production backend or ignored local HTTP mock. Components must not branch directly on `REACT_APP_USE_MOCKS`.
@@ -197,6 +320,14 @@ Current public Product Landing Page behavior:
 - Inherits the Creator Storefront theme when an existing real Storefront/theme source is available through current frontend architecture; otherwise it falls back to `DEFAULT_STOREFRONT_THEME`. Product-specific theme overrides are not implemented, and this inheritance affects the public Product presentation/Builder preview rather than Creator management chrome.
 - Applies persisted public-safe Product Landing Page config when available, including marketing description, hero layout, supported secondary section visibility, and supported secondary section order. It must still render safely without depending on a Creator-only endpoint.
 - Renders real Creator identity only when available from the existing public Storefront read model or from current authenticated owner profile state. Anonymous/public creator identity must eventually come from the dedicated public Product read model.
+
+Current private Product Preview behavior:
+
+- Route `/app/products/:productId/preview` is authenticated for Creator/Admin users and is launched from the Product Workspace Preview action.
+- Draft, Hidden, and Published Products can render in private preview once they have a Product ID. This does not make Draft/Hidden Products public.
+- The preview loads authenticated Product data, creator Product Landing Page config, Creator Storefront theme config, and current authenticated user profile data, then maps them into the shared `ProductLandingPage` view model.
+- The preview intentionally avoids public Product Landing Page config and public Storefront endpoints so preview availability is not coupled to customer/public visibility.
+- The preview wrapper shows lifecycle status and a Back to workspace action. Loading, unavailable, and config/storefront load errors are handled in the wrapper rather than inside the shared landing-page presentation.
 
 Type-specific public summaries:
 
@@ -217,7 +348,7 @@ Creator Product Landing Page Builder current behavior:
 - Product-owned fields such as name, description, type, status, price, pricing model, currency, thumbnail, and type-specific content remain read-only here and should be edited through Product Workspace.
 - User/Profile-owned Creator display fields and Storefront/theme ownership are not duplicated into Product Landing Page config. Product-specific theme overrides are intentionally not part of Task 2.
 
-Product Landing Page V2 intentionally does not implement galleries, slideshows, promo video/presentation upload, reusable asset library, Membership checkout/subscriptions, waitlists, entitlement/access, reviews/ratings, Product analytics, SEO, slugs/custom domains, arbitrary page-builder blocks, or new production backend APIs.
+Product Landing Page V2 now consumes canonical Product presentation media when available: thumbnail/image, ready Product gallery images, and a READY Product-level promo video. It intentionally does not implement slideshows, media upload inside the Landing Page Builder, reusable asset library, checkout, Stripe/PayPal, free Product fulfillment, Membership subscriptions, waitlists, entitlement/access, reviews/ratings, Product analytics, SEO, slugs/custom domains, arbitrary page-builder blocks, or new production backend APIs.
 
 Intentional model decisions:
 
@@ -267,7 +398,12 @@ Implemented / reasonably wired:
 - Public Storefront page at `/app/store/:creatorId` with creator identity/profile information, featured product when applicable, and a customer-facing published-product catalogue.
 - Public Product Landing Page V2 foundation at `/app/product/:id` with a shared public presentation, honest real Product data, frontend `PUBLISHED` visibility guard, Storefront/default theme inheritance, type-specific real-data summaries, and explicit unavailable purchase/access state.
 - Creator Product Landing Page Builder at `/app/products/:productId/landing-page` with shared `ProductLandingPage` live preview, local Save/Reset draft behavior, and backend-pending config contracts for marketing description, hero layout, and supported secondary-section visibility/order.
+- Creator Private Product Preview at `/app/products/:productId/preview` with shared `ProductLandingPage` rendering for Draft, Hidden, and Published Products behind Creator/Admin auth, while the public Product route remains `PUBLISHED`-guarded.
 - Product create/edit builder for course/download/consultation/membership basics.
+- Product Workspace Phase 1 shell/navigation redesign with lifecycle status, autosave/pending-save feedback, Product-type-aware Readiness destination, Preview/Publish foundations, and create-to-edit route replacement after Draft creation.
+- Product Workspace Phase 2 shared configuration redesign for Basics and Pricing, including read-only Product type in edit mode and Product-type-specific Free/One-time/Recurring pricing rules.
+- Product Workspace Phase 6 Media destination for Product-owned presentation media: thumbnail upload/removal, Product gallery images, and Product-level promo video. Product Landing Page consumes ready canonical Product media; Storefront continues to consume canonical Product thumbnails.
+- Product Workspace Phase 7 shared Readiness destination and temporary Publish flow for Course, Download, Consultation, and Membership, including blocker/warning semantics, autosave flush before Publish, inline publish errors, duplicate-submit prevention, and Product status update to `PUBLISHED` through the existing Product update path.
 - Membership builder integration with a Membership Content tab.
 - Generic reusable Product Picker used by Membership included-product selection.
 - Unified Membership content list foundation, inline `+ Add Content` chooser, and Membership-backed Post/Video/Resource create/edit/delete flows.
@@ -288,6 +424,8 @@ Partially implemented / placeholder:
 - Membership included products are limited to existing Course/Download products and persist as Membership feed Product-ID associations through Product-scoped Membership contracts.
 - Native Membership Post, Video, and Resource content have frontend contracts, services, Redux state, and ignored local HTTP mocks. Native Video/Resource selection may save metadata/asset references only; binary upload and member delivery remain unavailable.
 - Membership recurring pricing is Product-owned via Product pricing fields: `pricingModel`, `billingInterval`, and `currency`, with Product `price` as the amount source of truth. Subscription billing is unavailable.
+- Product gallery images, Product promo video, and Product thumbnail removal have frontend/backend-pending Product media contracts, services, Redux state, and ignored local HTTP mocks. Existing thumbnail upload uses the established Product image endpoint. Production storage/transcoding/processing contracts for gallery and promo video still need backend confirmation.
+- Publish currently uses a frontend Product status update through the generic Product PATCH path after frontend readiness checks pass. A production backend Publish contract is still required and must revalidate nested content, billing, entitlements/access, media, lifecycle authorization, and other cross-resource invariants.
 - Lesson content persistence for uploaded videos/rich text/quiz data may need backend contract verification.
 - Assignment lesson editor is a visible placeholder.
 - Rich text editor embed support has a TODO.

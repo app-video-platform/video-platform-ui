@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { IconType } from 'react-icons';
 import { TbListDetails, TbSection } from 'react-icons/tb';
 import { IoIosPricetags } from 'react-icons/io';
-import { MdGroups, MdPermMedia } from 'react-icons/md';
+import { MdFactCheck, MdGroups, MdPermMedia } from 'react-icons/md';
 import { CgDetailsMore } from 'react-icons/cg';
 import { PiRectangleDashed } from 'react-icons/pi';
 
@@ -21,7 +21,8 @@ export type BuilderTab =
   | 'consultation-details'
   | 'membership-content'
   | 'pricing'
-  | 'media';
+  | 'media'
+  | 'readiness';
 
 export interface BuilderLessonNavItem {
   id: string;
@@ -64,45 +65,51 @@ export const getProductTabs = (productType: ProductType): ProductTab[] => {
       icon: MdPermMedia as IconType,
       position: 4,
     },
+    {
+      id: 'readiness' as BuilderTab,
+      label: 'Readiness',
+      icon: MdFactCheck as IconType,
+      position: 5,
+    },
   ];
 
   if (productType === 'COURSE' || productType === 'DOWNLOAD') {
     return [
       ...baseTabs,
       {
-        id: 'sections',
+        id: 'sections' as BuilderTab,
         label: productType === 'COURSE' ? 'Curriculum' : 'Files',
         icon: TbSection,
         position: 3,
       },
-    ];
+    ].sort((a, b) => a.position - b.position);
   }
 
   if (productType === 'CONSULTATION') {
     return [
       ...baseTabs,
       {
-        id: 'consultation-details',
+        id: 'consultation-details' as BuilderTab,
         label: 'Availability',
         icon: CgDetailsMore,
         position: 3,
       },
-    ];
+    ].sort((a, b) => a.position - b.position);
   }
 
   if (productType === 'MEMBERSHIP') {
     return [
       ...baseTabs,
       {
-        id: 'membership-content',
+        id: 'membership-content' as BuilderTab,
         label: 'Content',
         icon: MdGroups,
         position: 3,
       },
-    ];
+    ].sort((a, b) => a.position - b.position);
   }
 
-  return baseTabs;
+  return baseTabs.sort((a, b) => a.position - b.position);
 };
 
 interface BuilderTabsProps {
@@ -136,12 +143,13 @@ const BuilderSidebar: React.FC<BuilderTabsProps> = ({
 
   return (
     <aside className="builder-sidebar" aria-label="Workspace sections">
-      <ul className="builder-sidebar-tabs">
+      <ul className="builder-sidebar-tabs" role="tablist" aria-orientation="vertical">
         {productTabs.map((tab) => (
           <React.Fragment key={tab.id}>
             {/* Top-level tab */}
             <li>
               <button
+                id={`builder-tab-${tab.id}`}
                 type="button"
                 className={tabClass(activeTab === tab.id)}
                 role="tab"

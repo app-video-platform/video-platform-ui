@@ -98,9 +98,9 @@ describe('<MembershipVideoEditor />', () => {
       title: '  ',
     });
 
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
+    expect(screen.getByText('Enter a video title.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 
@@ -110,9 +110,9 @@ describe('<MembershipVideoEditor />', () => {
       video: null,
     });
 
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
+    expect(screen.getByText('Select a video file.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 

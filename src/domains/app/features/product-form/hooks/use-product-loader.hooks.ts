@@ -50,6 +50,8 @@ export const useProductLoader = ({
           currency: product.currency,
           status: product.status,
           imageUrl: product.imageUrl,
+          galleryImages: product.galleryImages,
+          promoVideo: product.promoVideo,
           userId: product.userId,
         };
 

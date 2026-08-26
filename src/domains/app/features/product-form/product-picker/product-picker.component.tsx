@@ -15,8 +15,12 @@ export interface ProductPickerProps {
   selectedIds?: string[];
   allowedTypes: ProductType[];
   excludedIds?: string[];
-  onConfirm: (selectedIds: string[]) => void;
+  // eslint-disable-next-line no-unused-vars
+  onConfirm: (selectedIds: string[]) => Promise<void> | void;
   onCancel: () => void;
+  searchLabel?: string;
+  confirmLabel?: string;
+  isConfirming?: boolean;
 }
 
 const getProductTitle = (product: PickableProduct) =>
@@ -29,6 +33,9 @@ const ProductPicker: React.FC<ProductPickerProps> = ({
   excludedIds = [],
   onConfirm,
   onCancel,
+  searchLabel = 'Search products',
+  confirmLabel = 'Add selected',
+  isConfirming = false,
 }) => {
   const [query, setQuery] = useState('');
   const [draftSelectedIds, setDraftSelectedIds] = useState<string[]>(selectedIds);
@@ -81,6 +88,7 @@ const ProductPicker: React.FC<ProductPickerProps> = ({
       <div className="product-picker__search">
         <Input
           name="product-picker-search"
+          label={searchLabel}
           value={query}
           placeholder="Search products..."
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
@@ -91,11 +99,15 @@ const ProductPicker: React.FC<ProductPickerProps> = ({
 
       <div className="product-picker__list">
         {candidates.length === 0 && (
-          <p className="product-picker__empty">No eligible products available.</p>
+          <p className="product-picker__empty" role="status">
+            No eligible products available.
+          </p>
         )}
 
         {candidates.length > 0 && filteredProducts.length === 0 && (
-          <p className="product-picker__empty">No products match your search.</p>
+          <p className="product-picker__empty" role="status">
+            No products match your search.
+          </p>
         )}
 
         {filteredProducts.map((product) => {
@@ -130,7 +142,7 @@ const ProductPicker: React.FC<ProductPickerProps> = ({
               <CheckboxInput
                 id={`product-picker-${productId}`}
                 checked={isSelected}
-                aria-label={`Select ${getProductTitle(product)}`}
+                label={`Select ${getProductTitle(product)}`}
                 onChange={() => toggleSelection(productId)}
               />
             </div>
@@ -146,9 +158,10 @@ const ProductPicker: React.FC<ProductPickerProps> = ({
           type="button"
           variant="primary"
           onClick={handleConfirm}
-          disabled={draftSelectedIds.length === 0}
+          disabled={draftSelectedIds.length === 0 || isConfirming}
+          loading={isConfirming}
         >
-          Add selected
+          {confirmLabel}
         </Button>
       </div>
     </div>

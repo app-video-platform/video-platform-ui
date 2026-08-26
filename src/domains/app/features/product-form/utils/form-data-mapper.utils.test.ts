@@ -145,4 +145,90 @@ describe('mapFormDataToProductPayload', () => {
       userId: 'creator-1',
     });
   });
+
+  it('serializes Consultation availability configuration through product details', () => {
+    const formData = {
+      id: 'consultation-1',
+      type: 'CONSULTATION',
+      name: 'Offer audit',
+      price: 150,
+      status: 'DRAFT',
+      userId: 'creator-1',
+      consultationDetails: {
+        durationMinutes: 60,
+        meetingMethod: 'OTHER',
+        customLocation: 'Call my studio line',
+        weeklyAvailability: [
+          {
+            day: 'MONDAY',
+            enabled: true,
+            windows: [
+              { startTime: '09:00', endTime: '12:00' },
+              { startTime: '14:00', endTime: '17:00' },
+            ],
+          },
+          {
+            day: 'SUNDAY',
+            enabled: false,
+            windows: [],
+          },
+        ],
+        bufferBeforeMinutes: 15,
+        bufferAfterMinutes: 20,
+        maxSessionsPerDay: 4,
+        confirmationMessage: 'Bring your latest offer draft.',
+        cancellationPolicy: 'full_48h',
+        connectedCalendars: [
+          {
+            id: 'calendar-1',
+            provider: 'Google Calendar',
+            email: 'maya@example.test',
+          },
+        ],
+      },
+    } as ProductDraft;
+
+    expect(mapFormDataToProductPayload(formData, null)).toMatchObject({
+      id: 'consultation-1',
+      type: 'CONSULTATION',
+      name: 'Offer audit',
+      price: 150,
+      status: 'DRAFT',
+      userId: 'creator-1',
+      consultationDetails: {
+        durationMinutes: 60,
+        meetingMethod: 'OTHER',
+        customLocation: 'Call my studio line',
+        weeklyAvailability: [
+          {
+            day: 'MONDAY',
+            enabled: true,
+            windows: [
+              { startTime: '09:00', endTime: '12:00' },
+              { startTime: '14:00', endTime: '17:00' },
+            ],
+          },
+          {
+            day: 'SUNDAY',
+            enabled: false,
+            windows: [],
+          },
+        ],
+        bufferBeforeMinutes: 15,
+        bufferAfterMinutes: 20,
+        maxSessionsPerDay: 4,
+        confirmationMessage: 'Bring your latest offer draft.',
+        cancellationPolicy: 'full_48h',
+        connectedCalendars: [
+          {
+            id: 'calendar-1',
+            provider: 'Google Calendar',
+            email: 'maya@example.test',
+          },
+        ],
+      },
+    });
+    expect(getAutosaveSnapshot(formData).consultationDetails)
+      .toEqual(formData.consultationDetails);
+  });
 });

@@ -389,6 +389,11 @@ export const getProductLandingPageViewModel = ({
     imageAlt: product.imageUrl
       ? `${product.name || 'Product'} thumbnail`
       : '',
+    galleryImages: (product.galleryImages ?? [])
+      .filter((image) => image.status !== 'FAILED')
+      .slice()
+      .sort((first, second) => first.position - second.position),
+    promoVideo: product.promoVideo,
     price,
     cta: getProductLandingCta(price),
     theme,
