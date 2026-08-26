@@ -187,10 +187,11 @@ describe('CreatorStorefrontPage', () => {
     expect(screen.getByText('No products available')).toBeInTheDocument();
   });
 
-  it('edits public email through the profile API and falls back to login email', async () => {
+  it('edits public email through the profile API without showing login email fallback', async () => {
     renderManagement();
 
-    expect(await screen.findByText('maya@example.test')).toBeInTheDocument();
+    expect((await screen.findAllByText('Creator Launch Studio')).length).toBeGreaterThan(0);
+    expect(screen.queryByText('maya@example.test')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Edit Public Email' }));
     fireEvent.change(screen.getByLabelText('Public Email'), {
       target: { value: 'public@maya.example.com' },
