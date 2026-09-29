@@ -51,12 +51,44 @@ interface ProductState {
   error: string | null;
 }
 
+export interface ProductReadinessErrorPayload {
+  message: string;
+  errors: Record<string, string>;
+}
+
+export type ProductUpdateErrorPayload = string | ProductReadinessErrorPayload;
+
 const initialState: ProductState = {
   products: null,
   productSummaries: null,
   currentProduct: null,
   loading: false,
   error: null,
+};
+
+const extractProductUpdateError = (err: unknown): ProductUpdateErrorPayload => {
+  const response = (err as {
+    response?: {
+      status?: number;
+      data?: {
+        message?: string;
+        errors?: Record<string, string>;
+      };
+    };
+  }).response;
+
+  if (
+    response?.status === 422 &&
+    response.data?.errors &&
+    typeof response.data.errors === 'object'
+  ) {
+    return {
+      message: response.data.message ?? 'Product is not ready to publish',
+      errors: response.data.errors,
+    };
+  }
+
+  return extractErrorMessage(err);
 };
 
 const replaceSection = (
@@ -160,12 +192,12 @@ export const createProduct = createAsyncThunk<
 export const updateProductDetails = createAsyncThunk<
   AbstractProduct,
   AbstractProductBase,
-  { rejectValue: string }
+  { rejectValue: ProductUpdateErrorPayload }
 >('products/updateProductDetails', async (payload, thunkAPI) => {
   try {
     return await updateProductDetailsAPI(payload);
   } catch (err: unknown) {
-    return thunkAPI.rejectWithValue(extractErrorMessage(err));
+    return thunkAPI.rejectWithValue(extractProductUpdateError(err));
   }
 });
 
@@ -707,7 +739,9 @@ const productsSlice = createSlice({
       )
       .addCase(updateProductDetails.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string'
+          ? action.payload
+          : action.payload?.message ?? 'An unknown error occurred';
       })
 
       .addCase(deleteProduct.pending, (state) => {

@@ -8,11 +8,13 @@ export type CommerceOrderStatus =
   | 'REFUNDED';
 
 export interface CommerceCheckoutItem {
-  productId: string;
-  productTitle?: string;
+  itemId: string;
+  productName: string;
   productType?: ProductType;
   currency?: ProductCurrency | string;
-  amountMinor?: number;
+  unitAmountMinor: number;
+  lineTotalMinor: number;
+  quantity: number;
 }
 
 export interface CommerceCheckoutSession {

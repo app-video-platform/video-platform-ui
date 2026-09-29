@@ -514,7 +514,7 @@ describe('Products API', () => {
       );
     });
 
-    it('Product gallery APIs use the backend-pending Product media paths', async () => {
+    it('Product gallery APIs use the backend-supported Product media paths', async () => {
       const file = new File(['abc'], 'gallery.jpg', { type: 'image/jpeg' });
       const image = {
         id: 'gallery-1',
@@ -553,7 +553,7 @@ describe('Products API', () => {
       );
     });
 
-    it('Product promo video APIs use the backend-pending Product media paths', async () => {
+    it('Product promo video APIs use the backend-supported Product media paths', async () => {
       const file = new File(['video'], 'promo.mp4', { type: 'video/mp4' });
       const promoVideo = {
         id: 'promo-1',

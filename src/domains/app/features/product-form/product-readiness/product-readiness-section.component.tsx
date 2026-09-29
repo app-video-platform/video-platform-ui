@@ -96,7 +96,7 @@ const ProductReadinessSection: React.FC<ProductReadinessSectionProps> = ({
             {result.isEvaluating
               ? 'Some required Product data is still loading. Readiness will update when it is available.'
               : result.isReadyToPublish
-                ? 'Frontend readiness checks have passed. Backend Publish validation is still the future authority.'
+                ? 'Local readiness checks have passed. Backend validation will confirm this Product when publishing.'
                 : 'Resolve blockers before publishing. Warnings are worth reviewing but do not block Publish.'}
           </p>
         </div>

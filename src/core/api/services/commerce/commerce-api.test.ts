@@ -22,6 +22,15 @@ describe('commerce-api', () => {
       orderId: 'order-1',
       status: 'PENDING',
       provider: 'fake',
+      items: [
+        {
+          itemId: 'item-1',
+          productName: 'Course',
+          unitAmountMinor: 2500,
+          lineTotalMinor: 2500,
+          quantity: 1,
+        },
+      ],
     });
 
     await createCommerceCheckoutSessionAPI(['product-1', 'product-2'], 'key-1');
@@ -37,10 +46,26 @@ describe('commerce-api', () => {
     mock.onGet('api/commerce/orders/order-1').reply(200, {
       orderId: 'order-1',
       status: 'PAID',
+      items: [
+        {
+          itemId: 'item-1',
+          productName: 'Course',
+          unitAmountMinor: 2500,
+          lineTotalMinor: 5000,
+          quantity: 2,
+        },
+      ],
     });
 
-    await getCommerceOrderAPI('order-1');
+    const order = await getCommerceOrderAPI('order-1');
 
     expect(mock.history.get[0].url).toBe('api/commerce/orders/order-1');
+    expect(order.items?.[0]).toEqual({
+      itemId: 'item-1',
+      productName: 'Course',
+      unitAmountMinor: 2500,
+      lineTotalMinor: 5000,
+      quantity: 2,
+    });
   });
 });

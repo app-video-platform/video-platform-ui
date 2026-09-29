@@ -7,6 +7,18 @@ import {
 } from 'core/api/models';
 import { Button, StatusBadge, UppyFileUploader } from '@shared/ui';
 import placeholderImage from '../../../../../assets/image-placeholder.png';
+import {
+  PRODUCT_MEDIA_IMAGE_FORMAT_LABEL,
+  PRODUCT_MEDIA_IMAGE_MIME_TYPES,
+  PRODUCT_MEDIA_MAX_GALLERY_IMAGES,
+  PRODUCT_MEDIA_MAX_IMAGE_SIZE_BYTES,
+  PRODUCT_MEDIA_MAX_PROMO_VIDEO_SIZE_BYTES,
+  PRODUCT_MEDIA_PROMO_VIDEO_FORMAT_LABEL,
+  PRODUCT_MEDIA_PROMO_VIDEO_MIME_TYPES,
+  validateProductGallerySelection,
+  validateProductImageFile,
+  validateProductPromoVideoFile,
+} from './product-media.validation';
 
 import './product-media-section.styles.scss';
 
@@ -92,6 +104,12 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
     setThumbnailError(null);
 
     try {
+      const validationError = validateProductImageFile(file);
+
+      if (validationError) {
+        throw new Error(validationError);
+      }
+
       await onUploadThumbnail(file);
       setThumbnailStatus('saved');
     } catch (error) {
@@ -134,6 +152,15 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
     );
 
     try {
+      const validationError = validateProductGallerySelection(
+        sortedGalleryImages,
+        newFiles,
+      );
+
+      if (validationError) {
+        throw new Error(validationError);
+      }
+
       for (const file of newFiles) {
         await onAddGalleryImage(file);
         uploadedGallerySignaturesRef.current.add(getFileSignature(file));
@@ -219,6 +246,12 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
     setPromoError(null);
 
     try {
+      const validationError = validateProductPromoVideoFile(file);
+
+      if (validationError) {
+        throw new Error(validationError);
+      }
+
       await onUploadPromoVideo(file);
       setPromoStatus('saved');
     } catch (error) {
@@ -274,11 +307,12 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
           />
           <div className="product-media-upload">
             <UppyFileUploader
-              allowedFileTypes={['image/*']}
+              allowedFileTypes={PRODUCT_MEDIA_IMAGE_MIME_TYPES}
+              maxFileSize={PRODUCT_MEDIA_MAX_IMAGE_SIZE_BYTES}
               maxNumberOfFiles={1}
               disableImporters
               uploadMode="SELECT_ONLY"
-              note="Select a Product thumbnail image."
+              note={`Select a Product thumbnail image (${PRODUCT_MEDIA_IMAGE_FORMAT_LABEL}, max 10 MB).`}
               onFilesChange={handleThumbnailFiles}
             />
             <div className="product-media-actions">
@@ -319,10 +353,15 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
         </div>
 
         <UppyFileUploader
-          allowedFileTypes={['image/*']}
+          allowedFileTypes={PRODUCT_MEDIA_IMAGE_MIME_TYPES}
+          maxFileSize={PRODUCT_MEDIA_MAX_IMAGE_SIZE_BYTES}
+          maxNumberOfFiles={Math.max(
+            1,
+            PRODUCT_MEDIA_MAX_GALLERY_IMAGES - sortedGalleryImages.length,
+          )}
           disableImporters
           uploadMode="SELECT_ONLY"
-          note="Add gallery images."
+          note={`Add gallery images (${PRODUCT_MEDIA_IMAGE_FORMAT_LABEL}, max 10 MB each, 20 total).`}
           onFilesChange={handleGalleryFiles}
         />
 
@@ -444,11 +483,12 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
         )}
 
         <UppyFileUploader
-          allowedFileTypes={['video/*']}
+          allowedFileTypes={PRODUCT_MEDIA_PROMO_VIDEO_MIME_TYPES}
+          maxFileSize={PRODUCT_MEDIA_MAX_PROMO_VIDEO_SIZE_BYTES}
           maxNumberOfFiles={1}
           disableImporters
           uploadMode="SELECT_ONLY"
-          note="Select an optional Product promo video."
+          note={`Select an optional Product promo video (${PRODUCT_MEDIA_PROMO_VIDEO_FORMAT_LABEL}, max 100 MB).`}
           onFilesChange={handlePromoVideoFiles}
         />
 

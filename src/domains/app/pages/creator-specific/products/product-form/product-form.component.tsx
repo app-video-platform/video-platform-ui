@@ -17,6 +17,7 @@ import {
   ProductPricingSection,
   ProductMediaSection,
   ProductReadinessSection,
+  ProductReadinessIssue,
   SectionDraft,
   MembershipContentSection,
   RecurringPricing,
@@ -118,7 +119,7 @@ const tabCopy: Record<BuilderTab, { title: string; description: string }> = {
   },
   readiness: {
     title: 'Readiness',
-    description: 'Review known publish blockers and backend-pending lifecycle requirements.',
+    description: 'Review known publish blockers and backend readiness feedback.',
   },
 };
 
@@ -159,6 +160,9 @@ const ProductForm: React.FC = () => {
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [backendReadinessIssues, setBackendReadinessIssues] = useState<
+    ProductReadinessIssue[]
+  >([]);
   const membershipRecurringPricing = useMemo(
     () => getRecurringPricingFromProduct(formData),
     [formData],
@@ -197,6 +201,15 @@ const ProductForm: React.FC = () => {
     membershipNativeContentItems,
     membershipRecurringPricing,
   ]);
+  const displayedReadinessResult = useMemo(() => ({
+    ...readinessResult,
+    blockers: [
+      ...readinessResult.blockers,
+      ...backendReadinessIssues,
+    ],
+    isReadyToPublish:
+      readinessResult.isReadyToPublish && backendReadinessIssues.length === 0,
+  }), [backendReadinessIssues, readinessResult]);
   const [hasHeroCollapsed, setHasHeroCollapsed] = useState(false);
   const [pendingSidebarScrollTarget, setPendingSidebarScrollTarget] = useState<{
     id: string;
@@ -378,7 +391,45 @@ const ProductForm: React.FC = () => {
     ? 'Membership publishing is not available yet. Content metadata can be saved, but subscriptions, entitlements, and member access are unavailable.'
     : hasReadinessBlockers
     ? 'Publish will open Readiness until known blockers are resolved.'
-    : 'Publish currently uses the temporary Product update flow; backend lifecycle validation remains pending.';
+    : 'Publish uses backend readiness validation after local checks pass.';
+
+  useEffect(() => {
+    setBackendReadinessIssues([]);
+  }, [formData]);
+
+  const backendReadinessDestinationByPath: Record<string, BuilderTab> = {
+    name: 'basics',
+    price: 'pricing',
+    'details.sections': 'sections',
+    'details.lessons': 'sections',
+    'details.files': 'sections',
+    'details.durationMinutes': 'consultation-details',
+    'details.meetingMethod': 'consultation-details',
+    'details.customLocation': 'consultation-details',
+    'details.weeklyAvailability': 'consultation-details',
+    status: 'readiness',
+  };
+
+  const isBackendReadinessError = (
+    error: unknown,
+  ): error is { message: string; errors: Record<string, string> } =>
+    Boolean(
+      error &&
+      typeof error === 'object' &&
+      'errors' in error &&
+      typeof (error as { errors?: unknown }).errors === 'object',
+    );
+
+  const toBackendReadinessIssues = (
+    errors: Record<string, string>,
+  ): ProductReadinessIssue[] =>
+    Object.entries(errors).map(([path, message]) => ({
+      id: `backend-readiness-${path}`,
+      severity: 'BLOCKER',
+      title: path,
+      description: message,
+      destination: backendReadinessDestinationByPath[path] ?? 'readiness',
+    }));
 
   const handleWorkspaceBack = async () => {
     try {
@@ -409,6 +460,7 @@ const ProductForm: React.FC = () => {
     }
 
     setPublishError(null);
+    setBackendReadinessIssues([]);
 
     try {
       setIsPublishing(true);
@@ -441,8 +493,13 @@ const ProductForm: React.FC = () => {
       );
       const updatedProduct = await dispatch(updateProductDetails(payload)).unwrap();
       setField('status', updatedProduct.status ?? 'PUBLISHED');
-    } catch {
-      setPublishError('Publish failed. Check the Product details and try again.');
+    } catch (error) {
+      if (isBackendReadinessError(error)) {
+        setBackendReadinessIssues(toBackendReadinessIssues(error.errors));
+        setPublishError(error.message);
+      } else {
+        setPublishError('Publish failed. Check the Product details and try again.');
+      }
       setActiveTab('readiness');
     } finally {
       setIsPublishing(false);
@@ -451,7 +508,7 @@ const ProductForm: React.FC = () => {
 
   const renderReadinessPanel = () => (
     <ProductReadinessSection
-      result={readinessResult}
+      result={displayedReadinessResult}
       publishError={publishError}
       onNavigateToDestination={(destination) => setActiveTab(destination)}
     />
