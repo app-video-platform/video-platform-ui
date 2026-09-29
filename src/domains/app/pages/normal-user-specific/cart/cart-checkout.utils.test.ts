@@ -164,7 +164,7 @@ describe('cart checkout utils', () => {
     expect(getCommerceOrderAPI).not.toHaveBeenCalled();
   });
 
-  it('handles fake gateway responses without a checkout URL by resolving order status', async () => {
+  it('handles automatic fake-payment responses without a checkout URL by resolving order status', async () => {
     mockCryptoRandomUUID(['checkout-key']);
     (createCommerceCheckoutSessionAPI as jest.Mock).mockResolvedValue({
       orderId: 'order-1',
@@ -180,6 +180,39 @@ describe('cart checkout utils', () => {
 
     expect(result.order?.status).toBe('PENDING');
     expect(getCommerceOrderAPI).toHaveBeenCalledWith('order-1');
+  });
+
+  it('consumes confirmed automatic fake-payment order state', async () => {
+    mockCryptoRandomUUID(['checkout-key']);
+    (createCommerceCheckoutSessionAPI as jest.Mock).mockResolvedValue({
+      orderId: 'order-1',
+      status: 'PENDING',
+      checkoutUrl: null,
+    });
+    (getCommerceOrderAPI as jest.Mock).mockResolvedValue({
+      orderId: 'order-1',
+      status: 'PAID',
+      items: [
+        {
+          itemId: 'item-1',
+          productName: 'Paid product',
+          unitAmountMinor: 2500,
+          lineTotalMinor: 2500,
+          quantity: 1,
+        },
+      ],
+    });
+
+    const result = await startPaidCheckout([paidProduct()]);
+
+    expect(result.order?.status).toBe('PAID');
+    expect(result.order?.items?.[0]).toEqual(
+      expect.objectContaining({
+        itemId: 'item-1',
+        productName: 'Paid product',
+        lineTotalMinor: 2500,
+      }),
+    );
   });
 
   it('formats Commerce totals from minor units', () => {

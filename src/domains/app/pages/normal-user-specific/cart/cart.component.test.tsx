@@ -115,6 +115,10 @@ describe('<Cart /> Commerce checkout', () => {
     (enrollInFreeProductAPI as jest.Mock).mockResolvedValue({});
     const store = renderCart([paidProduct({ id: 'free-1', price: 'free' })]);
 
+    expect(
+      screen.queryByText(/test payment/i),
+    ).not.toBeInTheDocument();
+
     fireEvent.click(screen.getByRole('button', { name: 'Proceed to checkout' }));
 
     await waitFor(() => {
@@ -154,6 +158,10 @@ describe('<Cart /> Commerce checkout', () => {
       totalMinor: 2500,
     });
     const store = renderCart([paidProduct()]);
+
+    expect(screen.getByText(
+      'Test payment — No real charge will be made during checkout.',
+    )).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Proceed to checkout' }));
 

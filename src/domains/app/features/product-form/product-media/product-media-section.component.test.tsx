@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
+const mockUploaderFilesByNote = new Map<string, File[]>();
+
 jest.mock('@shared/ui', () => {
   const actual = jest.requireActual('@shared/ui');
   type MockUploaderProps = {
@@ -16,15 +18,18 @@ jest.mock('@shared/ui', () => {
     ...actual,
     UppyFileUploader: ({ note, onFilesChange }: MockUploaderProps) => {
       const label = note ?? 'Select file';
-      const file =
-        label.includes('promo')
-          ? new File(['video'], 'promo.mp4', { type: 'video/mp4' })
-          : new File(['image'], `${label.replace(/\W+/g, '-').toLowerCase()}.jpg`, {
-            type: 'image/jpeg',
-          });
+      const defaultFile = label.includes('promo')
+        ? new File(['video'], 'promo.mp4', { type: 'video/mp4' })
+        : new File(['image'], `${label.replace(/\W+/g, '-').toLowerCase()}.jpg`, {
+          type: 'image/jpeg',
+        });
+      const file = mockUploaderFilesByNote.get(label)?.[0] ?? defaultFile;
 
       return (
-        <button type="button" onClick={() => onFilesChange?.([file])}>
+        <button
+          type="button"
+          onClick={() => onFilesChange?.(mockUploaderFilesByNote.get(label) ?? [file])}
+        >
           {label}
         </button>
       );
@@ -87,6 +92,10 @@ const renderSection = (overrides = {}) => {
 };
 
 describe('<ProductMediaSection />', () => {
+  beforeEach(() => {
+    mockUploaderFilesByNote.clear();
+  });
+
   it('renders the current thumbnail', () => {
     renderSection();
 
@@ -100,7 +109,7 @@ describe('<ProductMediaSection />', () => {
     const { onUploadThumbnail } = renderSection();
 
     await user.click(screen.getByRole('button', {
-      name: 'Select a Product thumbnail image.',
+      name: /select a product thumbnail image/i,
     }));
 
     await waitFor(() => {
@@ -128,7 +137,7 @@ describe('<ProductMediaSection />', () => {
 
     expect(screen.getByText('No gallery images yet')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Add gallery images.' }));
+    await user.click(screen.getByRole('button', { name: /add gallery images/i }));
 
     await waitFor(() => {
       expect(onAddGalleryImage).toHaveBeenCalledTimes(1);
@@ -150,7 +159,7 @@ describe('<ProductMediaSection />', () => {
     renderSection({ onAddGalleryImage });
 
     const uploadButton = screen.getByRole('button', {
-      name: 'Add gallery images.',
+      name: /add gallery images/i,
     });
 
     await user.click(uploadButton);
@@ -204,7 +213,7 @@ describe('<ProductMediaSection />', () => {
     ).toHaveAttribute('src', 'https://cdn.example.com/promo.mp4');
 
     await user.click(screen.getByRole('button', {
-      name: 'Select an optional Product promo video.',
+      name: /select an optional product promo video/i,
     }));
 
     await waitFor(() => {
@@ -227,9 +236,105 @@ describe('<ProductMediaSection />', () => {
     });
 
     await user.click(screen.getByRole('button', {
-      name: 'Select a Product thumbnail image.',
+      name: /select a product thumbnail image/i,
     }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Upload denied');
+  });
+
+  it('rejects unsupported Product image formats before upload', async () => {
+    const user = userEvent.setup();
+    const onUploadThumbnail = jest.fn();
+    renderSection({ onUploadThumbnail });
+    const uploadButton = screen.getByRole('button', {
+      name: /select a product thumbnail image/i,
+    });
+
+    mockUploaderFilesByNote.set(uploadButton.textContent ?? '', [
+      new File(['image'], 'thumbnail.svg', { type: 'image/svg+xml' }),
+    ]);
+
+    await user.click(uploadButton);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Unsupported image format',
+    );
+    expect(onUploadThumbnail).not.toHaveBeenCalled();
+  });
+
+  it('rejects Product images over 10 MB before upload', async () => {
+    const user = userEvent.setup();
+    const onAddGalleryImage = jest.fn();
+    renderSection({ onAddGalleryImage });
+    const uploadButton = screen.getByRole('button', {
+      name: /add gallery images/i,
+    });
+    const oversizedImage = new File(['image'], 'large.jpg', {
+      type: 'image/jpeg',
+    });
+    Object.defineProperty(oversizedImage, 'size', { value: 11 * 1024 * 1024 });
+    mockUploaderFilesByNote.set(uploadButton.textContent ?? '', [oversizedImage]);
+
+    await user.click(uploadButton);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Product images must be 10 MB or smaller',
+    );
+    expect(onAddGalleryImage).not.toHaveBeenCalled();
+  });
+
+  it('rejects gallery selections that exceed 20 total images', async () => {
+    const user = userEvent.setup();
+    const onAddGalleryImage = jest.fn();
+    const existingGallery = Array.from({ length: 20 }, (_, index) => ({
+      id: `gallery-${index}`,
+      url: `https://cdn.example.com/${index}.jpg`,
+      fileName: `${index}.jpg`,
+      position: index + 1,
+      status: 'READY' as const,
+    }));
+
+    renderSection({ galleryImages: existingGallery, onAddGalleryImage });
+
+    await user.click(screen.getByRole('button', {
+      name: /add gallery images/i,
+    }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Gallery can include up to 20 images total',
+    );
+    expect(onAddGalleryImage).not.toHaveBeenCalled();
+  });
+
+  it('rejects unsupported and oversized promo videos before upload', async () => {
+    const user = userEvent.setup();
+    const onUploadPromoVideo = jest.fn();
+    renderSection({ onUploadPromoVideo });
+    const uploadButton = screen.getByRole('button', {
+      name: /select an optional product promo video/i,
+    });
+
+    mockUploaderFilesByNote.set(uploadButton.textContent ?? '', [
+      new File(['video'], 'promo.mov', { type: 'video/quicktime' }),
+    ]);
+    await user.click(uploadButton);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Unsupported promo-video format',
+    );
+    expect(onUploadPromoVideo).not.toHaveBeenCalled();
+
+    const oversizedVideo = new File(['video'], 'promo.mp4', {
+      type: 'video/mp4',
+    });
+    Object.defineProperty(oversizedVideo, 'size', { value: 101 * 1024 * 1024 });
+    mockUploaderFilesByNote.set(uploadButton.textContent ?? '', [oversizedVideo]);
+
+    await user.click(uploadButton);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Product promo videos must be 100 MB or smaller',
+    );
+    expect(onUploadPromoVideo).not.toHaveBeenCalled();
   });
 });

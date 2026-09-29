@@ -255,6 +255,12 @@ jest.mock('domains/app/features/product-form', () => ({
     <div data-testid="product-readiness-section">
       <h3>Readiness</h3>
       <div>{result.isReadyToPublish ? 'Ready to publish' : 'Blockers'}</div>
+      {result.blockers?.map((blocker: any) => (
+        <div key={blocker.id}>
+          <strong>{blocker.title}</strong>
+          <span>{blocker.description}</span>
+        </div>
+      ))}
       {publishError && <div role="alert">{publishError}</div>}
       <button
         data-testid="readiness-go-pricing"
@@ -1208,6 +1214,61 @@ describe('<ProductForm />', () => {
         isPublishing: false,
       }),
     );
+  });
+
+  it('surfaces backend readiness validation entries from Publish failures', async () => {
+    mockUpdateProductDetailsUnwrap.mockRejectedValueOnce({
+      message: 'Product is not ready to publish',
+      errors: {
+        'details.lessons': 'At least one lesson is required',
+        price: 'Set a valid price',
+      },
+    });
+    const state = makeFacadeState({
+      showRestOfForm: true,
+      formData: {
+        id: 'course-1',
+        name: 'Ready Course',
+        description: '',
+        type: 'COURSE',
+        price: 25,
+        sections: [
+          {
+            id: 'section-1',
+            title: 'Intro',
+            position: 1,
+            lessons: [
+              {
+                id: 'lesson-1',
+                title: 'Welcome',
+                sectionId: 'section-1',
+                description: '',
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    mockUseProductFormFacade.mockReturnValue(state);
+
+    render(<ProductForm />);
+
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[
+        mockProductWorkspaceShell.mock.calls.length - 1
+      ][0].onPublish();
+    });
+
+    expect(state.setField).not.toHaveBeenCalledWith('status', 'PUBLISHED');
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'Product is not ready to publish',
+      );
+    });
+    expect(screen.getByText('At least one lesson is required')).toBeInTheDocument();
+    expect(screen.getByText('Set a valid price')).toBeInTheDocument();
   });
 
   it('prevents duplicate Publish while already publishing', async () => {

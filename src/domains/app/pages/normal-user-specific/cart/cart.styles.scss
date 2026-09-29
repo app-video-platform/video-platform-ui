@@ -60,6 +60,17 @@
 
     .cart-products-aside {
       grid-area: 2 / 4 / 3 / 5;
+
+      .cart-products-aside__notice {
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        background: #eff6ff;
+        color: #1e3a8a;
+        font-size: 0.9rem;
+        line-height: 1.35;
+        margin: 0 0 16px;
+        padding: 10px 12px;
+      }
     }
   }
 }

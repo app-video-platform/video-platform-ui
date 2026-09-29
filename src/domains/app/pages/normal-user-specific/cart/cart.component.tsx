@@ -198,6 +198,11 @@ const Cart: React.FC = () => {
                   <span>free</span>
                 )}
               </h2>
+              {containsPaidProducts && (
+                <p className="cart-products-aside__notice" role="note">
+                  Test payment — No real charge will be made during checkout.
+                </p>
+              )}
 
               <Button
                 type="button"
