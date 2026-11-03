@@ -11,48 +11,55 @@ const VerifyEmail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState<
-    'loading' | 'success' | 'error' | 'expired'
+    'loading' | 'success' | 'error' | 'expired' | 'missing'
   >('loading');
 
   useEffect(() => {
     const token = searchParams.get('token');
+    let active = true;
 
     if (!token) {
-      setStatus('error');
-      return;
+      setStatus('missing');
+      return () => {
+        active = false;
+      };
     }
 
     dispatch(verifyEmail(token))
-      .then(() => setStatus('success'))
+      .unwrap()
+      .then(() => {
+        if (active) {
+          setStatus('success');
+        }
+      })
       .catch((error) => {
-        if (error.response?.data.reason === 'expired') {
-          setStatus('expired');
-        } else {
-          setStatus('error');
+        if (active) {
+          const message = typeof error === 'string' ? error : '';
+          setStatus(/expir/i.test(message) ? 'expired' : 'error');
         }
       });
+
+    return () => {
+      active = false;
+    };
   }, [searchParams]);
 
   const messages = {
-    loading: <p>Invalid verification link. Please check your email again.</p>,
-    error: <p>Invalid verification link. Please check your email again.</p>,
+    loading: <p>Verifying your email…</p>,
+    error: <p role="alert">This verification link is invalid or has already been used.</p>,
+    missing: <p role="alert">This verification link is missing. Please check your email again.</p>,
     success: (
       <p>
         Email verified! You can now <a href="/auth/login">log in</a>.
       </p>
     ),
     expired: (
-      <p>
-        This link has expired. <a href="/resend-verification">Resend email?</a>
-      </p>
+      <p role="alert">This verification link has expired. Please contact support to request a new link.</p>
     ),
   };
 
-  // if (status === 'loading') { return <p>Verifying your email...</p>; }
-  // if (status === 'success') { return <p>Email verified! You can now <a href="/auth/login">log in</a>.</p>; }
-  // if (status === 'expired') { return <p>This link has expired. <a href="/resend-verification">Resend email?</a></p>; }
   return (
-    <div className="verify-email-box">{status ? messages[status] : null}</div>
+    <div className="verify-email-box" aria-live="polite">{messages[status]}</div>
   );
 };
 

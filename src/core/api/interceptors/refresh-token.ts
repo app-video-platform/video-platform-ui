@@ -47,7 +47,7 @@ export function attachRefreshTokenInterceptor(httpClient: AxiosInstance) {
       if (!original || (!original._publicRead && original._sessionGeneration !== getTransportGeneration())) {
         return Promise.reject(original ? changed() : error);
       }
-      const authEndpoint = /api\/auth\/(refresh|login|logout|googleSignIn|register|verify)(?:[/?]|$)/;
+      const authEndpoint = /api\/auth\/(csrf|refresh|login|logout|googleSignIn|register|verify)(?:[/?]|$)/;
       if (original._publicRead || error.response?.status !== 401 || authEndpoint.test(original.url ?? '')) {
         return Promise.reject(error);
       }

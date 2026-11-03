@@ -140,7 +140,7 @@ describe('application onboarding route', () => {
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'creator@example.test' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByTestId('input-password'), {
       target: { value: 'password123' },
     });
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));

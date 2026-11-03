@@ -45,8 +45,9 @@ describe('Auth API', () => {
   });
 
   describe('registerUser', () => {
-    it('posts with withCredentials:false and returns data', async () => {
+    it('bootstraps CSRF then registers with credentials and the returned token', async () => {
       const fakeResponse = 'registered';
+      const token = 'csrf-fixture-token';
       const userData = {
         email: 'test@example.com',
         password: 'secret',
@@ -54,17 +55,49 @@ describe('Auth API', () => {
         lastName: 'Example',
       };
 
+      mockedHttpClient.get.mockResolvedValueOnce({ data: { token } });
       mockedHttpClient.post.mockResolvedValueOnce({ data: fakeResponse });
 
       await expect(registerUser(userData)).resolves.toEqual(fakeResponse);
+      expect(mockedHttpClient.get).toHaveBeenCalledWith('api/auth/csrf', {
+        withCredentials: true,
+      });
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
         'api/auth/register',
         userData,
-        { withCredentials: false },
+        { withCredentials: true, headers: { 'X-XSRF-TOKEN': token } },
+      );
+      expect(mockedHttpClient.get.mock.invocationCallOrder[0]).toBeLessThan(
+        mockedHttpClient.post.mock.invocationCallOrder[0],
       );
     });
 
-    it('rethrows on error and logs', async () => {
+    it('does not register when the CSRF bootstrap request fails', async () => {
+      mockedHttpClient.get.mockRejectedValueOnce(new Error('network unavailable'));
+      await expect(registerUser({
+        email: 'test@example.com',
+        password: 'secret',
+        firstName: 'Test',
+        lastName: 'Example',
+      })).rejects.toThrow(/secure registration could not be initialized/i);
+      expect(mockedHttpClient.post).not.toHaveBeenCalled();
+      expect(errorLogSpy).not.toHaveBeenCalled();
+    });
+
+    it.each([undefined, null, '', '   ', 7])(
+      'rejects an invalid CSRF token without registering (%s)', async (token) => {
+        mockedHttpClient.get.mockResolvedValueOnce({ data: { token } });
+        await expect(registerUser({
+          email: 'test@example.com',
+          password: 'secret',
+          firstName: 'Test',
+          lastName: 'Example',
+        })).rejects.toThrow(/secure registration could not be initialized/i);
+        expect(mockedHttpClient.post).not.toHaveBeenCalled();
+      },
+    );
+
+    it('propagates registration rejection without logging request headers', async () => {
       const err = new Error('Registration error');
       const userData = {
         email: 'test@example.com',
@@ -73,12 +106,13 @@ describe('Auth API', () => {
         lastName: 'Example',
       };
 
+      mockedHttpClient.get.mockResolvedValueOnce({ data: { token: 'csrf-token' } });
       mockedHttpClient.post.mockRejectedValueOnce(err);
 
       await expect(registerUser(userData)).rejects.toThrow(
         'Registration error',
       );
-      expect(errorLogSpy).toHaveBeenCalled();
+      expect(errorLogSpy).not.toHaveBeenCalled();
     });
   });
 

@@ -20,6 +20,16 @@ const setup = () => {
 describe('cookie refresh coordination', () => {
   afterEach(() => { setSessionFailureHandler(() => undefined); });
 
+  it('does not treat a CSRF bootstrap rejection as an expired authenticated session', async () => {
+    const { client, mock, detach } = setup();
+    mock.onGet('api/auth/csrf').reply(401);
+    await expect(client.get('api/auth/csrf', { withCredentials: true })).rejects.toMatchObject({
+      response: { status: 401 },
+    });
+    expect(mock.history.post).toHaveLength(0);
+    detach();
+  });
+
   it.each([1, 3])('settles %i concurrent reads after one text refresh without a Bearer header', async (count) => {
     const { client, mock, detach } = setup();
     const gate = deferred<[number, string]>();

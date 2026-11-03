@@ -1,5 +1,5 @@
 import { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { getCookie } from '@shared/utils';
+import { getCookie } from '@shared/utils/cookie.util';
 
 /**
  * Attaches a request interceptor that automatically adds
@@ -7,7 +7,6 @@ import { getCookie } from '@shared/utils';
  */
 export function attachCsrfInterceptor(httpClient: AxiosInstance) {
   const excluded = [
-    '/api/auth/register',
     '/api/auth/login',
     '/api/auth/verify',
   ];
@@ -31,7 +30,7 @@ export function attachCsrfInterceptor(httpClient: AxiosInstance) {
         config.headers?.['X-CSRF-Force']
       ) {
         const csrfToken = getCookie('XSRF-TOKEN');
-        if (csrfToken) {
+        if (csrfToken && !config.headers?.['X-XSRF-TOKEN']) {
           config.headers = config.headers || {};
           config.headers['X-XSRF-TOKEN'] = csrfToken;
         }

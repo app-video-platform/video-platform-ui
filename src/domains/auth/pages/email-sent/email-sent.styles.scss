@@ -1,10 +1,11 @@
 .email-sent-message-container {
   background: white;
-  width: 600px;
-  height: 400px;
-  margin: 100px auto;
+  color: var(--text-inverse);
+  width: min(600px, calc(100% - 2rem));
+  min-height: 400px;
+  margin: clamp(2rem, 10vh, 6.25rem) auto;
   border-radius: 20px;
-  padding: 20px;
+  padding: clamp(1.25rem, 5vw, 2rem);
   text-align: center;
   display: flex;
   flex-direction: column;

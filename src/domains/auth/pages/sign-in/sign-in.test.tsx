@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 import { getUserProfile, signinUser } from 'core/store/auth-store';
 import SignIn from './sign-in.component';
@@ -42,7 +43,7 @@ describe('SignIn component', () => {
     // Check that the email input is rendered
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     // Check that the password input is rendered
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     // Check that the submit button is rendered (using Button component, so role "button")
     expect(
       screen.getByRole('button', { name: /sign in/i }),
@@ -61,6 +62,12 @@ describe('SignIn component', () => {
     const passwordError = await screen.findByText(/Password is required/i);
     expect(emailError).toBeInTheDocument();
     expect(passwordError).toBeInTheDocument();
+    const emailField = screen.getByLabelText(/email/i);
+    const passwordField = screen.getByLabelText(/^password$/i);
+    expect(emailField).toHaveAttribute('aria-invalid', 'true');
+    expect(emailField).toHaveAttribute('aria-describedby', 'email-error');
+    expect(passwordField).toHaveAttribute('aria-invalid', 'true');
+    expect(passwordField).toHaveAttribute('aria-describedby', 'password-error');
 
     // Now provide an invalid email format.
     const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
@@ -69,6 +76,74 @@ describe('SignIn component', () => {
 
     const invalidEmailError = await screen.findByText(/Invalid email format/i);
     expect(invalidEmailError).toBeInTheDocument();
+    expect(emailInput).toHaveAttribute('aria-invalid', 'true');
+    expect(emailInput).toHaveAttribute('aria-describedby', 'email-error');
+    fireEvent.change(emailInput, { target: { value: 'correct@example.com' } });
+    expect(emailInput).not.toHaveAttribute('aria-invalid');
+    expect(emailInput).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('keeps password guidance in a stable position and accepts the first pointer submit', async () => {
+    const mockThunkResultSignin = { unwrap: () => Promise.resolve() };
+    const mockThunkResultProfile = {
+      unwrap: () => Promise.resolve({ onboardingCompleted: true }),
+    };
+    (signinUser as unknown as jest.Mock).mockReturnValue(() => mockThunkResultSignin);
+    (getUserProfile as unknown as jest.Mock).mockReturnValue(() => mockThunkResultProfile);
+    mockDispatch.mockImplementation((action) =>
+      typeof action === 'function'
+        ? mockDispatch.mock.calls.filter(([arg]) => typeof arg === 'function').length === 1
+          ? mockThunkResultSignin
+          : mockThunkResultProfile
+        : action,
+    );
+
+    render(<SignIn />);
+    expect(screen.getByText('At least 8 characters')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'test@example.com' },
+    });
+    const password = screen.getByLabelText(/^password$/i);
+    fireEvent.change(password, { target: { value: 'Password123!' } });
+    fireEvent.focus(password);
+    const submit = screen.getByRole('button', { name: /sign in/i });
+    fireEvent.mouseDown(submit);
+    fireEvent.blur(password);
+    fireEvent.click(submit);
+
+    expect(screen.getByText('At least 8 characters')).toBeInTheDocument();
+    expect(signinUser).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: 'Password123!',
+    });
+  });
+
+  it('submits from the password field with Enter', async () => {
+    const user = userEvent.setup();
+    const mockThunkResultSignin = { unwrap: () => Promise.resolve() };
+    const mockThunkResultProfile = {
+      unwrap: () => Promise.resolve({ onboardingCompleted: true }),
+    };
+    (signinUser as unknown as jest.Mock).mockReturnValue(() => mockThunkResultSignin);
+    (getUserProfile as unknown as jest.Mock).mockReturnValue(() => mockThunkResultProfile);
+    mockDispatch.mockImplementation((action) =>
+      typeof action === 'function'
+        ? mockDispatch.mock.calls.filter(([arg]) => typeof arg === 'function').length === 1
+          ? mockThunkResultSignin
+          : mockThunkResultProfile
+        : action,
+    );
+
+    render(<SignIn />);
+    await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+    const password = screen.getByLabelText(/^password$/i);
+    await user.type(password, 'Password123!');
+    await user.keyboard('{Enter}');
+
+    expect(signinUser).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: 'Password123!',
+    });
   });
 
   it('submits the form and navigates to dashboard when onboardingCompleted is true', async () => {
@@ -109,7 +184,7 @@ describe('SignIn component', () => {
 
     render(<SignIn />);
     const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -162,7 +237,7 @@ describe('SignIn component', () => {
 
     render(<SignIn />);
     const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByLabelText(/^password$/i);
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
