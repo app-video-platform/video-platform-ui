@@ -358,6 +358,31 @@ describe('<LessonEditor />', () => {
     expect(changeLessonMock).not.toHaveBeenCalled();
   });
 
+  it('shows the selected Course video after the file callback rerenders the lesson', () => {
+    const lesson = { ...baseLesson, id: 'video-lesson', title: 'Video', type: 'VIDEO' as const };
+    render(
+      <LessonEditor
+        lesson={lesson}
+        index={0}
+        productId="product-1"
+        sectionId="sec-1"
+        removeLessonFromList={removeLessonMock}
+        onChange={changeLessonMock}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Edit'));
+    fireEvent.click(screen.getByTestId('file-uploader'));
+
+    expect(screen.getByText(/video\.mp4 is selected for this lesson/)).toBeInTheDocument();
+    expect(changeLessonMock).toHaveBeenCalledWith(0, expect.objectContaining({
+      videoUrl: 'pending-video-asset://video.mp4',
+      id: 'video-lesson',
+      productId: 'product-1',
+      sectionId: 'sec-1',
+    }));
+  });
+
   it('preserves unsupported Article content without mounting a destructive editor', () => {
     render(<LessonEditor index={0} productId="p" sectionId="s"
       lesson={{ ...baseLesson, type: 'ARTICLE', content: '{"type":"unknown"}' }}

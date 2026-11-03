@@ -103,6 +103,9 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   const [uploadStatusBySignature, setUploadStatusBySignature] = useState<
     Record<string, UploadStatus>
   >({});
+  const [uploadErrorsBySignature, setUploadErrorsBySignature] = useState<
+    Record<string, string>
+  >({});
   const [fileDeleteTargetId, setFileDeleteTargetId] = useState<string | null>(
     null,
   );
@@ -149,6 +152,14 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
       }
 
       uploadedFileSignaturesRef.current.add(signature);
+      setUploadErrorsBySignature((current) => {
+        if (!current[signature]) {
+          return current;
+        }
+        const next = { ...current };
+        delete next[signature];
+        return next;
+      });
       setUploadStatusBySignature((current) => ({
         ...current,
         [signature]: 'uploading',
@@ -171,6 +182,14 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
             ...current,
             [signature]: 'uploaded',
           }));
+          setUploadErrorsBySignature((current) => {
+            if (!current[signature]) {
+              return current;
+            }
+            const next = { ...current };
+            delete next[signature];
+            return next;
+          });
 
           applySectionUpdate((current) => {
             const existingFiles = current.files ?? [];
@@ -194,11 +213,12 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
             ...current,
             [signature]: 'failed',
           }));
-          setOperationError(
-            typeof error === 'string'
+          setUploadErrorsBySignature((current) => ({
+            ...current,
+            [signature]: typeof error === 'string'
               ? error
               : `Could not upload ${file.name}. Try again.`,
-          );
+          }));
         });
     });
   };
@@ -414,6 +434,11 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
           {operationError}
         </p>
       )}
+      {Object.entries(uploadErrorsBySignature).map(([signature, error]) => (
+        <p className="content-group__error" role="alert" key={signature}>
+          {error}
+        </p>
+      ))}
 
       {productType === 'COURSE' && (
         <CourseLessons

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Uppy, { Uppy as UppyType } from '@uppy/core';
 import { Dashboard } from '@uppy/react';
 import XHRUpload from '@uppy/xhr-upload';
@@ -47,14 +47,26 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
   // Use state to hold the Uppy instance so that re-render occurs when it’s created
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [uppy, setUppy] = useState<UppyType<any, any> | null>(null);
-  const memoizedOnFilesChange = useCallback(onFilesChange, [onFilesChange]);
+  const onFilesChangeRef = useRef(onFilesChange);
+  onFilesChangeRef.current = onFilesChange;
+
+  // Consumers may pass inline arrays. Compare the actual restrictions instead
+  // of their array identity so ordinary parent renders keep the same Uppy.
+  const allowedFileTypesKey = JSON.stringify(
+    allowedFileTypes ?? ['video/*', 'audio/*', 'text/*'],
+  );
+  const stableAllowedFileTypes = useMemo(
+    () => JSON.parse(allowedFileTypesKey) as string[],
+    [allowedFileTypesKey],
+  );
 
   useEffect(() => {
+    let isActive = true;
     // Create the Uppy instance with the provided restrictions
     const uppyInstance = new Uppy({
       restrictions: {
         maxNumberOfFiles: maxNumberOfFiles || 10,
-        allowedFileTypes: allowedFileTypes || ['video/*', 'audio/*', 'text/*'],
+        allowedFileTypes: stableAllowedFileTypes,
         maxFileSize: maxFileSize || 100 * 1024 * 1024, // 100 MB in bytes
       },
       autoProceed: false,
@@ -83,7 +95,7 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
     }
 
     // If image uploads are allowed, add the ThumbnailGenerator plugin
-    if (allowedFileTypes && allowedFileTypes.includes('image/*')) {
+    if (stableAllowedFileTypes.includes('image/*')) {
       uppyInstance.use(ThumbnailGenerator, {
         thumbnailWidth: 200,
         waitForThumbnailsBeforeUpload: true,
@@ -92,10 +104,13 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
 
     // Listen for file-added and file-removed events to update the file list
     const updateFiles = () => {
+      if (!isActive) {
+        return;
+      }
       const files: File[] = uppyInstance
         .getFiles()
         .map((file) => file.data as File);
-      memoizedOnFilesChange(files);
+      onFilesChangeRef.current(files);
     };
 
     uppyInstance.on('file-added', updateFiles);
@@ -117,15 +132,15 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
 
     // Cleanup on unmount
     return () => {
-      // if (uppyInstance && typeof uppyInstance.destroy === 'function') {
+      isActive = false;
+      uppyInstance.off('file-added', updateFiles);
+      uppyInstance.off('file-removed', updateFiles);
       uppyInstance.destroy();
-      // }
     };
   }, [
-    allowedFileTypes,
+    stableAllowedFileTypes,
     maxFileSize,
     maxNumberOfFiles,
-    memoizedOnFilesChange,
     disableImporters,
     uploadMode,
   ]);

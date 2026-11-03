@@ -138,6 +138,43 @@ describe('<MembershipVideoEditor />', () => {
     });
   });
 
+  it('retains the selected video through parent rerenders, validation correction, and save', () => {
+    const onSave = jest.fn();
+    const Harness = () => {
+      const [value, setValue] = React.useState<MembershipVideoDraft>({
+        ...draft,
+        title: '',
+        video: null,
+      });
+      return (
+        <MembershipVideoEditor
+          value={value}
+          onChange={setValue}
+          onSave={onSave}
+          onCancel={jest.fn()}
+        />
+      );
+    };
+    render(<Harness />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Select video file' }));
+    expect(screen.getByText(/Selected file: member-video\.mp4/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Description'), {
+      target: { value: 'Updated description' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(screen.getByText('Enter a video title.')).toBeInTheDocument();
+    expect(screen.getByText(/Selected file: member-video\.mp4/)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Title'), {
+      target: { value: 'Corrected title' },
+    });
+    expect(screen.queryByText('Enter a video title.')).not.toBeInTheDocument();
+    expect(screen.getByText(/Selected file: member-video\.mp4/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
   it('changing status preserves other values', () => {
     const { onChange } = renderEditor();
 
