@@ -1,12 +1,14 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CiHeart } from 'react-icons/ci';
 import { useNavigate } from 'react-router-dom';
 
 import {
   selectWishlistCount,
   selectWishlistProducts,
+  moveWishlistItemToCart,
 } from 'core/store/wishlist';
+import { AppDispatch } from 'core/api/models';
 import { Dropdown, Icon, Button } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 
@@ -15,9 +17,19 @@ import './wishlist-dropdown.styles.scss';
 const formatCount = (n: number) => (n > 99 ? '99+' : String(n));
 
 const WishlistDropdown: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const wishlistProducts = useSelector(selectWishlistProducts);
   const wishlistProdCount = useSelector(selectWishlistCount);
+
+  const handleAddToCart = (productId?: string) => {
+    if (!productId) {
+      return;
+    }
+    if (dispatch(moveWishlistItemToCart(productId))) {
+      navigate('/app/cart');
+    }
+  };
 
   return (
     <div className="wishlist-dropdown">
@@ -58,7 +70,7 @@ const WishlistDropdown: React.FC = () => {
                     <Button
                       type="button"
                       variant="secondary"
-                      onClick={() => navigate('/app/cart')}
+                      onClick={() => handleAddToCart(item.id)}
                     >
                       Add to cart
                     </Button>
