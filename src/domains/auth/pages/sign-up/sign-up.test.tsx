@@ -1,6 +1,6 @@
 // SignUp.test.tsx
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter } from 'react-router-dom';
@@ -34,6 +34,24 @@ describe('SignUp Component', () => {
       </Provider>,
     );
 
+  const fillValidForm = () => {
+    fireEvent.change(screen.getByLabelText(/First Name/i), {
+      target: { value: 'John' },
+    });
+    fireEvent.change(screen.getByLabelText(/Last Name/i), {
+      target: { value: 'Doe' },
+    });
+    fireEvent.change(screen.getByLabelText(/Email/i), {
+      target: { value: 'john.doe@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'Password123!' },
+    });
+    fireEvent.change(screen.getByLabelText(/^Confirm Password$/i), {
+      target: { value: 'Password123!' },
+    });
+  };
+
   test('renders the sign up form with all input fields', () => {
     renderComponent();
     expect(screen.getByTestId('sign-up-header')).toBeInTheDocument();
@@ -42,7 +60,7 @@ describe('SignUp Component', () => {
     expect(screen.getByLabelText(/Last Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByTestId('input-password')).toBeInTheDocument();
-    expect(screen.getByLabelText(/Confirm Password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Confirm Password$/i)).toBeInTheDocument();
   });
 
   // test('validates the form and shows errors when fields are empty', async () => {
@@ -70,28 +88,46 @@ describe('SignUp Component', () => {
 
     renderComponent();
 
-    // Fill in valid form data
-    fireEvent.change(screen.getByLabelText(/First Name/i), {
-      target: { value: 'John' },
-    });
-    fireEvent.change(screen.getByLabelText(/Last Name/i), {
-      target: { value: 'Doe' },
-    });
-    fireEvent.change(screen.getByLabelText(/Email/i), {
-      target: { value: 'john.doe@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'Password123!' },
-    });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
-      target: { value: 'Password123!' },
-    });
+    fillValidForm();
 
     const submitButton = screen.getByRole('button', { name: /Sign Up/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith('/auth/email-sent');
+    });
+  });
+
+  test('prevents duplicate submits, shows a recoverable rejection, and allows retry', async () => {
+    let rejectFirst!: (error: string) => void;
+    const firstAttempt = new Promise((_, reject) => {
+      rejectFirst = reject;
+    });
+    const mockDispatch = jest
+      .fn()
+      .mockReturnValueOnce({ unwrap: () => firstAttempt })
+      .mockReturnValueOnce({ unwrap: () => Promise.resolve('registered') });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (store.dispatch as any) = mockDispatch;
+
+    renderComponent();
+    fillValidForm();
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
+    fireEvent.click(submitButton);
+    fireEvent.click(submitButton);
+    expect(mockDispatch).toHaveBeenCalledTimes(1);
+    expect(submitButton).toBeDisabled();
+
+    await act(async () => {
+      rejectFirst('Secure registration could not be initialized. Please try again.');
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent(/secure registration/i);
+    expect(screen.getByRole('button', { name: /sign up/i })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledTimes(2);
       expect(mockNavigate).toHaveBeenCalledWith('/auth/email-sent');
     });
   });

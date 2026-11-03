@@ -106,6 +106,15 @@ the requested URL rather than redirecting away from it. Browser-cookie/server ro
 races still require backend session enforcement; cancellation does not revoke a server
 operation that has already committed.
 
+Guest registration uses the shared Axios client and an explicit CSRF bootstrap:
+credentialed `GET api/auth/csrf` must return a non-empty `{token}` and establish the
+matching `XSRF-TOKEN` cookie before credentialed `POST api/auth/register` sends that
+token in `X-XSRF-TOKEN`. Registration remains CSRF-protected. The CSRF interceptor may
+provide the cookie token for other mutations but must preserve an explicit token on the
+registration request; bootstrap failures are surfaced without logging Axios request
+configuration or token material. The frontend integration does not imply that the
+backend route is deployed in every environment.
+
 ## Onboarding route and persistence lifecycle
 
 - The canonical onboarding URL is the top-level `/onboarding` route in `src/App.tsx`. It mounts `Onboarding` through `ProtectedRoute` for the existing User, Creator, and Admin roles, outside `AppRouter`'s role-home layout. Keep `/app/onboarding` as the existing protected app-prefixed entry.

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
@@ -29,10 +29,32 @@ const SignUp: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      if (name === 'password' && formData.confirmPassword) {
+        if (value !== formData.confirmPassword) {
+          next.confirmPassword = 'Passwords do not match';
+        } else {
+          delete next.confirmPassword;
+        }
+      }
+      if (name === 'confirmPassword' && value) {
+        if (value !== formData.password) {
+          next.confirmPassword = 'Passwords do not match';
+        } else {
+          delete next.confirmPassword;
+        }
+      }
+      return next;
+    });
   };
 
   const validateForm = () => {
@@ -62,8 +84,11 @@ const SignUp: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) {
+      return;
+    }
     if (validateForm()) {
       const registerData: RegisterRequest = {
         firstName: formData.firstName,
@@ -71,11 +96,22 @@ const SignUp: React.FC = () => {
         email: formData.email,
         password: formData.password,
       };
-      dispatch(signupUser(registerData))
-        .unwrap() // unwrap() turns the thunk result into a "normal" promise
-        .then(() => {
-          navigate('/auth/email-sent'); // example redirect (requires useNavigate)
-        });
+      submittingRef.current = true;
+      setIsSubmitting(true);
+      setSubmitError(null);
+      try {
+        await dispatch(signupUser(registerData)).unwrap();
+        navigate('/auth/email-sent');
+      } catch (error) {
+        setSubmitError(
+          typeof error === 'string'
+            ? error
+            : 'Registration could not be completed. Please check your details and try again.',
+        );
+      } finally {
+        submittingRef.current = false;
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -91,11 +127,10 @@ const SignUp: React.FC = () => {
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
+          error={errors.firstName}
+          disabled={isSubmitting}
           required
         />
-        {errors.firstName && (
-          <p className="error-text-red">{errors.firstName}</p>
-        )}
 
         <Input
           label="Last Name"
@@ -103,9 +138,10 @@ const SignUp: React.FC = () => {
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
+          error={errors.lastName}
+          disabled={isSubmitting}
           required
         />
-        {errors.lastName && <p className="error-text-red">{errors.lastName}</p>}
 
         <Input
           label="Email"
@@ -113,9 +149,10 @@ const SignUp: React.FC = () => {
           name="email"
           value={formData.email}
           onChange={handleChange}
+          error={errors.email}
+          disabled={isSubmitting}
           required
         />
-        {errors.email && <p className="error-text-red">{errors.email}</p>}
 
         <PasswordInput
           label="Password"
@@ -123,24 +160,26 @@ const SignUp: React.FC = () => {
           value={formData.password}
           onChange={handleChange}
           showRules={true}
+          error={errors.password}
+          disabled={isSubmitting}
           required
         />
-        {errors.password && <p className="error-text-red">{errors.password}</p>}
 
         <PasswordInput
           label="Confirm Password"
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
+          error={errors.confirmPassword}
+          disabled={isSubmitting}
           required
         />
 
-        {errors.confirmPassword && (
-          <p className="error-text-red">{errors.confirmPassword}</p>
-        )}
+        {submitError && <p className="auth-submit-error" role="alert">{submitError}</p>}
+        {isSubmitting && <p role="status">Preparing secure registration…</p>}
 
-        <Button type="submit" variant="primary" className="sign-up-btn">
-          Sign Up
+        <Button type="submit" variant="primary" className="sign-up-btn" disabled={isSubmitting}>
+          {isSubmitting ? 'Signing up…' : 'Sign Up'}
         </Button>
       </form>
     </div>

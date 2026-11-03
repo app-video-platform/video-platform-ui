@@ -10,6 +10,7 @@ interface PasswordInputProps
   label?: string;
   required?: boolean;
   showRules?: boolean; // whether to show the rules list
+  error?: string;
 }
 
 const passwordValidationRules = [
@@ -46,22 +47,10 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   required,
   showRules = true,
   maxLength,
-  onFocus,
-  onBlur,
+  error,
   ...otherProps
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-
-  const handleFocus: React.FocusEventHandler<HTMLInputElement> = (e) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  };
-
-  const handleBlur: React.FocusEventHandler<HTMLInputElement> = (e) => {
-    setIsFocused(false);
-    onBlur?.(e);
-  };
 
   const handlePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -74,16 +63,17 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         label={label}
         required={required}
         value={value}
+        error={error}
         prefix="none"
         maxLength={maxLength}
         type={showPassword ? 'text' : 'password'}
         suffixIcon={showPassword ? FaEye : FaEyeSlash}
         handleSuffixClick={handlePasswordVisibility}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        suffixAriaLabel={`${showPassword ? 'Hide' : 'Show'} ${label?.toLowerCase() ?? 'password'}`}
+        suffixPressed={showPassword}
       />
 
-      {showRules && isFocused && (
+      {showRules && (
         <ul className="password-rules">
           {passwordValidationRules.map((rule) => (
             <li

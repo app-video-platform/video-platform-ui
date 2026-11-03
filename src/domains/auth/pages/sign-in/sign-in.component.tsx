@@ -22,6 +22,25 @@ const SignIn: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (name === 'email' && prev.email) {
+        if (!value) {
+          next.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          next.email = 'Invalid email format';
+        } else {
+          delete next.email;
+        }
+      } else if (name === 'password' && prev.password) {
+        if (!value) {
+          next.password = 'Password is required';
+        } else {
+          delete next.password;
+        }
+      }
+      return next;
+    });
   };
 
   const validateForm = () => {
@@ -70,20 +89,18 @@ const SignIn: React.FC = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            error={errors.email}
             required
           />
-          {errors.email && <p className="error-text-red">{errors.email}</p>}
 
           <PasswordInput
             label="Password"
             name="password"
             value={formData.password}
             onChange={handleChange}
+            error={errors.password}
             required
           />
-          {errors.password && (
-            <p className="error-text-red">{errors.password}</p>
-          )}
           <Button variant="primary" type="submit">
             Sign in
           </Button>

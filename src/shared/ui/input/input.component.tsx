@@ -18,6 +18,8 @@ export interface InputProps
   prefixIcon?: IconType;
   suffixIcon?: IconType;
   handleSuffixClick?: () => void;
+  suffixAriaLabel?: string;
+  suffixPressed?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
@@ -35,6 +37,8 @@ const Input: React.FC<InputProps> = ({
   prefixIcon,
   suffixIcon,
   handleSuffixClick,
+  suffixAriaLabel,
+  suffixPressed,
   ...otherProps
 }) => {
   const {
@@ -83,6 +87,8 @@ const Input: React.FC<InputProps> = ({
             type="button"
             onClick={handleSuffixClick}
             className="input-suffix"
+            aria-label={suffixAriaLabel}
+            aria-pressed={suffixPressed}
           >
             <Icon
               icon={suffixIcon}

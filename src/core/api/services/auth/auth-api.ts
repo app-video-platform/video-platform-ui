@@ -16,17 +16,26 @@ export const getNewAPI = async () => {
 };
 
 export const registerUser = async (userData: RegisterRequest) => {
+  let token: unknown;
   try {
-    const response = await httpClient.post<string>(
-      'api/auth/register',
-      userData,
-      { withCredentials: false },
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error registering new user:', error);
-    throw error;
+    const csrfResponse = await httpClient.get<{ token?: unknown }>('api/auth/csrf', {
+      withCredentials: true,
+    });
+    token = csrfResponse.data?.token;
+  } catch {
+    // Axios errors can contain request headers; avoid logging CSRF material.
+    throw new Error('Secure registration could not be initialized. Please try again.');
   }
+
+  if (typeof token !== 'string' || !token.trim()) {
+    throw new Error('Secure registration could not be initialized. Please try again.');
+  }
+
+  const response = await httpClient.post<string>('api/auth/register', userData, {
+    withCredentials: true,
+    headers: { 'X-XSRF-TOKEN': token },
+  });
+  return response.data;
 };
 
 export const verifyEmailApi = (token: string) =>
