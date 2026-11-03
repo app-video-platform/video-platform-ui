@@ -13,6 +13,23 @@ import {
 import '@testing-library/jest-dom';
 
 // ── 1) MOCK SectionEditor with UPDATED PROPS ────────────────────────────────
+const mockDispatch = jest.fn();
+const mockUpdateProductSection = jest.fn((payload: {
+  productId: string;
+  sectionId: string;
+  position: number;
+}) => ({ type: 'updateSection', payload }));
+
+jest.mock('core/store/product-store', () => ({
+  createProductSection: (payload: unknown) => ({ type: 'createSection', payload }),
+  deleteProductSection: (payload: unknown) => ({ type: 'deleteSection', payload }),
+  updateProductSection: (payload: {
+    productId: string;
+    sectionId: string;
+    position: number;
+  }) => mockUpdateProductSection(payload),
+}));
+
 jest.mock('../editors/section-editor/section-editor.component', () => ({
   __esModule: true,
   default: ({
@@ -21,15 +38,21 @@ jest.mock('../editors/section-editor/section-editor.component', () => ({
     showRemoveButton,
     onRequestDelete,
     onConfirmDelete,
+    onMoveUp,
+    onMoveDown,
   }: {
     index: number;
     section: { id: string; title: string; description?: string };
     onRequestDelete?: () => void;
     onConfirmDelete?: () => void;
+    onMoveUp?: () => void;
+    onMoveDown?: () => void;
     showRemoveButton: boolean;
   }) => (
     <div data-testid={`section-editor-${index}`}>
       <span data-testid={`section-title-${index}`}>{section.title}</span>
+      <button type="button" aria-label={`Move ${section.title} up`} onClick={onMoveUp}>Up</button>
+      <button type="button" aria-label={`Move ${section.title} down`} onClick={onMoveDown}>Down</button>
       {showRemoveButton && (
         <>
           <button
@@ -94,18 +117,7 @@ jest.mock('@shared/ui', () => ({
 
 jest.mock('react-redux', () => ({
   __esModule: true,
-  useDispatch: () =>
-    jest.fn(() => ({
-      unwrap: () =>
-        Promise.resolve({
-          id: 'created-section',
-          title: 'Created section',
-          description: '',
-          position: 1,
-          lessons: [],
-          files: [],
-        }),
-    })),
+  useDispatch: () => mockDispatch,
   useSelector: () => ({ id: 'creator-1' }),
 }));
 
@@ -115,6 +127,21 @@ import { SectionDraft } from '../models';
 
 // ── 4) Tests ────────────────────────────────────────────────────────────────
 describe('<CreateProductSections />', () => {
+  beforeEach(() => {
+    mockDispatch.mockReset();
+    mockUpdateProductSection.mockClear();
+    mockDispatch.mockImplementation(() => ({
+      unwrap: () => Promise.resolve({
+        id: 'created-section',
+        title: 'Created section',
+        description: '',
+        position: 1,
+        lessons: [],
+        files: [],
+      }),
+    }));
+  });
+
   afterEach(() => {
     cleanup();
   });
@@ -250,5 +277,77 @@ describe('<CreateProductSections />', () => {
         `Section ${i + 1}`,
       );
     }
+  });
+
+  it.each([
+    ['COURSE', 'Could not save section order.'],
+    ['DOWNLOAD', 'Could not save file group order.'],
+  ] as const)('clears a %s reorder failure only after a successful complete retry', async (type, errorMessage) => {
+    const initial = createSections(3);
+    const onSectionsChange = jest.fn();
+    let request = 0;
+    mockDispatch.mockImplementation(() => {
+      const currentRequest = request++;
+      return {
+        unwrap: () => currentRequest === 1
+          ? Promise.reject(new Error('503'))
+          : Promise.resolve({}),
+      };
+    });
+
+    render(
+      <CreateProductSections
+        sections={initial}
+        productType={type}
+        productId={productId}
+        onSectionsChange={onSectionsChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Move Section 3 up' }));
+    expect(onSectionsChange).toHaveBeenCalledTimes(1);
+    expect(await screen.findByRole('alert')).toHaveTextContent(errorMessage);
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(3));
+    expect(mockUpdateProductSection.mock.calls.slice(0, 3).map(([payload]) => payload))
+      .toEqual([
+        { productId, sectionId: 'sec-1', position: 1 },
+        { productId, sectionId: 'sec-3', position: 2 },
+        { productId, sectionId: 'sec-2', position: 3 },
+      ]);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retry order save' }));
+    await waitFor(() => expect(screen.queryByText(errorMessage)).not.toBeInTheDocument());
+    expect(mockDispatch).toHaveBeenCalledTimes(6);
+  });
+
+  it('serializes overlapping reorder saves and keeps partial failures visible', async () => {
+    const initial = createSections(3);
+    const pending: Array<() => void> = [];
+    let request = 0;
+    mockDispatch.mockImplementation(() => ({
+      unwrap: () => new Promise<void>((resolve, reject) => {
+        const currentRequest = request++;
+        pending.push(() => (currentRequest === 1 ? reject(new Error('503')) : resolve()));
+      }),
+    }));
+
+    render(
+      <CreateProductSections
+        sections={initial}
+        productType="DOWNLOAD"
+        productId={productId}
+        onSectionsChange={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Move Section 3 up' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Move Section 3 up' }));
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(3));
+
+    pending.splice(0).forEach((resolve) => resolve());
+    await waitFor(() => expect(mockDispatch).toHaveBeenCalledTimes(6));
+    pending.splice(0).forEach((resolve) => resolve());
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 });

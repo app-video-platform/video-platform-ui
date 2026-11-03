@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
 
 import {
@@ -41,6 +40,7 @@ import {
   ProductLandingPage,
 } from 'domains/app/features/product-landing-page';
 import { appRoutes } from '../../routes/routes';
+import { renderArticleContent } from './article-content.utils';
 
 import './product-page.styles.scss';
 
@@ -283,23 +283,25 @@ const ProductPage: React.FC = () => {
           {loadedProduct.sections?.map((section) => (
             <LegacyExpansionPanel key={section.id} header={section.title || ''}>
               {section.description && <p>{section.description}</p>}
-              {section.lessons?.map((lesson) => (
-                <article key={lesson.id} className="product-page__lesson">
-                  <h3>{lesson.title}</h3>
-                  {lesson.content && (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(lesson.content),
-                      }}
-                    />
-                  )}
-                  {lesson.videoUrl && (
-                    <video controls src={lesson.videoUrl}>
-                      <track kind="captions" />
-                    </video>
-                  )}
-                </article>
-              ))}
+              {section.lessons?.map((lesson) => {
+                const articleContent = renderArticleContent(lesson.content);
+                return (
+                  <article key={lesson.id} className="product-page__lesson">
+                    <h3>{lesson.title}</h3>
+                    {articleContent?.kind === 'html' && (
+                      <div
+                        dangerouslySetInnerHTML={{ __html: articleContent.value }}
+                      />
+                    )}
+                    {articleContent?.kind === 'text' && <p>{articleContent.value}</p>}
+                    {lesson.videoUrl && (
+                      <video controls src={lesson.videoUrl}>
+                        <track kind="captions" />
+                      </video>
+                    )}
+                  </article>
+                );
+              })}
             </LegacyExpansionPanel>
           ))}
         </section>

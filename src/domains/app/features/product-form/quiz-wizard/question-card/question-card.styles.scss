@@ -32,6 +32,20 @@
     }
   }
 
+  .question-card__heading {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    width: 100%;
+  }
+
+  .question-card__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    margin-left: auto;
+  }
+
   // .question-card-body {
   //   display: grid;
   //   gap: $spacing-3;
