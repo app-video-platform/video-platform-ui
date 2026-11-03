@@ -10,6 +10,7 @@ import {
   updateCreatorProductLandingPageConfigAPI,
 } from 'core/api/services';
 import { extractErrorMessage } from '@shared/utils';
+import { isAxiosError } from 'axios';
 
 interface ProductLandingPageState {
   publicByProductId: Record<string, ProductLandingPageConfig>;
@@ -20,6 +21,7 @@ interface ProductLandingPageState {
   creatorError: string | null;
   creatorSaveLoading: boolean;
   creatorSaveError: string | null;
+  creatorSaveRequestId?: string;
 }
 
 const initialState: ProductLandingPageState = {
@@ -76,7 +78,16 @@ export const updateCreatorProductLandingPageConfig = createAsyncThunk<
     try {
       return await updateCreatorProductLandingPageConfigAPI(productId, config);
     } catch (error: unknown) {
-      return rejectWithValue(extractErrorMessage(error));
+      if (isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          return rejectWithValue('You do not have permission to save this landing page.');
+        }
+        if (error.response?.status === 404) {
+          return rejectWithValue('This landing page is unavailable.');
+        }
+        return rejectWithValue('Could not save the landing page. Please try again.');
+      }
+      return rejectWithValue('Could not save the landing page. Please try again.');
     }
   },
 );
@@ -119,19 +130,29 @@ const productLandingPageSlice = createSlice({
         state.creatorError =
           action.payload ?? 'Failed to load Product Landing Page configuration';
       })
-      .addCase(updateCreatorProductLandingPageConfig.pending, (state) => {
+      .addCase(updateCreatorProductLandingPageConfig.pending, (state, action) => {
+        state.creatorSaveRequestId = action.meta.requestId;
         state.creatorSaveLoading = true;
         state.creatorSaveError = null;
       })
       .addCase(
         updateCreatorProductLandingPageConfig.fulfilled,
-        (state, action: PayloadAction<ProductLandingPageConfig>) => {
-          state.creatorSaveLoading = false;
+        (state, action) => {
+          if (action.meta?.requestId) {
+            if (state.creatorSaveRequestId !== action.meta.requestId) {return;}
+            state.creatorSaveRequestId = undefined;
+            state.creatorSaveLoading = false;
+            state.creatorSaveError = null;
+          }
           state.creatorByProductId[action.payload.productId] = action.payload;
           state.publicByProductId[action.payload.productId] = action.payload;
         },
       )
       .addCase(updateCreatorProductLandingPageConfig.rejected, (state, action) => {
+        if (state.creatorSaveRequestId !== action.meta.requestId) {
+          return;
+        }
+        state.creatorSaveRequestId = undefined;
         state.creatorSaveLoading = false;
         state.creatorSaveError =
           action.payload ?? 'Failed to save Product Landing Page configuration';

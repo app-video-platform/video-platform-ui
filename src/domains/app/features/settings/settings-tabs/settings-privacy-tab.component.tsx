@@ -1,8 +1,6 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 
-import { selectAuthUser } from 'core/store/auth-store';
 import { Input } from '@shared/ui';
 
 export interface PrivacyFormData {
@@ -13,8 +11,6 @@ export interface PrivacyFormData {
 }
 
 const SettingsPrivacyTab: React.FC = () => {
-  const user = useSelector(selectAuthUser);
-
   const methods = useForm<PrivacyFormData>({
     defaultValues: {
       title: '',
@@ -24,7 +20,7 @@ const SettingsPrivacyTab: React.FC = () => {
     },
     mode: 'onTouched',
   });
-  const { control } = methods;
+  const { control, trigger } = methods;
 
   return (
     <FormProvider {...methods}>
@@ -45,28 +41,26 @@ const SettingsPrivacyTab: React.FC = () => {
           const hasError = !!fieldState.error;
           return (
             <>
-              <label className="onboarding-input-label">Notifications</label>
               <Input
                 type="text"
+                label="Privacy"
                 value={field.value}
                 onChange={field.onChange}
                 name={field.name}
                 className={`form-input onboarding-form-input${
                   hasError ? ' onboarding-form-input__error' : ''
                 }`}
-                placeholder="Notifications"
+                placeholder="Privacy"
                 aria-describedby={
-                  fieldState.error ? `${field.name}-error` : undefined
+                  undefined
                 }
-                onBlur={(e: { target: { value: string } }) =>
-                  field.onChange(e.target.value.trim())
-                }
+                error={fieldState.error?.message}
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  field.onChange(e.currentTarget.value.trim());
+                  field.onBlur();
+                  void trigger(field.name);
+                }}
               />
-              {fieldState.error && (
-                <p className="form-field-error error-text-red">
-                  {fieldState.error.message}
-                </p>
-              )}
             </>
           );
         }}

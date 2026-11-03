@@ -1,9 +1,14 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { selectAuthUser } from 'core/store/auth-store';
+import {
+  selectAuthUser,
+  selectProfileUpdateLoading,
+  updateUserDetails,
+} from 'core/store/auth-store';
+import { AppDispatch, SocialMediaLink, SocialPlatforms } from 'core/api/models';
 import {
   Button,
   Divider,
@@ -16,6 +21,29 @@ import { SettingsSection } from '../settings-section';
 import { SocialInput } from '../social-input';
 import { PageHeader } from 'domains/app/components';
 import { PUBLIC_EMAIL_POPOVER_COPY } from '../settings.constants';
+
+const SOCIAL_PREFIXES: Record<SocialPlatforms, string> = {
+  [SocialPlatforms.FB]: 'https://www.facebook.com/',
+  [SocialPlatforms.IG]: 'https://www.instagram.com/',
+  [SocialPlatforms.X]: 'https://www.x.com/',
+  [SocialPlatforms.YT]: 'https://www.youtube.com/',
+  [SocialPlatforms.TT]: 'https://www.tiktok.com/',
+};
+
+const getSocialHandle = (
+  url: string | undefined,
+  platform: SocialPlatforms,
+) => {
+  if (!url) {
+    return '';
+  }
+  try {
+    const parsed = new URL(url.startsWith('http') ? url : `https://${url}`);
+    return parsed.pathname.replace(/^\/+|\/+$/g, '');
+  } catch {
+    return url.replace(SOCIAL_PREFIXES[platform], '').replace(/^\/+|\/+$/g, '');
+  }
+};
 
 export interface ProfileFormData {
   firstName: string;
@@ -40,7 +68,9 @@ export interface ProfileFormData {
 // }
 
 const SettingsProfileTab: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
+  const saving = useSelector(selectProfileUpdateLoading);
   // const [socialLinks, setSocialLinks] = useState<SettingsSocials>({
   //   initialLinks: [],
   //   newLinks: [],
@@ -77,264 +107,330 @@ const SettingsProfileTab: React.FC = () => {
         bio: user.bio,
         website: user.website,
         tagline: user.taglineMission,
+        publicEmail: user.publicEmail ?? '',
+        facebook: getSocialHandle(
+          user.socialLinks?.find((link) => link.platform === SocialPlatforms.FB)
+            ?.url,
+          SocialPlatforms.FB,
+        ),
+        instagram: getSocialHandle(
+          user.socialLinks?.find((link) => link.platform === SocialPlatforms.IG)
+            ?.url,
+          SocialPlatforms.IG,
+        ),
+        xPlatform: getSocialHandle(
+          user.socialLinks?.find((link) => link.platform === SocialPlatforms.X)
+            ?.url,
+          SocialPlatforms.X,
+        ),
+        youtube: getSocialHandle(
+          user.socialLinks?.find((link) => link.platform === SocialPlatforms.YT)
+            ?.url,
+          SocialPlatforms.YT,
+        ),
+        tiktok: getSocialHandle(
+          user.socialLinks?.find((link) => link.platform === SocialPlatforms.TT)
+            ?.url,
+          SocialPlatforms.TT,
+        ),
       });
     }
   }, [user, methods]);
 
+  const onSubmit = async (values: ProfileFormData) => {
+    const socialValues: Array<[SocialPlatforms, string | undefined]> = [
+      [SocialPlatforms.FB, values.facebook],
+      [SocialPlatforms.IG, values.instagram],
+      [SocialPlatforms.X, values.xPlatform],
+      [SocialPlatforms.YT, values.youtube],
+      [SocialPlatforms.TT, values.tiktok],
+    ];
+    const socialLinks: SocialMediaLink[] = socialValues.flatMap(
+      ([platform, url]) => {
+        const handle = url?.trim();
+        return handle
+          ? [{
+            platform,
+            url: `${SOCIAL_PREFIXES[platform]}${handle.replace(/^\/+/, '')}`,
+          }]
+          : [];
+      },
+    );
+    try {
+      await dispatch(
+        updateUserDetails({
+          firstName: values.firstName.trim(),
+          lastName: values.lastName.trim(),
+          title: values.title.trim(),
+          bio: values.bio.trim(),
+          website: values.website.trim(),
+          taglineMission: values.tagline.trim(),
+          publicEmail: values.publicEmail?.trim(),
+          socialLinks,
+        }),
+      ).unwrap();
+      toast.success('Profile saved.');
+    } catch {
+      toast.error('Could not save your profile. Please try again.');
+    }
+  };
+
   return (
     <FormProvider {...methods}>
-      <PageHeader
-        title="Public Profile"
-        subTitle=" Update your personal info, like profile picture and display name"
-        primaryLabel="Save"
-        onPrimaryClick={() => {
-          toast.success('Product created successfully!');
-        }}
-        secondaryLabel="Cancel"
-      />
+      <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+        <PageHeader
+          title="Public Profile"
+          subTitle=" Update your personal info, like profile picture and display name"
+          primaryLabel="Save"
+          primaryType="submit"
+          primaryLoading={saving}
+          secondaryLabel="Cancel"
+        />
 
-      <SettingsSection
-        title="Basic Info"
-        subTitle="Edit your name and profile image"
-      >
-        <>
-          <div className="settings-input-row">
-            <Controller
-              name="firstName"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  type="text"
-                  label="First Name"
-                  value={field.value}
-                  onChange={field.onChange}
-                  name={field.name}
-                />
-              )}
-            />
-            <Controller
-              name="lastName"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  type="text"
-                  label="Last Name"
-                  value={field.value}
-                  onChange={field.onChange}
-                  name={field.name}
-                />
-              )}
-            />
-          </div>
-          <Input
-            type="text"
-            label="Email"
-            value={user?.email ?? ''}
-            className="form-input settings-form-input"
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            onChange={() => {}}
-            disabled
-          />
-          <div className="image-changer">
-            <div className="avatar-container">
-              <div className="avatar-wrapper">
-                <UserAvatar
-                  imageUrl={user?.imageUrl ?? ''}
-                  alt={user?.firstName}
-                  large
-                />
-              </div>
+        <SettingsSection
+          title="Basic Info"
+          subTitle="Edit your name and profile image"
+        >
+          <>
+            <div className="settings-input-row">
+              <Controller
+                name="firstName"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    label="First Name"
+                    value={field.value}
+                    onChange={field.onChange}
+                    name={field.name}
+                  />
+                )}
+              />
+              <Controller
+                name="lastName"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    label="Last Name"
+                    value={field.value}
+                    onChange={field.onChange}
+                    name={field.name}
+                  />
+                )}
+              />
             </div>
-            <Button variant="tertiary">Change picture</Button>
-            <Button variant="secondary">Remove picture</Button>
-          </div>
-        </>
-      </SettingsSection>
+            <Input
+              type="text"
+              label="Email"
+              value={user?.email ?? ''}
+              className="form-input settings-form-input"
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              onChange={() => {}}
+              disabled
+            />
+            <div className="image-changer">
+              <div className="avatar-container">
+                <div className="avatar-wrapper">
+                  <UserAvatar
+                    imageUrl={user?.imageUrl ?? ''}
+                    alt={user?.firstName}
+                    large
+                  />
+                </div>
+              </div>
+              <Button variant="tertiary" type="button" disabled title="Profile image editing is not available yet">Change picture</Button>
+              <Button variant="secondary" type="button" disabled title="Profile image editing is not available yet">Remove picture</Button>
+            </div>
+          </>
+        </SettingsSection>
 
-      <Divider />
+        <Divider />
 
-      <SettingsSection
-        title="Public Info"
-        subTitle="Tell us something about yourself and your mission"
-      >
-        <>
-          <Controller
-            name="bio"
-            control={control}
-            rules={{
-              minLength: {
-                value: 30,
-                message: 'Your bio should be at least 30 characters long',
-              },
-              maxLength: {
-                value: 250,
-                // eslint-disable-next-line quotes
-                message: "Your bio can't exceed 250 characters",
-              },
-            }}
-            render={({ field, fieldState }) => (
-              <Textarea
-                label="Bio"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                error={fieldState.error?.message}
-                isMaxLengthShown={true}
-                maxLength={250}
-              />
-            )}
-          />
-          <Controller
-            name="title"
-            control={control}
-            render={({ field }) => (
-              <Input
-                type="text"
-                label="Title"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                className="settings-form-input"
-              />
-            )}
-          />
-          <Controller
-            name="tagline"
-            control={control}
-            rules={{
-              minLength: {
-                value: 10,
-                message: 'Your tagline should be at least 10 characters',
-              },
-              maxLength: {
-                value: 120,
-                message: 'Your tagline can not exceed 120 characters',
-              },
-            }}
-            render={({ field, fieldState }) => (
-              <Input
-                placeholder="Tell us what drives you"
-                type="text"
-                label="Tagline / Mission"
-                className="settings-form-input"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                error={fieldState.error?.message}
-              />
-            )}
-          />
-        </>
-      </SettingsSection>
-
-      <Divider />
-
-      <SettingsSection
-        title="Contact Info"
-        subTitle="Update your public contact information"
-      >
-        <>
-          <div className="settings-input-row">
+        <SettingsSection
+          title="Public Info"
+          subTitle="Tell us something about yourself and your mission"
+        >
+          <>
             <Controller
-              name="publicEmail"
+              name="bio"
+              control={control}
+              rules={{
+                minLength: {
+                  value: 30,
+                  message: 'Your bio should be at least 30 characters long',
+                },
+                maxLength: {
+                  value: 250,
+                  // eslint-disable-next-line quotes
+                  message: "Your bio can't exceed 250 characters",
+                },
+              }}
+              render={({ field, fieldState }) => (
+                <Textarea
+                  label="Bio"
+                  value={field.value}
+                  onChange={field.onChange}
+                  name={field.name}
+                  error={fieldState.error?.message}
+                  isMaxLengthShown={true}
+                  maxLength={250}
+                />
+              )}
+            />
+            <Controller
+              name="title"
               control={control}
               render={({ field }) => (
                 <Input
                   type="text"
-                  label="Public email"
+                  label="Title"
+                  value={field.value}
+                  onChange={field.onChange}
+                  name={field.name}
+                  className="settings-form-input"
+                />
+              )}
+            />
+            <Controller
+              name="tagline"
+              control={control}
+              rules={{
+                minLength: {
+                  value: 10,
+                  message: 'Your tagline should be at least 10 characters',
+                },
+                maxLength: {
+                  value: 120,
+                  message: 'Your tagline can not exceed 120 characters',
+                },
+              }}
+              render={({ field, fieldState }) => (
+                <Input
+                  placeholder="Tell us what drives you"
+                  type="text"
+                  label="Tagline / Mission"
+                  className="settings-form-input"
+                  value={field.value}
+                  onChange={field.onChange}
+                  name={field.name}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </>
+        </SettingsSection>
+        <Divider />
+
+        <SettingsSection
+          title="Contact Info"
+          subTitle="Update your public contact information"
+        >
+          <>
+            <div className="settings-input-row">
+              <Controller
+                name="publicEmail"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    label="Public email"
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    name={field.name}
+                  />
+                )}
+              />
+
+              <InfoPopover className="info-popover" position="left">
+                <span>{PUBLIC_EMAIL_POPOVER_COPY}</span>
+              </InfoPopover>
+            </div>
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  type="text"
+                  label="Phone number"
                   value={field.value ?? ''}
                   onChange={field.onChange}
                   name={field.name}
+                  className="settings-form-input"
+                  disabled
                 />
               )}
             />
-
-            <InfoPopover className="info-popover" position="left">
-              <span>{PUBLIC_EMAIL_POPOVER_COPY}</span>
-            </InfoPopover>
-          </div>
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <Input
-                type="text"
-                label="Phone number"
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                name={field.name}
-                className="settings-form-input"
-              />
-            )}
-          />
-          <Controller
-            name="website"
-            control={control}
-            rules={{
-              pattern: {
-                value: URL_PATTERN,
-                message:
+            <p className="settings-profile-save-note">Phone and profile image editing are not available yet.</p>
+            <Controller
+              name="website"
+              control={control}
+              rules={{
+                pattern: {
+                  value: URL_PATTERN,
+                  message:
                   'Enter a valid URL (e.g. https://example.com or www.example.com)',
-              },
-            }}
-            render={({ field, fieldState }) => (
-              <Input
-                label="Website"
-                placeholder="my-website.com"
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                name={field.name}
-                error={fieldState.error?.message}
-                className="settings-form-input"
-              />
-            )}
-          />
-        </>
-      </SettingsSection>
+                },
+              }}
+              render={({ field, fieldState }) => (
+                <Input
+                  label="Website"
+                  placeholder="my-website.com"
+                  type="text"
+                  value={field.value}
+                  onChange={field.onChange}
+                  name={field.name}
+                  error={fieldState.error?.message}
+                  className="settings-form-input"
+                />
+              )}
+            />
+          </>
+        </SettingsSection>
 
-      <Divider />
+        <Divider />
 
-      <SettingsSection title="Social Media" subTitle="Your social media links">
-        <>
-          <SocialInput
-            label="Facebook"
-            value="www.facebook.com/"
-            control={control}
-            name="facebook"
-          />
-          <SocialInput
-            label="Instagram"
-            value="www.instagram.com/"
-            control={control}
-            name="instagram"
-            margin
-          />
-          <SocialInput
-            label="X"
-            value="www.x.com/"
-            control={control}
-            name="xPlatform"
-            margin
-          />
+        <SettingsSection title="Social Media" subTitle="Your social media links">
+          <>
+            <SocialInput
+              label="Facebook"
+              value="www.facebook.com/"
+              control={control}
+              name="facebook"
+            />
+            <SocialInput
+              label="Instagram"
+              value="www.instagram.com/"
+              control={control}
+              name="instagram"
+              margin
+            />
+            <SocialInput
+              label="X"
+              value="www.x.com/"
+              control={control}
+              name="xPlatform"
+              margin
+            />
 
-          <SocialInput
-            label="Youtube"
-            value="www.youtube.com/"
-            control={control}
-            name="youtube"
-            margin
-          />
+            <SocialInput
+              label="Youtube"
+              value="www.youtube.com/"
+              control={control}
+              name="youtube"
+              margin
+            />
 
-          <SocialInput
-            label="TikTok"
-            value="www.tiktok.com/"
-            control={control}
-            name="tiktok"
-            margin
-          />
-        </>
-      </SettingsSection>
+            <SocialInput
+              label="TikTok"
+              value="www.tiktok.com/"
+              control={control}
+              name="tiktok"
+              margin
+            />
+          </>
+        </SettingsSection>
+      </form>
     </FormProvider>
   );
 };

@@ -11,6 +11,9 @@ interface PageHeaderProps {
   secondaryLabel?: string;
   onPrimaryClick?: () => void;
   onSecondaryClick?: () => void;
+  primaryType?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
+  secondaryType?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
+  primaryLoading?: boolean;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
@@ -20,6 +23,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   secondaryLabel,
   onPrimaryClick,
   onSecondaryClick,
+  primaryType = 'button',
+  secondaryType = 'button',
+  primaryLoading = false,
 }) => (
   <>
     <div className="page-header">
@@ -30,12 +36,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       {primaryLabel && secondaryLabel && (
         <div className="header-actions">
           {secondaryLabel && (
-            <Button variant="secondary" onClick={onSecondaryClick}>
+            <Button type={secondaryType} variant="secondary" onClick={onSecondaryClick}>
               {secondaryLabel}
             </Button>
           )}
           {primaryLabel && (
-            <Button variant="primary" onClick={onPrimaryClick}>
+            <Button type={primaryType} variant="primary" loading={primaryLoading} onClick={onPrimaryClick}>
               {primaryLabel}
             </Button>
           )}

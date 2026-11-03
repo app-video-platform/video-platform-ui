@@ -4,6 +4,10 @@ export const selectAuthUser = (state: RootState) =>
   state.auth.sessionStatus && state.auth.sessionStatus !== 'authenticated' ? null : state.auth.user;
 export const selectAuthLoading = (state: RootState) => state.auth.loading;
 export const selectAuthError = (state: RootState) => state.auth.error;
+export const selectProfileUpdateLoading = (state: RootState) =>
+  state.auth.profileUpdateLoading ?? false;
+export const selectProfileUpdateError = (state: RootState) =>
+  state.auth.profileUpdateError ?? null;
 export const selectIsUserLoggedIn = (state: RootState) =>
   state.auth.isUserLoggedIn;
 

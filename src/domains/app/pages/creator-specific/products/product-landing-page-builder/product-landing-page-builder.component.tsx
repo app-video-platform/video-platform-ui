@@ -222,13 +222,19 @@ const ProductLandingPageBuilder: React.FC = () => {
       return;
     }
 
-    await dispatch(
-      updateCreatorProductLandingPageConfig({
-        productId,
-        config: draftConfig,
-      }),
-    ).unwrap();
-    setSavedMessage('Landing page saved.');
+    setSavedMessage(null);
+    try {
+      await dispatch(
+        updateCreatorProductLandingPageConfig({
+          productId,
+          config: draftConfig,
+        }),
+      ).unwrap();
+      setSavedMessage('Landing page saved.');
+    } catch {
+      // The slice exposes a safe, status-specific message. Keep the draft intact
+      // and contain the rejected thunk at this click boundary.
+    }
   };
 
   const reset = () => {

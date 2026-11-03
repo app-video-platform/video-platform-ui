@@ -18,6 +18,8 @@ const ConnectedCalendarTab: React.FC = () => {
   );
   const [selectedProvider, setSelectedProvider] = useState<string>('');
   const [email, setEmail] = useState<string>(user?.email ?? '');
+  const [connecting, setConnecting] = useState(false);
+  const [connectError, setConnectError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true; // optional safety to avoid setting state after unmount
@@ -26,8 +28,6 @@ const ConnectedCalendarTab: React.FC = () => {
       try {
         const providers = await getAllCalendarProvidersAPI(); // string[]
 
-        console.log('providers', providers);
-
         if (isMounted) {
           const options: SelectOption[] = providers.map((provider) => ({
             value: provider,
@@ -35,8 +35,8 @@ const ConnectedCalendarTab: React.FC = () => {
           }));
           setCalendarProviders(options);
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
+        if (isMounted) {setConnectError('Calendar providers are unavailable. Please try again later.');}
       }
     })();
 
@@ -45,15 +45,22 @@ const ConnectedCalendarTab: React.FC = () => {
     };
   }, []);
 
-  const handleCalendarConnect = () => {
-    console.log('Tryna connect', selectedProvider, email);
-
-    connectCalendarAPI({ provider: selectedProvider, loginHint: email }).then(
-      (data) => {
-        console.log('data', data);
-        window.open(data.authorizationUrl, '_blank');
-      },
-    );
+  const handleCalendarConnect = async () => {
+    if (!selectedProvider || connecting) {return;}
+    setConnectError(null);
+    setConnecting(true);
+    try {
+      const data = await connectCalendarAPI({ provider: selectedProvider, loginHint: email });
+      const authorizationUrl = data.authorizationUrl;
+      if (!authorizationUrl) {throw new Error('Missing authorization URL');}
+      const parsedUrl = new URL(authorizationUrl);
+      if (parsedUrl.protocol !== 'https:') {throw new Error('Invalid authorization URL');}
+      window.open(parsedUrl.toString(), '_blank', 'noopener,noreferrer');
+    } catch {
+      setConnectError(`Could not start ${selectedProvider} Calendar connection. Check your details and try again.`);
+    } finally {
+      setConnecting(false);
+    }
   };
 
   return (
@@ -87,21 +94,25 @@ const ConnectedCalendarTab: React.FC = () => {
             label="Calendar Providers"
             value={selectedProvider}
             customClassName="calendar-selector"
-            onChange={(e: { target: { value: string } }) =>
-              setSelectedProvider(e.target.value)
-            }
+            onChange={(e: { target: { value: string } }) => {
+              setSelectedProvider(e.target.value);
+              setConnectError(null);
+            }}
+            disabled={connecting}
           />
 
           <Button
             type="button"
             variant="primary"
             className="connect-calendar-btn"
-            onClick={() => handleCalendarConnect()}
-            disabled={!selectedProvider}
+            onClick={handleCalendarConnect}
+            disabled={!selectedProvider || connecting}
+            loading={connecting}
           >
-            Connect
+            {connecting ? 'Connecting…' : 'Connect'}
           </Button>
         </div>
+        {connectError && <p className="form-field-error error-text-red" role="alert">{connectError}</p>}
       </SettingsSection>
 
       {/* <div className="connect-provider">

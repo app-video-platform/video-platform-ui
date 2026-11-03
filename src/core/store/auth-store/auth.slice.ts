@@ -32,6 +32,9 @@ export interface AuthState {
   sessionVersion?: number;
   profileRequestId?: string;
   profileError?: string | null;
+  profileUpdateRequestId?: string;
+  profileUpdateLoading?: boolean;
+  profileUpdateError?: string | null;
 }
 
 const initialState: AuthState = {
@@ -42,6 +45,8 @@ const initialState: AuthState = {
   sessionStatus: 'resolving',
   sessionVersion: 0,
   profileError: null,
+  profileUpdateLoading: false,
+  profileUpdateError: null,
 };
 
 const beginSession = (state: AuthState, status: SessionStatus) => {
@@ -51,6 +56,9 @@ const beginSession = (state: AuthState, status: SessionStatus) => {
   state.isUserLoggedIn = status === 'unauthenticated' ? false : null;
   state.profileRequestId = undefined;
   state.profileError = null;
+  state.profileUpdateRequestId = undefined;
+  state.profileUpdateLoading = false;
+  state.profileUpdateError = null;
 };
 
 const acceptUser = (state: AuthState, user: User, resolveSession = true) => {
@@ -323,19 +331,30 @@ const authSlice = createSlice({
         state.error = action.payload || 'Logout failed';
       })
 
-      .addCase(updateUserDetails.pending, (state) => {
-        state.loading = true;
+      .addCase(updateUserDetails.pending, (state, action) => {
+        state.profileUpdateRequestId = action.meta.requestId;
+        state.profileUpdateLoading = true;
+        state.profileUpdateError = null;
       })
       .addCase(
         updateUserDetails.fulfilled,
-        (state, action: PayloadAction<User>) => {
-          state.loading = false;
+        (state, action) => {
+          if (state.profileUpdateRequestId !== action.meta.requestId) {
+            return;
+          }
+          state.profileUpdateRequestId = undefined;
+          state.profileUpdateLoading = false;
+          state.profileUpdateError = null;
           acceptUser(state, action.payload, state.sessionStatus === 'authenticated');
         },
       )
-      .addCase(updateUserDetails.rejected, (state) => {
-        state.loading = false;
-        state.error = 'Update user details failed';
+      .addCase(updateUserDetails.rejected, (state, action) => {
+        if (state.profileUpdateRequestId !== action.meta.requestId) {
+          return;
+        }
+        state.profileUpdateRequestId = undefined;
+        state.profileUpdateLoading = false;
+        state.profileUpdateError = action.payload || 'Update profile failed';
       })
       .addCase(changeDevUserRole.pending, (state) => {
         state.sessionVersion = (state.sessionVersion ?? 0) + 1;
