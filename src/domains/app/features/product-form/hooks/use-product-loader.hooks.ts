@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 
 import { AbstractProduct, AppDispatch } from 'core/api/models';
 import { getProductById } from 'core/store/product-store';
@@ -31,14 +31,21 @@ export const useProductLoader = ({
   const lastSavedSnapshot = useRef<Partial<ProductDraft> | null>(null);
   const [, setLastSavedAt] = useState<Date | null>(null); // you can also lift this up if needed
 
+  const onLoadedRef = useRef(onProductLoaded);
+  useLayoutEffect(() => { onLoadedRef.current = onProductLoaded; });
+
   useEffect(() => {
     if (!isEditMode || !id) {
       return;
     }
 
+    let active = true;
+    setShowRestOfForm(false);
+    setErrors({});
     dispatch(getProductById({ productId: id }))
       .unwrap()
       .then((product) => {
+        if (!active) {return;}
         const baseData = {
           id: product.id ?? '',
           name: product.name ?? '',
@@ -75,13 +82,15 @@ export const useProductLoader = ({
         lastSavedSnapshot.current = getAutosaveSnapshot(newData);
         setLastSavedAt(new Date());
         setShowRestOfForm(true);
-        onProductLoaded?.(product);
+        onLoadedRef.current?.(product);
       })
       .catch((error) => {
+        if (!active) {return;}
         // eslint-disable-next-line no-console
         console.error('Failed to load product data', error);
         setErrors({ api: 'Could not load product data' });
       });
+    return () => { active = false; };
   }, [
     dispatch,
     id,
@@ -89,7 +98,6 @@ export const useProductLoader = ({
     setFormData,
     setErrors,
     setShowRestOfForm,
-    onProductLoaded,
   ]);
 
   return { lastSavedSnapshot };

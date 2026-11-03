@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoAddOutline } from 'react-icons/io5';
 
@@ -12,11 +12,12 @@ import { selectAuthUser } from 'core/store/auth-store';
 import {
   createProductSection,
   deleteProductSection,
-  updateProductSection,
 } from 'core/store/product-store';
 import { getCssVar } from '@shared/utils';
 import SectionEditor from '../editors/section-editor/section-editor.component';
 import { SectionDraft } from '../models';
+
+import { NestedAutosaveContext, flushNestedSaves } from '../hooks/nested-autosave-context';
 
 import './create-product-sections.styles.scss';
 
@@ -76,6 +77,7 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
   onSectionsChange,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const nestedSaves = useContext(NestedAutosaveContext);
   const user = useSelector(selectAuthUser);
   const copy = getContentCopy(productType);
   const [isCreating, setIsCreating] = useState(false);
@@ -147,26 +149,6 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
     }
   };
 
-  const persistSectionPosition = (section: SectionDraft, position: number) => {
-    if (!section.id) {
-      return;
-    }
-
-    dispatch(
-      updateProductSection({
-        productId,
-        sectionId: section.id,
-        title: section.title,
-        description: section.description,
-        position,
-      }),
-    )
-      .unwrap()
-      .catch(() => {
-        setOperationError(`Could not save ${copy.entityName} order.`);
-      });
-  };
-
   const handleMoveSection = (index: number, direction: -1 | 1) => {
     const nextIndex = index + direction;
     if (nextIndex < 0 || nextIndex >= sections.length) {
@@ -179,11 +161,7 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
     const normalized = normalizePositions(next);
 
     onSectionsChange(normalized);
-    persistSectionPosition(normalized[index], normalized[index].position);
-    persistSectionPosition(
-      normalized[nextIndex],
-      normalized[nextIndex].position,
-    );
+
   };
 
   const handleDeleteSection = async (section: SectionDraft, index: number) => {
@@ -193,6 +171,7 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
     }
 
     try {
+      if (nestedSaves) {await flushNestedSaves(nestedSaves);}
       await dispatch(
         deleteProductSection({
           productId,

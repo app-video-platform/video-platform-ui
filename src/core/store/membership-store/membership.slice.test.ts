@@ -213,3 +213,30 @@ describe('membership slice', () => {
     ).toBe(1);
   });
 });
+
+
+describe('Membership request identity', () => {
+  it('ignores older successes and failures after a newer same-Product request', () => {
+    let state = membershipReducer(undefined, fetchMembershipAggregate.pending('old', 'membership-1'));
+    state = membershipReducer(state, fetchMembershipAggregate.pending('new', 'membership-1'));
+    state = membershipReducer(state, fetchMembershipAggregate.fulfilled(aggregate, 'new', 'membership-1'));
+    state = membershipReducer(state, fetchMembershipAggregate.fulfilled({ ...aggregate, feed: [] }, 'old', 'membership-1'));
+    state = membershipReducer(state, fetchMembershipAggregate.rejected(new Error('stale error'), 'old', 'membership-1'));
+    expect(state.byProductId['membership-1']).toEqual(aggregate);
+    expect(state.requests?.['membership-1'].status).toBe('loaded');
+    expect(state.error).toBeNull();
+  });
+
+  it('keeps failures and deliberate retry scoped to each Membership', () => {
+    let state = membershipReducer(undefined, fetchMembershipAggregate.pending('a', 'membership-1'));
+    state = membershipReducer(state, fetchMembershipAggregate.rejected(new Error('503'), 'a', 'membership-1', '503'));
+    state = membershipReducer(state, fetchMembershipAggregate.pending('b', 'membership-2'));
+    state = membershipReducer(state, fetchMembershipAggregate.fulfilled({ ...aggregate, productId: 'membership-2' }, 'b', 'membership-2'));
+    expect(state.requests?.['membership-1'].status).toBe('failed');
+    expect(state.requests?.['membership-2'].status).toBe('loaded');
+    state = membershipReducer(state, fetchMembershipAggregate.pending('retry', 'membership-1'));
+    state = membershipReducer(state, fetchMembershipAggregate.fulfilled(aggregate, 'retry', 'membership-1'));
+    expect(state.requests?.['membership-1'].status).toBe('loaded');
+    expect(state.requests?.['membership-1'].error).toBeNull();
+  });
+});

@@ -67,10 +67,11 @@ jest.mock('@shared/ui', () => ({
       {children}
     </button>
   ),
-  Drawer: ({ open, title, children }: any) =>
+  Drawer: ({ open, title, children, onClose }: any) =>
     open ? (
       <div role="dialog">
         <div>{title}</div>
+        <button onClick={onClose}>Close editor</button>
         {children}
       </div>
     ) : null,
@@ -121,6 +122,7 @@ jest.mock('@shared/ui', () => ({
     </button>
   ),
   RichTextEditor: ({
+    initialContent,
     onChange,
   }: {
     initialContent?: any;
@@ -128,6 +130,7 @@ jest.mock('@shared/ui', () => ({
   }) => (
     <div
       data-testid="rich-text-editor"
+      data-initial-content={JSON.stringify(initialContent)}
       onClick={() => onChange({ delta: 'changed' })}
     >
       RichText
@@ -196,6 +199,7 @@ jest.mock('@features/product-form/hooks', () => ({
   useLessonAutosave: () => ({
     isAutosaving: false,
     lastSavedAt: null,
+    flush: () => Promise.resolve(),
   }),
 }));
 
@@ -338,5 +342,29 @@ describe('<LessonEditor />', () => {
     });
 
     expect(removeLessonMock).toHaveBeenCalledWith(3);
+  });
+
+  it('reopens from the latest same-ID Article body without emitting an edit', () => {
+    const body = (text: string) => JSON.stringify({ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text }] }] });
+    const props = { index: 0, productId: 'p', sectionId: 's', removeLessonFromList: removeLessonMock, onChange: changeLessonMock };
+    const lesson = { ...baseLesson, id: 'article', title: 'Article', type: 'ARTICLE' as const, content: body('A') };
+    const view = render(<LessonEditor {...props} lesson={lesson} />);
+    fireEvent.click(screen.getByText('Edit'));
+    expect(screen.getByTestId('rich-text-editor')).toHaveAttribute('data-initial-content', body('A'));
+    fireEvent.click(screen.getByText('Close editor'));
+    view.rerender(<LessonEditor {...props} lesson={{ ...lesson, content: body('B') }} />);
+    fireEvent.click(screen.getByText('Edit'));
+    expect(screen.getByTestId('rich-text-editor')).toHaveAttribute('data-initial-content', body('B'));
+    expect(changeLessonMock).not.toHaveBeenCalled();
+  });
+
+  it('preserves unsupported Article content without mounting a destructive editor', () => {
+    render(<LessonEditor index={0} productId="p" sectionId="s"
+      lesson={{ ...baseLesson, type: 'ARTICLE', content: '{"type":"unknown"}' }}
+      removeLessonFromList={removeLessonMock} onChange={changeLessonMock} />);
+    fireEvent.click(screen.getByText('Edit'));
+    expect(screen.getByRole('alert')).toHaveTextContent('unsupported');
+    expect(screen.queryByTestId('rich-text-editor')).not.toBeInTheDocument();
+    expect(changeLessonMock).not.toHaveBeenCalled();
   });
 });

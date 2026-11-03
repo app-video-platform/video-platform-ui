@@ -21,6 +21,7 @@ const mockProductStoreState = {
     error: null as string | null,
   },
   membership: {
+    requests: {} as Record<string, any>,
     byProductId: {} as Record<string, any>,
     loading: false,
     error: null as string | null,
@@ -29,6 +30,7 @@ const mockProductStoreState = {
   },
 };
 const mockNavigate = jest.fn();
+let mockNestedEditor: React.ComponentType | null = null;
 const mockUpdateProductDetailsUnwrap = jest.fn(() =>
   Promise.resolve({ status: 'PUBLISHED' }),
 );
@@ -280,6 +282,7 @@ jest.mock('domains/app/features/product-form', () => ({
     productId: string;
   }) => (
     <div data-testid="create-sections">
+      {mockNestedEditor && React.createElement(mockNestedEditor)}
       CreateProductSections (type: {productType}, id: {productId})
     </div>
   ),
@@ -402,6 +405,7 @@ jest.mock('domains/app/components', () => ({
 
 // ── 4) Import component under test (after mocks) ────────────────────────
 import ProductForm from './product-form.component';
+import { useNestedAutosave } from 'domains/app/features/product-form/hooks/use-nested-autosave.hook';
 
 // ── 5) Helpers ───────────────────────────────────────────────────────────
 afterEach(() => {
@@ -410,10 +414,12 @@ afterEach(() => {
 });
 
 beforeEach(() => {
+  mockNestedEditor = null;
   mockProductStoreState.products.productSummaries = null;
   mockProductStoreState.products.loading = false;
   mockProductStoreState.products.error = null;
   mockProductStoreState.membership.byProductId = {};
+  mockProductStoreState.membership.requests = {};
   mockProductStoreState.membership.loading = false;
   mockProductStoreState.membership.error = null;
   mockProductStoreState.membership.saving = false;
@@ -1396,7 +1402,7 @@ describe('<ProductForm />', () => {
       mockProductWorkspaceShell.mock.calls.length - 1
     ][0].onPreview();
 
-    expect(mockNavigate).toHaveBeenCalledWith('/app/products/published-1/preview');
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/app/products/published-1/preview'));
   });
 
   it('enables private Preview for Draft Products once they have an ID', async () => {
@@ -1431,7 +1437,7 @@ describe('<ProductForm />', () => {
       mockProductWorkspaceShell.mock.calls.length - 1
     ][0].onPreview();
 
-    expect(mockNavigate).toHaveBeenCalledWith('/app/products/draft-1/preview');
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/app/products/draft-1/preview'));
   });
 
   it('Back flushes pending Product autosave before leaving the workspace', async () => {
@@ -1524,5 +1530,117 @@ describe('<ProductForm />', () => {
     });
 
     expect(screen.getByTestId('active-tab')).toHaveTextContent('sections');
+  });
+});
+
+
+describe('saved workspace lifecycle regression', () => {
+  it.each(['COURSE', 'DOWNLOAD', 'CONSULTATION', 'MEMBERSHIP'])(
+    'keeps hook order stable for saved %s loading, error and success transitions', async (type) => {
+      const state = makeFacadeState({ isEditMode: true, showRestOfForm: false });
+      state.formData.type = type;
+      mockUseProductFormFacade.mockReturnValue(state);
+      mockProductStoreState.products.loading = true;
+      const view = render(<ProductForm />);
+      expect(screen.getByText('Loading Product workspace')).toBeInTheDocument();
+      mockProductStoreState.products.loading = false;
+      state.errors = { api: 'Product not found' };
+      view.rerender(<ProductForm />);
+      expect(screen.getByText('Product workspace unavailable')).toBeInTheDocument();
+      state.errors = {};
+      state.showRestOfForm = true;
+      view.rerender(<ProductForm />);
+      await waitFor(() => expect(screen.getByTestId('active-tab')).toHaveTextContent('basics'));
+      state.showRestOfForm = false;
+      state.errors = { api: 'Access denied' };
+      view.rerender(<ProductForm />);
+      expect(screen.getByText('Access denied')).toBeInTheDocument();
+    });
+});
+
+
+describe('pending nested writes in the workspace', () => {
+  const save = jest.fn();
+  const Editor = () => {
+    const [value, setValue] = React.useState('A');
+    useNestedAutosave(value, true, save);
+    return <input aria-label="Nested description" value={value} onChange={(event) => setValue(event.target.value)} />;
+  };
+  const openEditedWorkspace = async () => {
+    mockNestedEditor = Editor;
+    mockUseProductFormFacade.mockReturnValue(makeFacadeState());
+    render(<ProductForm />);
+    fireEvent.click(screen.getByTestId('tab-sections'));
+    fireEvent.change(screen.getByLabelText('Nested description'), { target: { value: 'B' } });
+  };
+
+  it.each(['tab', 'preview', 'products'])('waits for pending nested writes before %s navigation', async (destination) => {
+    let finish!: () => void;
+    save.mockImplementationOnce(() => new Promise<void>((resolve) => { finish = resolve; }));
+    await openEditedWorkspace();
+    act(() => {
+      if (destination === 'tab') {fireEvent.click(screen.getByTestId('tab-basics'));}
+      else {
+        const props = mockProductWorkspaceShell.mock.calls[mockProductWorkspaceShell.mock.calls.length - 1][0];
+        if (destination === 'preview') {props.onPreview();} else {void props.onBack();}
+      }
+    });
+    expect(screen.getByLabelText('Nested description')).toHaveValue('B');
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(save).toHaveBeenCalledWith('B');
+    await act(async () => { finish(); });
+    if (destination === 'tab') {expect(screen.queryByLabelText('Nested description')).not.toBeInTheDocument();}
+    else {expect(mockNavigate).toHaveBeenCalledWith(destination === 'preview' ? '/app/products/prod-1/preview' : '/app/products');}
+  });
+
+  it('keeps the edited tab mounted after rejection and retries before navigation', async () => {
+    save.mockRejectedValueOnce(new Error('503')).mockResolvedValue(undefined);
+    await openEditedWorkspace();
+    fireEvent.click(screen.getByTestId('tab-basics'));
+    await screen.findByText(/Your work is still here/);
+    expect(screen.getByLabelText('Nested description')).toHaveValue('B');
+    fireEvent.click(screen.getByTestId('tab-basics'));
+    await waitFor(() => expect(screen.queryByLabelText('Nested description')).not.toBeInTheDocument());
+    expect(save).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the edited content mounted when Publish cannot flush a nested write', async () => {
+    save.mockRejectedValueOnce(new Error('503'));
+    await openEditedWorkspace();
+    await act(async () => {
+      await mockProductWorkspaceShell.mock.calls[mockProductWorkspaceShell.mock.calls.length - 1][0].onPublish();
+    });
+    expect(screen.getByLabelText('Nested description')).toHaveValue('B');
+    expect(screen.getByRole('alert')).toHaveTextContent('Your work is still here');
+  });
+
+  it('warns on browser unload while nested changes remain', async () => {
+    await openEditedWorkspace();
+    const event = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+  });
+});
+
+describe('Membership failure recovery', () => {
+  it('keeps a failure stable across rerenders and retries only deliberately', async () => {
+    const state = makeFacadeState();
+    state.formData.type = 'MEMBERSHIP';
+    mockUseProductFormFacade.mockReturnValue(state);
+    mockProductStoreState.products.productSummaries = [];
+    mockProductStoreState.membership.requests['prod-1'] = { status: 'failed', error: 'Service unavailable', requestId: 'failed' };
+    const view = render(<ProductForm />);
+    fireEvent.click(screen.getByTestId('tab-membership-content'));
+    expect(screen.getByRole('alert')).toHaveTextContent('Service unavailable');
+    const calls = mockDispatch.mock.calls.length;
+    view.rerender(<ProductForm />);
+    view.rerender(<ProductForm />);
+    expect(mockDispatch).toHaveBeenCalledTimes(calls);
+    fireEvent.click(screen.getByText('Retry Membership load'));
+    expect(mockDispatch).toHaveBeenCalledTimes(calls + 1);
+    mockProductStoreState.membership.byProductId['prod-1'] = { productId: 'prod-1', config: { orderingMode: 'NEWEST_FIRST' }, content: [], feed: [] };
+    mockProductStoreState.membership.requests['prod-1'] = { status: 'loaded', error: null };
+    view.rerender(<ProductForm />);
+    expect(screen.getByTestId('membership-content')).toBeInTheDocument();
   });
 });

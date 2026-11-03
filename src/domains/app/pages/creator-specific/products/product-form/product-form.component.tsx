@@ -60,8 +60,7 @@ import {
   deleteMembershipContent,
   fetchMembershipAggregate,
   selectMembershipAggregateByProductId,
-  selectMembershipError,
-  selectMembershipLoading,
+  selectMembershipRequest,
   selectMembershipSaveError,
   selectMembershipSaving,
   updateMembershipContent,
@@ -69,6 +68,8 @@ import {
 } from 'core/store/membership-store';
 import { ProductWorkspaceShell } from 'domains/app/layouts/product-workspace-shell';
 import { mapFormDataToProductPayload } from 'domains/app/features/product-form/utils/form-data-mapper.utils';
+
+import { NestedAutosaveContext, flushNestedSaves, useNestedAutosaveRegistry } from 'domains/app/features/product-form/hooks/nested-autosave-context';
 
 import './product-form.styles.scss';
 
@@ -153,8 +154,9 @@ const ProductForm: React.FC = () => {
   const membershipAggregate = useSelector((state: RootState) =>
     selectMembershipAggregateByProductId(state, formData.id),
   );
-  const membershipLoading = useSelector(selectMembershipLoading);
-  const membershipError = useSelector(selectMembershipError);
+  const membershipRequest = useSelector((state: RootState) => selectMembershipRequest(state, formData.id));
+  const membershipLoading = membershipRequest?.status === 'loading';
+  const membershipError = membershipRequest?.error;
   const membershipSaving = useSelector(selectMembershipSaving);
   const membershipSaveError = useSelector(selectMembershipSaveError);
   const [activeTab, setActiveTab] = useState<BuilderTab | null>(null);
@@ -235,7 +237,8 @@ const ProductForm: React.FC = () => {
       !showRestOfForm ||
       !productOwnerId ||
       productSummaries ||
-      productsLoading
+      productsLoading ||
+      productsError
     ) {
       return;
     }
@@ -247,6 +250,7 @@ const ProductForm: React.FC = () => {
     productOwnerId,
     productSummaries,
     productsLoading,
+    productsError,
     showRestOfForm,
   ]);
 
@@ -255,7 +259,7 @@ const ProductForm: React.FC = () => {
       return;
     }
 
-    if (membershipAggregate || membershipLoading) {
+    if (membershipAggregate || membershipRequest) {
       return;
     }
 
@@ -265,7 +269,7 @@ const ProductForm: React.FC = () => {
     formData.id,
     formData.type,
     membershipAggregate,
-    membershipLoading,
+    membershipRequest,
     showRestOfForm,
   ]);
 
@@ -323,6 +327,48 @@ const ProductForm: React.FC = () => {
       savedVisibleMs: 2000,
     },
   );
+
+  useEffect(() => {
+    setBackendReadinessIssues([]);
+  }, [formData]);
+
+  const nestedSaves = useNestedAutosaveRegistry();
+  const [navigationError, setNavigationError] = useState<string | null>(null);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const navigationPending = useRef(false);
+  const safelyNavigate = async (action: () => void, includeProduct = false) => {
+    if (navigationPending.current) {return;}
+    if (!includeProduct && !Array.from(nestedSaves).some((entry) => entry.hasPending())) {
+      action();
+      return;
+    }
+    navigationPending.current = true;
+    setIsLeaving(true);
+    setNavigationError(null);
+    try {
+      await flushNestedSaves(nestedSaves);
+      if (includeProduct) {
+        await flushAutosave();
+        await flushNestedSaves(nestedSaves);
+      }
+      action();
+    } catch {
+      setNavigationError('Changes could not be saved. Your work is still here. Retry saving before leaving.');
+    } finally {
+      navigationPending.current = false;
+      setIsLeaving(false);
+    }
+  };
+  useEffect(() => {
+    const protectUnload = (event: BeforeUnloadEvent) => {
+      if (hasPendingAutosave || isAutosaving || Array.from(nestedSaves).some((entry) => entry.hasPending())) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', protectUnload);
+    return () => window.removeEventListener('beforeunload', protectUnload);
+  }, [hasPendingAutosave, isAutosaving, nestedSaves]);
 
   if (!user || !user.id) {
     return <p>You must be logged in to create a product.</p>;
@@ -393,9 +439,6 @@ const ProductForm: React.FC = () => {
     ? 'Publish will open Readiness until known blockers are resolved.'
     : 'Publish uses backend readiness validation after local checks pass.';
 
-  useEffect(() => {
-    setBackendReadinessIssues([]);
-  }, [formData]);
 
   const backendReadinessDestinationByPath: Record<string, BuilderTab> = {
     name: 'basics',
@@ -431,27 +474,10 @@ const ProductForm: React.FC = () => {
       destination: backendReadinessDestinationByPath[path] ?? 'readiness',
     }));
 
-  const handleWorkspaceBack = async () => {
-    try {
-      await flushAutosave();
-      navigate(appRoutes.products);
-    } catch {
-      const shouldLeave = window.confirm(
-        'Latest Product changes could not be saved. Leave the workspace anyway?',
-      );
-
-      if (shouldLeave) {
-        navigate(appRoutes.products);
-      }
-    }
-  };
-
+  const handleWorkspaceBack = () => safelyNavigate(() => navigate(appRoutes.products), true);
   const handlePreview = () => {
-    if (!formData.id || !canPreview) {
-      return;
-    }
-
-    navigate(appRoutes.productsPreview(formData.id));
+    const productId = formData.id;
+    if (productId && canPreview) {void safelyNavigate(() => navigate(appRoutes.productsPreview(productId)), true);}
   };
 
   const handlePublish = async () => {
@@ -464,9 +490,11 @@ const ProductForm: React.FC = () => {
 
     try {
       setIsPublishing(true);
+      await flushNestedSaves(nestedSaves);
       await flushAutosave();
+      await flushNestedSaves(nestedSaves);
     } catch {
-      setActiveTab('readiness');
+      setNavigationError('Changes could not be saved. Your work is still here. Retry saving before publishing.');
       setPublishError('Latest Product changes could not be saved. Resolve the save issue and try Publish again.');
       setIsPublishing(false);
       return;
@@ -559,6 +587,12 @@ const ProductForm: React.FC = () => {
         );
 
       case 'membership-content':
+        if (membershipError && !membershipAggregate) {return (
+          <div role="alert"><p>{membershipError}</p>
+            <Button type="button"
+              onClick={() => { if (formData.id) {dispatch(fetchMembershipAggregate(formData.id));} }}>Retry Membership load</Button>
+          </div>
+        );}
         return (
           <MembershipContentSection
             ownerId={productOwnerId}
@@ -570,7 +604,7 @@ const ProductForm: React.FC = () => {
             productSummaries={productSummaries}
             includedProducts={includedProducts}
             isLoadingProducts={productsLoading || membershipLoading}
-            productsError={productsError || membershipError}
+            productsError={productsError || membershipError || null}
             onAddNativeContentItem={handleCreateMembershipContent}
             onUpdateNativeContentItem={handleUpdateMembershipContent}
             onDeleteNativeContentItem={handleDeleteMembershipContent}
@@ -872,13 +906,14 @@ const ProductForm: React.FC = () => {
         productType={formData.type}
         activeTab={activeTab}
         sections={sidebarSections}
-        onChange={(tab) => setActiveTab(tab)}
+        onChange={(tab) => { void safelyNavigate(() => setActiveTab(tab)); }}
         onSectionClick={handleSidebarSectionNavigation}
         onLessonClick={handleSidebarLessonNavigation}
       />
     ) : null;
 
   return (
+    <NestedAutosaveContext.Provider value={nestedSaves}>
     <ProductWorkspaceShell
       productType={formData.type}
       productTitle={formData.name}
@@ -904,7 +939,19 @@ const ProductForm: React.FC = () => {
       onPublish={handlePublish}
       navigation={workspaceNavigation}
     >
-      <div ref={container}>
+      {isLeaving && <p role="status">Saving changes before continuing…</p>}
+      {navigationError && <div role="alert">{navigationError}
+        <Button type="button" onClick={() => { void safelyNavigate(() => undefined, true); }}>Retry saving</Button>
+      </div>}
+      <div ref={container} onClickCapture={(event) => {
+        const link = (event.target as Element).closest?.('a[href]') as HTMLAnchorElement | null;
+        if (!link || link.target === '_blank' || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {return;}
+        const destination = new URL(link.href, window.location.href);
+        if (destination.origin !== window.location.origin || destination.href === window.location.href) {return;}
+        event.preventDefault();
+        event.stopPropagation();
+        void safelyNavigate(() => navigate(destination.pathname + destination.search + destination.hash), true);
+      }}>
         <form id="product-builder-form" ref={formRef} onSubmit={handleSubmit}>
         {!showRestOfForm && (
           <div
@@ -954,6 +1001,7 @@ const ProductForm: React.FC = () => {
         </form>
       </div>
     </ProductWorkspaceShell>
+    </NestedAutosaveContext.Provider>
   );
 };
 
