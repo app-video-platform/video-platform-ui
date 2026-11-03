@@ -20,6 +20,8 @@ interface QuizWizardProps {
 
 const QuizWizard: React.FC<QuizWizardProps> = ({ lesson, updateLesson }) => {
   const didInit = useRef(false);
+  const [totalScoreDraft, setTotalScoreDraft] = useState<string | null>(null);
+  const [totalScoreError, setTotalScoreError] = useState<string | null>(null);
 
   useEffect(() => {
     if (didInit.current) {
@@ -166,12 +168,34 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ lesson, updateLesson }) => {
     updateLesson({ quiz });
   };
 
+  const updateTotalScore = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setTotalScoreDraft(value);
+
+    const totalScore = Number(value);
+    if (!value || !Number.isInteger(totalScore) || totalScore <= 0) {
+      setTotalScoreError('Enter a whole number greater than zero.');
+      return;
+    }
+
+    const current = lesson?.quiz ?? ensureQuizDefaults(lesson);
+    updateLesson({
+      quiz: autoSplitQuizPoints({ ...current, totalScore }),
+    });
+    setTotalScoreDraft(null);
+    setTotalScoreError(null);
+  };
+
   return (
     <div className="quiz-wizard">
       <RadioGroup
         name="scoreType"
         value={scoreType}
-        onChange={(v) => setScoreType(v as 'auto' | 'manual')}
+        onChange={(v) => {
+          setScoreType(v as 'auto' | 'manual');
+          setTotalScoreDraft(null);
+          setTotalScoreError(null);
+        }}
         label="Points distribution"
         className="score-radios"
       >
@@ -197,26 +221,28 @@ const QuizWizard: React.FC<QuizWizardProps> = ({ lesson, updateLesson }) => {
           onChange={updateQuiz}
         />
         <Input
-          value={
-            scoreType === 'auto'
-              ? (lesson?.quiz?.totalScore ?? 0)
-              : (totalPoints ?? 100)
-          }
+          value={scoreType === 'auto'
+            ? (totalScoreDraft ?? lesson?.quiz?.totalScore ?? 100)
+            : (totalPoints ?? 100)}
           label="Total points"
-          name="totalPoints"
+          name="totalScore"
           className="score-input"
           type="number"
+          min={1}
+          step={1}
+          error={scoreType === 'auto' ? totalScoreError ?? undefined : undefined}
           readOnly={scoreType === 'manual'}
-          onChange={updateQuiz}
+          onChange={updateTotalScore}
         />
       </div>
 
       <section className="questions">
         {lesson?.quiz?.questions?.map((q, idx) => (
           <QuestionCard
-            key={idx}
+            key={q.id}
             question={q}
             index={idx}
+            canMoveDown={idx < (lesson?.quiz?.questions?.length ?? 0) - 1}
             readOnly={scoreType === 'auto'}
             // onTypeChange={(type) => onTypeChange(q, type)}
             onChange={(next) => updateQuestion(q.id, next)}

@@ -20,7 +20,7 @@ export const useSectionAutosave = ({
 }: UseSectionAutosaveParams) => {
   const snapshot: ProductSectionUpdateRequest = {
     productId, sectionId: section.id ?? '', title: section.title,
-    description: section.description, position: section.position,
+    description: section.description,
   };
   return useNestedAutosave(snapshot, Boolean(section.id && user?.id),
     (value) => dispatch(updateProductSection(value)).unwrap());

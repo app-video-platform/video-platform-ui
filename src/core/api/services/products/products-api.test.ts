@@ -198,6 +198,7 @@ describe('Products API', () => {
           type: 'VIDEO',
           videoUrl: undefined,
           content: undefined,
+          quiz: undefined,
           description: '',
           position: undefined,
         },
@@ -211,6 +212,11 @@ describe('Products API', () => {
         productId: 'p1',
         sectionId: 's1',
         title: 'New',
+        quiz: {
+          totalScore: 50,
+          passingScore: 40,
+          questions: [],
+        },
       } as any;
       const resp = { ...payload };
       mockedHttpClient.patch.mockResolvedValueOnce({ data: resp });
@@ -223,6 +229,7 @@ describe('Products API', () => {
           type: undefined,
           videoUrl: undefined,
           content: undefined,
+          quiz: payload.quiz,
           description: undefined,
           position: undefined,
         },

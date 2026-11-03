@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoAddOutline } from 'react-icons/io5';
 
@@ -12,6 +12,7 @@ import { selectAuthUser } from 'core/store/auth-store';
 import {
   createProductSection,
   deleteProductSection,
+  updateProductSection,
 } from 'core/store/product-store';
 import { getCssVar } from '@shared/utils';
 import SectionEditor from '../editors/section-editor/section-editor.component';
@@ -87,11 +88,65 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
   const [isSavingCreate, setIsSavingCreate] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [operationError, setOperationError] = useState<string | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const orderQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const orderRevisionRef = useRef(0);
+  const latestSectionsRef = useRef(sections);
+
+  useEffect(() => {
+    latestSectionsRef.current = sections;
+  }, [sections]);
+
+  const persistSectionOrder = (orderedSections: SectionDraft[]) => {
+    const revision = ++orderRevisionRef.current;
+    setIsSavingOrder(true);
+
+    const save = orderQueueRef.current.catch(() => undefined).then(async () => {
+      if (orderedSections.some((section) => !section.id)) {
+        throw new Error('A content group is not ready to be reordered yet.');
+      }
+
+      const results = await Promise.allSettled(
+        orderedSections.map((section) =>
+          dispatch(updateProductSection({
+            productId,
+            sectionId: section.id ?? '',
+            position: section.position,
+          })).unwrap(),
+        ),
+      );
+
+      if (results.some((result) => result.status === 'rejected')) {
+        throw new Error(`Could not save ${copy.entityName} order.`);
+      }
+    });
+
+    orderQueueRef.current = save.then(() => undefined, () => undefined);
+    void save.then(
+      () => {
+        if (revision === orderRevisionRef.current) {
+          setOrderError(null);
+          setIsSavingOrder(false);
+        }
+      },
+      (error: unknown) => {
+        if (revision === orderRevisionRef.current) {
+          setOrderError(error instanceof Error
+            ? error.message
+            : `Could not save ${copy.entityName} order.`,
+          );
+          setIsSavingOrder(false);
+        }
+      },
+    );
+  };
 
   const handleSectionChange = (index: number, nextSection: SectionDraft) => {
     const updated = sections.map((section: SectionDraft, i: number) =>
       i === index ? nextSection : section,
     );
+    latestSectionsRef.current = updated;
     onSectionsChange(updated);
   };
 
@@ -136,7 +191,9 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
         files: createdSection.files ?? [],
       };
 
-      onSectionsChange(normalizePositions([...sections, nextSection]));
+      const nextSections = normalizePositions([...sections, nextSection]);
+      latestSectionsRef.current = nextSections;
+      onSectionsChange(nextSections);
       resetCreate();
     } catch (error) {
       setCreateError(
@@ -160,13 +217,17 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
     next.splice(nextIndex, 0, moved);
     const normalized = normalizePositions(next);
 
+    latestSectionsRef.current = normalized;
     onSectionsChange(normalized);
-
+    persistSectionOrder(normalized);
   };
 
   const handleDeleteSection = async (section: SectionDraft, index: number) => {
     if (!section.id) {
-      onSectionsChange(normalizePositions(sections.filter((_, i) => i !== index)));
+      const remaining = normalizePositions(sections.filter((_, i) => i !== index));
+      latestSectionsRef.current = remaining;
+      onSectionsChange(remaining);
+      persistSectionOrder(remaining);
       return;
     }
 
@@ -178,7 +239,10 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
           sectionId: section.id,
         }),
       ).unwrap();
-      onSectionsChange(normalizePositions(sections.filter((_, i) => i !== index)));
+      const remaining = normalizePositions(sections.filter((_, i) => i !== index));
+      latestSectionsRef.current = remaining;
+      onSectionsChange(remaining);
+      persistSectionOrder(remaining);
       setDeleteTargetId(null);
     } catch (error) {
       setOperationError(
@@ -215,6 +279,20 @@ const CreateProductSections: React.FC<CreateProductSectionsProps> = ({
       {operationError && (
         <p className="content-manager__error" role="alert">
           {operationError}
+        </p>
+      )}
+      {isSavingOrder && <p role="status">Saving {copy.entityName} order…</p>}
+      {orderError && (
+        <p className="content-manager__error" role="alert">
+          {orderError}
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={isSavingOrder}
+            onClick={() => persistSectionOrder(latestSectionsRef.current)}
+          >
+            Retry order save
+          </Button>
         </p>
       )}
 

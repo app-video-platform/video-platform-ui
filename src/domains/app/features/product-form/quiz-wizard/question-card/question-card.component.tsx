@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React, { useState } from 'react';
+import React, { useId } from 'react';
 
 import {
   Input,
@@ -7,6 +7,7 @@ import {
   Toggle,
   InfoPopover,
   ExpansionPanel,
+  Button,
 } from '@shared/ui';
 import { MCQQuestion, QuestionType, QuizQuestion } from 'core/api/models';
 import MCQEditor from '../../editors/mcq-editor/mcq-editor.component';
@@ -19,6 +20,7 @@ import './question-card.styles.scss';
 interface QuestionCardProps {
   question: QuizQuestion;
   index: number;
+  canMoveDown?: boolean;
   readOnly?: boolean;
   // eslint-disable-next-line no-unused-vars
   onChange: (q: QuizQuestion) => void;
@@ -30,12 +32,13 @@ interface QuestionCardProps {
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   index,
+  canMoveDown = true,
   readOnly = true,
   onChange,
   onRemove,
   onMove,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const fieldIdPrefix = `quiz-${useId()}`;
 
   const handleTypeChange = (type: string) => {
     const newType = type as QuestionType;
@@ -54,15 +57,48 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       defaultExpanded={true}
       header={
         <>
-          <h4 className="question-index">Question {index + 1}</h4>
-          <EditableTitle
-            value={question.title ?? ''}
-            placeholder="How many cats does Taylor Swift have? (click here to edit)"
-            onChange={(title: string) =>
-              onChange({ ...question, title } as QuizQuestion)
-            }
-            smaller
-          />
+          <div className="question-card__heading">
+            <h4 className="question-index">Question {index + 1}</h4>
+            <EditableTitle
+              value={question.title ?? ''}
+              placeholder="How many cats does Taylor Swift have? (click here to edit)"
+              onChange={(title: string) =>
+                onChange({ ...question, title } as QuizQuestion)
+              }
+              smaller
+            />
+            <div className="question-card__actions">
+              <Button
+                type="button"
+                onClick={() => onMove(-1)}
+                disabled={index === 0}
+                aria-label={`Move question ${index + 1} up`}
+                variant="tertiary"
+                size="sm"
+              >
+                Move up
+              </Button>
+              <Button
+                type="button"
+                onClick={() => onMove(1)}
+                disabled={!canMoveDown}
+                aria-label={`Move question ${index + 1} down`}
+                variant="tertiary"
+                size="sm"
+              >
+                Move down
+              </Button>
+              <Button
+                type="button"
+                onClick={onRemove}
+                aria-label={`Remove question ${index + 1}`}
+                variant="danger"
+                size="sm"
+              >
+                Remove question
+              </Button>
+            </div>
+          </div>
         </>
       }
     >
@@ -80,7 +116,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 
         <Input
           value={question.points}
-          name="points"
+          name={`${fieldIdPrefix}-points`}
           label="Points"
           type="number"
           readOnly={readOnly}
@@ -135,7 +171,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <Textarea
         value={question.explanation ?? ''}
         label="Explanation (shown after submit)"
-        name="explanation"
+        name={`${fieldIdPrefix}-explanation`}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
           onChange({
             ...question,

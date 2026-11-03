@@ -8,8 +8,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 
 import httpClient from 'core/api/http-client';
-import { AbstractProduct, PublicStorefront } from 'core/api/models';
-import authReducer from 'core/store/auth-store/auth.slice';
+import { AbstractProduct, PublicStorefront, User, UserRole } from 'core/api/models';
+import authReducer, { AuthState } from 'core/store/auth-store/auth.slice';
 import productLandingPageReducer from 'core/store/product-landing-page-store/product-landing-page.slice';
 import productReducer from 'core/store/product-store/product.slice';
 import shopCartReducer from 'core/store/shop-cart/shop-cart.slice';
@@ -49,6 +49,17 @@ const courseProduct: AbstractProduct = {
           title: 'Price the offer',
           description: '',
           type: 'ARTICLE',
+          content: JSON.stringify({
+            type: 'doc',
+            content: [{
+              type: 'paragraph',
+              content: [{
+                type: 'text',
+                text: 'Saved Article body',
+                marks: [{ type: 'bold' }],
+              }],
+            }],
+          }),
         },
       ],
     },
@@ -127,7 +138,23 @@ const LocationProbe = () => {
   return <span data-testid="location">{location.pathname}</span>;
 };
 
-const renderProductPage = (initialEntry = '/app/product/course-1') => {
+const authorizedReaders: Array<[User, boolean]> = [
+  [{ id: 'creator-1', firstName: 'Owner', lastName: 'Creator', email: 'owner@example.com', roles: [UserRole.CREATOR] }, false],
+  [{ id: 'learner-1', firstName: 'Enrolled', lastName: 'Learner', email: 'learner@example.com', roles: [UserRole.USER] }, true],
+  [{ id: 'admin-1', firstName: 'Platform', lastName: 'Admin', email: 'admin@example.com', roles: [UserRole.ADMIN] }, false],
+];
+
+const renderProductPage = (
+  initialEntry = '/app/product/course-1',
+  user: User | null = null,
+) => {
+  const preloadedAuth: AuthState = {
+    user,
+    loading: false,
+    error: null,
+    isUserLoggedIn: Boolean(user),
+    sessionStatus: user ? 'authenticated' : 'unauthenticated',
+  };
   const testStore = configureStore({
     reducer: {
       auth: authReducer,
@@ -137,16 +164,11 @@ const renderProductPage = (initialEntry = '/app/product/course-1') => {
       storefront: storefrontReducer,
     },
     preloadedState: {
-      auth: {
-        user: null,
-        loading: false,
-        error: null,
-        isUserLoggedIn: false,
-      },
+      auth: preloadedAuth,
     },
   });
 
-  return render(
+  const view = render(
     <Provider store={testStore}>
       <MemoryRouter initialEntries={[initialEntry]}>
         <Routes>
@@ -172,6 +194,7 @@ const renderProductPage = (initialEntry = '/app/product/course-1') => {
       </MemoryRouter>
     </Provider>,
   );
+  return { ...view, store: testStore };
 };
 
 describe('<ProductPage />', () => {
@@ -336,6 +359,45 @@ describe('<ProductPage />', () => {
     expect(screen.getByText('Positioning foundations')).toBeInTheDocument();
     expect(screen.getByText('Define the transformation')).toBeInTheDocument();
     expect(screen.getByText('Price the offer')).toBeInTheDocument();
+  });
+
+  it.each(authorizedReaders)('renders formatted Article content for authorized readers and after reload', async (user, hasAccess) => {
+    mock.onGet('api/products/course-1').reply(200, courseProduct);
+    mock.onGet('api/entitlements/products/course-1/access').reply(200, { hasAccess });
+
+    const firstView = renderProductPage('/app/product/course-1', user);
+    expect(await screen.findByText('Saved Article body')).toBeInTheDocument();
+    expect(screen.getByText('Saved Article body').tagName).toBe('STRONG');
+    expect(screen.queryByText(/"type":"doc"/)).toBeNull();
+    firstView.unmount();
+
+    const reloadedView = renderProductPage('/app/product/course-1', user);
+    expect(await screen.findByText('Saved Article body')).toBeInTheDocument();
+    expect(screen.getByText('Saved Article body').tagName).toBe('STRONG');
+    expect(mock.history.get.filter((request) => request.url === 'api/products/course-1'))
+      .toHaveLength(2);
+    reloadedView.unmount();
+  });
+
+  it('does not render private Article bodies for guests or users without entitlement', async () => {
+    mock.onGet('api/products/course-1').reply(200, courseProduct);
+    const guestView = renderProductPage();
+
+    await screen.findByRole('heading', { name: 'Creator Product Growth System' });
+    expect(screen.queryByText('Saved Article body')).toBeNull();
+    guestView.unmount();
+
+    mock.onGet('api/entitlements/products/course-1/access').reply(200, { hasAccess: false });
+    const unauthorizedView = renderProductPage('/app/product/course-1', {
+      id: 'learner-2',
+      firstName: 'Unrelated',
+      lastName: 'User',
+      email: 'unrelated@example.com',
+      roles: [UserRole.USER],
+    });
+    await screen.findByRole('heading', { name: 'Creator Product Growth System' });
+    expect(screen.queryByText('Saved Article body')).toBeNull();
+    unauthorizedView.unmount();
   });
 
   it('renders representative Consultation details without fake duration claims', async () => {

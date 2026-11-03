@@ -2,10 +2,10 @@
 
 Generated from repository state:
 
-Branch: main
-Commit: b9f5510
+Branch: codex/m7-course-content-integrity
+Base commit: fbc0145
 
-Last reviewed: 2026-08-13
+Last reviewed: 2026-11-03
 
 # How to use this document
 
@@ -288,6 +288,13 @@ Product Builder Redesign Phase 3 redesigns section-based Course and Download con
 - Download file ordering is upload-order-only in the current frontend/model. There is no persisted file position or renaming contract, so Phase 3 does not invent file reordering or file metadata editing.
 - Nested content save state is local to sections, lessons, uploads, and destructive actions. Product header autosave remains Product-detail focused and should not be treated as a guarantee that nested content mutations succeeded.
 - Phase 3 does not redesign Consultation Availability, Membership Content, Media, final Readiness rules, checkout/entitlements, private preview, publish validation, Course drip scheduling, free-preview lessons, certificates, student analytics, file renaming, or advanced quiz/question-bank behavior.
+
+M7 establishes the following Course reader and authoring conventions:
+
+- `CourseLesson.content` remains the persisted Article string and the Tiptap editor continues to serialize JSON. The Course reader converts supported documents using the existing StarterKit, Link, TaskList/TaskItem, Image, and Underline extensions, then sanitizes the generated HTML with DOMPurify. Supported legacy HTML is sanitized; plain legacy text is rendered as text. Empty, malformed, or unsupported JSON content does not expose its serialization. Content authorization remains governed by the existing owner/entitlement checks.
+- Quiz uses the existing `QuizDraft.totalScore` field. Auto-Split accepts positive whole-number totals and assigns any integer remainder to the earliest questions. Manual Split still derives the total from the sum of question points; passing-score behavior remains unchanged. The editor validates locally and does not introduce a new Quiz persistence or assessment contract.
+- QuestionCard points/explanation labels use `useId()`-based field IDs, and the Quiz Wizard keys each card by the stable question ID so labels remain associated when questions are added, removed, or moved.
+- Section and Download file-group positions use the existing section PATCH API. `CreateProductSections` serializes reorder batches and waits for every position response before reporting success. Section detail autosaves no longer include position, preventing a separate debounce from racing the reorder operation. Partial failures remain visible; a later fully successful reorder clears the reorder error. The current backend does not guarantee atomic multi-section reorder transactions.
 
 Product Builder Redesign Phase 4 redesigns Consultation Availability configuration only.
 
