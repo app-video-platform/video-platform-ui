@@ -25,8 +25,8 @@ import {
   clearCurrentProduct,
   getProductById,
   selectCurrentProduct,
-  selectProductsError,
-  selectProductsLoading,
+  selectProductDetailError,
+  selectProductDetailLoading,
 } from 'core/store/product-store';
 import { selectAuthUser } from 'core/store/auth-store';
 import {
@@ -118,8 +118,8 @@ const ProductLandingPageBuilder: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
   const product = useSelector(selectCurrentProduct);
-  const productLoading = useSelector(selectProductsLoading);
-  const productError = useSelector(selectProductsError);
+  const productLoading = useSelector(selectProductDetailLoading);
+  const productError = useSelector(selectProductDetailError);
   const creatorStorefrontConfig = useSelector(selectCreatorStorefrontConfig);
   const persistedConfig = useSelector((state: RootState) =>
     selectCreatorProductLandingPageConfigByProductId(state, productId),

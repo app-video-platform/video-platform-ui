@@ -15,8 +15,8 @@ import {
   clearCurrentProduct,
   getProductById,
   selectCurrentProduct,
-  selectProductsError,
-  selectProductsLoading,
+  selectProductDetailError,
+  selectProductDetailLoading,
 } from 'core/store/product-store';
 import {
   fetchCreatorProductLandingPageConfig,
@@ -54,8 +54,8 @@ const ProductPreview: React.FC = () => {
   const navigate = useNavigate();
   const user = useSelector(selectAuthUser);
   const product = useSelector(selectCurrentProduct);
-  const productLoading = useSelector(selectProductsLoading);
-  const productError = useSelector(selectProductsError);
+  const productLoading = useSelector(selectProductDetailLoading);
+  const productError = useSelector(selectProductDetailError);
   const creatorStorefrontConfig = useSelector(selectCreatorStorefrontConfig);
   const creatorStorefrontLoading = useSelector(selectCreatorStorefrontConfigLoading);
   const creatorStorefrontError = useSelector(selectCreatorStorefrontConfigError);

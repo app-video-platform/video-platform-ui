@@ -53,6 +53,7 @@ import {
   selectProductSummaries,
   selectProductsError,
   selectProductsLoading,
+  selectProductDetailLoading,
   updateProductDetails,
 } from 'core/store/product-store';
 import {
@@ -129,6 +130,7 @@ const ProductForm: React.FC = () => {
   const navigate = useNavigate();
   const productSummaries = useSelector(selectProductSummaries);
   const productsLoading = useSelector(selectProductsLoading);
+  const detailLoading = useSelector(selectProductDetailLoading);
   const productsError = useSelector(selectProductsError);
   const {
     user,
@@ -378,7 +380,7 @@ const ProductForm: React.FC = () => {
     return <p>Select a creator owner before creating a product.</p>;
   }
 
-  if (isEditMode && productsLoading && !showRestOfForm) {
+  if (isEditMode && detailLoading && !showRestOfForm) {
     return (
       <ProductWorkspaceShell
         productType={formData.type}

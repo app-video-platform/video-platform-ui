@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,8 +12,9 @@ import {
 import { getAdminUsersAPI } from 'core/api/services';
 import {
   fetchAdminProducts,
-  selectAdminError,
-  selectAdminLoading,
+  selectAdminProductsQueryKey,
+  selectAdminProductsError,
+  selectAdminProductsLoading,
   selectAdminProductsPage,
 } from 'core/store/admin-store';
 import { deleteProduct } from 'core/store/product-store';
@@ -29,9 +30,10 @@ const productStatuses: ProductStatus[] = ['DRAFT', 'PUBLISHED', 'HIDDEN'];
 const AdminProductsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const productsPage = useSelector(selectAdminProductsPage);
-  const loading = useSelector(selectAdminLoading);
-  const error = useSelector(selectAdminError);
+  const storedPage = useSelector(selectAdminProductsPage);
+  const queryKey = useSelector(selectAdminProductsQueryKey);
+  const loading = useSelector(selectAdminProductsLoading);
+  const error = useSelector(selectAdminProductsError);
   const [search, setSearch] = useState('');
   const [ownerId, setOwnerId] = useState('');
   const [type, setType] = useState<ProductType | ''>('');
@@ -39,6 +41,11 @@ const AdminProductsPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [creators, setCreators] = useState<AdminUser[]>([]);
   const [selectedCreatorId, setSelectedCreatorId] = useState('');
+
+  const latestQuery = useRef({ search, ownerId, type, status, page, size: 20 });
+  latestQuery.current = { search, ownerId, type, status, page, size: 20 };
+  const queryMatches = queryKey === JSON.stringify({ search, ownerId, type, status, page, size: 20 });
+  const productsPage = queryMatches ? storedPage : null;
 
   useEffect(() => {
     dispatch(
@@ -53,9 +60,7 @@ const AdminProductsPage: React.FC = () => {
   }, []);
 
   const refreshCurrentPage = () => {
-    dispatch(
-      fetchAdminProducts({ search, ownerId, type, status, page, size: 20 }),
-    );
+    dispatch(fetchAdminProducts(latestQuery.current));
   };
 
   const handleDelete = (productId?: string) => {
@@ -149,8 +154,11 @@ const AdminProductsPage: React.FC = () => {
         </button>
       </div>
 
-      {error && <p className="admin-error">{error}</p>}
-      {loading && <p>Loading...</p>}
+      {queryMatches && error && <p className="admin-error" role="alert">{error}
+        <button onClick={() => dispatch(fetchAdminProducts({ search, ownerId, type, status, page, size: 20 }))}>Retry</button></p>}
+      {(loading || !queryMatches) && <p role="status">Loading...</p>}
+
+      {queryMatches && !loading && !error && productsPage?.content.length === 0 && <p>No results found.</p>}
 
       <div className="admin-table-wrap">
         <table className="admin-table">
@@ -166,7 +174,7 @@ const AdminProductsPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {productsPage?.content.map((product) => (
+            {!loading && productsPage?.content.map((product) => (
               <tr key={product.id}>
                 <td>{product.title}</td>
                 <td>
@@ -197,7 +205,7 @@ const AdminProductsPage: React.FC = () => {
       </div>
 
       <div className="admin-pagination">
-        <button disabled={page === 0} onClick={() => setPage((value) => value - 1)}>
+        <button disabled={loading || !queryMatches || page === 0} onClick={() => setPage((value) => value - 1)}>
           Previous
         </button>
         <span>
@@ -205,7 +213,7 @@ const AdminProductsPage: React.FC = () => {
           {productsPage?.totalPages || 1}
         </span>
         <button
-          disabled={Boolean(productsPage?.last)}
+          disabled={loading || !queryMatches || Boolean(productsPage?.last)}
           onClick={() => setPage((value) => value + 1)}
         >
           Next

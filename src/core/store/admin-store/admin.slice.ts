@@ -23,12 +23,24 @@ interface AdminState {
   usersPage: PageResponse<AdminUser> | null;
   productsPage: AdminProductsPage | null;
   auditPage: PageResponse<AdminAuditLog> | null;
+  productsRequestId?: string;
+  productsQueryKey?: string;
+  productsLoading?: boolean;
+  productsError?: string | null;
+  auditRequestId?: string;
+  auditQueryKey?: string;
+  auditLoading?: boolean;
+  auditError?: string | null;
   loading: boolean;
   roleUpdatingUserId: string | null;
   error: string | null;
 }
 
 const initialState: AdminState = {
+  productsLoading: false,
+  productsError: null,
+  auditLoading: false,
+  auditError: null,
   usersPage: null,
   productsPage: null,
   auditPage: null,
@@ -131,36 +143,54 @@ const adminSlice = createSlice({
         state.error = action.payload ?? 'Failed to update role';
       })
 
-      .addCase(fetchAdminProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(fetchAdminProducts.pending, (state, action) => {
+        state.productsRequestId = action.meta.requestId;
+        state.productsQueryKey = JSON.stringify(action.meta.arg ?? {});
+        state.productsLoading = true;
+        state.productsError = null;
+        state.productsPage = null;
       })
       .addCase(
         fetchAdminProducts.fulfilled,
-        (state, action: PayloadAction<AdminProductsPage>) => {
-          state.loading = false;
+        (state, action) => {
+          if (!state.productsRequestId || state.productsRequestId !== action.meta?.requestId) {return;}
+          state.productsRequestId = undefined;
+          state.productsLoading = false;
+          state.productsError = null;
           state.productsPage = action.payload;
         },
       )
       .addCase(fetchAdminProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload ?? 'Failed to load products';
+        if (!state.productsRequestId || state.productsRequestId !== action.meta?.requestId) {return;}
+        state.productsRequestId = undefined;
+        state.productsLoading = false;
+        state.productsError = action.payload ?? 'Could not load results';
+        state.productsPage = null;
       })
 
-      .addCase(fetchAdminAuditLogs.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(fetchAdminAuditLogs.pending, (state, action) => {
+        state.auditRequestId = action.meta.requestId;
+        state.auditQueryKey = JSON.stringify(action.meta.arg ?? {});
+        state.auditLoading = true;
+        state.auditError = null;
+        state.auditPage = null;
       })
       .addCase(
         fetchAdminAuditLogs.fulfilled,
-        (state, action: PayloadAction<PageResponse<AdminAuditLog>>) => {
-          state.loading = false;
+        (state, action) => {
+          if (!state.auditRequestId || state.auditRequestId !== action.meta?.requestId) {return;}
+          state.auditRequestId = undefined;
+          state.auditLoading = false;
+          state.auditError = null;
           state.auditPage = action.payload;
         },
       )
       .addCase(fetchAdminAuditLogs.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload ?? 'Failed to load audit logs';
+        if (!state.auditRequestId || state.auditRequestId !== action.meta?.requestId) {return;}
+        state.auditRequestId = undefined;
+        state.auditLoading = false;
+        state.auditError = action.payload ?? 'Could not load results';
+        state.auditPage = null;
       });
   },
 });
@@ -177,3 +207,11 @@ export const selectRoleUpdatingUserId = (state: RootState) =>
   state.admin.roleUpdatingUserId;
 
 export default adminSlice.reducer;
+
+export const selectAdminProductsLoading = (state: RootState) => state.admin.productsLoading ?? state.admin.loading;
+export const selectAdminProductsError = (state: RootState) => state.admin.productsError === undefined ? state.admin.error : state.admin.productsError;
+export const selectAdminProductsQueryKey = (state: RootState) => state.admin.productsQueryKey;
+
+export const selectAdminAuditLoading = (state: RootState) => state.admin.auditLoading ?? state.admin.loading;
+export const selectAdminAuditError = (state: RootState) => state.admin.auditError === undefined ? state.admin.error : state.admin.auditError;
+export const selectAdminAuditQueryKey = (state: RootState) => state.admin.auditQueryKey;

@@ -5,6 +5,9 @@ import { createSessionMiddleware } from './session.middleware';
 import { logout, setUserProfile, signinUser, changeDevUserRole } from './auth-store/auth.slice';
 import { User, UserRole, CreatorDashboardSummary } from 'core/api/models';
 import { setupProductListeners } from './listeners/product-listeners';
+import { getProductById } from './product-store';
+import { fetchCreatorCustomerDetail } from './customers-store';
+import { AbstractProduct, CreatorCustomerDetail } from 'core/api/models';
 import { fetchMembershipAggregate } from './membership-store/membership.slice';
 
 const user = (id: string, role = UserRole.CREATOR) => ({ id, roles: [role], firstName: id } as User);
@@ -74,13 +77,18 @@ describe('account-owned Redux lifecycle', () => {
   it('clears private slices together, preserving separate public caches and browser collections', () => {
     const store = setup();
     store.dispatch(setUserProfile(user('A')));
-    store.dispatch({ type: 'products/getProductById/fulfilled', payload: { id: 'private draft' } });
+    store.dispatch(getProductById.pending('product-seed', { productId: 'private draft' }));
+    store.dispatch(getProductById.fulfilled({ id: 'private draft' } as AbstractProduct, 'product-seed', { productId: 'private draft' }));
+    store.dispatch(fetchCreatorCustomerDetail.pending('customer-seed', 'private customer'));
+    store.dispatch(fetchCreatorCustomerDetail.fulfilled({ id: 'private customer' } as CreatorCustomerDetail, 'customer-seed', 'private customer'));
+    expect(store.getState().products.currentProduct?.id).toBe('private draft');
+    expect(store.getState().customers.currentCustomer?.id).toBe('private customer');
     store.dispatch({ type: 'storefront/fetchPublicStorefront/fulfilled', payload: { creator: { id: 'public' } } });
     store.dispatch({ type: 'storefront/fetchCreatorStorefrontConfig/fulfilled', payload: { theme: 'private' } });
     store.dispatch({ type: 'productLandingPage/fetchCreatorProductLandingPageConfig/fulfilled', payload: { productId: 'draft' } });
     store.dispatch({ type: 'notifications/addNotification', payload: { title: 'private' } });
     for (const type of ['admin/fetchUsers', 'analytics/fetchCreatorAnalyticsOverview',
-      'customers/fetchCreatorCustomerDetail', 'sales/fetchCreatorSalesSummary',
+      'sales/fetchCreatorSalesSummary',
       'dashboard/fetchCreatorDashboardSummary']) {
       store.dispatch({ type: `${type}/fulfilled`, payload: { privateAccount: 'A' } });
     }

@@ -17,6 +17,11 @@ const LocationProbe: React.FC = () => {
   return <span data-testid="location-search">{location.search}</span>;
 };
 
+const loadedDialog = async () => {
+  await waitFor(() => expect(screen.queryByText('Loading order…')).not.toBeInTheDocument());
+  return screen.findByRole('dialog');
+};
+
 describe('Creator Sales', () => {
   let mock: MockAdapter;
 
@@ -166,7 +171,7 @@ describe('Creator Sales', () => {
       await screen.findByRole('button', { name: 'Open ORD-2026-00124 order detail' }),
     );
 
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(await loadedDialog()).toBeInTheDocument();
     expect(screen.getByText('Order #ORD-2026-00124')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Items' })).toBeInTheDocument();
     expect(screen.getAllByText('Creator Product Growth System').length)
@@ -196,7 +201,7 @@ describe('Creator Sales', () => {
   it('restores an order detail drawer from a deep link', async () => {
     renderSales('/app/sales?order=ORD-2026-00123');
 
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(await loadedDialog()).toBeInTheDocument();
     expect(screen.getByText('Order #ORD-2026-00123')).toBeInTheDocument();
     const dialog = screen.getByRole('dialog');
     expect(
@@ -208,7 +213,7 @@ describe('Creator Sales', () => {
   it('renders refunded and failed order detail contexts', async () => {
     const { unmount } = renderSales('/app/sales?order=ORD-2026-00121');
 
-    const refundDialog = await screen.findByRole('dialog');
+    const refundDialog = await loadedDialog();
     expect(within(refundDialog).getByText('Refund')).toBeInTheDocument();
     expect(within(refundDialog).getByText('Customer request')).toBeInTheDocument();
     expect(within(refundDialog).getAllByText('Access revoked').length).toBeGreaterThan(
@@ -217,7 +222,7 @@ describe('Creator Sales', () => {
     unmount();
 
     renderSales('/app/sales?order=ORD-2026-00120');
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await loadedDialog();
     expect(within(dialog).getByText('Failed payment')).toBeInTheDocument();
     expect(within(dialog).getByText('Card was declined.')).toBeInTheDocument();
     expect(within(dialog).getByText(/Retry scheduled/)).toBeInTheDocument();
@@ -266,7 +271,7 @@ describe('Creator Sales', () => {
   it('renders singular compatibility product and access fields when items are unavailable', async () => {
     renderSales('/app/sales?order=ORD-2026-00123');
 
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await loadedDialog();
 
     expect(within(dialog).getByRole('heading', { name: 'Items' }))
       .toBeInTheDocument();

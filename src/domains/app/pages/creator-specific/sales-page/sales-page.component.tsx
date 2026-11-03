@@ -26,6 +26,9 @@ import {
   selectCreatorSalesSummary,
   selectCreatorSalesSummaryError,
   selectCurrentCreatorOrder,
+  selectCreatorOrderDetailLoading,
+  selectCreatorOrderDetailError,
+  selectCreatorOrderDetailId,
 } from 'core/store/sales-store';
 
 import {
@@ -72,6 +75,9 @@ const SalesPage: React.FC = () => {
   const ordersLoading = useSelector(selectCreatorOrdersLoading);
   const ordersError = useSelector(selectCreatorOrdersError);
   const currentOrder = useSelector(selectCurrentCreatorOrder);
+  const detailLoading = useSelector(selectCreatorOrderDetailLoading);
+  const detailError = useSelector(selectCreatorOrderDetailError);
+  const detailOrderId = useSelector(selectCreatorOrderDetailId);
   const [filterForm, setFilterForm] = useState(defaultSalesFilterForm);
   const [page, setPage] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -97,7 +103,7 @@ const SalesPage: React.FC = () => {
   useEffect(() => {
     if (selectedOrderId) {
       dispatch(fetchCreatorOrderDetail(selectedOrderId));
-      return;
+      return () => { dispatch(clearCurrentOrder()); };
     }
 
     dispatch(clearCurrentOrder());
@@ -374,7 +380,9 @@ const SalesPage: React.FC = () => {
         </>
       )}
 
-      <OrderDetailDrawer order={selectedOrder} open={Boolean(selectedOrder)} onClose={closeOrder} />
+      <OrderDetailDrawer order={selectedOrder} open={Boolean(selectedOrderId)} onClose={closeOrder}
+        loading={detailLoading || detailOrderId !== selectedOrderId} error={detailError}
+        onRetry={() => selectedOrderId && dispatch(fetchCreatorOrderDetail(selectedOrderId))} />
 
       <Drawer
         open={filtersOpen}
@@ -457,6 +465,9 @@ const OrderLedgerRow: React.FC<OrderLedgerRowProps> = ({ order, onOpen }) => {
 
 interface OrderDetailDrawerProps {
   order?: SalesOrderDetail;
+  loading?: boolean;
+  error?: string | null;
+  onRetry: () => void;
   open: boolean;
   onClose: () => void;
 }
@@ -465,9 +476,17 @@ const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
   order,
   open,
   onClose,
+  loading,
+  error,
+  onRetry,
 }) => {
   if (!order) {
-    return null;
+    return <Drawer open={open} title={<h2>Order details</h2>} onClose={onClose}>
+      {loading ? <p role="status">Loading order…</p> : <div role="alert">
+        <p>{error ? 'Order details could not be loaded.' : 'This order is not available.'}</p>
+        <Button type="button" onClick={onRetry}>Retry</Button>
+      </div>}
+    </Drawer>;
   }
 
   const items = getSalesOrderItems(order);
