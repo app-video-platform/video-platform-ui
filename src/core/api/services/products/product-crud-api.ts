@@ -194,6 +194,7 @@ export const addImageToProductAPI = async (image: File, productId: string) => {
     const response = await httpClient.post<string>(
       `api/products/image?productId=${productId}`,
       image,
+      { headers: { 'Content-Type': image.type } },
     );
     return response.data;
   } catch (error) {
@@ -220,6 +221,7 @@ export const addProductGalleryImageAPI = async (
     const response = await httpClient.post<ProductGalleryImage>(
       `api/products/${productId}/media/gallery`,
       image,
+      { headers: { 'Content-Type': image.type } },
     );
     return response.data;
   } catch (error) {
@@ -267,6 +269,7 @@ export const addProductPromoVideoAPI = async (
     const response = await httpClient.post<ProductPromoVideo>(
       `api/products/${productId}/media/promo-video`,
       video,
+      { headers: { 'Content-Type': video.type } },
     );
     return response.data;
   } catch (error) {

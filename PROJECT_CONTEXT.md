@@ -60,6 +60,35 @@ Dashboard, Sales, Customers, Analytics, Storefront, and Product Landing Page con
 
 Mock mode is intentionally strict: unmatched API requests return a local `501` with a clear “No local mock is registered” message instead of passing through to the real backend. Explicit exceptions should be registered as their own handlers. External Google OAuth is not simulated; calendar connect returns a mock-safe authorization URL placeholder rather than pretending to complete provider OAuth.
 
+## Upload and file-selection lifecycle
+
+`UppyFileUploader` owns one Uppy instance for a stable set of restrictions and
+upload-mode options. Keep the latest consumer callback in a ref instead of
+recreating the instance when a parent supplies a new callback or equivalent
+inline file-type array. On real teardown, detach selection listeners before
+destroying Uppy so cleanup cannot be mistaken for a user removing the selected
+file. Actual `file-removed` events continue to publish the current selection.
+
+Product Thumbnail, Gallery, and Promo media use the existing raw-`File` API
+contract and set the request `Content-Type` to that file's MIME type. The shared
+Axios JSON default remains in place for JSON endpoints. Existing Product media
+validation rejects unsupported or missing MIME types before sending a request.
+This presentation-media transport is separate from Download section files.
+
+Gallery duplicate protection reserves each `name:size:lastModified` signature
+while its upload is in flight and after it succeeds. A failed upload releases its
+signature; a saved image's signature is released only after the corresponding
+delete request succeeds, so the same file may then be uploaded again. Failed
+deletion leaves the image and duplicate protection intact.
+
+Download section files follow presign → direct storage PUT → backend confirmation.
+Only a confirmed response adds the file row. Upload errors are associated with
+their file signature: retrying and confirming that file clears its obsolete error
+without clearing a different file's failure. Membership Video/Resource selection
+and Course Video selection retain file metadata for their existing editor flows;
+these selection references do not imply durable Membership/Course binary upload
+or delivery, which remains backend-pending.
+
 ## Authentication and account-scoped state lifecycle
 
 Milestone 1 keeps authentication in the existing Auth slice. `sessionStatus` distinguishes

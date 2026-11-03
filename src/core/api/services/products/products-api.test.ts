@@ -502,7 +502,9 @@ describe('Products API', () => {
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
         'api/products/image?productId=p1',
         file,
+        { headers: { 'Content-Type': 'image/png' } },
       );
+      expect(file.size).toBe(3);
     });
 
     it('removeImageFromProductAPI DELETEs by productId', async () => {
@@ -530,7 +532,9 @@ describe('Products API', () => {
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
         'api/products/p1/media/gallery',
         file,
+        { headers: { 'Content-Type': 'image/jpeg' } },
       );
+      expect(file.size).toBe(3);
 
       await expect(
         reorderProductGalleryImagesAPI('p1', ['gallery-1']),
@@ -570,7 +574,9 @@ describe('Products API', () => {
       expect(mockedHttpClient.post).toHaveBeenCalledWith(
         'api/products/p1/media/promo-video',
         file,
+        { headers: { 'Content-Type': 'video/mp4' } },
       );
+      expect(file.size).toBe(5);
 
       await expect(removeProductPromoVideoAPI('p1')).resolves.toBe('p1');
       expect(mockedHttpClient.delete).toHaveBeenCalledWith(
@@ -704,6 +710,68 @@ describe('Products API', () => {
         url: 'https://cdn/doc.pdf',
       });
     });
+
+    it.each(['presign', 'storage', 'confirmation'] as const)(
+      'allows a confirmed retry after the %s step fails',
+      async (failedStage) => {
+        const presignedUrl = {
+          fileId: 'temp',
+          presignedUrl: 'https://s3/presigned',
+          key: 'uploads/retry.pdf',
+          fileUrl: 'https://cdn/retry.pdf',
+        };
+        const confirmation = {
+          fileId: 'confirmed-retry',
+          fileName: 'retry.pdf',
+          url: 'https://cdn/retry.pdf',
+        };
+        const file = new File(['retry'], 'retry.pdf', {
+          type: 'application/pdf',
+        });
+
+        mockedHttpClient.get.mockResolvedValue({ data: presignedUrl });
+        mockedHttpClient.post.mockResolvedValue({ data: confirmation });
+        (global.fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200 });
+
+        if (failedStage === 'presign') {
+          mockedHttpClient.get.mockRejectedValueOnce(new Error('Presign 503'));
+        } else if (failedStage === 'storage') {
+          (global.fetch as jest.Mock).mockResolvedValueOnce({
+            ok: false,
+            status: 503,
+          });
+        } else {
+          mockedHttpClient.post.mockRejectedValueOnce(
+            new Error('Confirmation 503'),
+          );
+        }
+
+        const request = {
+          productId: 'p1',
+          sectionId: 's1',
+          file,
+        };
+        await expect(uploadDownloadSectionFileAPI(request)).rejects.toThrow(
+          failedStage === 'presign'
+            ? 'Presign 503'
+            : failedStage === 'storage'
+              ? 'File upload to presigned URL failed'
+              : 'Confirmation 503',
+        );
+
+        const confirmedFile = await uploadDownloadSectionFileAPI(request);
+        expect(confirmedFile).toEqual({
+          id: 'confirmed-retry',
+          fileName: 'retry.pdf',
+          size: file.size,
+          fileType: file.type,
+          url: 'https://cdn/retry.pdf',
+        });
+        expect(mockedHttpClient.post).toHaveBeenCalledTimes(
+          failedStage === 'confirmation' ? 2 : 1,
+        );
+      },
+    );
   });
 
   describe('Error logging parity (spot checks)', () => {

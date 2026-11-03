@@ -86,9 +86,9 @@ const renderSection = (overrides = {}) => {
     ...overrides,
   };
 
-  render(<ProductMediaSection {...props} />);
+  const view = render(<ProductMediaSection {...props} />);
 
-  return props;
+  return { ...props, rerender: view.rerender };
 };
 
 describe('<ProductMediaSection />', () => {
@@ -175,6 +175,112 @@ describe('<ProductMediaSection />', () => {
     });
   });
 
+  it('allows the exact same file to be uploaded after its saved image is removed', async () => {
+    const user = userEvent.setup();
+    const file = new File(['same-image'], 'same.png', {
+      type: 'image/png',
+      lastModified: 12345,
+    });
+    const note = 'Add gallery images (JPEG, PNG, WebP, or GIF, max 10 MB each, 20 total).';
+    mockUploaderFilesByNote.set(note, [file]);
+    const savedImage = {
+      id: 'gallery-same',
+      url: 'https://cdn.example.com/same.png',
+      fileName: file.name,
+      fileType: file.type,
+      size: file.size,
+      position: 1,
+      status: 'READY' as const,
+    };
+    const nextSavedImage = { ...savedImage, id: 'gallery-same-again' };
+    const onAddGalleryImage = jest.fn()
+      .mockResolvedValueOnce(savedImage)
+      .mockResolvedValueOnce(nextSavedImage);
+    const onRemoveGalleryImage = jest.fn().mockResolvedValue(undefined);
+    const props = renderSection({ onAddGalleryImage, onRemoveGalleryImage });
+    const uploadButton = screen.getByRole('button', { name: /add gallery images/i });
+
+    await user.click(uploadButton);
+    await waitFor(() => expect(onAddGalleryImage).toHaveBeenCalledTimes(1));
+
+    // Re-render with the saved server image, then delete it successfully.
+    const { rerender, ...sectionProps } = props;
+    rerender(<ProductMediaSection {...sectionProps} galleryImages={[savedImage]} />);
+    await user.click(screen.getByRole('button', { name: /remove same\.png/i }));
+    await waitFor(() => expect(onRemoveGalleryImage).toHaveBeenCalledWith(savedImage.id));
+
+    rerender(<ProductMediaSection {...sectionProps} galleryImages={[]} />);
+    await user.click(screen.getByRole('button', { name: /add gallery images/i }));
+
+    await waitFor(() => expect(onAddGalleryImage).toHaveBeenCalledTimes(2));
+    expect(onAddGalleryImage).toHaveBeenLastCalledWith(file);
+  });
+
+  it('keeps a gallery image and its duplicate protection when deletion fails', async () => {
+    const user = userEvent.setup();
+    const file = new File(['same-image'], 'same.png', {
+      type: 'image/png',
+      lastModified: 12345,
+    });
+    const note = 'Add gallery images (JPEG, PNG, WebP, or GIF, max 10 MB each, 20 total).';
+    mockUploaderFilesByNote.set(note, [file]);
+    const savedImage = {
+      id: 'gallery-same',
+      url: 'https://cdn.example.com/same.png',
+      fileName: file.name,
+      fileType: file.type,
+      size: file.size,
+      position: 1,
+      status: 'READY' as const,
+    };
+    const onAddGalleryImage = jest.fn().mockResolvedValue(savedImage);
+    const onRemoveGalleryImage = jest.fn().mockRejectedValue(new Error('Delete failed'));
+    const props = renderSection({ onAddGalleryImage, onRemoveGalleryImage });
+    await user.click(screen.getByRole('button', { name: /add gallery images/i }));
+    await waitFor(() => expect(onAddGalleryImage).toHaveBeenCalledTimes(1));
+
+    const { rerender, ...sectionProps } = props;
+    rerender(<ProductMediaSection {...sectionProps} galleryImages={[savedImage]} />);
+    await user.click(screen.getByRole('button', { name: /remove same\.png/i }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Delete failed');
+    expect(screen.getByText('same.png')).toBeInTheDocument();
+    expect(onRemoveGalleryImage).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: /add gallery images/i }));
+    expect(onAddGalleryImage).toHaveBeenCalledTimes(1);
+    rerender(<ProductMediaSection {...sectionProps} galleryImages={[savedImage]} />);
+  });
+
+  it('prevents a repeated identical selection from starting a concurrent gallery upload', async () => {
+    const user = userEvent.setup();
+    const file = new File(['same-image'], 'pending.png', {
+      type: 'image/png',
+      lastModified: 54321,
+    });
+    const note = 'Add gallery images (JPEG, PNG, WebP, or GIF, max 10 MB each, 20 total).';
+    mockUploaderFilesByNote.set(note, [file]);
+    let completeUpload: (() => void) | undefined;
+    const onAddGalleryImage = jest.fn(() =>
+      new Promise<{ id: string; url: string; position: number }>((resolve) => {
+        completeUpload = () =>
+          resolve({
+            id: 'gallery-pending',
+            url: 'https://cdn.example.com/pending.png',
+            position: 1,
+          });
+      }),
+    );
+    renderSection({ onAddGalleryImage });
+    const uploadButton = screen.getByRole('button', { name: /add gallery images/i });
+
+    await user.click(uploadButton);
+    await user.click(uploadButton);
+
+    expect(onAddGalleryImage).toHaveBeenCalledTimes(1);
+    completeUpload?.();
+    await waitFor(() => expect(onAddGalleryImage).toHaveBeenCalledTimes(1));
+  });
+
   it('reorders and removes gallery images', async () => {
     const user = userEvent.setup();
     const { onReorderGalleryImages, onRemoveGalleryImage } = renderSection({
@@ -252,6 +358,25 @@ describe('<ProductMediaSection />', () => {
 
     mockUploaderFilesByNote.set(uploadButton.textContent ?? '', [
       new File(['image'], 'thumbnail.svg', { type: 'image/svg+xml' }),
+    ]);
+
+    await user.click(uploadButton);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Unsupported image format',
+    );
+    expect(onUploadThumbnail).not.toHaveBeenCalled();
+  });
+
+  it('rejects an image with a missing MIME type before making the media request', async () => {
+    const user = userEvent.setup();
+    const onUploadThumbnail = jest.fn();
+    renderSection({ onUploadThumbnail });
+    const uploadButton = screen.getByRole('button', {
+      name: /select a product thumbnail image/i,
+    });
+    mockUploaderFilesByNote.set(uploadButton.textContent ?? '', [
+      new File(['image'], 'unknown.png', { type: '' }),
     ]);
 
     await user.click(uploadButton);

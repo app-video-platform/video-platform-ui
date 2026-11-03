@@ -90,6 +90,7 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
   const [promoStatus, setPromoStatus] = useState<OperationStatus>('idle');
   const [promoError, setPromoError] = useState<string | null>(null);
   const uploadedGallerySignaturesRef = useRef(new Set<string>());
+  const gallerySignatureByImageIdRef = useRef(new Map<string, string>());
 
   const sortedGalleryImages = getSortedGalleryImages(galleryImages);
 
@@ -144,12 +145,15 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
       return;
     }
 
-    setGalleryStatus('uploading');
-    setGalleryError(null);
-
     const newFiles = files.filter(
       (file) => !uploadedGallerySignaturesRef.current.has(getFileSignature(file)),
     );
+    if (newFiles.length === 0) {
+      return;
+    }
+
+    setGalleryStatus('uploading');
+    setGalleryError(null);
 
     try {
       const validationError = validateProductGallerySelection(
@@ -162,8 +166,20 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
       }
 
       for (const file of newFiles) {
-        await onAddGalleryImage(file);
-        uploadedGallerySignaturesRef.current.add(getFileSignature(file));
+        const signature = getFileSignature(file);
+        // Reserve before awaiting so a repeated selection cannot start a
+        // concurrent duplicate request. A failed attempt releases the key.
+        if (uploadedGallerySignaturesRef.current.has(signature)) {
+          continue;
+        }
+        uploadedGallerySignaturesRef.current.add(signature);
+        try {
+          const savedImage = await onAddGalleryImage(file);
+          gallerySignatureByImageIdRef.current.set(savedImage.id, signature);
+        } catch (error) {
+          uploadedGallerySignaturesRef.current.delete(signature);
+          throw error;
+        }
       }
       setGalleryStatus('saved');
     } catch (error) {
@@ -182,6 +198,11 @@ const ProductMediaSection: React.FC<ProductMediaSectionProps> = ({
 
     try {
       await onRemoveGalleryImage(imageId);
+      const signature = gallerySignatureByImageIdRef.current.get(imageId);
+      if (signature) {
+        uploadedGallerySignaturesRef.current.delete(signature);
+        gallerySignatureByImageIdRef.current.delete(imageId);
+      }
       setGalleryStatus('saved');
     } catch (error) {
       setGalleryStatus('error');

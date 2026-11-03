@@ -9,6 +9,7 @@ import {
   fireEvent,
   act,
   cleanup,
+  waitFor,
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -40,6 +41,8 @@ import {
   deleteProductSection,
   uploadDownloadSectionFile,
 } from 'core/store/product-store';
+
+type FakeDownloadUploadAction = { meta: { arg: { file: File } } };
 
 // ── 3) MOCK shared UI barrel used by SectionEditor ─────────────────
 jest.mock('@shared/ui', () => ({
@@ -415,6 +418,139 @@ describe('<SectionEditor />', () => {
       ]),
     );
     expect(finalSection.files).toHaveLength(2);
+  });
+
+  it('clears the failed file upload alert after its confirmed retry succeeds', async () => {
+    const uploadSection: SectionDraft = {
+      id: 'section-download',
+      title: 'Assets',
+      description: '',
+      position: 0,
+      lessons: [],
+      files: [],
+    };
+    const file = new File(['asset'], 'retry.txt', { type: 'text/plain' });
+    (
+      globalThis as typeof globalThis & {
+        __sectionEditorUploaderFiles?: File[];
+      }
+    ).__sectionEditorUploaderFiles = [file];
+    mockedUploadSectionFile.mockImplementation(
+      ({ file: uploadFile }: { file: File }) =>
+        ({ meta: { arg: { file: uploadFile } } }) as unknown as ReturnType<
+          typeof uploadDownloadSectionFile
+        >,
+    );
+    let uploadAttempt = 0;
+    fakeDispatch.mockImplementation((action: FakeDownloadUploadAction) => ({
+      unwrap: () => {
+        uploadAttempt += 1;
+        if (uploadAttempt === 1) {
+          return Promise.reject('Presign failed. Try again.');
+        }
+        return Promise.resolve({
+          file: {
+            id: 'confirmed-file',
+            fileName: action.meta.arg.file.name,
+            fileType: action.meta.arg.file.type,
+            size: action.meta.arg.file.size,
+          },
+        });
+      },
+    }));
+
+    render(
+      <SectionEditor
+        index={0}
+        section={uploadSection}
+        productType="DOWNLOAD"
+        productId="product-download"
+        onRemove={removeParentMock}
+        onChange={changeParentMock}
+      />,
+    );
+    const uploader = screen.getByTestId('file-uploader');
+
+    await act(async () => {
+      fireEvent.click(uploader);
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Presign failed');
+
+    await act(async () => {
+      fireEvent.click(uploader);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(changeParentMock).toHaveBeenLastCalledWith(
+        0,
+        expect.objectContaining({
+          files: [expect.objectContaining({ id: 'confirmed-file' })],
+        }),
+      );
+    });
+    expect(uploadAttempt).toBe(2);
+  });
+
+  it('does not let an older success clear a newer file upload failure', async () => {
+    const uploadSection: SectionDraft = {
+      id: 'section-download',
+      title: 'Assets',
+      description: '',
+      position: 0,
+      lessons: [],
+      files: [],
+    };
+    const olderFile = new File(['older'], 'older.txt', { type: 'text/plain' });
+    const newerFile = new File(['newer'], 'newer.txt', { type: 'text/plain' });
+    (
+      globalThis as typeof globalThis & {
+        __sectionEditorUploaderFiles?: File[];
+      }
+    ).__sectionEditorUploaderFiles = [olderFile, newerFile];
+    mockedUploadSectionFile.mockImplementation(
+      ({ file }: { file: File }) =>
+        ({ meta: { arg: { file } } }) as unknown as ReturnType<
+          typeof uploadDownloadSectionFile
+        >,
+    );
+    let completeOlderUpload: (() => void) | undefined;
+    fakeDispatch.mockImplementation((action: FakeDownloadUploadAction) => ({
+      unwrap: () => {
+        const file = action.meta.arg.file;
+        if (file.name === 'older.txt') {
+          return new Promise((resolve) => {
+            completeOlderUpload = () =>
+              resolve({
+                file: { id: 'older-confirmed', fileName: 'older.txt' },
+              });
+          });
+        }
+        return Promise.reject('Newer upload failed.');
+      },
+    }));
+
+    render(
+      <SectionEditor
+        index={0}
+        section={uploadSection}
+        productType="DOWNLOAD"
+        productId="product-download"
+        onRemove={removeParentMock}
+        onChange={changeParentMock}
+      />,
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('file-uploader'));
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Newer upload failed');
+
+    await act(async () => {
+      completeOlderUpload?.();
+    });
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Newer upload failed');
   });
 
   it('allows re-uploading the same file after it has been removed', async () => {

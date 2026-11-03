@@ -44,6 +44,7 @@ describe('UppyFileUploader component', () => {
     mockUppyInstance = {
       use: jest.fn(),
       on: jest.fn(),
+      off: jest.fn(),
       getFiles: jest.fn(() => [{ data: { name: 'file1.mp4' } }]),
       // Add the destroy method to the mock instance
       destroy: jest.fn(),
@@ -137,9 +138,75 @@ describe('UppyFileUploader component', () => {
     )?.[1];
     expect(fileRemovedCallback).toBeDefined();
     // Simulate a file removal.
+    mockUppyInstance.getFiles.mockReturnValue([]);
     act(() => {
       fileRemovedCallback();
     });
-    expect(mockOnFilesChange).toHaveBeenCalledWith([{ name: 'file1.mp4' }]);
+    expect(mockOnFilesChange).toHaveBeenCalledWith([]);
+
+    const replacement = { name: 'replacement.mp4' };
+    mockUppyInstance.getFiles.mockReturnValue([{ data: replacement }]);
+    mockOnFilesChange.mockClear();
+    const fileAddedCallback = mockUppyInstance.on.mock.calls.find(
+      (call: any) => call[0] === 'file-added',
+    )?.[1];
+    act(() => fileAddedCallback());
+    expect(mockOnFilesChange).toHaveBeenCalledWith([replacement]);
+  });
+
+  it('keeps one Uppy instance across rerenders and calls the latest callback', () => {
+    const latestCallback = jest.fn();
+    const { rerender } = render(
+      <UppyFileUploader
+        allowedFileTypes={['video/*']}
+        uploadMode="SELECT_ONLY"
+        onFilesChange={mockOnFilesChange}
+      />,
+    );
+
+    rerender(
+      <UppyFileUploader
+        allowedFileTypes={['video/*']}
+        uploadMode="SELECT_ONLY"
+        onFilesChange={latestCallback}
+      />,
+    );
+
+    expect(Uppy).toHaveBeenCalledTimes(1);
+    expect(mockUppyInstance.destroy).not.toHaveBeenCalled();
+
+    const fileAddedCallback = mockUppyInstance.on.mock.calls.find(
+      (call: any) => call[0] === 'file-added',
+    )?.[1];
+    act(() => fileAddedCallback());
+
+    expect(mockOnFilesChange).not.toHaveBeenCalled();
+    expect(latestCallback).toHaveBeenCalledWith([{ name: 'file1.mp4' }]);
+  });
+
+  it('detaches selection listeners before destroying the instance on unmount', () => {
+    const { unmount } = render(
+      <UppyFileUploader
+        uploadMode="SELECT_ONLY"
+        onFilesChange={mockOnFilesChange}
+      />,
+    );
+    const fileRemovedCallback = mockUppyInstance.on.mock.calls.find(
+      (call: any) => call[0] === 'file-removed',
+    )?.[1];
+
+    unmount();
+
+    expect(mockUppyInstance.off).toHaveBeenCalledWith(
+      'file-added',
+      expect.any(Function),
+    );
+    expect(mockUppyInstance.off).toHaveBeenCalledWith(
+      'file-removed',
+      fileRemovedCallback,
+    );
+    expect(mockUppyInstance.destroy).toHaveBeenCalledTimes(1);
+    act(() => fileRemovedCallback());
+    expect(mockOnFilesChange).not.toHaveBeenCalled();
   });
 });

@@ -142,6 +142,43 @@ describe('<MembershipResourceEditor />', () => {
     });
   });
 
+  it('retains the selected resource through parent rerenders, validation correction, and save', () => {
+    const onSave = jest.fn();
+    const Harness = () => {
+      const [value, setValue] = React.useState<MembershipResourceDraft>({
+        ...draft,
+        title: '',
+        file: null,
+      });
+      return (
+        <MembershipResourceEditor
+          value={value}
+          onChange={setValue}
+          onSave={onSave}
+          onCancel={jest.fn()}
+        />
+      );
+    };
+    render(<Harness />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Select resource file' }));
+    expect(screen.getByText(/Selected file: member-resource\.pdf/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Description'), {
+      target: { value: 'Updated description' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(screen.getByText('Enter a resource title.')).toBeInTheDocument();
+    expect(screen.getByText(/Selected file: member-resource\.pdf/)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Title'), {
+      target: { value: 'Corrected title' },
+    });
+    expect(screen.queryByText('Enter a resource title.')).not.toBeInTheDocument();
+    expect(screen.getByText(/Selected file: member-resource\.pdf/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
   it('changing status preserves other values', () => {
     const { onChange } = renderEditor();
 
