@@ -87,7 +87,20 @@ const parseArticleContent = (content?: string): JSONContent | undefined => {
   }
 
   try {
-    return JSON.parse(content) as JSONContent;
+    const parsed: unknown = JSON.parse(content);
+    const nodes = new Set([
+      'doc', 'paragraph', 'text', 'heading', 'bulletList', 'orderedList', 'listItem',
+      'blockquote', 'codeBlock', 'hardBreak', 'horizontalRule', 'image', 'taskList', 'taskItem',
+    ]);
+    const marks = new Set(['bold', 'italic', 'strike', 'code', 'link', 'underline']);
+    const valid = (node: unknown): node is JSONContent => {
+      if (!node || typeof node !== 'object' || Array.isArray(node)) {return false;}
+      const value = node as JSONContent;
+      return Boolean(value.type && nodes.has(value.type) &&
+        (!value.content || (Array.isArray(value.content) && value.content.every(valid))) &&
+        (!value.marks || (Array.isArray(value.marks) && value.marks.every((mark) => marks.has(mark.type)))));
+    };
+    return valid(parsed) && parsed.type === 'doc' ? parsed : undefined;
   } catch {
     return {
       type: 'doc',
@@ -123,7 +136,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     'Course video asset persistence is backend-pending; this records the ' +
     'intended video lesson state without pretending the file is uploaded.';
 
-  const { isAutosaving, lastSavedAt } = useLessonAutosave({
+  const { isAutosaving, lastSavedAt, saveError, flush } = useLessonAutosave({
     lesson,
     productId,
     user,
@@ -133,7 +146,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
 
   const articleInitialContent = useMemo(
     () => parseArticleContent(lesson.content),
-    [lesson.id],
+    [lesson.id, lesson.content],
   );
 
   const updateLesson = (patch: Partial<CourseLesson>) => {
@@ -146,12 +159,13 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
     onChange(index, next);
   };
 
-  const handleDeleteLesson = () => {
+  const handleDeleteLesson = async () => {
     if (!lesson.id) {
       removeLessonFromList(index);
       return;
     }
 
+    try { await flush(); } catch { return; }
     dispatch(
       deleteCourseLesson({
         productId,
@@ -206,10 +220,12 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
       case 'ARTICLE':
         return (
           <div className="form-input-group">
-            <RichTextEditor
+            {lesson.content && !articleInitialContent ? (
+              <p role="alert">This Article format is unsupported. Its saved body has been preserved.</p>
+            ) : <RichTextEditor
               initialContent={articleInitialContent}
               onChange={handleArticleChange}
-            />
+            />}
           </div>
         );
 
@@ -242,7 +258,7 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
           {lesson.description && <span>{lesson.description}</span>}
         </div>
         <StatusBadge
-          label={isAutosaving ? 'Saving' : lastSavedAt ? 'Saved' : 'Draft'}
+          label={saveError ? 'Unsaved' : isAutosaving ? 'Saving' : lastSavedAt ? 'Saved' : 'Draft'}
           tone={isAutosaving ? 'info' : 'neutral'}
           size="sm"
         />
@@ -304,6 +320,9 @@ const LessonEditor: React.FC<LessonEditorProps> = ({
         </div>
       </div>
 
+      {saveError && <p role="alert">{saveError}
+        <Button type="button" onClick={() => { void flush().catch(() => undefined); }}>Retry lesson save</Button>
+      </p>}
       {operationError && (
         <p className="lesson-row__error" role="alert">
           {operationError}

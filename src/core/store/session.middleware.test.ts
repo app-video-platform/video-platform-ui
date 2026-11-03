@@ -5,6 +5,7 @@ import { createSessionMiddleware } from './session.middleware';
 import { logout, setUserProfile, signinUser, changeDevUserRole } from './auth-store/auth.slice';
 import { User, UserRole, CreatorDashboardSummary } from 'core/api/models';
 import { setupProductListeners } from './listeners/product-listeners';
+import { fetchMembershipAggregate } from './membership-store/membership.slice';
 
 const user = (id: string, role = UserRole.CREATOR) => ({ id, roles: [role], firstName: id } as User);
 const summary = (id: string) => ({ id } as unknown as CreatorDashboardSummary);
@@ -83,7 +84,13 @@ describe('account-owned Redux lifecycle', () => {
       'dashboard/fetchCreatorDashboardSummary']) {
       store.dispatch({ type: `${type}/fulfilled`, payload: { privateAccount: 'A' } });
     }
-    store.dispatch({ type: 'membership/fetchMembershipAggregate/fulfilled', payload: { productId: 'private membership' } });
+    store.dispatch(fetchMembershipAggregate.pending('membership-seed', 'private membership'));
+    store.dispatch(fetchMembershipAggregate.fulfilled({
+      productId: 'private membership',
+      config: { productId: 'private membership', orderingMode: 'NEWEST_FIRST' },
+      content: [], feed: [],
+    }, 'membership-seed', 'private membership'));
+    expect(store.getState().membership.requests?.['private membership'].status).toBe('loaded');
     store.dispatch({ type: 'reviews/getReviewsPage/fulfilled', payload: { items: [{ id: 'private review' }], page: 0, pageSize: 1 } });
     store.dispatch({ type: 'productLandingPage/updateCreatorProductLandingPageConfig/fulfilled', payload: { productId: 'draft' } });
     store.dispatch({ type: 'productLandingPage/fetchPublicProductLandingPageConfig/fulfilled', payload: { productId: 'public' } });

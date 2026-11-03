@@ -21,6 +21,7 @@ import { extractErrorMessage } from '@shared/utils';
 
 interface MembershipState {
   byProductId: Record<string, MembershipAggregate | undefined>;
+  requests?: Record<string, { requestId: string; status: 'loading' | 'loaded' | 'failed'; error: string | null }>;
   loading: boolean;
   error: string | null;
   saving: boolean;
@@ -29,6 +30,7 @@ interface MembershipState {
 
 const initialState: MembershipState = {
   byProductId: {},
+  requests: {},
   loading: false,
   error: null,
   saving: false,
@@ -158,17 +160,26 @@ const membershipSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchMembershipAggregate.pending, (state) => {
+      .addCase(fetchMembershipAggregate.pending, (state, action) => {
+        state.requests ??= {};
+        state.requests[action.meta.arg] = { requestId: action.meta.requestId, status: 'loading', error: null };
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchMembershipAggregate.fulfilled, (state, action) => {
-        state.loading = false;
-        state.byProductId[action.payload.productId] = action.payload;
+        const request = state.requests?.[action.meta.arg];
+        if (!request || request.requestId !== action.meta.requestId) {return;}
+        request.status = 'loaded';
+        state.loading = Object.values(state.requests ?? {}).some((entry) => entry.status === 'loading');
+        state.byProductId[action.meta.arg] = action.payload;
       })
       .addCase(fetchMembershipAggregate.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Membership could not load';
+        const request = state.requests?.[action.meta.arg];
+        if (!request || request.requestId !== action.meta.requestId) {return;}
+        request.status = 'failed';
+        request.error = action.payload || 'Membership could not load';
+        state.loading = Object.values(state.requests ?? {}).some((entry) => entry.status === 'loading');
+        state.error = request.error;
       })
       .addCase(updateMembershipConfig.pending, setSaving)
       .addCase(updateMembershipConfig.fulfilled, (state, action) => {
@@ -232,6 +243,9 @@ export const selectMembershipAggregateByProductId = (
   state: RootState,
   productId?: string,
 ) => (productId ? state.membership.byProductId[productId] ?? null : null);
+
+export const selectMembershipRequest = (state: RootState, productId?: string) =>
+  productId ? state.membership.requests?.[productId] : undefined;
 
 export const selectMembershipLoading = (state: RootState) =>
   state.membership.loading;

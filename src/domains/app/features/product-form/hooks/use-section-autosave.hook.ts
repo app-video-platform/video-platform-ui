@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { useState, useRef, useEffect } from 'react';
+import { useNestedAutosave } from './use-nested-autosave.hook';
 
 import { selectAuthUser } from 'core/store/auth-store';
 import { updateProductSection } from 'core/store/product-store';
@@ -13,78 +12,16 @@ interface UseSectionAutosaveParams {
   dispatch: AppDispatch;
 }
 
-const getAutosaveSnapshot = (section: SectionDraft): Partial<SectionDraft> => ({
-  id: section.id,
-  title: section.title,
-  description: section.description,
-  position: section.position,
-});
-
 export const useSectionAutosave = ({
   section,
   user,
   productId,
   dispatch,
 }: UseSectionAutosaveParams) => {
-  const [isAutosaving, setIsAutosaving] = useState(false);
-  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-  const lastSavedSnapshot = useRef<Partial<SectionDraft> | null>(null);
-
-  useEffect(() => {
-    if (!section.id) {
-      return;
-    }
-    if (!user || !user.id) {
-      return;
-    }
-
-    const currentSnapshot = getAutosaveSnapshot(section);
-
-    if (!lastSavedSnapshot.current) {
-      lastSavedSnapshot.current = currentSnapshot;
-      return;
-    }
-
-    const hasChanges =
-      JSON.stringify(currentSnapshot) !==
-      JSON.stringify(lastSavedSnapshot.current);
-
-    if (!hasChanges) {
-      return;
-    }
-
-    setIsAutosaving(true);
-
-    const timeoutId = window.setTimeout(() => {
-      try {
-        const updatedSection: ProductSectionUpdateRequest = {
-          productId,
-          sectionId: section.id ?? '',
-          title: section.title,
-          description: section.description,
-          position: section.position,
-        };
-
-        dispatch(updateProductSection(updatedSection))
-          .unwrap()
-          .then(() => {
-            lastSavedSnapshot.current = currentSnapshot;
-            setLastSavedAt(new Date());
-          })
-          .catch((error) => {
-            console.error('Autosave failed:', error);
-          })
-          .finally(() => {
-            setIsAutosaving(false);
-          });
-      } catch (e) {
-        console.error('Autosave mapping error:', e);
-        setIsAutosaving(false);
-      }
-    }, 2000);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [section, user, productId, dispatch]);
-
-  return { isAutosaving, lastSavedAt };
+  const snapshot: ProductSectionUpdateRequest = {
+    productId, sectionId: section.id ?? '', title: section.title,
+    description: section.description, position: section.position,
+  };
+  return useNestedAutosave(snapshot, Boolean(section.id && user?.id),
+    (value) => dispatch(updateProductSection(value)).unwrap());
 };

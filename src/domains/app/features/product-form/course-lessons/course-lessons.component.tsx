@@ -8,7 +8,6 @@ import { AppDispatch, CourseLesson, LessonCreate, LessonType } from 'core/api/mo
 import { selectAuthUser } from 'core/store/auth-store';
 import {
   createCourseLesson,
-  updateCourseLesson,
 } from 'core/store/product-store';
 import { getCssVar } from '@shared/utils';
 
@@ -63,7 +62,6 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
   const [draftType, setDraftType] = useState<LessonType>('VIDEO');
   const [createError, setCreateError] = useState<string | null>(null);
   const [isSavingCreate, setIsSavingCreate] = useState(false);
-  const [operationError, setOperationError] = useState<string | null>(null);
 
   const resetCreate = () => {
     setDraftTitle('');
@@ -122,25 +120,6 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
     onLessonsChange(normalizeLessonPositions(updated));
   };
 
-  const persistLessonPosition = (lesson: CourseLesson, position: number) => {
-    if (!lesson.id) {
-      return;
-    }
-
-    dispatch(
-      updateCourseLesson({
-        ...lesson,
-        productId,
-        sectionId,
-        position,
-      }),
-    )
-      .unwrap()
-      .catch(() => {
-        setOperationError('Could not save lesson order.');
-      });
-  };
-
   const handleMoveLesson = (index: number, direction: -1 | 1) => {
     const nextIndex = index + direction;
     if (nextIndex < 0 || nextIndex >= lessons.length) {
@@ -153,11 +132,7 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
     const normalized = normalizeLessonPositions(next);
 
     onLessonsChange(normalized);
-    persistLessonPosition(normalized[index], normalized[index].position ?? index + 1);
-    persistLessonPosition(
-      normalized[nextIndex],
-      normalized[nextIndex].position ?? nextIndex + 1,
-    );
+
   };
 
   return (
@@ -185,11 +160,7 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({
         )}
       </div>
 
-      {operationError && (
-        <p className="course-lessons__error" role="alert">
-          {operationError}
-        </p>
-      )}
+
 
       {lessons.length === 0 && !isCreating && (
         <div className="course-lessons__empty">

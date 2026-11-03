@@ -109,7 +109,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
   const [operationError, setOperationError] = useState<string | null>(null);
   const [isLocalDeleteOpen, setIsLocalDeleteOpen] = useState(false);
 
-  const { isAutosaving, lastSavedAt } = useSectionAutosave({
+  const { isAutosaving, lastSavedAt, saveError, flush } = useSectionAutosave({
     section,
     user,
     productId,
@@ -317,7 +317,7 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         <div className="content-group__meta">
           <StatusBadge
             label={
-              isAutosaving
+              saveError ? 'Unsaved' : isAutosaving
                 ? 'Saving'
                 : lastSavedAt
                   ? 'Saved'
@@ -406,6 +406,9 @@ const SectionEditor: React.FC<SectionEditorProps> = ({
         </div>
       )}
 
+      {saveError && <p role="alert">{saveError}
+        <Button type="button" onClick={() => { void flush().catch(() => undefined); }}>Retry section save</Button>
+      </p>}
       {operationError && (
         <p className="content-group__error" role="alert">
           {operationError}
