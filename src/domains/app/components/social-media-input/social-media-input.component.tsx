@@ -44,7 +44,10 @@ const options: Option[] = [
   { id: SocialPlatforms.TT, icon: FaTiktok, color: '#000000', title: 'Tiktok' },
 ];
 
-type ValuesById = Record<SocialPlatforms, string>;
+const currentLinkValue = (
+  links: SocialMediaLink[],
+  platform: SocialPlatforms,
+) => links.find((link) => link.platform === platform)?.url.trim() ?? '';
 
 interface SocialMediaInputProps {
   initialSocialLinks?: SocialMediaLink[];
@@ -63,13 +66,6 @@ const SocialMediaInput: React.FC<SocialMediaInputProps> = ({
   const [socialLinks, setSocialLinks] = useState<SocialMediaLink[]>(
     initialSocialLinks || [],
   );
-  const [initialValuesById, setInitialValuesById] = useState<ValuesById>({
-    [SocialPlatforms.FB]: '',
-    [SocialPlatforms.IG]: '',
-    [SocialPlatforms.TT]: '',
-    [SocialPlatforms.X]: '',
-    [SocialPlatforms.YT]: '',
-  });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -107,10 +103,6 @@ const SocialMediaInput: React.FC<SocialMediaInputProps> = ({
     if (initialSocialLinks && initialSocialLinks.length > 0) {
       initialSocialLinks.forEach((link) => {
         setCompleted((prev) => ({ ...prev, [link.platform]: true }));
-        setInitialValuesById((prev) => ({
-          ...prev,
-          [link.platform]: link.url,
-        }));
       });
     }
   }, [initialSocialLinks]);
@@ -120,41 +112,40 @@ const SocialMediaInput: React.FC<SocialMediaInputProps> = ({
   }, [socialLinks, onChange]);
 
   const handleAdd = (id: SocialPlatforms) => {
-    if (initialValuesById[id] !== inputValue.trim()) {
-      const link: SocialMediaLink = {
-        id: null,
-        platform: id,
-        url: inputValue,
-      };
-      if (socialLinks.length > 0) {
-        // const foundLink = socialLinks.find((link) => link.platform === id);
+    const normalizedValue = inputValue.trim();
+    const currentValue =
+      socialLinks.find((link) => link.platform === id)?.url.trim() ?? '';
+
+    if (currentValue !== normalizedValue) {
+      if (!normalizedValue) {
+        setSocialLinks((prev) => prev.filter((link) => link.platform !== id));
+        setCompleted((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        setRemoved((prev) => ({ ...prev, [id]: true }));
+      } else {
+        const link: SocialMediaLink = {
+          id: null,
+          platform: id,
+          url: normalizedValue,
+        };
         setSocialLinks((prev) => {
-          const idx = prev.findIndex((l) => l.platform === id);
-          if (idx !== -1) {
-            // We already have an entry for this platform → update its URL
-            return prev.map((l) =>
-              l.platform === link.platform ? { ...l, url: link.url } : l,
-            );
-          } else {
-            // No existing entry → append it
+          const index = prev.findIndex((entry) => entry.platform === id);
+          if (index < 0) {
             return [...prev, link];
           }
+          return prev.map((entry) =>
+            entry.platform === id ? { ...entry, url: normalizedValue } : entry,
+          );
         });
-      } else {
-        setSocialLinks([link]);
-      }
-
-      if (inputValue.trim()) {
         setCompleted((prev) => ({ ...prev, [id]: true }));
-      } else {
-        if (completed[id]) {
-          setCompleted((prev) => {
-            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            const { [id]: _, ...rest } = prev;
-            return rest;
-          });
-        }
-        setRemoved((prev) => ({ ...prev, [id]: true }));
+        setRemoved((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
       }
     }
 
@@ -237,19 +228,24 @@ const SocialMediaInput: React.FC<SocialMediaInputProps> = ({
                     onClick={() => handleAdd(opt.id)}
                     style={{
                       backgroundColor: inputValue.trim()
-                        ? '#28a745'
-                        : initialValuesById[opt.id] === inputValue.trim()
+                        ? currentLinkValue(socialLinks, opt.id) === inputValue.trim()
                           ? '#2865a7'
-                          : '#a72828ff',
+                          : '#28a745'
+                        : currentLinkValue(socialLinks, opt.id)
+                          ? '#a72828ff'
+                          : '#2865a7',
                     }}
                   >
-                    {inputValue.trim() && <Plus size={16} />}
-                    {!inputValue.trim() &&
-                      initialValuesById[opt.id] === inputValue.trim() && (
-                        <Minus size={16} />
+                    {inputValue.trim() &&
+                      currentLinkValue(socialLinks, opt.id) !== inputValue.trim() && (
+                        <Plus size={16} />
                       )}
-                    {initialValuesById[opt.id] !== inputValue.trim() &&
-                      !inputValue.trim() && <BadgeX size={16} />}
+                    {!inputValue.trim() && currentLinkValue(socialLinks, opt.id) && (
+                      <Minus size={16} />
+                    )}
+                    {!inputValue.trim() && !currentLinkValue(socialLinks, opt.id) && (
+                      <BadgeX size={16} />
+                    )}
                   </button>
                 </motion.div>
               )}

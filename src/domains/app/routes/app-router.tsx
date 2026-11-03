@@ -55,9 +55,9 @@ const RoleHome: React.FC = () => {
 
 const AppRouter: React.FC = () => (
   <Routes>
-    {/* Onboarding lives at root (same as your current setup) */}
+    {/* Legacy app-prefixed onboarding entry; canonical /onboarding is in App.tsx. */}
     <Route
-      path="/onboarding"
+      path="/app/onboarding"
       element={
         <ProtectedRoute
           allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}

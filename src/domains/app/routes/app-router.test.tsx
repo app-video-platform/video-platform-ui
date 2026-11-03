@@ -105,6 +105,14 @@ describe('AppRouter role routing', () => {
     expect(screen.getByText('User home')).toBeInTheDocument();
   });
 
+  it.each([UserRole.CREATOR, UserRole.USER, UserRole.ADMIN])(
+    'preserves the app-prefixed onboarding entry for %s',
+    (role) => {
+      renderRouter([role], '/app/onboarding');
+      expect(screen.getByText('Onboarding')).toBeInTheDocument();
+    },
+  );
+
   it('renders admin user management for admins', () => {
     renderRouter([UserRole.ADMIN], '/admin/users');
 

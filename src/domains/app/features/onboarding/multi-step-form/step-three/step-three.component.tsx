@@ -29,23 +29,19 @@ const StepThree: React.FC = () => {
           const hasError = !!fieldState.error;
           return (
             <>
-              <label className="onboarding-input-label">Bio</label>
               <Textarea
+                label="Bio"
                 placeholder="Something about you"
                 value={field.value}
                 onChange={field.onChange}
                 name={field.name}
                 isMaxLengthShown={true}
                 maxLength={250}
+                error={fieldState.error?.message}
                 className={`form-input onboarding-form-input onboarding-form-input__bio${
                   hasError ? ' onboarding-form-input__error' : ''
                 }`}
               />
-              {fieldState.error && (
-                <p className="form-field-error error-text-red">
-                  {fieldState.error.message}
-                </p>
-              )}
             </>
           );
         }}
@@ -68,10 +64,8 @@ const StepThree: React.FC = () => {
           const hasError = !!fieldState.error;
           return (
             <>
-              <label className="onboarding-input-label">
-                Tagline / Mission
-              </label>
               <Input
+                label="Tagline / Mission"
                 className={`form-input onboarding-form-input${
                   hasError ? ' onboarding-form-input__error' : ''
                 }`}
@@ -82,12 +76,8 @@ const StepThree: React.FC = () => {
                 name={field.name}
                 isMaxLengthShown={true}
                 maxLength={120}
+                error={fieldState.error?.message}
               />
-              {fieldState.error && (
-                <p className="form-field-error error-text-red">
-                  {fieldState.error.message}
-                </p>
-              )}
             </>
           );
         }}

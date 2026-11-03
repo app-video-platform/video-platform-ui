@@ -93,6 +93,7 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
           return (
             <>
               <Input
+                label="Website"
                 className={`form-input onboarding-form-input${
                   hasError ? ' onboarding-form-input__error' : ''
                 }`}
@@ -101,12 +102,8 @@ const StepFour: React.FC<StepFourProps> = ({ onSocialMediaChange }) => {
                 value={field.value}
                 onChange={field.onChange}
                 name={field.name}
+                error={fieldState.error?.message}
               />
-              {fieldState.error && (
-                <p className="form-field-error error-text-red">
-                  {fieldState.error.message}
-                </p>
-              )}
             </>
           );
         }}
