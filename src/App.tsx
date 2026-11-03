@@ -4,8 +4,10 @@ import { Toaster } from 'sonner';
 
 import RoutesDev from './devtools/__routes-dev';
 import { DevDashboard, NotFoundPage, UnauthorizedPage } from '@shared/pages';
-import { AppInitializer } from 'core/providers';
+import { AppInitializer, ProtectedRoute } from 'core/providers';
+import { UserRole } from '@core/api';
 import { AppRouter } from '@domains/app/routes';
+import { Onboarding } from '@domains/app/pages';
 import { AuthRouter } from '@domains/auth/routes';
 import { MarketingRouter } from '@domains/marketing/routes';
 
@@ -25,8 +27,17 @@ const App = () => (
     <Routes>
       {/* App domain */}
       <Route path="/app/*" element={<AppRouter />} />
-      {/* Onboarding (root) is defined inside AppRouter as absolute /onboarding */}
-      <Route path="/onboarding" element={<AppRouter />} />
+      {/* Keep the canonical onboarding URL outside AppRouter's role-home layout. */}
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute
+            allowedRoles={[UserRole.ADMIN, UserRole.CREATOR, UserRole.USER]}
+          >
+            <Onboarding />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Auth domain */}
       <Route path="/auth/*" element={<AuthRouter />} />

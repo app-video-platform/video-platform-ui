@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ import {
   SocialMediaLink,
   UpdateUserRequest,
   AppDispatch,
+  RootState,
 } from 'core/api/models';
 import { selectAuthUser, updateUserDetails } from 'core/store/auth-store';
 
@@ -36,8 +37,23 @@ const MultiStepForm: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
+  const sessionVersion = useSelector(
+    (state: RootState) => state.auth.sessionVersion ?? 0,
+  );
   const [step, setStep] = useState(1);
   const [socialLinks, setSocialLinks] = useState<SocialMediaLink[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+  const savingRef = useRef(false);
+  const stepRef = useRef(step);
+  const sessionVersionRef = useRef(sessionVersion);
+  const userIdRef = useRef(user?.id);
+  const pendingSaveRef = useRef<UpdateUserRequest | null>(null);
+
+  stepRef.current = step;
+  sessionVersionRef.current = sessionVersion;
+  userIdRef.current = user?.id;
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
@@ -57,6 +73,13 @@ const MultiStepForm: React.FC = () => {
   });
 
   useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     if (user) {
       methods.reset({
         title: user.title,
@@ -71,27 +94,90 @@ const MultiStepForm: React.FC = () => {
     }
   }, [user, methods]);
 
-  const onStepValid = (data: MultiStepFormData) => {
-    if (step === 1) {
-      nextStep();
+  const persistStep = async (userDetails: UpdateUserRequest) => {
+    if (savingRef.current) {
       return;
     }
 
-    const userDetails: UpdateUserRequest = {
-      userId: user!.id!,
+    const saveOwner = {
+      step: stepRef.current,
+      sessionVersion: sessionVersionRef.current,
+      userId: userIdRef.current,
+    };
+    savingRef.current = true;
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      await dispatch(updateUserDetails(userDetails)).unwrap();
+      if (
+        mountedRef.current &&
+        stepRef.current === saveOwner.step &&
+        sessionVersionRef.current === saveOwner.sessionVersion &&
+        userIdRef.current === saveOwner.userId
+      ) {
+        pendingSaveRef.current = null;
+        nextStep();
+      }
+    } catch {
+      if (
+        mountedRef.current &&
+        stepRef.current === saveOwner.step &&
+        sessionVersionRef.current === saveOwner.sessionVersion &&
+        userIdRef.current === saveOwner.userId
+      ) {
+        pendingSaveRef.current = userDetails;
+        setSaveError(
+          'We could not save your profile changes. Your answers are still here; retry to continue.',
+        );
+      }
+    } finally {
+      savingRef.current = false;
+      if (mountedRef.current) {
+        setIsSaving(false);
+      }
+    }
+  };
+
+  const buildUserDetails = (data: MultiStepFormData): UpdateUserRequest | null => {
+    if (!user?.id) {
+      return null;
+    }
+
+    return {
+      userId: user.id,
       title: data.title,
       bio: data.bio,
       website: data.website,
       city: data.city,
       country: data.country,
       taglineMission: data.tagline,
-      socialLinks: socialLinks,
+      socialLinks,
     };
+  };
 
-    console.log('[UPDATE USER DETAILS] userDetails', userDetails);
-    // Save partial data to Redux or back-end
-    dispatch(updateUserDetails(userDetails));
-    nextStep();
+  const onStepValid = async (data: MultiStepFormData) => {
+    if (step === 1) {
+      nextStep();
+      return;
+    }
+
+    const userDetails = buildUserDetails(data);
+    if (!userDetails) {
+      setSaveError('Your profile is unavailable. Please retry after reconnecting.');
+      return;
+    }
+
+    pendingSaveRef.current = userDetails;
+    await persistStep(userDetails);
+  };
+
+  const retrySave = () => {
+    const latestValues = buildUserDetails(methods.getValues());
+    if (latestValues) {
+      pendingSaveRef.current = latestValues;
+      void persistStep(latestValues);
+    }
   };
 
   return (
@@ -141,16 +227,17 @@ const MultiStepForm: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="step-action-buttons">
+        <div className="step-action-buttons" aria-busy={isSaving}>
           <Button
             type="button"
             variant="neutral"
+            disabled={isSaving || !!saveError}
             onClick={() => navigate('/app')}
           >
             Skip
           </Button>
           {step !== 1 && (
-            <Button type="button" variant="primary" onClick={prevStep}>
+            <Button type="button" variant="primary" disabled={isSaving || !!saveError} onClick={prevStep}>
               Back
             </Button>
           )}
@@ -158,7 +245,14 @@ const MultiStepForm: React.FC = () => {
             <Button
               type="button"
               variant="primary"
-              onClick={methods.handleSubmit(onStepValid)}
+              disabled={isSaving}
+              onClick={() => {
+                if (step === 1) {
+                  nextStep();
+                  return;
+                }
+                void methods.handleSubmit(onStepValid)();
+              }}
             >
               Next
             </Button>
@@ -174,6 +268,15 @@ const MultiStepForm: React.FC = () => {
             </Button>
           )}
         </div>
+        {isSaving && <p role="status">Saving profile changes…</p>}
+        {saveError && (
+          <div role="alert" className="onboarding-save-error">
+            <p>{saveError}</p>
+            <Button type="button" variant="primary" disabled={isSaving} onClick={retrySave}>
+              {isSaving ? 'Saving…' : 'Retry save'}
+            </Button>
+          </div>
+        )}
       </FormProvider>
     </div>
   );

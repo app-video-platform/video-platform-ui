@@ -28,8 +28,8 @@ const StepTwo: React.FC = () => {
           const hasError = !!fieldState.error;
           return (
             <>
-              <label className="onboarding-input-label">Title</label>
               <Input
+                label="Title"
                 type="text"
                 value={field.value}
                 onChange={field.onChange}
@@ -38,20 +38,13 @@ const StepTwo: React.FC = () => {
                   hasError ? ' onboarding-form-input__error' : ''
                 }`}
                 placeholder="E.g. Teacher, Creator, etc."
-                aria-describedby={
-                  fieldState.error ? `${field.name}-error` : undefined
-                }
+                error={fieldState.error?.message}
                 onBlur={(e: { target: { value: string } }) =>
                   field.onChange(e.target.value.trim())
                 }
                 isMaxLengthShown={true}
                 maxLength={50}
               />
-              {fieldState.error && (
-                <p className="form-field-error error-text-red">
-                  {fieldState.error.message}
-                </p>
-              )}
             </>
           );
         }}

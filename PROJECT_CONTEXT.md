@@ -106,6 +106,14 @@ the requested URL rather than redirecting away from it. Browser-cookie/server ro
 races still require backend session enforcement; cancellation does not revoke a server
 operation that has already committed.
 
+## Onboarding route and persistence lifecycle
+
+- The canonical onboarding URL is the top-level `/onboarding` route in `src/App.tsx`. It mounts `Onboarding` through `ProtectedRoute` for the existing User, Creator, and Admin roles, outside `AppRouter`'s role-home layout. Keep `/app/onboarding` as the existing protected app-prefixed entry.
+- `Onboarding` retains the existing completed-profile redirect behavior. Incomplete profiles use the shared `MultiStepForm`; each profile step awaits `updateUserDetails(...).unwrap()` before advancing.
+- Profile mutation loading does not gate an already-authorized route. Preserve the wizard instance while the profile request runs; the M1 protected-route lifecycle also removes it at authentication or account boundaries.
+- A rejected profile update keeps the active step and React Hook Form values, shows a retryable error, and blocks normal wizard navigation until the user retries. Late completions are owned by the starting step, session version, and user ID.
+- Onboarding fields use the shared `Input` and `Textarea` `label`/`error` props so IDs, `aria-invalid`, and `aria-describedby` remain aligned. Social-link updates compare against current editor state. Location selection only updates profile form values after valid coordinates and a successful, complete Nominatim reverse-geocode response; a prior valid selection remains in the form when a later lookup fails.
+
 ## Authenticated Creator Management Architecture
 
 Creator/Admin management routes are visually and structurally separated from buyer/marketplace routes in `src/domains/app/pages/app-layout/app-layout.component.tsx`.

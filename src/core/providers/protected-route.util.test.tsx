@@ -60,6 +60,16 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Allowed content')).toBeInTheDocument();
   });
 
+  it('keeps the authorized child mounted while a profile mutation is loading', () => {
+    renderProtectedRoute({
+      isUserLoggedIn: true,
+      loading: true,
+      user: { roles: [UserRole.CREATOR] },
+    });
+
+    expect(screen.getByText('Allowed content')).toBeInTheDocument();
+  });
+
   it('redirects authenticated users without the required role to unauthorized', () => {
     renderProtectedRoute({
       isUserLoggedIn: true,
