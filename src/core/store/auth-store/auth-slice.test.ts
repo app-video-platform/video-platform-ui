@@ -7,6 +7,7 @@ import authReducer, {
   verifyEmail,
   signinUser,
   changeDevUserRole,
+  updateUserDetails,
 } from './auth.slice';
 
 // Define an initial state matching your AuthState interface
@@ -48,6 +49,29 @@ describe('auth slice reducers', () => {
 });
 
 describe('auth slice async thunks', () => {
+  it('keeps only the newest profile mutation result and leaves auth errors independent', () => {
+    const user = {
+      id: 'u1', firstName: 'New', lastName: 'Name', email: 'u@example.test',
+      roles: [UserRole.CREATOR],
+    } as User;
+    const pending1 = updateUserDetails.pending('r1', { firstName: 'First' });
+    const pending2 = updateUserDetails.pending('r2', { firstName: 'Newest' });
+    let state = authReducer({
+      ...initialState,
+      user: { ...user, firstName: 'Old' },
+      sessionStatus: 'authenticated',
+      error: 'Unrelated authentication error',
+    }, pending1);
+    state = authReducer(state, pending2);
+    state = authReducer(state, updateUserDetails.fulfilled(user, 'r1', { firstName: 'First' }));
+    expect(state.user?.firstName).toBe('Old');
+    state = authReducer(state, updateUserDetails.rejected(null, 'r1', { firstName: 'First' }, 'stale failure'));
+    expect(state.profileUpdateError).toBeNull();
+    state = authReducer(state, updateUserDetails.fulfilled(user, 'r2', { firstName: 'Newest' }));
+    expect(state.user?.firstName).toBe('New');
+    expect(state.profileUpdateLoading).toBe(false);
+    expect(state.error).toBe('Unrelated authentication error');
+  });
   // Simulate the fulfilled state for signupUser
   it('should handle signupUser.fulfilled', () => {
     const action = {

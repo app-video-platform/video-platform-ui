@@ -12,7 +12,7 @@ export const getAllCalendarProvidersAPI = async () => {
     );
     return response.data.providers;
   } catch (error) {
-    console.error('Error getting all calendar providers:', error);
+    console.error('Calendar providers request failed.');
     throw error;
   }
 };
@@ -28,7 +28,7 @@ export const connectCalendarAPI = async (payload: ConnectInitRequest) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error connecting calendar:', error);
+    console.error('Calendar connection initialization failed.');
     throw error;
   }
 };

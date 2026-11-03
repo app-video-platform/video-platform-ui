@@ -2,8 +2,8 @@
 
 Generated from repository state:
 
-Branch: codex/m8-request-freshness-async-feedback
-Base commit: 796ceff
+Branch: codex/m9-profile-validation-save-feedback
+Base commit: ee826e5
 
 Last reviewed: 2026-11-03
 
@@ -113,6 +113,30 @@ against the session version and discards old-session fulfillments **and rejectio
 before reducers/listeners run. New account-owned thunk namespaces must be included in
 its scoped-prefix list. This prevents late responses from repopulating cleared state or
 creating notifications. It does not replace per-feature query/entity freshness handling.
+
+## Profile settings and save feedback
+
+`updateUserDetails` uses the existing `PUT api/user/userInfo` contract for supported
+User fields. Profile mutations have their own request ID, loading flag, and error in
+the Auth slice; they do not share the session/profile-resolution loading or generic
+authentication error. The reducer accepts only the current profile-mutation result,
+while session transitions clear its ownership. Settings Profile and Storefront inline
+editors use this operation and must show success only after its fulfilled response.
+
+Settings Profile validates Bio (30–250 characters), Tagline/Mission (10–120), and
+Website before dispatch, and submits supported identity/contact/social fields through
+the existing API. Profile image upload/removal and phone editing are not supported by
+the current persistence contract and remain unavailable. The Settings Subscription,
+Privacy, and Notification fields are local validation placeholders only; do not imply
+that they persist account preferences or configure those services.
+
+Landing Page save errors are handled at the component's `.unwrap()` boundary. Permission
+and missing-resource failures receive safe distinct messages; transient/network failures
+remain retryable, and the local draft stays intact. Calendar connection initialization
+is distinct from OAuth consent and calendar synchronization: only a valid HTTPS
+authorization URL returned by the existing backend contract may be opened. Never expose
+authorization response details in UI or logs, and automated tests must use synthetic
+URLs and stub `window.open`.
 
 The existing Axios client coordinates one cookie-based refresh promise per instance.
 A successful text response settles waiters without generating Bearer headers; each
@@ -888,6 +912,7 @@ Avoid hardcoding viewport-specific pixel values into this document; inspect the 
 
 Recent Git history includes admin role/product ownership work, Membership frontend work, and the authenticated Creator redesign:
 
+- M9 Settings Profile persistence/validation, independent profile-mutation state, safe Landing Page save feedback, Calendar initialization errors, and local-only placeholder validation.
 - Admin role management UI and role-based routing.
 - Dev role switcher/backend role change support.
 - Admin product management and create-for-creator flow using `ownerId` query param.

@@ -207,6 +207,36 @@ describe('CreatorStorefrontPage', () => {
     expect(mock.history.patch).toHaveLength(0);
   });
 
+  it('clears a failed profile save after a successful Storefront retry', async () => {
+    mock.onPut('api/user/userInfo').reply((request) => {
+      const payload = JSON.parse(request.data ?? '{}');
+      if (payload.title?.length > 100) {
+        return [400, { message: 'Title is too long' }];
+      }
+      return [200, {
+        id: 'creator-1', firstName: 'Maya', lastName: 'Rivera',
+        email: 'maya@example.test', roles: [UserRole.CREATOR], ...payload,
+      }];
+    });
+    renderManagement();
+
+    await screen.findAllByText('Creator Launch Studio');
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Title' }));
+    const title = screen.getByRole('textbox', { name: 'Title' });
+    fireEvent.change(title, { target: { value: 'x'.repeat(101) } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByText('Unable to save title.')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Title' }), {
+      target: { value: 'A valid title' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(mock.history.put).toHaveLength(2));
+    expect(await screen.findByText('A valid title')).toBeInTheDocument();
+    expect(screen.queryByText('Unable to save title.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Title is too long')).not.toBeInTheDocument();
+  });
+
   it('keeps Storefront management creator-only', () => {
     renderManagement([UserRole.USER]);
 

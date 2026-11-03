@@ -179,6 +179,23 @@ describe('<ProductLandingPageBuilder />', () => {
     expect(payload.sectionOrder).toEqual(['ABOUT', 'CREATOR', 'CONTENTS']);
   });
 
+  it('contains a permission rejection, retains the draft, and shows no success state', async () => {
+    mock.onPatch('api/creator/products/course-1/landing-page').reply(403, {
+      message: 'sensitive backend details',
+    });
+    renderBuilder();
+
+    const textarea = await screen.findByDisplayValue('Persisted public marketing copy.');
+    fireEvent.change(textarea, { target: { value: 'Unsaved owner draft.' } });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled());
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/do not have permission/i);
+    expect(screen.getByRole('textbox')).toHaveValue('Unsaved owner draft.');
+    expect(screen.queryByText('Landing page saved.')).not.toBeInTheDocument();
+    expect(mock.history.patch).toHaveLength(1);
+  });
+
   it('resets local changes to the last persisted config', async () => {
     renderBuilder();
 

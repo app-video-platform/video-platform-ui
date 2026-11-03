@@ -35,8 +35,7 @@ import {
   UserRole,
 } from 'core/api/models';
 import {
-  selectAuthError,
-  selectAuthLoading,
+  selectProfileUpdateLoading,
   selectAuthUser,
   updateUserDetails,
 } from 'core/store/auth-store';
@@ -242,8 +241,7 @@ const InlineProfileEditor: React.FC<InlineProfileEditorProps> = ({
 const CreatorStorefrontPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector(selectAuthUser);
-  const authLoading = useSelector(selectAuthLoading);
-  const authError = useSelector(selectAuthError);
+  const authLoading = useSelector(selectProfileUpdateLoading);
   const summaries = useSelector(selectProductSummaries);
   const productsLoading = useSelector(selectProductsLoading);
   const productsError = useSelector(selectProductsError);
@@ -610,13 +608,13 @@ const CreatorStorefrontPage: React.FC = () => {
         </section>
       )}
 
-      {(productsError || configError || configSaveError || authError) && (
+      {(productsError || configError || configSaveError) && (
         <section
           className="storefront-management__notice storefront-management__notice--error"
           role="alert"
         >
           <h2>Unable to load or save Storefront data</h2>
-          <p>{productsError || configError || configSaveError || authError}</p>
+          <p>{productsError || configError || configSaveError}</p>
         </section>
       )}
 
