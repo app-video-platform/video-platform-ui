@@ -12,8 +12,9 @@ import {
   clearCurrentProduct,
   getProductById,
   selectCurrentProduct,
-  selectProductsError,
-  selectProductsLoading,
+  selectProductDetailError,
+  selectProductDetailLoading,
+  selectProductDetailId,
 } from 'core/store/product-store';
 import { PRODUCT_TYPE_REGISTRY } from 'core/constants';
 import { Button, Icon, StatusBadge, StatusBadgeTone } from '@shared/ui';
@@ -323,8 +324,9 @@ const ProductOverview: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const product = useSelector(selectCurrentProduct);
-  const loading = useSelector(selectProductsLoading);
-  const error = useSelector(selectProductsError);
+  const requestedProductId = useSelector(selectProductDetailId);
+  const loading = useSelector(selectProductDetailLoading) || Boolean(productId && requestedProductId !== productId);
+  const error = useSelector(selectProductDetailError);
 
   useEffect(() => {
     dispatch(clearCurrentProduct());
@@ -332,6 +334,7 @@ const ProductOverview: React.FC = () => {
     if (productId) {
       dispatch(getProductById({ productId }));
     }
+    return () => { dispatch(clearCurrentProduct()); };
   }, [dispatch, productId]);
 
   const loadedProduct = product?.id === productId ? product : null;
@@ -384,7 +387,7 @@ const ProductOverview: React.FC = () => {
           <Icon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
           <span>Products</span>
         </Button>
-        <div className="product-overview-state product-overview-state--loading" role="status">
+        <div className="product-overview-state product-overview-state--loading" role="status" aria-label="Loading product">
           <div className="product-overview-skeleton product-overview-skeleton--hero" />
           <div className="product-overview-skeleton" />
           <div className="product-overview-skeleton" />

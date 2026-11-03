@@ -34,3 +34,10 @@ export const selectTopThreeProducts = createSelector(
       .slice(0, 3);
   },
 );
+
+// Detail requests are independent of list/mutation loading and errors.
+export const selectProductDetailLoading = (state: RootState) =>
+  state.products.detailLoading ?? state.products.loading;
+export const selectProductDetailError = (state: RootState) =>
+  state.products.detailError === undefined ? state.products.error : state.products.detailError;
+export const selectProductDetailId = (state: RootState) => state.products.detailProductId;

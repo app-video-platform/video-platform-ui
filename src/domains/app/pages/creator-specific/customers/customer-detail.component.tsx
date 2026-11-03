@@ -4,11 +4,14 @@ import clsx from 'clsx';
 import { HiArrowLeft } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Icon } from '@shared/ui';
+import { Button, Icon } from '@shared/ui';
 import { getCssVar } from '@shared/utils';
 import { AppDispatch } from 'core/api/models';
 import {
+  clearCurrentCustomer,
   fetchCreatorCustomerDetail,
+  selectCreatorCustomerDetailStatus,
+  selectCreatorCustomerDetailId,
   selectCreatorCustomerDetailError,
   selectCreatorCustomerDetailLoading,
   selectCurrentCreatorCustomer,
@@ -42,18 +45,23 @@ const tabs: Array<{ id: CustomerDetailTab; label: string }> = [
 const CustomerDetail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { customerId } = useParams();
-  const customer = useSelector(selectCurrentCreatorCustomer);
+  const storedCustomer = useSelector(selectCurrentCreatorCustomer);
+  const customer = storedCustomer?.id === customerId ? storedCustomer : null;
+  const status = useSelector(selectCreatorCustomerDetailStatus);
+  const requestCustomerId = useSelector(selectCreatorCustomerDetailId);
   const loading = useSelector(selectCreatorCustomerDetailLoading);
   const error = useSelector(selectCreatorCustomerDetailError);
   const [activeTab, setActiveTab] = useState<CustomerDetailTab>('overview');
 
   useEffect(() => {
+    setActiveTab('overview');
     if (customerId) {
       dispatch(fetchCreatorCustomerDetail(customerId));
     }
+    return () => { dispatch(clearCurrentCustomer()); };
   }, [customerId, dispatch]);
 
-  if (loading && !customer) {
+  if (customerId && (loading || (requestCustomerId !== customerId && !customer))) {
     return (
       <div className="customer-detail-page">
         <Link to="/app/customers" className="customer-detail-back">
@@ -74,12 +82,10 @@ const CustomerDetail: React.FC = () => {
           <Icon icon={HiArrowLeft} size={18} color={getCssVar('--brand-primary')} />
           Back to Customers
         </Link>
-        <div className="customers-state" role="status">
-          <h2>Customer profile data is not available yet</h2>
-          <p>
-            Customer details will appear once customer, purchase, access, and notes
-            APIs are connected.
-          </p>
+        <div className="customers-state" role="alert">
+          <h2>{status === 404 ? 'Customer not found' : 'Customer details could not be loaded'}</h2>
+          <p>{status === 404 ? 'This customer is not available.' : 'Please try again.'}</p>
+          <Button type="button" onClick={() => customerId && dispatch(fetchCreatorCustomerDetail(customerId))}>Retry</Button>
         </div>
       </div>
     );

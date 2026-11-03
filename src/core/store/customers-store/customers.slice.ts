@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import {
@@ -17,6 +18,9 @@ interface CustomersState {
   listLoading: boolean;
   listError: string | null;
   currentCustomer: CreatorCustomerDetail | null;
+  detailRequestId?: string;
+  detailCustomerId?: string;
+  detailStatus?: number;
   detailLoading: boolean;
   detailError: string | null;
 }
@@ -48,12 +52,12 @@ export const fetchCreatorCustomersPage = createAsyncThunk<
 export const fetchCreatorCustomerDetail = createAsyncThunk<
   CreatorCustomerDetail,
   string,
-  { rejectValue: string }
+  { rejectValue: string | { message: string; status?: number } }
 >('customers/fetchCreatorCustomerDetail', async (customerId, { rejectWithValue }) => {
   try {
     return await getCreatorCustomerDetailAPI(customerId);
   } catch (error: unknown) {
-    return rejectWithValue(extractErrorMessage(error));
+    return rejectWithValue({ message: 'Customer details could not be loaded.', status: isAxiosError(error) ? error.response?.status : undefined });
   }
 });
 
@@ -62,6 +66,10 @@ const customersSlice = createSlice({
   initialState,
   reducers: {
     clearCurrentCustomer(state) {
+      state.detailRequestId = undefined;
+      state.detailCustomerId = undefined;
+      state.detailStatus = undefined;
+      state.detailLoading = false;
       state.currentCustomer = null;
       state.detailError = null;
     },
@@ -84,20 +92,29 @@ const customersSlice = createSlice({
         state.listError = action.payload ?? 'Failed to load customers';
         state.customersPage = null;
       })
-      .addCase(fetchCreatorCustomerDetail.pending, (state) => {
+      .addCase(fetchCreatorCustomerDetail.pending, (state, action) => {
+        state.detailRequestId = action.meta.requestId;
+        state.detailCustomerId = action.meta.arg;
+        state.detailStatus = undefined;
+        state.currentCustomer = null;
         state.detailLoading = true;
         state.detailError = null;
       })
       .addCase(
         fetchCreatorCustomerDetail.fulfilled,
-        (state, action: PayloadAction<CreatorCustomerDetail>) => {
+        (state, action) => {
+          if (!state.detailRequestId || state.detailRequestId !== action.meta?.requestId || state.detailCustomerId !== action.meta.arg) {return;}
+          state.detailRequestId = undefined;
           state.detailLoading = false;
           state.currentCustomer = action.payload;
         },
       )
       .addCase(fetchCreatorCustomerDetail.rejected, (state, action) => {
+        if (!state.detailRequestId || state.detailRequestId !== action.meta?.requestId || state.detailCustomerId !== action.meta.arg) {return;}
+        state.detailRequestId = undefined;
+        state.detailStatus = typeof action.payload === 'object' ? action.payload.status : undefined;
         state.detailLoading = false;
-        state.detailError = action.payload ?? 'Failed to load customer';
+        state.detailError = 'Customer details could not be loaded.';
         state.currentCustomer = null;
       });
   },
@@ -123,3 +140,6 @@ export const selectCreatorCustomerDetailError = (state: RootState) =>
   state.customers.detailError;
 
 export default customersSlice.reducer;
+
+export const selectCreatorCustomerDetailStatus = (state: RootState) => state.customers.detailStatus;
+export const selectCreatorCustomerDetailId = (state: RootState) => state.customers.detailCustomerId;

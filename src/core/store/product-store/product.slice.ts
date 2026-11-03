@@ -47,6 +47,10 @@ interface ProductState {
   products: null | AbstractProduct[];
   productSummaries: null | ProductMinimised[];
   currentProduct: AbstractProduct | null;
+  detailRequestId?: string;
+  detailProductId?: string;
+  detailLoading?: boolean;
+  detailError?: string | null;
   loading: boolean;
   error: string | null;
 }
@@ -60,6 +64,8 @@ export type ProductUpdateErrorPayload = string | ProductReadinessErrorPayload;
 
 const initialState: ProductState = {
   products: null,
+  detailLoading: false,
+  detailError: null,
   productSummaries: null,
   currentProduct: null,
   loading: false,
@@ -477,6 +483,10 @@ const productsSlice = createSlice({
   initialState,
   reducers: {
     clearCurrentProduct(state) {
+      state.detailRequestId = undefined;
+      state.detailProductId = undefined;
+      state.detailLoading = false;
+      state.detailError = null;
       state.currentProduct = null;
       state.error = null;
     },
@@ -1008,21 +1018,31 @@ const productsSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      .addCase(getProductById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(getProductById.pending, (state, action) => {
+        state.detailRequestId = action.meta.requestId;
+        state.detailProductId = action.meta.arg.productId;
+        state.detailLoading = true;
+        state.detailError = null;
+        state.currentProduct = null;
       })
       .addCase(
         getProductById.fulfilled,
-        (state, action: PayloadAction<AbstractProduct>) => {
-          state.loading = false;
-          state.error = null;
+        (state, action) => {
+          if (!state.detailRequestId || state.detailRequestId !== action.meta?.requestId ||
+            state.detailProductId !== action.meta.arg.productId) {return;}
+          state.detailRequestId = undefined;
+          state.detailLoading = false;
+          state.detailError = null;
           state.currentProduct = action.payload;
         },
       )
       .addCase(getProductById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
+        if (!state.detailRequestId || state.detailRequestId !== action.meta?.requestId ||
+            state.detailProductId !== action.meta.arg.productId) {return;}
+        state.detailRequestId = undefined;
+        state.detailLoading = false;
+        state.detailError = action.payload ?? 'Could not load product';
+        state.currentProduct = null;
       });
   },
 });

@@ -2,8 +2,8 @@
 
 Generated from repository state:
 
-Branch: codex/m7-course-content-integrity
-Base commit: fbc0145
+Branch: codex/m8-request-freshness-async-feedback
+Base commit: 796ceff
 
 Last reviewed: 2026-11-03
 
@@ -143,6 +143,47 @@ provide the cookie token for other mutations but must preserve an explicit token
 registration request; bootstrap failures are surfaced without logging Axios request
 configuration or token material. The frontend integration does not imply that the
 backend route is deployed in every environment.
+
+## Active read request ownership (M8)
+
+Product, Creator Customer, and Creator Order detail reads use Redux Toolkit's
+`meta.requestId` together with the requested entity ID. Pending clears the prior
+detail and its error; only the currently owned request may fulfill or reject.
+The ID guard also distinguishes duplicate requests and A → B → A navigation.
+Settling a request releases its request ID while retaining the target ID for
+route/status matching. Clearing a detail invalidates pending ownership and
+clears its loading/error state. Overview, Customer detail, and the Sales
+selection effect perform this cleanup on selection change/unmount.
+
+Product detail loading/error selectors are separate from Product list/mutation
+loading/error. All Product detail consumers use the detail channel for their
+read status; Product workspace mutations continue to use their existing state
+and local save feedback. Customer and Sales already have separate list/detail
+channels. Route/selection guards prevent presenting another entity under the
+current URL, including the render before the next request effect runs.
+
+Admin Product and Audit reads have independent request IDs, query keys,
+loading, and errors. Each page compares its complete query (filters, page, and
+size) with the stored query key before presenting rows or errors. Changing a
+filter resets page to zero, pending paging is disabled, and empty results are
+distinct from loading/failure. Admin Product deletion refreshes the latest
+query at completion. Existing API serialization, including filter casing, is
+preserved. Product and Audit requests do not mutate the legacy Admin status used
+by Users/role operations, so independent Admin views cannot end one another's
+loading or error state.
+
+The selected Sales Order URL parameter keeps its drawer open through loading
+and failure; retry reissues that selection. Closing removes the selection and
+invalidates pending detail ownership. Customer HTTP 404 displays `Customer not
+found` / `This customer is not available.` Other detail failures display
+`Customer details could not be loaded` / `Please try again.` Both offer Retry
+and omit raw backend messages and identifiers; 404 does not distinguish missing
+from inaccessible customers.
+
+These read guards complement M1 session-generation middleware and private-cache
+reset. They do not replace backend authorization or add a second session model.
+Navigation invalidates state ownership without requiring transport cancellation;
+M1 session changes retain their existing cancellation and stale-action defenses.
 
 ## Browser-local Cart and Wishlist lifecycle
 

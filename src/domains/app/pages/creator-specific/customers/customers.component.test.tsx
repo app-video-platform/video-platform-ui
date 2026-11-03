@@ -219,7 +219,7 @@ describe('Creator Customers', () => {
 
     renderDetail('cust-maya-johnson');
     expect(
-      await screen.findByText('Customer profile data is not available yet'),
+      await screen.findByText('Customer not found'),
     ).toBeInTheDocument();
   });
 });

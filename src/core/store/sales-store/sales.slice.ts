@@ -23,6 +23,8 @@ interface SalesState {
   ordersLoading: boolean;
   ordersError: string | null;
   currentOrder: SalesOrderDetail | null;
+  detailRequestId?: string;
+  detailOrderId?: string;
   detailLoading: boolean;
   detailError: string | null;
 }
@@ -83,6 +85,9 @@ const salesSlice = createSlice({
   initialState,
   reducers: {
     clearCurrentOrder(state) {
+      state.detailRequestId = undefined;
+      state.detailOrderId = undefined;
+      state.detailLoading = false;
       state.currentOrder = null;
       state.detailError = null;
     },
@@ -121,18 +126,25 @@ const salesSlice = createSlice({
         state.ordersError = action.payload ?? 'Failed to load orders';
         state.ordersPage = null;
       })
-      .addCase(fetchCreatorOrderDetail.pending, (state) => {
+      .addCase(fetchCreatorOrderDetail.pending, (state, action) => {
+        state.detailRequestId = action.meta.requestId;
+        state.detailOrderId = action.meta.arg;
+        state.currentOrder = null;
         state.detailLoading = true;
         state.detailError = null;
       })
       .addCase(
         fetchCreatorOrderDetail.fulfilled,
-        (state, action: PayloadAction<SalesOrderDetail>) => {
+        (state, action) => {
+          if (!state.detailRequestId || state.detailRequestId !== action.meta?.requestId || state.detailOrderId !== action.meta.arg) {return;}
+          state.detailRequestId = undefined;
           state.detailLoading = false;
           state.currentOrder = action.payload;
         },
       )
       .addCase(fetchCreatorOrderDetail.rejected, (state, action) => {
+        if (!state.detailRequestId || state.detailRequestId !== action.meta?.requestId || state.detailOrderId !== action.meta.arg) {return;}
+        state.detailRequestId = undefined;
         state.detailLoading = false;
         state.detailError = action.payload ?? 'Failed to load order';
         state.currentOrder = null;
@@ -166,3 +178,5 @@ export const selectCreatorOrderDetailError = (state: RootState) =>
   state.sales.detailError;
 
 export default salesSlice.reducer;
+
+export const selectCreatorOrderDetailId = (state: RootState) => state.sales.detailOrderId;

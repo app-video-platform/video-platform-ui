@@ -20,8 +20,9 @@ import {
   clearCurrentProduct,
   getProductById,
   selectCurrentProduct,
-  selectProductsError,
-  selectProductsLoading,
+  selectProductDetailError,
+  selectProductDetailLoading,
+  selectProductDetailId,
 } from 'core/store/product-store';
 import {
   fetchPublicProductLandingPageConfig,
@@ -51,8 +52,9 @@ const ProductPage: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const cartIds = useSelector(selectCartIds);
   const currentProduct = useSelector(selectCurrentProduct);
-  const loading = useSelector(selectProductsLoading);
-  const error = useSelector(selectProductsError);
+  const requestedProductId = useSelector(selectProductDetailId);
+  const loading = useSelector(selectProductDetailLoading) || Boolean(id && requestedProductId !== id);
+  const error = useSelector(selectProductDetailError);
   const creatorStorefrontConfig = useSelector(selectCreatorStorefrontConfig);
   const [hasAccess, setHasAccess] = useState(false);
   const [enrolling, setEnrolling] = useState(false);

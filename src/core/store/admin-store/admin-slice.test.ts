@@ -1,4 +1,4 @@
-import { UserRole } from 'core/api/models';
+import { AdminProductsPage, UserRole } from 'core/api/models';
 import adminReducer, {
   fetchAdminProducts,
   fetchAdminUsers,
@@ -84,7 +84,7 @@ describe('admin slice', () => {
   });
 
   it('stores loaded admin products', () => {
-    const productsPage = {
+    const productsPage: AdminProductsPage = {
       content: [{ id: 'product-1', title: 'Course', type: 'COURSE' }],
       totalElements: 1,
       totalPages: 1,
@@ -95,11 +95,31 @@ describe('admin slice', () => {
       empty: false,
     };
 
-    const state = adminReducer(initialState, {
-      type: fetchAdminProducts.fulfilled.type,
-      payload: productsPage,
-    });
+    const pending = adminReducer(initialState, fetchAdminProducts.pending('products', {}));
+    const state = adminReducer(pending, fetchAdminProducts.fulfilled(productsPage, 'products', {}));
 
     expect(state.productsPage).toEqual(productsPage);
+  });
+
+  it('keeps Product and Audit request status independent from the Users channel', () => {
+    const usersPending = adminReducer(initialState, fetchAdminUsers.pending('users', {}));
+    const productsPending = adminReducer(usersPending, fetchAdminProducts.pending('products', {}));
+    expect(productsPending.loading).toBe(true);
+
+    const productsFulfilled = adminReducer(
+      productsPending,
+      fetchAdminProducts.fulfilled({
+        content: [], totalElements: 0, totalPages: 0, size: 20, number: 0,
+        first: true, last: true, empty: true,
+      }, 'products', {}),
+    );
+    expect(productsFulfilled.loading).toBe(true);
+
+    const productsRejected = adminReducer(
+      productsPending,
+      fetchAdminProducts.rejected(null, 'products', {}, 'Product failure'),
+    );
+    expect(productsRejected.loading).toBe(true);
+    expect(productsRejected.error).toBeNull();
   });
 });
