@@ -9,6 +9,7 @@ import { UserRole } from 'core/api/models';
 
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(),
+  useDispatch: () => jest.fn(),
 }));
 
 describe('ProtectedRoute', () => {

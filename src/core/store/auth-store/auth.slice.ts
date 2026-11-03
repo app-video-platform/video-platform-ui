@@ -19,12 +19,19 @@ import {
   changeDevUserRoleAPI,
 } from 'core/api/services';
 import { extractErrorMessage } from '@shared/utils';
+import { isAxiosError } from 'axios';
 
-interface AuthState {
+export type SessionStatus = 'resolving' | 'authenticated' | 'unauthenticated' | 'unavailable';
+
+export interface AuthState {
   user: null | User;
   loading: boolean;
   error: string | null;
   isUserLoggedIn: boolean | null;
+  sessionStatus?: SessionStatus;
+  sessionVersion?: number;
+  profileRequestId?: string;
+  profileError?: string | null;
 }
 
 const initialState: AuthState = {
@@ -32,6 +39,31 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   isUserLoggedIn: null,
+  sessionStatus: 'resolving',
+  sessionVersion: 0,
+  profileError: null,
+};
+
+const beginSession = (state: AuthState, status: SessionStatus) => {
+  state.sessionVersion = (state.sessionVersion ?? 0) + 1;
+  state.sessionStatus = status;
+  state.user = null;
+  state.isUserLoggedIn = status === 'unauthenticated' ? false : null;
+  state.profileRequestId = undefined;
+  state.profileError = null;
+};
+
+const acceptUser = (state: AuthState, user: User, resolveSession = true) => {
+  const roles = (value: User | null) => [...(value?.roles ?? [])].sort().join(',');
+  if (state.user?.id !== user.id || roles(state.user) !== roles(user)) {
+    state.sessionVersion = (state.sessionVersion ?? 0) + 1;
+  }
+  state.user = user;
+  if (resolveSession) {
+    state.sessionStatus = 'authenticated';
+    state.isUserLoggedIn = true;
+    state.profileError = null;
+  }
 };
 
 // Registration thunk: returns a success message from the backend.
@@ -67,9 +99,13 @@ export const signinUser = createAsyncThunk<
   string, // Return type: user login response
   LoginRequest, // Argument type (user data)
   { rejectValue: string } // Error type
->('auth/signinUser', async (userData, { dispatch, rejectWithValue }) => {
+>('auth/signinUser', async (userData, { dispatch, getState, rejectWithValue }) => {
+  const version = (getState() as { auth: AuthState }).auth.sessionVersion;
   try {
     const response = await signInUser(userData);
+    if ((getState() as { auth: AuthState }).auth.sessionVersion !== version) {
+      return rejectWithValue('Session changed');
+    }
     if (response === 'Login successful') {
       dispatch(getUserProfile());
     }
@@ -83,9 +119,13 @@ export const googleSignInUser = createAsyncThunk<
   string, // Return type: google login response
   GoogleLoginRequest, // Argument type (token)
   { rejectValue: string } // Error type
->('auth/googleSignInUser', async (idToken, { dispatch, rejectWithValue }) => {
+>('auth/googleSignInUser', async (idToken, { dispatch, getState, rejectWithValue }) => {
+  const version = (getState() as { auth: AuthState }).auth.sessionVersion;
   try {
     const response = await googleAPI(idToken);
+    if ((getState() as { auth: AuthState }).auth.sessionVersion !== version) {
+      return rejectWithValue('Session changed');
+    }
     if (!response) {
       // If response is null or falsy, reject with an error message.
       return rejectWithValue('Signin failed');
@@ -98,15 +138,17 @@ export const googleSignInUser = createAsyncThunk<
 });
 
 export const getUserProfile = createAsyncThunk<
-  User, // Return type: user login response
-  void, // Argument type (user data)
-  { rejectValue: string } // Error type
+  User,
+  void,
+  { rejectValue: { message: string; status?: number } }
 >('auth/getUserProfile', async (_, { rejectWithValue }) => {
   try {
-    const response = await getUserProfileAPI();
-    return response; // API returns user info with token
+    return await getUserProfileAPI();
   } catch (error: unknown) {
-    return rejectWithValue(extractErrorMessage(error));
+    return rejectWithValue({
+      message: extractErrorMessage(error),
+      status: isAxiosError(error) ? error.response?.status : undefined,
+    });
   }
 });
 
@@ -157,11 +199,21 @@ const authSlice = createSlice({
     //   state.token = action.payload;
     // },
     setUserProfile: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
+      acceptUser(state, action.payload);
+    },
+    sessionExpired: (state) => {
+      beginSession(state, 'unauthenticated');
+      state.loading = false;
+    },
+    sessionUnavailable: (state) => {
+      state.sessionStatus = 'unavailable';
+      state.isUserLoggedIn = null;
+      state.profileError = 'Your session could not be verified. Please retry.';
+      state.loading = false;
     },
     logout: (state) => {
-      state.user = null;
-      state.isUserLoggedIn = null;
+      beginSession(state, 'unauthenticated');
+      state.loading = false;
     },
     resetOnboarding: (state) => {
       // Reset any onboarding state if needed
@@ -201,6 +253,7 @@ const authSlice = createSlice({
       })
       // Sign in cases:
       .addCase(signinUser.pending, (state) => {
+        beginSession(state, 'resolving');
         state.loading = true;
         state.error = null;
       })
@@ -208,11 +261,13 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(signinUser.rejected, (state, action) => {
+        beginSession(state, 'unauthenticated');
         state.loading = false;
         state.error = action.payload || 'Signin failed';
       })
       // Google Sign In
       .addCase(googleSignInUser.pending, (state) => {
+        beginSession(state, 'resolving');
         state.loading = true;
         state.error = null;
       })
@@ -220,30 +275,48 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(googleSignInUser.rejected, (state, action) => {
+        beginSession(state, 'unauthenticated');
         state.loading = false;
         state.error = action.payload || 'Google Signin failed';
       })
-      // Get User Profile
-      .addCase(getUserProfile.pending, (state) => {
+      // Profile resolution is independent from profile mutation loading.
+      .addCase(getUserProfile.pending, (state, action) => {
         state.loading = true;
-        state.error = null;
+        state.sessionStatus = 'resolving';
+        state.isUserLoggedIn = null;
+        state.profileRequestId = action.meta.requestId;
+        state.profileError = null;
       })
-      .addCase(
-        getUserProfile.fulfilled,
-        (state, action: PayloadAction<User>) => {
-          state.loading = false;
-          state.user = action.payload;
-          state.isUserLoggedIn = true;
-        },
-      )
-      .addCase(getUserProfile.rejected, (state) => {
+      .addCase(getUserProfile.fulfilled, (state, action) => {
+        if (state.profileRequestId !== action.meta.requestId) {
+          return;
+        }
         state.loading = false;
-        state.isUserLoggedIn = false;
-        state.error = 'Get User Profile failed';
+        state.profileRequestId = undefined;
+        acceptUser(state, action.payload);
+      })
+      .addCase(getUserProfile.rejected, (state, action) => {
+        if (state.profileRequestId !== action.meta.requestId) {
+          return;
+        }
+        state.loading = false;
+        state.profileRequestId = undefined;
+        if (action.payload?.status === 401 || action.payload?.status === 403) {
+          beginSession(state, 'unauthenticated');
+        } else {
+          state.sessionStatus = 'unavailable';
+          state.isUserLoggedIn = null;
+          state.profileError = 'Your session could not be verified. Please retry.';
+        }
+      })
+      .addCase(logoutUser.pending, (state) => {
+        beginSession(state, 'unauthenticated');
+        state.loading = false;
       })
       .addCase(logoutUser.fulfilled, (state) => {
+        state.sessionStatus = 'unauthenticated';
+        state.isUserLoggedIn = false;
         state.user = null;
-        state.isUserLoggedIn = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         // Optionally handle logout errors here.
@@ -257,7 +330,7 @@ const authSlice = createSlice({
         updateUserDetails.fulfilled,
         (state, action: PayloadAction<User>) => {
           state.loading = false;
-          state.user = action.payload;
+          acceptUser(state, action.payload, state.sessionStatus === 'authenticated');
         },
       )
       .addCase(updateUserDetails.rejected, (state) => {
@@ -265,6 +338,9 @@ const authSlice = createSlice({
         state.error = 'Update user details failed';
       })
       .addCase(changeDevUserRole.pending, (state) => {
+        state.sessionVersion = (state.sessionVersion ?? 0) + 1;
+        state.sessionStatus = 'resolving';
+        state.isUserLoggedIn = null;
         state.loading = true;
         state.error = null;
       })
@@ -272,16 +348,17 @@ const authSlice = createSlice({
         changeDevUserRole.fulfilled,
         (state, action: PayloadAction<User>) => {
           state.loading = false;
-          state.user = action.payload;
-          state.isUserLoggedIn = true;
+          acceptUser(state, action.payload);
         },
       )
       .addCase(changeDevUserRole.rejected, (state, action) => {
         state.loading = false;
+        state.sessionStatus = state.user ? 'authenticated' : 'unauthenticated';
+        state.isUserLoggedIn = Boolean(state.user);
         state.error = action.payload || 'Change dev user role failed';
       });
   },
 });
 
-export const { logout, setUserProfile, resetOnboarding } = authSlice.actions;
+export const { logout, setUserProfile, resetOnboarding, sessionExpired, sessionUnavailable } = authSlice.actions;
 export default authSlice.reducer;

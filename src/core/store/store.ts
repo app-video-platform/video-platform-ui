@@ -1,52 +1,26 @@
 import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit';
-import authReducer from './auth-store/auth.slice';
-import adminReducer from './admin-store/admin.slice';
-import analyticsReducer from './analytics-store/analytics.slice';
-import productsReducer from './product-store/product.slice';
-import customersReducer from './customers-store/customers.slice';
-import dashboardReducer from './dashboard-store/dashboard.slice';
-import membershipReducer from './membership-store/membership.slice';
-import notificationsReducer from './notifications/notifications.slice';
-import productLandingPageReducer from './product-landing-page-store/product-landing-page.slice';
-import salesReducer from './sales-store/sales.slice';
-import storefrontReducer from './storefront-store/storefront.slice';
-import shopCartReducer, {
-  loadCartFromStorage,
-  saveCartToStorage,
-  ShopCartState,
-} from './shop-cart/shop-cart.slice';
-import wishlistReducer from './wishlist/wishlist.slice';
+import { isAxiosError } from 'axios';
+import { rootReducer } from './root-reducer';
+import { createSessionMiddleware } from './session.middleware';
+import { sessionExpired, sessionUnavailable } from './auth-store/auth.slice';
+import { setSessionFailureHandler } from '../api/interceptors/session-lifecycle';
+import { loadCartFromStorage, saveCartToStorage, ShopCartState } from './shop-cart/shop-cart.slice';
 import { setupProductListeners } from './listeners/product-listeners';
-import { reviewsSlice } from './reviews-store';
 
 const listenerMiddleware = createListenerMiddleware();
-
 setupProductListeners(listenerMiddleware);
-
 const preloadedCart = loadCartFromStorage();
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    admin: adminReducer,
-    analytics: analyticsReducer,
-    products: productsReducer,
-    customers: customersReducer,
-    dashboard: dashboardReducer,
-    membership: membershipReducer,
-    notifications: notificationsReducer,
-    productLandingPage: productLandingPageReducer,
-    sales: salesReducer,
-    storefront: storefrontReducer,
-    shopCart: shopCartReducer,
-    wishlist: wishlistReducer,
-    reviews: reviewsSlice,
-  },
-  preloadedState: preloadedCart
-    ? ({ shopCart: preloadedCart } as { shopCart: ShopCartState })
-    : undefined,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(listenerMiddleware.middleware),
+  reducer: rootReducer,
+  preloadedState: preloadedCart ? { ...rootReducer(undefined, { type: '@@init' }), shopCart: preloadedCart } : undefined,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware()
+    .prepend(createSessionMiddleware(), listenerMiddleware.middleware),
+});
+
+setSessionFailureHandler((error) => {
+  const status = isAxiosError(error) ? error.response?.status : undefined;
+  store.dispatch(status === 401 || status === 403 ? sessionExpired() : sessionUnavailable());
 });
 
 let lastSaved: string | null = null;
