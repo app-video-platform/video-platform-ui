@@ -48,7 +48,7 @@ const paidProduct = (
   ...overrides,
 });
 
-const renderCart = (products: ProductMinimised[]) => {
+const renderCart = (products: ProductMinimised[], role = UserRole.USER) => {
   const store = configureStore({
     reducer: {
       auth: authReducer,
@@ -62,7 +62,7 @@ const renderCart = (products: ProductMinimised[]) => {
           firstName: 'Buyer',
           lastName: 'One',
           email: 'buyer@example.test',
-          roles: [UserRole.USER],
+          roles: [role],
         },
         loading: false,
         error: null,
@@ -131,6 +131,22 @@ describe('<Cart /> Commerce checkout', () => {
     expect(store.getState().shopCart.products).toEqual([]);
   });
 
+  it('takes a Creator to the shared Library after successful free enrollment', async () => {
+    (enrollInFreeProductAPI as jest.Mock).mockResolvedValue({});
+    const store = renderCart(
+      [paidProduct({ id: 'creator-free-1', price: 'free' })],
+      UserRole.CREATOR,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Proceed to checkout' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Library products route')).toBeInTheDocument();
+    });
+    expect(store.getState().auth.user?.roles).toEqual([UserRole.CREATOR]);
+    expect(store.getState().shopCart.products).toEqual([]);
+  });
+
   it('rejects mixed free and paid carts in the UI', () => {
     renderCart([
       paidProduct(),
@@ -157,7 +173,7 @@ describe('<Cart /> Commerce checkout', () => {
       currency: 'EUR',
       totalMinor: 2500,
     });
-    const store = renderCart([paidProduct()]);
+    const store = renderCart([paidProduct()], UserRole.CREATOR);
 
     expect(screen.getByText(
       'Test payment — No real charge will be made during checkout.',

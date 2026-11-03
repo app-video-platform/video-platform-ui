@@ -115,6 +115,29 @@ registration request; bootstrap failures are surfaced without logging Axios requ
 configuration or token material. The frontend integration does not imply that the
 backend route is deployed in every environment.
 
+## Browser-local Cart and Wishlist lifecycle
+
+Cart (`cart:v1`) and Wishlist (`wishlist:v1`) remain browser-local shopping
+preferences. M1 session boundaries intentionally do not clear them. Their existing
+storage boundaries validate JSON shape and Product summary fields before hydration;
+both collections require a non-empty Product ID and deduplicate by ID. Cart entries
+also require a supported non-negative numeric price or `free`, because the current
+Cart represents each Product once and has no quantity field. Cart loading state and
+total are derived and recomputed; persisted totals are not trusted. Invalid entries
+are dropped, malformed JSON is reset when storage is writable, and browser storage
+failures do not prevent app startup. These local collections do not grant purchase
+or Product access.
+
+The shared Library at `/app/library/*` is available to authenticated User, Creator,
+and Admin roles. It reads the current principal's entitlements through the existing
+`GET api/entitlements/me` contract. The route grant only permits the Library UI to
+load; Product and file access remain subject to server-side entitlement checks.
+Successful free enrollment and confirmed paid checkout continue to route to the
+shared Library. Wishlist `Move to cart` and dropdown `Add to cart` use the same
+deduplicating move action and remove the Product from Wishlist after it is already
+in or has been added to Cart. Library tab selection is derived from the active child
+route, with arrow-key and Home/End navigation preserving the route and focus.
+
 ## Onboarding route and persistence lifecycle
 
 - The canonical onboarding URL is the top-level `/onboarding` route in `src/App.tsx`. It mounts `Onboarding` through `ProtectedRoute` for the existing User, Creator, and Admin roles, outside `AppRouter`'s role-home layout. Keep `/app/onboarding` as the existing protected app-prefixed entry.
@@ -519,7 +542,6 @@ Confirmed:
 - Tests emit icon casing warnings because icon mocks render as unknown tags in some shared UI tests.
 - Some shared UI tests emit controlled-input warnings.
 - `.github/workflows/docs.yml` expects a `docs/` directory, but no `docs/` directory exists in this checkout.
-- `src/core/store/shop-cart/shop-cart.slice.ts` removal has a likely index bug: index `0` is treated as false, so the first cart item may not remove.
 - Membership has frontend contracts, services, Redux store integration, and ignored local HTTP mock responses for Product-scoped aggregate/config, native content CRUD, and feed/included-product associations. Membership publishing and checkout remain disabled.
 - Product recurring pricing has frontend model/form support for Membership metadata, but subscription billing is unavailable.
 - Membership Video/Resource binary asset upload and member delivery are unavailable; the existing Download section upload flow is section-scoped and should be generalized or adapted before claiming real Membership media delivery.

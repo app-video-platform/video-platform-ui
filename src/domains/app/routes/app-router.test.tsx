@@ -119,6 +119,14 @@ describe('AppRouter role routing', () => {
     expect(screen.getByText('Admin users')).toBeInTheDocument();
   });
 
+  it.each([UserRole.USER, UserRole.CREATOR, UserRole.ADMIN])(
+    'allows %s to reach the shared server-backed Library route',
+    (role) => {
+      renderRouter([role], '/library/my-courses');
+      expect(screen.getByText('Courses')).toBeInTheDocument();
+    },
+  );
+
   it('renders creator customer routes for creators', () => {
     renderRouter([UserRole.CREATOR], '/customers');
 

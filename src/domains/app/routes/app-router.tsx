@@ -152,11 +152,11 @@ const AppRouter: React.FC = () => (
           }
         />
 
-        {/* User/Admin: library */}
+        {/* User/Creator/Admin: server-backed purchased content and personal Wishlist */}
         <Route
           path="library"
           element={
-            <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.ADMIN]}>
+            <ProtectedRoute allowedRoles={[UserRole.USER, UserRole.CREATOR, UserRole.ADMIN]}>
               <LibraryPage />
             </ProtectedRoute>
           }

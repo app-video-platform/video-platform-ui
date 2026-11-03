@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import React, { useRef } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import './library-page.styles.scss';
 
@@ -13,12 +13,36 @@ const TABS = [
 
 const LibraryPage: React.FC = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const tabRefs = useRef<Array<HTMLAnchorElement | null>>([]);
 
-  const active = (() => {
-    // pathname like /library/started-courses
-    const seg = pathname.split('/')[2] ?? 'all-products';
-    return TABS.findIndex((t) => t.path === seg);
-  })();
+  const activePath = TABS.find((tab) =>
+    pathname.endsWith(`/library/${tab.path}`),
+  )?.path;
+
+  const handleTabKeyDown = (
+    event: React.KeyboardEvent<HTMLAnchorElement>,
+    index: number,
+  ) => {
+    let nextIndex: number | undefined;
+    if (event.key === 'ArrowRight') {
+      nextIndex = (index + 1) % TABS.length;
+    } else if (event.key === 'ArrowLeft') {
+      nextIndex = (index - 1 + TABS.length) % TABS.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = TABS.length - 1;
+    }
+    if (nextIndex === undefined) {
+      return;
+    }
+
+    event.preventDefault();
+    const tab = TABS[nextIndex];
+    navigate(`/app/library/${tab.path}`);
+    tabRefs.current[nextIndex]?.focus();
+  };
 
   return (
     <div className="library-page">
@@ -31,14 +55,16 @@ const LibraryPage: React.FC = () => {
           aria-label="Library sections"
         >
           {TABS.map((tab, idx) => {
-            const isActive = idx === active || (active === -1 && idx === 0);
+            const isActive = tab.path === activePath;
             return (
               <NavLink
                 key={tab.path}
                 to={`/app/library/${tab.path}`}
-                className={({ isActive: routeActive }) =>
-                  `tab-button${routeActive ? ' tab-button__active' : ''}`
-                }
+                end
+                ref={(node) => { tabRefs.current[idx] = node; }}
+                tabIndex={isActive ? 0 : -1}
+                onKeyDown={(event) => handleTabKeyDown(event, idx)}
+                className={`tab-button${isActive ? ' tab-button__active' : ''}`}
                 role="tab"
                 aria-selected={isActive}
               >
