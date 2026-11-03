@@ -10,6 +10,7 @@ import { UserRole } from '@core/api';
 
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(),
+  useDispatch: () => jest.fn(),
 }));
 
 jest.mock('../pages', () => {

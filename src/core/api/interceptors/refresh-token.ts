@@ -1,90 +1,101 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable no-unused-vars */
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosInstance, CanceledError, InternalAxiosRequestConfig } from 'axios';
+import {
+  getTransportGeneration,
+  onSessionInvalidated,
+  reportSessionFailure,
+} from './session-lifecycle';
 
-let isRefreshing = false;
-let failedQueue: Array<{
-  resolve: (token: string) => void;
-  reject: (error: unknown) => void;
-}> = [];
-
-const processQueue = (error: unknown, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else if (token) {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
+type SessionRequest = InternalAxiosRequestConfig & {
+  _sessionGeneration?: number;
+  _retry?: boolean;
+  _publicRead?: boolean;
 };
 
-/**
- * Attaches a response interceptor to handle 401s by
- * requesting a token refresh and replaying failed requests.
- */
+/** Cookie refresh is shared per client and never depends on a bearer payload. */
 export function attachRefreshTokenInterceptor(httpClient: AxiosInstance) {
-  httpClient.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    (error) => {
-      const originalRequest = error.config as AxiosRequestConfig & {
-        _retry?: boolean;
-      };
-
-      // If status is 401, and we haven't already retried this request:
-      if (error.response?.status === 401 && !originalRequest._retry) {
-        // If the request was the refresh endpoint itself, just reject:
-        if (
-          originalRequest.url &&
-          originalRequest.url.includes('api/auth/refresh')
-        ) {
-          return Promise.reject(error);
-        }
-
-        if (isRefreshing) {
-          // Queue up the request until the refresh finishes
-          return new Promise((resolve, reject) => {
-            failedQueue.push({ resolve, reject });
-          })
-            .then((token) => {
-              // Once refreshed, retry the original
-              originalRequest.headers!['Authorization'] = `Bearer ${token}`;
-              return httpClient.request(originalRequest);
-            })
-            .catch((err) => Promise.reject(err));
-        }
-
-        originalRequest._retry = true;
-        isRefreshing = true;
-
-        return new Promise((resolve, reject) => {
-          httpClient
-            .post(
-              'api/auth/refresh',
-              {},
-              { withCredentials: true }
-            )
-            .then((res) => {
-              // Backend should have updated the cookie(s). If you need
-              // a fresh Authorization: Bearer header, extract it from res here.
-              const newToken = res.data.token; // or however your backend returns it
-              processQueue(null, newToken);
-
-              // Retry original request
-              originalRequest.headers!['Authorization'] = `Bearer ${newToken}`;
-              resolve(httpClient.request(originalRequest));
-            })
-            .catch((err) => {
-              processQueue(err, null);
-              reject(err);
-            })
-            .finally(() => {
-              isRefreshing = false;
-            });
-        });
-      }
-
-      return Promise.reject(error);
+  let refresh: Promise<void> | undefined;
+  let cancelRefresh: (() => void) | undefined;
+  const changed = () => new CanceledError('Session changed');
+  const unsubscribe = onSessionInvalidated(() => {
+    const cancel = cancelRefresh;
+    cancelRefresh = undefined;
+    refresh = undefined;
+    cancel?.();
+  });
+  const requestId = httpClient.interceptors.request.use((config: SessionRequest) => {
+    const url = config.url?.replace(/^\//, '') ?? '';
+    config._publicRead = config.method === 'get' && (
+      url.startsWith('api/storefronts/') || url.startsWith('api/products/search?') ||
+      /^api\/products\/[^/]+\/landing-page$/.test(url)
+    );
+    config._sessionGeneration ??= getTransportGeneration();
+    if (!config._publicRead && config._sessionGeneration !== getTransportGeneration()) {
+      throw changed();
     }
+    return config;
+  }, (error) => { throw error; }, { synchronous: true });
+  const responseId = httpClient.interceptors.response.use(
+    (response) => {
+      const config = response.config as SessionRequest;
+      if (!config._publicRead && config._sessionGeneration !== getTransportGeneration()) {
+        return Promise.reject(changed());
+      }
+      return response;
+    },
+    async (error) => {
+      const original = error.config as SessionRequest | undefined;
+      if (!original || (!original._publicRead && original._sessionGeneration !== getTransportGeneration())) {
+        return Promise.reject(original ? changed() : error);
+      }
+      const authEndpoint = /api\/auth\/(refresh|login|logout|googleSignIn|register|verify)(?:[/?]|$)/;
+      if (original._publicRead || error.response?.status !== 401 || authEndpoint.test(original.url ?? '')) {
+        return Promise.reject(error);
+      }
+      if (original._retry) {
+        reportSessionFailure(error);
+        return Promise.reject(error);
+      }
+      original._retry = true;
+      if (!refresh) {
+        const controller = new AbortController();
+        const version = getTransportGeneration();
+        const cancelled = new Promise<never>((_, reject) => {
+          cancelRefresh = () => {
+            reject(changed());
+            controller.abort();
+          };
+        });
+        const attempt = Promise.race([
+          httpClient.post('api/auth/refresh', {}, {
+            withCredentials: true,
+            signal: controller.signal,
+            timeout: 15000,
+          }).then(() => undefined),
+          cancelled,
+        ]).catch((refreshError) => {
+          if (version === getTransportGeneration()) {
+            reportSessionFailure(refreshError);
+          }
+          throw refreshError;
+        }).finally(() => {
+          if (refresh === attempt) {
+            refresh = undefined;
+            cancelRefresh = undefined;
+          }
+        });
+        refresh = attempt;
+      }
+      await refresh;
+      if (original._sessionGeneration !== getTransportGeneration()) {
+        throw changed();
+      }
+      return httpClient.request(original);
+    },
   );
+  return () => {
+    cancelRefresh?.();
+    unsubscribe();
+    httpClient.interceptors.request.eject(requestId);
+    httpClient.interceptors.response.eject(responseId);
+  };
 }

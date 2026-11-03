@@ -60,6 +60,52 @@ Dashboard, Sales, Customers, Analytics, Storefront, and Product Landing Page con
 
 Mock mode is intentionally strict: unmatched API requests return a local `501` with a clear “No local mock is registered” message instead of passing through to the real backend. Explicit exceptions should be registered as their own handlers. External Google OAuth is not simulated; calendar connect returns a mock-safe authorization URL placeholder rather than pretending to complete provider OAuth.
 
+## Authentication and account-scoped state lifecycle
+
+Milestone 1 keeps authentication in the existing Auth slice. `sessionStatus` distinguishes
+`resolving`, `authenticated`, `unauthenticated`, and retryable `unavailable` states. The
+existing `loading` flag still describes Auth operations; profile mutation loading does
+not gate authenticated routes. Profile HTTP 401/403 is treated as invalid authentication;
+network/availability failures require explicit profile Retry without claiming logout.
+
+`sessionVersion` advances on login attempts, explicit logout (including pending server
+logout), confirmed identity/role changes, and authentication invalidation. Local logout
+remains effective if the server logout request fails; a failed request cannot restore the
+old browser identity. `rootReducer` clears account-owned Admin, reporting, Product,
+Membership, notification, review and Creator presentation caches atomically at that
+boundary. Product state mixes public reads and private drafts and must be cleared.
+Separate public Storefront/landing caches are retained, except landing entries also
+written by Creator saves. Existing browser-local cart/Wishlist collections are shopping
+preferences, not account-owned entitlements, and retain their established persistence.
+The current React Query search/autocomplete caches contain public catalogue reads only.
+
+The session middleware must precede Product listeners. It registers thunk request IDs
+against the session version and discards old-session fulfillments **and rejections**
+before reducers/listeners run. New account-owned thunk namespaces must be included in
+its scoped-prefix list. This prevents late responses from repopulating cleared state or
+creating notifications. It does not replace per-feature query/entity freshness handling.
+
+The existing Axios client coordinates one cookie-based refresh promise per instance.
+A successful text response settles waiters without generating Bearer headers; each
+original request is replayed at most once. Session boundaries cancel queued refresh
+waiters, abort refresh transport, and reject stale private HTTP responses. Explicitly
+public Storefront, landing-config and search reads remain independent. The synchronous
+CSRF/session request interceptors capture ownership when the request is invoked. Refresh
+has a 15-second transport timeout. Failed refresh or persistent private 401 reports into
+Auth; availability errors remain retryable instead of forcing sign-in.
+
+Protected routes require positively resolved identity and the existing allowed roles.
+Initial unresolved sessions never mount protected children. During same-session profile
+verification/outage, an already-authorized workspace at the same URL can remain mounted
+but hidden so local work survives retry; it is removed at an account/role boundary or
+navigation change. The retained workspace is keyed by session version so even batched
+account switches discard the old component state. `selectAuthUser` supplies confirmed identity for normal/visible UI.
+`selectRetainedSessionUser` is restricted to shell selection and draft continuity and
+must never be used to authorize routes or expose account controls. Bootstrap preserves
+the requested URL rather than redirecting away from it. Browser-cookie/server rotation
+races still require backend session enforcement; cancellation does not revoke a server
+operation that has already committed.
+
 ## Authenticated Creator Management Architecture
 
 Creator/Admin management routes are visually and structurally separated from buyer/marketplace routes in `src/domains/app/pages/app-layout/app-layout.component.tsx`.

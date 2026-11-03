@@ -8,7 +8,7 @@ import {
   hasRole,
   UserRole,
 } from 'core/api/models';
-import { selectAuthUser } from 'core/store/auth-store';
+import { selectRetainedSessionUser } from 'core/store/auth-store';
 import { UseProductFormFacadeResult } from '../models/product-form';
 import { useProductAutosave } from './use-product-autosave.hook';
 import { useProductFormState } from './use-product-form-state.hook';
@@ -24,7 +24,7 @@ export const useProductFormFacade = (): UseProductFormFacadeResult => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const user = useSelector(selectAuthUser);
+  const user = useSelector(selectRetainedSessionUser);
   const isEditMode = Boolean(id);
   const selectedAdminOwnerId = searchParams.get('ownerId') ?? undefined;
   const isAdmin = hasRole(user?.roles, UserRole.ADMIN);

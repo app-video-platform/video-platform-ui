@@ -38,6 +38,7 @@ export function attachCsrfInterceptor(httpClient: AxiosInstance) {
       }
       return config;
     },
-    (error) => Promise.reject(error),
+    (error) => { throw error; },
+    { synchronous: true },
   );
 }
