@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useId, useLayoutEffect, useRef } from 'react';
 import clsx from 'clsx';
 
 import './textarea.styles.scss';
@@ -30,8 +30,9 @@ const Textarea: React.FC<TextareaProps> = ({
     ['aria-describedby']: ariaDescribedBy,
     ...textareaProps
   } = otherProps;
-  const errorId =
-    error && textareaProps.name ? `${textareaProps.name}-error` : undefined;
+  const generatedId = useId();
+  const inputId = textareaProps.id ?? generatedId;
+  const errorId = error ? `${inputId}-error` : undefined;
   const describedBy = [ariaDescribedBy, errorId].filter(Boolean).join(' ') || undefined;
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -48,7 +49,7 @@ const Textarea: React.FC<TextareaProps> = ({
   return (
     <div className={clsx('textarea-wrapper', className)}>
       {label && (
-        <label htmlFor={textareaProps.name} className="input-label">
+        <label htmlFor={inputId} className="input-label">
           {label}
         </label>
       )}
@@ -58,7 +59,7 @@ const Textarea: React.FC<TextareaProps> = ({
           ref={ref}
           value={value}
           {...textareaProps}
-          id={textareaProps.name}
+          id={inputId}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           maxLength={maxLength}

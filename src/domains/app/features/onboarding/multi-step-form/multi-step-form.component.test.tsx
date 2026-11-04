@@ -172,8 +172,7 @@ describe('MultiStepForm profile persistence', () => {
     fireEvent.change(tagline, { target: { value: 'Short' } });
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     await waitFor(() => expect(bio).toHaveAttribute('aria-invalid', 'true'));
-    expect(bio).toHaveAttribute('aria-describedby', 'bio-error');
-    expect(document.getElementById('bio-error')).toHaveTextContent(/at least 30/i);
+    expect(bio).toHaveAccessibleDescription(/at least 30/i);
     expect(tagline).toHaveAttribute('aria-invalid', 'true');
     expect(tagline).toHaveAttribute('aria-describedby', 'tagline-error');
     expect(document.getElementById('tagline-error')).toHaveTextContent(/at least 10/i);

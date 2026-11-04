@@ -962,6 +962,12 @@ Implemented examples:
 
 Avoid hardcoding viewport-specific pixel values into this document; inspect the SCSS breakpoints and component styles when implementing a responsive change.
 
+## Shared accessibility conventions
+
+- Shared Drawers use a common active stack: each dialog has its own title ID, only the top Drawer handles Escape and traps focus, and body scrolling is restored after the final Drawer closes. Restore focus within any remaining Drawer.
+- Forward native disabled and read-only states to form controls. Shared Textarea generates an instance-specific ID for its label and validation description unless an ID is supplied.
+- Icon-only navigation and menu triggers need accessible names; notification unread state is presentation of session-local Redux data and does not imply a read or persistence API.
+
 ## Recent / Unfinished Work
 
 Recent Git history includes admin role/product ownership work, Membership frontend work, and the authenticated Creator redesign:

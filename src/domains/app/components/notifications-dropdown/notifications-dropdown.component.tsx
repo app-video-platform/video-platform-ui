@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { IoIosNotifications } from 'react-icons/io';
 import { useSelector } from 'react-redux';
 
@@ -12,6 +12,7 @@ import { getCssVar } from '@shared/utils';
 const NotificationsDropdown: React.FC = () => {
   const user = useSelector(selectAuthUser);
   const notifications = useSelector(selectNotifications);
+  const panelId = useId();
 
   if (!user) {
     return null;
@@ -20,8 +21,10 @@ const NotificationsDropdown: React.FC = () => {
     <div className="notifications-dropdown">
       <Dropdown
         customClassName="notifications-dropdown-panel"
-        trigger={({ toggle }) => (
-          <button onClick={toggle} className="notifications-button">
+        id={panelId}
+        trigger={({ toggle, open }) => (
+          <button type="button" onClick={toggle} className="notifications-button"
+            aria-label="Notifications" aria-expanded={open} aria-controls={open ? panelId : undefined}>
             <Icon
               icon={IoIosNotifications}
               size={16}
@@ -42,8 +45,8 @@ const NotificationsDropdown: React.FC = () => {
                   <span className="notification-message">
                     {notification.message}
                   </span>
-                  {notification.isRead && (
-                    <div className="notification-is-read-bubble" />
+                  {!notification.isRead && (
+                    <span className="notification-unread">Unread</span>
                   )}
                 </div>
               ))

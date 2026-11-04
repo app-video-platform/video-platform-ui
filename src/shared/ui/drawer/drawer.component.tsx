@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { ReactNode, useId, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { HiX } from 'react-icons/hi';
@@ -28,6 +28,34 @@ const focusableSelector = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+interface DrawerEntry {
+  panel: HTMLElement;
+  layer: HTMLElement;
+  restoreFocus: HTMLElement | null;
+}
+
+const drawerStack: DrawerEntry[] = [];
+let originalOverflow = '';
+let nextLayer = 1000;
+
+const refreshLayers = () => {
+  drawerStack.forEach((entry, index) => {
+    const inactive = index !== drawerStack.length - 1;
+    if (inactive) {
+      entry.layer.setAttribute('aria-hidden', 'true');
+      entry.layer.setAttribute('inert', '');
+    } else {
+      entry.layer.removeAttribute('aria-hidden');
+      entry.layer.removeAttribute('inert');
+    }
+  });
+};
+
+const focusPanel = (entry: DrawerEntry) => {
+  const first = entry.panel.querySelector<HTMLElement>(focusableSelector);
+  (first ?? entry.panel).focus();
+};
+
 const Drawer: React.FC<DrawerProps> = ({
   open,
   title,
@@ -38,59 +66,66 @@ const Drawer: React.FC<DrawerProps> = ({
   closeLabel = 'Close drawer',
 }) => {
   const panelRef = useRef<HTMLElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const layerRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  const titleId = useId();
 
-  useEffect(() => {
-    if (!open) {
+  useLayoutEffect(() => {
+    if (!open || !panelRef.current || !layerRef.current) {
       return undefined;
     }
-
-    previousFocusRef.current = document.activeElement as HTMLElement | null;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    window.setTimeout(() => {
-      const firstFocusable = panelRef.current?.querySelector<HTMLElement>(
-        focusableSelector,
-      );
-      firstFocusable?.focus();
+    const entry: DrawerEntry = {
+      panel: panelRef.current,
+      layer: layerRef.current,
+      restoreFocus: document.activeElement instanceof HTMLElement ? document.activeElement : null,
+    };
+    if (drawerStack.length === 0) {
+      originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
+    entry.layer.style.zIndex = String(++nextLayer);
+    drawerStack.push(entry);
+    refreshLayers();
+    const isTop = () => drawerStack[drawerStack.length - 1] === entry;
+    const timer = window.setTimeout(() => {
+      if (isTop()) {
+        focusPanel(entry);
+      }
     }, 0);
 
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      previousFocusRef.current?.focus?.();
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) {
-      return undefined;
-    }
-
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isTop()) {
+        return;
+      }
       if (event.key === 'Escape') {
-        onClose();
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeRef.current();
         return;
       }
 
-      if (event.key !== 'Tab' || !panelRef.current) {
+      if (event.key !== 'Tab') {
         return;
       }
 
       const focusable = Array.from(
-        panelRef.current.querySelectorAll<HTMLElement>(focusableSelector),
+        entry.panel.querySelectorAll<HTMLElement>(focusableSelector),
       );
 
       if (focusable.length === 0) {
         event.preventDefault();
-        panelRef.current.focus();
+        entry.panel.focus();
         return;
       }
 
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
 
-      if (event.shiftKey && document.activeElement === first) {
+      if (!entry.panel.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
       } else if (!event.shiftKey && document.activeElement === last) {
@@ -99,20 +134,57 @@ const Drawer: React.FC<DrawerProps> = ({
       }
     };
 
+    const handleFocusIn = (event: FocusEvent) => {
+      if (isTop() && event.target instanceof Node && !entry.panel.contains(event.target)) {
+        focusPanel(entry);
+      }
+    };
+
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, open]);
+    document.addEventListener('focusin', handleFocusIn);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('focusin', handleFocusIn);
+      const index = drawerStack.indexOf(entry);
+      const wasTop = isTop();
+      if (index < 0) {
+        return;
+      }
+      drawerStack.slice(index + 1).forEach((child) => {
+        if (child.restoreFocus && entry.panel.contains(child.restoreFocus)) {
+          child.restoreFocus = entry.restoreFocus;
+        }
+      });
+      drawerStack.splice(index, 1);
+      refreshLayers();
+      const active = drawerStack[drawerStack.length - 1];
+      if (!active) {
+        document.body.style.overflow = originalOverflow;
+        nextLayer = 1000;
+      }
+      if (wasTop) {
+        const target = entry.restoreFocus;
+        if (target?.isConnected && (!active || active.panel.contains(target))) {
+          target.focus();
+        } else if (active) {
+          focusPanel(active);
+        }
+      }
+    };
+  }, [open]);
 
   if (!open) {
     return null;
   }
 
   return createPortal(
-    <div className="drawer-layer">
+    <div ref={layerRef} className="drawer-layer">
       <button
         type="button"
         className="drawer-overlay"
         aria-label={closeLabel}
+        tabIndex={-1}
         onClick={onClose}
       />
       <section
@@ -120,11 +192,11 @@ const Drawer: React.FC<DrawerProps> = ({
         className={clsx('drawer-panel', className)}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="drawer-title"
+        aria-labelledby={titleId}
         tabIndex={-1}
       >
         <header className="drawer-header">
-          <div id="drawer-title" className="drawer-title">
+          <div id={titleId} className="drawer-title">
             {title}
           </div>
           <Button

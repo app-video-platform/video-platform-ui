@@ -4,6 +4,7 @@ import UserDropdown from './user-dropdown.component';
 import { useDispatch, useSelector } from 'react-redux';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 import { UserRole } from 'core/api/models';
 import { logout } from 'core/store/auth-store';
@@ -136,5 +137,31 @@ describe('UserDropdown component', () => {
 
     // Verify navigation to '/'.
     expect(mockNavigate).toHaveBeenCalledWith('/');
+  });
+
+  it.each(['{Enter}', ' '])('allows keyboard logout with %s', async (key) => {
+    const user = userEvent.setup();
+    mockDispatch.mockReturnValueOnce(undefined).mockReturnValueOnce({ unwrap: () => Promise.resolve() });
+    render(<MemoryRouter><UserDropdown /></MemoryRouter>);
+    await user.tab();
+    await user.keyboard('{Enter}');
+    const logoutButton = screen.getByRole('button', { name: 'Logout' });
+    for (let i = 0; i < 10 && document.activeElement !== logoutButton; i += 1) {
+      await user.tab();
+    }
+    expect(logoutButton).toHaveFocus();
+    await user.keyboard(key);
+    expect(mockDispatch).toHaveBeenCalledWith(logout());
+  });
+
+  it('dismisses the menu with Escape without signing out', async () => {
+    const user = userEvent.setup();
+    render(<MemoryRouter><UserDropdown /></MemoryRouter>);
+    await user.tab();
+    await user.keyboard(' ');
+    expect(screen.getByRole('button', { name: 'Logout' })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('button', { name: 'Logout' })).toBeNull();
+    expect(mockDispatch).not.toHaveBeenCalled();
   });
 });

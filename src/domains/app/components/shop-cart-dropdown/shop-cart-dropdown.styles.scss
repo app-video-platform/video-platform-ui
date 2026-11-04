@@ -1,7 +1,8 @@
 .shop-cart-dropdown {
-  .shopping-cart-dropdown-panel {
+  .dropdown-root .shopping-cart-dropdown-panel {
     width: 250px;
-    background: white;
+    background: var(--surface-panel-elevated);
+    color: var(--text-primary);
     padding: 20px;
     border-radius: 15px;
     margin-top: 20px;
@@ -10,6 +11,14 @@
 
     p {
       font-size: 11px;
+    }
+
+    button.vp-btn__primary {
+      background: var(--brand-primary);
+      color: var(--text-inverse);
+
+      &:hover:not(:disabled) { background: var(--brand-primary-light); }
+      &:active:not(:disabled) { background: var(--brand-primary-dark); }
     }
   }
 

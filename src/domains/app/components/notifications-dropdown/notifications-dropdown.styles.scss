@@ -1,11 +1,18 @@
 .notifications-dropdown {
-  .notifications-dropdown-panel {
+  .dropdown-root .notifications-dropdown-panel {
     width: 350px;
-    background: white;
+    background: var(--surface-panel-elevated);
+    color: var(--text-primary);
     padding: 20px;
     border-radius: 15px;
     margin-top: 20px;
     right: 0;
     left: unset;
+  }
+
+  .notification-unread {
+    display: block;
+    color: var(--brand-primary);
+    font-weight: 700;
   }
 }

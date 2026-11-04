@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useRef } from 'react';
+import React, { useId, useState, ReactNode, useRef } from 'react';
 
 import './legacy-expansion-panel.styles.scss';
 
@@ -25,6 +25,8 @@ const LegacyExpansionPanel: React.FC<LegacyExpansionPanelProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(defaultExpanded);
   const contentRef = useRef<HTMLDivElement>(null);
+  const headerId = useId();
+  const contentId = useId();
 
   const togglePanel = () => {
     if (disabled) {
@@ -41,12 +43,13 @@ const LegacyExpansionPanel: React.FC<LegacyExpansionPanelProps> = ({
     <div className={`legacy-expansion-panel ${disabled ? 'disabled' : ''}`}>
       <button
         type="button"
+        id={headerId}
         className="expansion-panel__header"
         onClick={togglePanel}
         aria-expanded={isOpen}
         aria-disabled={disabled}
         // aria-controls references the ID of the content region
-        aria-controls="expansion-panel-content"
+        aria-controls={contentId}
         disabled={disabled}
       >
         <span className="expansion-panel__header-text">{header}</span>
@@ -61,11 +64,11 @@ const LegacyExpansionPanel: React.FC<LegacyExpansionPanelProps> = ({
       </button>
 
       <div
-        id="expansion-panel-content"
+        id={contentId}
         className={`expansion-panel__content ${isOpen ? 'open' : ''}`}
         ref={contentRef}
         role="region"
-        aria-labelledby="expansion-panel-header"
+        aria-labelledby={headerId}
         style={{
           maxHeight: isOpen
             ? `${contentRef.current?.scrollHeight ?? 0}px`
