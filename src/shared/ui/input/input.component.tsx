@@ -74,6 +74,8 @@ const Input: React.FC<InputProps> = ({
           className={inputClass}
           {...inputProps}
           required={required}
+          disabled={disabled}
+          readOnly={readOnly}
           id={inputProps.name}
           data-testid={`input-${inputProps.name}`}
           aria-invalid={error ? true : undefined}
@@ -85,6 +87,7 @@ const Input: React.FC<InputProps> = ({
         {suffixIcon && (
           <button
             type="button"
+            disabled={disabled}
             onClick={handleSuffixClick}
             className="input-suffix"
             aria-label={suffixAriaLabel}

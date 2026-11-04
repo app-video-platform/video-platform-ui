@@ -51,6 +51,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ onNavigate }) => {
         <button
           type="button"
           className={clsx('sidebar-link', 'sidebar-link__disabled')}
+          aria-label={route.label}
           aria-disabled="true"
           title={`${route.label} is planned`}
         >
@@ -63,6 +64,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ onNavigate }) => {
     return (
       <NavLink
         to={route.path}
+        aria-label={route.label}
         end={route.end}
         className={({ isActive }) => linkClass(isActive)}
         onClick={onNavigate}

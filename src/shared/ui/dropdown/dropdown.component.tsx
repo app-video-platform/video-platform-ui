@@ -6,6 +6,7 @@ import './dropdown.styles.scss';
 
 interface DropdownProps {
   customClassName: string;
+  id?: string;
   /** The element that toggles the dropdown open/closed */
   trigger: (props: { open: boolean; toggle: () => void }) => ReactNode;
   /** The actual dropdown menu, rendered only when open=true */
@@ -14,6 +15,7 @@ interface DropdownProps {
 
 const Dropdown: React.FC<DropdownProps> = ({
   customClassName,
+  id,
   trigger,
   menu,
 }) => {
@@ -44,7 +46,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     <div ref={ref} className="dropdown-root">
       {trigger({ open, toggle })}
       {open && (
-        <div className={`dropdown-panel ${customClassName}`}>
+        <div id={id} className={`dropdown-panel ${customClassName}`}>
           {menu({ close })}
         </div>
       )}

@@ -150,9 +150,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
               </Link>
             </div>
             <hr />
-            <div className="dropdown-item logout-btn" onClick={handleLogout}>
+            <button type="button" className="dropdown-item logout-btn" onClick={handleLogout}>
               Logout
-            </div>
+            </button>
           </>
         )}
       />

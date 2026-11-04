@@ -121,4 +121,13 @@ describe('SidebarNav', () => {
       screen.getByRole('button', { name: 'Account footer collapsed' }),
     ).toBeInTheDocument();
   });
+
+  it('keeps the same accessible route names when collapsed', () => {
+    renderSidebar([UserRole.CREATOR]);
+    const names = ['Dashboard', 'Products', 'Customers', 'Sales', 'Analytics', 'Storefront', 'Settings'];
+    names.forEach((name) => expect(screen.getByRole('link', { name })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    names.forEach((name) => expect(screen.getByRole('link', { name })).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Help' })).toHaveAttribute('aria-disabled', 'true');
+  });
 });
