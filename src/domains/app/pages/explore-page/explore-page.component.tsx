@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaRegHeart } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa';
 
@@ -142,15 +142,21 @@ const ExplorePage: React.FC = () => {
                         {product.price}
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      className="creator-route-btn"
-                      onClick={() => navigate(`/store/${product.createdById}`)}
-                    >
+                    {product.createdById ? (
+                      <Link
+                        className="creator-route-btn"
+                        to={appRoutes.store(product.createdById)}
+                      >
+                        <span className="creator">
+                          {product.createdByName}, {product.createdByTitle}
+                        </span>
+                      </Link>
+                    ) : (
                       <span className="creator">
-                        {product.createdByName}, {product.createdByTitle}
+                        {product.createdByName ?? 'Creator'}
+                        {product.createdByTitle ? `, ${product.createdByTitle}` : ''}
                       </span>
-                    </button>
+                    )}
                   </div>
                   <div className="explore-card-actions">
                     <Button

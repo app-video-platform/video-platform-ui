@@ -117,4 +117,33 @@ describe('ProductBox component', () => {
     expect(typeAndPriceContainer.textContent).not.toContain('€');
     expect(typeAndPriceContainer.textContent).toContain('free');
   });
+
+  it('links a searchable product card to its public Creator Storefront', () => {
+    render(
+      <MemoryRouter>
+        <ProductBox
+          product={{
+            ...baseProductWithoutImage,
+            createdById: 'creator-7',
+            createdByName: 'Ada',
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('link', { name: 'Ada' })).toHaveAttribute(
+      'href',
+      '/app/store/creator-7',
+    );
+  });
+
+  it('omits the Creator link when owner identity is missing', () => {
+    render(
+      <MemoryRouter>
+        <ProductBox product={baseProductWithoutImage} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
 });

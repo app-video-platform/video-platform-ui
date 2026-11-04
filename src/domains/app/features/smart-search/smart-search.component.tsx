@@ -8,11 +8,12 @@ import React, {
 } from 'react';
 import debounce from 'lodash.debounce';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Search } from 'domains/app/components';
 import { fetchProducts } from 'core/api/services';
 import { ProductMinimised } from 'core/api/models';
+import { appRoutes } from 'domains/app/routes/routes';
 
 import './smart-search.styles.scss';
 
@@ -20,6 +21,7 @@ const SmartSearch: React.FC = () => {
   const [rawQuery, setRawQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Debounce the raw query into debouncedQuery
@@ -28,6 +30,11 @@ const SmartSearch: React.FC = () => {
     [],
   );
   useEffect(() => () => debouncedSetQuery.cancel(), [debouncedSetQuery]);
+  useEffect(() => {
+    if (location.pathname === appRoutes.exploreSearch) {
+      setRawQuery(new URLSearchParams(location.search).get('term') ?? '');
+    }
+  }, [location.pathname, location.search]);
   useEffect(() => {
     const trimmed = rawQuery.trim();
     if (trimmed.length >= 2) {
@@ -56,66 +63,96 @@ const SmartSearch: React.FC = () => {
   });
 
   const [open, setOpen] = useState(false);
-  const [highlight, setHighlight] = useState(0);
+  const [highlight, setHighlight] = useState(-1);
+  const trimmedQuery = rawQuery.trim();
+  const suggestionsMatchQuery =
+    trimmedQuery.length >= 2 && trimmedQuery === debouncedQuery;
+  const visibleSuggestions = suggestionsMatchQuery ? suggestions : [];
+  const listboxId = 'product-search-suggestions';
+
+  const submitSearch = (query: string) => {
+    const params = new URLSearchParams();
+    params.set('term', query.trim());
+    navigate(`${appRoutes.exploreSearch}?${params.toString()}`);
+    setOpen(false);
+    setHighlight(-1);
+  };
 
   // Open dropdown when suggestions arrive
   useEffect(() => {
-    if (suggestions.length > 0) {
+    if (suggestionsMatchQuery && suggestions.length > 0) {
       setOpen(true);
-      setHighlight(0);
+      setHighlight(-1);
     } else {
       setOpen(false);
     }
-  }, [suggestions]);
+  }, [suggestions, suggestionsMatchQuery]);
 
   // Keyboard navigation
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!open) {
+    if (e.key === 'Escape') {
+      setOpen(false);
+      setHighlight(-1);
+      return;
+    }
+    if (!open || !suggestionsMatchQuery || visibleSuggestions.length === 0) {
       return;
     }
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlight((i) => (i + 1) % suggestions.length);
+        setHighlight((i) => (i + 1 + visibleSuggestions.length) % visibleSuggestions.length);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlight((i) => (i - 1 + suggestions.length) % suggestions.length);
+        setHighlight((i) => (i <= 0 ? visibleSuggestions.length - 1 : i - 1));
         break;
       case 'Enter': {
         e.preventDefault();
-        const pick = suggestions[highlight]?.title ?? rawQuery;
-        navigate(`/app/explore/search?term=${encodeURIComponent(pick)}`);
-        setOpen(false);
+        const selected = highlight >= 0 ? visibleSuggestions[highlight] : undefined;
+        submitSearch(selected?.title ?? rawQuery);
         break;
       }
     }
   };
 
   const handleSelect = (title: string) => {
-    navigate(`/app/explore/search?term=${encodeURIComponent(title)}`);
-    setOpen(false);
+    if (suggestionsMatchQuery) {
+      submitSearch(title);
+    }
   };
 
   return (
     <div className="smart-search-container">
       <Search
         value={rawQuery}
-        onChange={setRawQuery}
-        onSearch={(q) =>
-          navigate(`/app/explore/search?term=${encodeURIComponent(q)}`)
-        }
+        onChange={(query) => {
+          setRawQuery(query);
+          setHighlight(-1);
+          setOpen(false);
+        }}
+        onSearch={submitSearch}
         onKeyDown={handleKeyDown}
         inputRef={inputRef as React.RefObject<HTMLInputElement>}
+        combobox={{
+          controls: listboxId,
+          expanded: open && visibleSuggestions.length > 0,
+          activeDescendant:
+            highlight >= 0 ? `product-search-option-${highlight}` : undefined,
+        }}
       />
 
-      {open && (
-        <ul className="autocomplete-dropdown" role="listbox">
+      <ul
+        className="autocomplete-dropdown"
+        id={listboxId}
+        role="listbox"
+        hidden={!open || !suggestionsMatchQuery}
+      >
           {isFetching && <li className="autocomplete-message">Loading...</li>}
-          {!isFetching && suggestions.length === 0 && (
+          {!isFetching && visibleSuggestions.length === 0 && (
             <li className="autocomplete-message">No suggestions</li>
           )}
-          {suggestions.map((s, idx) => {
+          {visibleSuggestions.map((s, idx) => {
             const titleValue = s.title ?? '';
             const titleLower = titleValue.toLowerCase();
             const termLower = debouncedQuery.toLowerCase();
@@ -124,6 +161,7 @@ const SmartSearch: React.FC = () => {
             return (
               <li
                 key={s.id}
+                id={`product-search-option-${idx}`}
                 role="option"
                 aria-selected={idx === highlight}
                 className={
@@ -144,8 +182,7 @@ const SmartSearch: React.FC = () => {
               </li>
             );
           })}
-        </ul>
-      )}
+      </ul>
     </div>
   );
 };

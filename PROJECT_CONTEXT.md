@@ -2,10 +2,10 @@
 
 Generated from repository state:
 
-Branch: codex/m9-profile-validation-save-feedback
-Base commit: ee826e5
+Branch: codex/m10-discovery-search-reliability
+Base commit: 8674513d3015c718bb0b6ff7c1746916b323b758
 
-Last reviewed: 2026-11-03
+Last reviewed: 2026-11-04
 
 # How to use this document
 
@@ -208,6 +208,36 @@ These read guards complement M1 session-generation middleware and private-cache
 reset. They do not replace backend authorization or add a second session model.
 Navigation invalidates state ownership without requiring transport cancellation;
 M1 session changes retain their existing cancellation and stale-action defenses.
+
+## Explore and Product search state (M10)
+
+The public Explore surface is `/app/explore`; its Product search route is
+`/app/explore/search`. The committed search term and zero-based API page are
+owned by the URL (`term` and optional `page`). New submissions omit `page` to
+start at page zero. Pagination actions update the URL, so reload and browser
+Back/Forward restore the same query/page. Malformed or negative page values are
+normalized to page zero with a history replace. User-visible page numbering is
+one-based.
+
+Search and autocomplete use separate React Query keys. Search keys include term,
+page, and page size; autocomplete suggestions are selectable only while the
+debounced query equals the current trimmed input. A changed input clears the
+highlight immediately, and no suggestion is highlighted until the user moves
+the keyboard selection. A late response remains isolated to its original query
+key and cannot replace the current result set.
+
+Creator storefront links use `appRoutes.store(creatorId)` and resolve to the
+public `/app/store/:creatorId` route. Product cards omit that link when the
+Creator ID is unavailable; public Storefront reads remain subject to the
+existing backend visibility and authorization behavior.
+
+Product pagination currently trusts the backend's `last`/`totalPages` fields
+for whether Next is available. The current public and owner-scoped search
+responses have QA evidence of contradictory totals and `last=true` while later
+pages return additional rows. The frontend displays one-based labels and avoids
+fabricating total counts, but cannot safely infer that an undisclosed page
+exists. Keep BUG-013 open for backend pagination-contract correction and
+revalidate the UI after that contract is fixed.
 
 ## Browser-local Cart and Wishlist lifecycle
 

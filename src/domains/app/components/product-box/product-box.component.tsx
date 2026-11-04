@@ -1,11 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const placeholderImage = require('../../../../assets/image-placeholder.png');
 
 import { Button } from '@shared/ui';
 import { ProductMinimised } from 'core/api/models';
+import { appRoutes } from 'domains/app/routes/routes';
 
 import './product-box.styles.scss';
 
@@ -47,6 +48,14 @@ const ProductBox: React.FC<ProductBoxProps> = ({ product }) => {
             {product.price}
           </span>
         </div>
+        {product.createdById && (
+          <Link
+            className="product-box-creator"
+            to={appRoutes.store(product.createdById)}
+          >
+            {product.createdByName ?? 'View creator storefront'}
+          </Link>
+        )}
       </div>
       <Button
         type="button"
