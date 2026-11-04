@@ -2,8 +2,8 @@
 
 Generated from repository state:
 
-Branch: codex/m10-discovery-search-reliability
-Base commit: 8674513d3015c718bb0b6ff7c1746916b323b758
+Branch: codex/m11-product-storefront-reliability
+Base commit: bc248bf793fc57079e474a51d386ea0d3bfdf6b3
 
 Last reviewed: 2026-11-04
 
@@ -238,6 +238,30 @@ pages return additional rows. The frontend displays one-based labels and avoids
 fabricating total counts, but cannot safely infer that an undisclosed page
 exists. Keep BUG-013 open for backend pagination-contract correction and
 revalidate the UI after that contract is fixed.
+
+## Product and Storefront presentation (M11)
+
+Product detail APIs may return numeric prices as JSON strings while summaries
+normally return numbers. Product service normalization converts valid,
+non-negative decimal strings and numbers to numbers, retains `free`, and
+leaves invalid, precision-losing, or absent prices unset. Overview and landing presentation use
+that normalized value; zero retains the existing Free semantics. The current
+`ProductCurrency` contract supports EUR. Historical Order amounts and checkout
+contracts are separate and must not be rewritten from current Product prices.
+
+The Storefront Builder derives its display order from saved explicit IDs, then
+newest creation time and the backend's Java UUID ordering for ties. It does not
+persist a derived order or mark it dirty. If a remaining Product lacks valid
+creation metadata, its input order is retained because the backend default cannot
+be reconstructed reliably. Featured fallback is the first eligible published
+Product in the effective order. Public pages continue to use the API's order.
+
+Landing Builder uses the Product owner's public Storefront for a cross-owner
+preview, including its theme. Only the Creator owner requests private Creator
+Storefront config and uses their own profile. Public Storefront cache selection
+is keyed by owner ID; an unavailable owner profile must not be replaced with the
+signed-in Admin's identity. Saved nonempty public title/bio take precedence over
+fallback text.
 
 ## Browser-local Cart and Wishlist lifecycle
 

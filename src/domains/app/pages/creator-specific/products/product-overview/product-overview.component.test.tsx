@@ -115,6 +115,37 @@ describe('<ProductOverview />', () => {
     mock.restore();
   });
 
+  it('shows a saved string price and distinguishes unset buffers from zero', async () => {
+    mock.onGet('api/products/consultation-1').reply(200, {
+      id: 'consultation-1', name: 'Consultation', type: 'CONSULTATION',
+      price: '12.50', currency: 'EUR',
+      consultationDetails: { durationMinutes: 30, bufferBeforeMinutes: null, bufferAfterMinutes: 0 },
+    });
+    renderOverview('/app/products/consultation-1');
+
+    expect(await screen.findByText('€12.50')).toBeInTheDocument();
+    expect(screen.queryByText('Buffer before')).not.toBeInTheDocument();
+    expect(screen.getByText('0 minutes')).toBeInTheDocument();
+    expect(screen.queryByText('null minutes')).not.toBeInTheDocument();
+    expect(screen.queryByText('undefined minutes')).not.toBeInTheDocument();
+  });
+
+  it.each([undefined, null, 0, 15])('renders optional Consultation buffers for %s', async (value) => {
+    mock.onGet('api/products/consultation-1').reply(200, {
+      id: 'consultation-1', name: 'Consultation', type: 'CONSULTATION', price: 0,
+      consultationDetails: { bufferBeforeMinutes: value, bufferAfterMinutes: value },
+    });
+    renderOverview('/app/products/consultation-1');
+    await screen.findByRole('heading', { name: 'Consultation' });
+    if (value === null || value === undefined) {
+      expect(screen.queryByText('Buffer before')).not.toBeInTheDocument();
+      expect(screen.queryByText('Buffer after')).not.toBeInTheDocument();
+    } else {
+      expect(screen.getAllByText(`${value} minutes`)).toHaveLength(2);
+    }
+    expect(screen.queryByText(/^(null|undefined) minutes$/)).not.toBeInTheDocument();
+  });
+
   it('renders a loaded Course product with status, pricing, dates, and content summary', async () => {
     mock.onGet('api/products/course-1').reply(200, courseProduct);
 

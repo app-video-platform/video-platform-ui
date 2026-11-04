@@ -118,17 +118,52 @@ export const orderStorefrontProducts = (
   products: StorefrontProduct[],
   orderedIds: string[],
 ) => {
-  if (orderedIds.length === 0) {
-    return products;
-  }
-
   const byId = new Map(products.map((product) => [product.id, product]));
-  const ordered = orderedIds
+  const ordered = [...new Set(orderedIds)]
     .map((id) => byId.get(id))
     .filter((product): product is StorefrontProduct => Boolean(product));
-  const remaining = products.filter(
-    (product) => !orderedIds.includes(product.id),
-  );
+  const remaining = products.filter((product) => !orderedIds.includes(product.id));
+  const timestamp = (value?: Date | string) => {
+    if (!value) {
+      return null;
+    }
+    const time = new Date(value).getTime();
+    return Number.isNaN(time) ? null : time;
+  };
+  // Missing creation metadata cannot distinguish an unknown date from a null
+  // backend date. Retain input order until a complete ordering can be derived.
+  if (remaining.some((product) => timestamp(product.createdAt) === null)) {
+    return [...ordered, ...remaining];
+  }
+  remaining.sort((left, right) => {
+    const a = timestamp(left.createdAt);
+    const b = timestamp(right.createdAt);
+    if (a !== b) {
+      return a === null ? 1 : b === null ? -1 : b - a;
+    }
+    const fraction = (value?: Date | string) => {
+      const text = value instanceof Date ? value.toISOString() : value ?? '';
+      return (text.match(/T\d\d:\d\d:\d\d\.(\d+)/)?.[1] ?? '').padEnd(9, '0').slice(0, 9);
+    };
+    const leftFraction = fraction(left.createdAt);
+    const rightFraction = fraction(right.createdAt);
+    if (leftFraction !== rightFraction) {
+      return leftFraction > rightFraction ? -1 : 1;
+    }
+    // Java UUID.compareTo compares the two signed 64-bit halves.
+    const uuidKey = (id: string) => {
+      const hex = id.toLowerCase().replace(/-/g, '');
+      if (!/^[0-9a-f]{32}$/.test(hex)) {
+        return id;
+      }
+      const signedHalf = (half: string) =>
+        (parseInt(half[0], 16) ^ 8).toString(16) + half.slice(1);
+      return signedHalf(hex.slice(0, 16)) + signedHalf(hex.slice(16));
+    };
+    const leftKey = uuidKey(left.id);
+    const rightKey = uuidKey(right.id);
+    return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+  });
 
   return [...ordered, ...remaining];
 };

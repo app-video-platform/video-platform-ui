@@ -225,6 +225,12 @@ describe('<ProductPage />', () => {
     mock.restore();
   });
 
+  it('renders a positive detail price returned as a string', async () => {
+    mock.onGet('api/products/course-1').reply(200, { ...courseProduct, price: '99.99' });
+    renderProductPage();
+    expect((await screen.findAllByText('€99.99')).length).toBeGreaterThan(0);
+  });
+
   it('renders a published Product through the shared landing page with real data', async () => {
     mock.onGet('api/products/course-1').reply(200, courseProduct);
 

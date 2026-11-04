@@ -80,6 +80,25 @@ describe('CreatorStorefrontPage', () => {
     jest.clearAllMocks();
   });
 
+  it('derives the public default featured order without marking the config dirty', async () => {
+    mock.resetHandlers();
+    mock.onGet('api/creator/storefront').reply(200, {
+      id: 'config', featuredProductId: null, productOrderIds: [],
+      theme: { appearance: 'DARK', accentColor: '#ffbd41', typography: 'MODERN' },
+    });
+    mock.onGet('api/products?ownerId=creator-1').reply(200, [
+      { id: 'alpha', title: 'Alpha', type: 'DOWNLOAD', status: 'PUBLISHED', createdAt: '2026-01-01T00:00:00Z' },
+      { id: 'gamma', title: 'Gamma', type: 'DOWNLOAD', status: 'PUBLISHED', createdAt: '2026-03-01T00:00:00Z' },
+      { id: 'beta', title: 'Beta', type: 'DOWNLOAD', status: 'PUBLISHED', createdAt: '2026-02-01T00:00:00Z' },
+    ]);
+    const { container } = renderManagement();
+    await screen.findAllByText('Gamma');
+    const preview = container.querySelector('.storefront-public') as HTMLElement;
+    expect(within(preview).getByRole('heading', { name: 'Gamma', level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expect(mock.history.patch).toHaveLength(0);
+  });
+
   it('loads config and product catalogue through Redux-backed HTTP requests', async () => {
     renderManagement();
 

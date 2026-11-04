@@ -68,7 +68,7 @@ const StorefrontPublicPage: React.FC<StorefrontPublicPageProps> = ({
       | 'publicEmail',
     value = '',
     fallback?: React.ReactNode,
-  ) => editableFields?.[field]?.(value) ?? fallback ?? value;
+  ) => editableFields?.[field]?.(value) ?? (value?.trim() ? value : fallback ?? '');
 
   return (
     <article
@@ -119,8 +119,8 @@ const StorefrontPublicPage: React.FC<StorefrontPublicPageProps> = ({
             {renderEditable(
               'tagline',
               profile.tagline || '',
-              profile.tagline ||
-                profile.title ||
+              (profile.tagline?.trim() ? profile.tagline : undefined) ||
+                (profile.title?.trim() ? profile.title : undefined) ||
                 'Digital products from this creator.',
             )}
           </p>

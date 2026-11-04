@@ -258,14 +258,14 @@ const ProductContentSummary: React.FC<{
               {
                 label: 'Buffer before',
                 value:
-                  details.bufferBeforeMinutes !== undefined
+                  details.bufferBeforeMinutes !== undefined && details.bufferBeforeMinutes !== null
                     ? `${details.bufferBeforeMinutes} minutes`
                     : undefined,
               },
               {
                 label: 'Buffer after',
                 value:
-                  details.bufferAfterMinutes !== undefined
+                  details.bufferAfterMinutes !== undefined && details.bufferAfterMinutes !== null
                     ? `${details.bufferAfterMinutes} minutes`
                     : undefined,
               },
