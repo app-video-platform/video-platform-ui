@@ -26,19 +26,21 @@ export type ConsultationProductResponseDetails =
       consultationDetails?: ConsultationProduct['consultationDetails'];
     };
 
-export type CourseProductApiResponse = CourseProduct & {
+type ApiPrice = { price?: number | string | null };
+
+export type CourseProductApiResponse = Omit<CourseProduct, 'price'> & ApiPrice & {
   details?: CourseProductResponseDetails | null;
 };
 
-export type DownloadProductApiResponse = DownloadProduct & {
+export type DownloadProductApiResponse = Omit<DownloadProduct, 'price'> & ApiPrice & {
   details?: DownloadProductResponseDetails | null;
 };
 
-export type ConsultationProductApiResponse = ConsultationProduct & {
+export type ConsultationProductApiResponse = Omit<ConsultationProduct, 'price'> & ApiPrice & {
   details?: ConsultationProductResponseDetails | null;
 };
 
-export type MembershipProductApiResponse = MembershipProduct & {
+export type MembershipProductApiResponse = Omit<MembershipProduct, 'price'> & ApiPrice & {
   details?: null;
 };
 

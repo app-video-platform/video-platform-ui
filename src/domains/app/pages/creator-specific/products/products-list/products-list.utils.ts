@@ -1,5 +1,6 @@
 import {
   ProductBillingInterval,
+  ProductCurrency,
   ProductMinimised,
   ProductPricingModel,
   ProductStatus,
@@ -12,6 +13,7 @@ interface ProductPricingFields {
   pricingModel?: ProductPricingModel;
   billingInterval?: ProductBillingInterval;
   type?: ProductType;
+  currency?: ProductCurrency;
 }
 
 export type ProductsStatusFilter = 'all' | ProductStatus;
@@ -116,8 +118,9 @@ export const formatProductPrice = (
 
   const formatted = new Intl.NumberFormat('en-IE', {
     style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: Number.isInteger(product.price) ? 0 : 2,
+    currency: product.currency ?? 'EUR',
+    minimumFractionDigits: Number.isInteger(product.price) ? 0 : 2,
+    maximumFractionDigits: 20,
   }).format(product.price);
 
   if (product.pricingModel === 'RECURRING' && product.billingInterval) {

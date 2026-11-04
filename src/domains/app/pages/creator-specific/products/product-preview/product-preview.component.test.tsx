@@ -178,6 +178,13 @@ describe('<ProductPreview />', () => {
     mock.restore();
   });
 
+  it('renders a saved string price in the private preview', async () => {
+    const product = makeProduct('DRAFT');
+    mock.onGet(`api/products/${product.id}`).reply(200, { ...product, price: '12.50' });
+    renderPreview(product.id);
+    expect((await screen.findAllByText('€12.50')).length).toBeGreaterThan(0);
+  });
+
   it.each<ProductStatus>(['DRAFT', 'HIDDEN', 'PUBLISHED'])(
     'renders a creator-only %s Product through the shared landing page',
     async (status) => {

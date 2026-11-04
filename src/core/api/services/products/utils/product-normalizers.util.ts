@@ -4,9 +4,39 @@ import {
   ProductMinimised,
 } from 'core/api/models';
 
+export const normalizeProductPrice = (price: unknown): number | 'free' | undefined => {
+  if (price === 'free') {
+    return 'free';
+  }
+  if (typeof price !== 'number' && typeof price !== 'string') {
+    return undefined;
+  }
+  if (typeof price === 'string' && !/^\d+(?:\.\d+)?$/.test(price.trim())) {
+    return undefined;
+  }
+  const amount = typeof price === 'string' ? Number(price.trim()) : price;
+  if (!Number.isFinite(amount) || amount < 0 || amount > Number.MAX_SAFE_INTEGER) {
+    return undefined;
+  }
+  if (typeof price === 'string') {
+    const [whole, fractional = ''] = price.trim().split('.');
+    const decimal = fractional.replace(/0+$/, '');
+    const canonical = `${whole.replace(/^0+(?=\d)/, '')}${decimal ? `.${decimal}` : ''}`;
+    const roundTrip = new Intl.NumberFormat('en-US', {
+      useGrouping: false,
+      maximumFractionDigits: 20,
+    }).format(amount);
+    if (roundTrip !== canonical) {
+      return undefined;
+    }
+  }
+  return amount;
+};
+
 export const normalizeProductResponse = (
-  product: AbstractProductApiResponse,
+  response: AbstractProductApiResponse,
 ): AbstractProduct => {
+  const product = { ...response, price: normalizeProductPrice(response.price) } as AbstractProduct & AbstractProductApiResponse;
   switch (product.type) {
   case 'COURSE':
   case 'DOWNLOAD': {
@@ -53,4 +83,4 @@ export const normalizeProductResponse = (
 
 export const normalizeProductSummary = (
   product: ProductMinimised,
-): ProductMinimised => product;
+): ProductMinimised => ({ ...product, price: normalizeProductPrice(product.price) });

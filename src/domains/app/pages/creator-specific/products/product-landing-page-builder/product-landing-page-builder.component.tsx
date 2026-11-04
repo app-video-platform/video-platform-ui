@@ -18,6 +18,8 @@ import {
   ProductLandingPageHeroLayout,
   ProductLandingPageSectionId,
   RootState,
+  hasRole,
+  UserRole,
 } from 'core/api/models';
 import { Button, Drawer, Icon, StatusBadge, Textarea } from '@shared/ui';
 import { appRoutes } from 'domains/app/routes/routes';
@@ -40,7 +42,9 @@ import {
 } from 'core/store/product-landing-page-store';
 import {
   fetchCreatorStorefrontConfig,
+  fetchPublicStorefront,
   selectCreatorStorefrontConfig,
+  selectPublicStorefrontByCreatorId,
 } from 'core/store/storefront-store';
 import {
   DEFAULT_PRODUCT_LANDING_PAGE_CONFIG,
@@ -134,10 +138,6 @@ const ProductLandingPageBuilder: React.FC = () => {
   const [isMobileCustomize, setIsMobileCustomize] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchCreatorStorefrontConfig());
-  }, [dispatch]);
-
-  useEffect(() => {
     if (!window.matchMedia) {
       return undefined;
     }
@@ -167,6 +167,23 @@ const ProductLandingPageBuilder: React.FC = () => {
   }, [persistedConfig, productId]);
 
   const loadedProduct = product?.id === productId ? product : null;
+  const isCreatorOwner = Boolean(
+    loadedProduct?.userId && user?.id === loadedProduct.userId &&
+      hasRole(user?.roles, UserRole.CREATOR),
+  );
+  const publicStorefront = useSelector((state: RootState) =>
+    selectPublicStorefrontByCreatorId(state, loadedProduct?.userId),
+  );
+  useEffect(() => {
+    if (!loadedProduct?.userId) {
+      return;
+    }
+    if (isCreatorOwner) {
+      dispatch(fetchCreatorStorefrontConfig());
+    } else if (!publicStorefront) {
+      dispatch(fetchPublicStorefront(loadedProduct.userId));
+    }
+  }, [dispatch, isCreatorOwner, loadedProduct?.userId, publicStorefront]);
   const baselineConfig = useMemo(() => {
     if (!productId) {
       return DEFAULT_PRODUCT_LANDING_PAGE_CONFIG;
@@ -183,13 +200,14 @@ const ProductLandingPageBuilder: React.FC = () => {
     return getProductLandingPageViewModel({
       product: loadedProduct,
       currentUser: user,
-      creatorStorefrontTheme: creatorStorefrontConfig?.theme,
+      publicStorefront: isCreatorOwner ? undefined : publicStorefront,
+      creatorStorefrontTheme: isCreatorOwner ? creatorStorefrontConfig?.theme : undefined,
       landingPageConfig: {
         ...draftConfig,
         productId: loadedProduct.id,
       },
     });
-  }, [creatorStorefrontConfig?.theme, draftConfig, loadedProduct, user]);
+  }, [creatorStorefrontConfig?.theme, draftConfig, isCreatorOwner, loadedProduct, publicStorefront, user]);
 
   const updateDraft = (patch: Partial<DraftConfig>) => {
     setSavedMessage(null);

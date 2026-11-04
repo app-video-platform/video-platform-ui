@@ -42,6 +42,25 @@ const renderStorefront = (products = storefrontProductSummariesTestFixture) =>
   );
 
 describe('StorefrontPublicPage', () => {
+  it('renders saved title and biography rather than placeholders', () => {
+    renderStorefront();
+    expect(screen.getByText(publicStorefrontTestFixture.creator.title as string)).toBeInTheDocument();
+    expect(screen.getByText(publicStorefrontTestFixture.creator.bio as string)).toBeInTheDocument();
+    expect(screen.queryByText('Add a public bio.')).not.toBeInTheDocument();
+  });
+
+  it('uses the title fallback for whitespace-only public copy', () => {
+    render(
+      <MemoryRouter>
+        <StorefrontPublicPage storefront={getStorefrontViewModelFromPublicStorefront({
+          ...publicStorefrontTestFixture,
+          creator: { ...publicStorefrontTestFixture.creator, title: '   ', bio: '   ' },
+        })} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Creator')).toBeInTheDocument();
+    expect(screen.getByText('Add a public bio.')).toBeInTheDocument();
+  });
   it('renders published products and hides draft or hidden products', () => {
     renderStorefront();
 

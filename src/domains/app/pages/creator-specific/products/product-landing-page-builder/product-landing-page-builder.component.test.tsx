@@ -15,6 +15,7 @@ import productReducer from 'core/store/product-store/product.slice';
 import storefrontReducer from 'core/store/storefront-store/storefront.slice';
 
 import ProductLandingPageBuilder from './product-landing-page-builder.component';
+import { publicStorefrontTestFixture } from 'core/api/test-fixtures/creator-storefront-http.mock';
 
 jest.mock('../../../../../../assets/image-placeholder.png', () => 'placeholder.png');
 
@@ -47,7 +48,7 @@ const courseProduct: AbstractProduct = {
   ],
 };
 
-const renderBuilder = (initialEntry = '/app/products/course-1/landing-page') => {
+const renderBuilder = (initialEntry = '/app/products/course-1/landing-page', asAdmin = false) => {
   const testStore = configureStore({
     reducer: {
       auth: authReducer,
@@ -58,11 +59,11 @@ const renderBuilder = (initialEntry = '/app/products/course-1/landing-page') => 
     preloadedState: {
       auth: {
         user: {
-          id: 'creator-1',
-          firstName: 'Maya',
+          id: asAdmin ? 'admin-1' : 'creator-1',
+          firstName: asAdmin ? 'Admin' : 'Maya',
           lastName: 'Chen',
           email: 'maya@example.test',
-          roles: [UserRole.CREATOR],
+          roles: [asAdmin ? UserRole.ADMIN : UserRole.CREATOR],
           onboardingCompleted: true,
           title: 'Creator strategist',
           bio: 'Helps creators package useful products.',
@@ -142,6 +143,30 @@ describe('<ProductLandingPageBuilder />', () => {
     expect(container.querySelector('.product-landing__hero'))
       .toHaveClass('product-landing__hero--media-left');
     expect(screen.queryByDisplayValue('Creator Product Growth System')).toBeNull();
+  });
+
+  it.each(['COURSE', 'DOWNLOAD', 'CONSULTATION', 'MEMBERSHIP'] as const)(
+    'uses the public owner profile for an Admin viewing a foreign %s',
+    async (type) => {
+      mock.onGet('api/products/course-1').reply(200, { ...courseProduct, type });
+      mock.onGet('api/storefronts/creator-1').reply(200, publicStorefrontTestFixture);
+      const { container } = renderBuilder(undefined, true);
+
+      expect(await screen.findByText('Maya Rivera')).toBeInTheDocument();
+      expect(screen.getByText(publicStorefrontTestFixture.creator.bio as string)).toBeInTheDocument();
+      expect(screen.queryByText('Admin Chen')).not.toBeInTheDocument();
+      expect(container.querySelector('.product-landing')).toHaveClass('product-landing--dark');
+      expect(mock.history.get.some((request) => request.url === 'api/creator/storefront')).toBe(false);
+    },
+  );
+
+  it('does not substitute the Admin profile if the owner Storefront is unavailable', async () => {
+    mock.onGet('api/storefronts/creator-1').reply(404);
+    renderBuilder(undefined, true);
+    await screen.findAllByRole('heading', { name: 'Creator Product Growth System' });
+    await waitFor(() => expect(mock.history.get.some((request) => request.url === 'api/storefronts/creator-1')).toBe(true));
+    expect(screen.queryByText('Admin Chen')).not.toBeInTheDocument();
+    expect(mock.history.get.some((request) => request.url === 'api/creator/storefront')).toBe(false);
   });
 
   it('updates the shared preview from a local draft before saving', async () => {

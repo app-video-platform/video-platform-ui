@@ -125,7 +125,8 @@ const formatCurrency = (
   new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
-    maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    maximumFractionDigits: 20,
   }).format(amount);
 
 export const getProductLandingPrice = (
