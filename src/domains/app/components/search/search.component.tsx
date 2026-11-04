@@ -23,6 +23,12 @@ type SearchProps = {
   placeholder?: string;
   /** Extra className for styling */
   customClassName?: string;
+  /** Optional combobox semantics for autocomplete consumers. */
+  combobox?: {
+    controls: string;
+    expanded: boolean;
+    activeDescendant?: string;
+  };
 };
 
 const Search: React.FC<SearchProps> = ({
@@ -33,6 +39,7 @@ const Search: React.FC<SearchProps> = ({
   inputRef,
   placeholder = 'Search...',
   customClassName = '',
+  combobox,
 }) => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -53,6 +60,11 @@ const Search: React.FC<SearchProps> = ({
         placeholder={placeholder}
         className="search-input"
         aria-label="Product search"
+        role={combobox ? 'combobox' : undefined}
+        aria-autocomplete={combobox ? 'list' : undefined}
+        aria-expanded={combobox?.expanded}
+        aria-controls={combobox?.controls}
+        aria-activedescendant={combobox?.activeDescendant}
       />
       <button
         type="submit"

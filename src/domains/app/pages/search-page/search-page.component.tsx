@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { fetchProducts, SearchResponse } from 'core/api/services';
@@ -9,11 +9,14 @@ import { ProductMinimised } from 'core/api/models';
 import './search-page.styles.scss';
 
 const SearchResultsPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const term = searchParams.get('term') ?? '';
-  const pageParam = parseInt(searchParams.get('page') || '0', 10);
-  const [page, setPage] = useState<number>(pageParam);
+  const rawPage = searchParams.get('page');
+  const parsedPage = rawPage === null ? 0 : Number(rawPage);
+  const pageIsValid =
+    rawPage === null ||
+    (/^(0|[1-9]\d*)$/.test(rawPage) && Number.isSafeInteger(parsedPage));
+  const page = pageIsValid && parsedPage >= 0 ? parsedPage : 0;
   const size = 20;
 
   // Fetch page of results
@@ -21,29 +24,37 @@ const SearchResultsPage: React.FC = () => {
     SearchResponse<ProductMinimised>,
     Error
   >({
-    queryKey: ['products-search', term, page],
+    queryKey: ['products-search', term, page, size],
     queryFn: () => fetchProducts({ term, page, size }),
   });
+  const totalPages = data ? Math.max(1, data.totalPages || 0) : undefined;
 
-  // Sync page state to URL
+  // The URL is the committed state. Normalize malformed/negative page values
+  // with replace so history retains the user's actual navigation steps.
   useEffect(() => {
-    const params = new URLSearchParams({ term });
-    if (page > 0) {
-      params.set('page', String(page));
+    if (!pageIsValid || parsedPage < 0) {
+      setSearchParams((current) => {
+        const params = new URLSearchParams();
+        if (current.has('term')) {
+          params.set('term', current.get('term') ?? '');
+        }
+        return params;
+      }, { replace: true });
     }
-    navigate({ search: params.toString() }, { replace: true });
-  }, [term, page, navigate]);
+  }, [pageIsValid, parsedPage, setSearchParams]);
 
-  // Prefetch next page for smoother transitions
-  useEffect(() => {
-    if (
-      data &&
-      data.pageable &&
-      data?.pageable?.pageNumber < data.totalPages - 1
-    ) {
-      fetchProducts({ term, page: page + 1, size });
-    }
-  }, [data, term, page]);
+  const goToPage = (nextPage: number) => {
+    setSearchParams((current) => {
+      const params = new URLSearchParams();
+      if (current.has('term')) {
+        params.set('term', current.get('term') ?? '');
+      }
+      if (nextPage > 0) {
+        params.set('page', String(nextPage));
+      }
+      return params;
+    });
+  };
 
   if (isLoading) {
     return <div className="results-loading">Loading results...</div>;
@@ -60,7 +71,18 @@ const SearchResultsPage: React.FC = () => {
         <h1 className="results-title">Results for “{term}”</h1>
 
         {data?.content.length === 0 ? (
-          <p className="results-empty">No products found for “{term}”.</p>
+          <div className="results-empty">
+            <p>
+              {page > 0
+                ? `No products found on page ${page + 1} for “${term}”.`
+                : `No products found for “${term}”.`}
+            </p>
+            {page > 0 && (
+              <button type="button" onClick={() => goToPage(0)}>
+                Return to first page
+              </button>
+            )}
+          </div>
         ) : (
           <ul className="results-list">
             {data?.content.map((p: ProductMinimised) => (
@@ -71,21 +93,24 @@ const SearchResultsPage: React.FC = () => {
 
         <div className="results-pagination">
           <button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+            onClick={() => goToPage(Math.max(page - 1, 0))}
             disabled={page === 0}
             className="pagination-button"
+            aria-label="Previous results page"
           >
             Prev
           </button>
-          <span className="pagination-info">
-            Page {data && data.number && data.number + 1} of{' '}
-            {data && data.totalPages}
+          <span className="pagination-info" aria-live="polite">
+            {totalPages !== undefined && page < totalPages
+              ? `Page ${page + 1} of ${totalPages}`
+              : `Page ${page + 1}`}
           </span>
           {data && (
             <button
-              onClick={() => setPage((prev) => prev + 1)}
-              disabled={data.number + 1 >= data.totalPages}
+              onClick={() => goToPage(page + 1)}
+              disabled={data.last || page + 1 >= (totalPages ?? 1)}
               className="pagination-button"
+              aria-label="Next results page"
             >
               Next
             </button>

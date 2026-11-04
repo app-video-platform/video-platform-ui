@@ -1,7 +1,8 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
+import '@testing-library/jest-dom';
 
 import { ProductMinimised } from 'core/api/models';
 import { getAllProductsMinimalAPI } from 'core/api/services';
@@ -51,7 +52,7 @@ describe('ExplorePage', () => {
   });
 
   it('navigates Explore product cards to the app product detail route', async () => {
-    render(<ExplorePage />);
+    render(<MemoryRouter><ExplorePage /></MemoryRouter>);
 
     const viewProductButton = await screen.findByRole('button', {
       name: /view product/i,
@@ -61,5 +62,23 @@ describe('ExplorePage', () => {
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith('/app/product/product-1/COURSE');
     });
+  });
+
+  it('links the Creator name to the canonical public Storefront route', async () => {
+    render(<MemoryRouter><ExplorePage /></MemoryRouter>);
+
+    expect(
+      await screen.findByRole('link', { name: /Ada, Instructor/i }),
+    ).toHaveAttribute('href', '/app/store/creator-1');
+  });
+
+  it('does not create a broken Creator link when identity is unavailable', async () => {
+    (getAllProductsMinimalAPI as jest.Mock).mockResolvedValueOnce([
+      { ...product, createdById: undefined },
+    ]);
+    render(<MemoryRouter><ExplorePage /></MemoryRouter>);
+
+    expect(await screen.findByText('Ada, Instructor')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Ada/i })).not.toBeInTheDocument();
   });
 });

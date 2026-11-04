@@ -61,15 +61,15 @@ jest.mock('../pages', () => {
   };
 });
 
-const renderRouter = (roles: UserRole[], initialEntry = '/') => {
+const renderRouter = (roles: UserRole[] | null, initialEntry = '/') => {
   const state = {
     auth: {
-      user: {
+      user: roles ? {
         firstName: 'Test',
         lastName: 'User',
         email: 'test@example.test',
         roles,
-      },
+      } : null,
       loading: false,
       error: null,
       isUserLoggedIn: true,
@@ -177,9 +177,11 @@ describe('AppRouter role routing', () => {
     expect(screen.getByText('Creator Storefront')).toBeInTheDocument();
   });
 
-  it('renders the public Storefront route outside the protected Creator route', () => {
-    renderRouter([UserRole.USER], '/store/creator-1');
-
-    expect(screen.getByText('Storefront')).toBeInTheDocument();
-  });
+  it.each([null, [UserRole.USER], [UserRole.CREATOR], [UserRole.ADMIN]])(
+    'keeps the public Storefront route available to %s',
+    (roles) => {
+      renderRouter(roles, '/store/creator-1');
+      expect(screen.getByText('Storefront')).toBeInTheDocument();
+    },
+  );
 });
