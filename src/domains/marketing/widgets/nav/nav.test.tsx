@@ -9,9 +9,11 @@ import '@testing-library/jest-dom';
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(),
 }));
+const mockLocation = { pathname: '/' };
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
+  useLocation: () => mockLocation,
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
     <a href={to}>{children}</a>
   ),
@@ -55,6 +57,26 @@ describe('Navigation component', () => {
     expect(
       screen.getByRole('button', { name: /Sign In/i }),
     ).toBeInTheDocument();
+  });
+
+  it('opens and dismisses navigation with Escape, restoring focus', () => {
+    (useSelector as unknown as jest.Mock).mockReturnValue(null);
+    render(<Navigation />);
+    const trigger = screen.getByRole('button', { name: 'Menu' });
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger).toHaveFocus();
+  });
+
+  it('does not show guest actions while the session is resolving', () => {
+    (useSelector as unknown as jest.Mock).mockImplementation((selector) =>
+      selector({ auth: { user: null, sessionStatus: 'resolving' } }),
+    );
+    render(<Navigation />);
+    expect(screen.queryByRole('button', { name: 'Sign In' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Register' })).not.toBeInTheDocument();
   });
 
   it('renders user profile dropdown when a user is present', () => {

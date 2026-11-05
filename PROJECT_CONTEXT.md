@@ -968,6 +968,11 @@ Avoid hardcoding viewport-specific pixel values into this document; inspect the 
 - Forward native disabled and read-only states to form controls. Shared Textarea generates an instance-specific ID for its label and validation description unless an ID is supplied.
 - Icon-only navigation and menu triggers need accessible names; notification unread state is presentation of session-local Redux data and does not imply a read or persistence API.
 
+## Responsive public navigation and Settings
+
+- Marketing and marketplace headers each use their existing navigation content in a compact, non-modal menu at narrower widths. Menu state closes on route changes and Escape restores focus to its trigger. Marketplace keeps the existing SmartSearch visible in a separate row when compact; its form must shrink within its container so it cannot overlap Explore.
+- Settings keeps all tabs in a contained horizontal tab strip on narrow screens and stacks sections and action rows. Do not hide document overflow to compensate for oversized fields or controls.
+
 ## Recent / Unfinished Work
 
 Recent Git history includes admin role/product ownership work, Membership frontend work, and the authenticated Creator redesign:

@@ -10,7 +10,8 @@
   }
 
   .social-link {
-    width: 350px;
+    width: 50%;
+    min-width: 0;
 
     input {
       text-align: right;
@@ -20,6 +21,7 @@
   }
 
   .social-link-input {
+    min-width: 0;
     input {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;

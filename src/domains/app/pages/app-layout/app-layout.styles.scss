@@ -9,7 +9,7 @@
     flex-direction: column;
 
     .app-header {
-      height: 64px;
+      min-height: 64px;
       background: var(--surface-canvas);
       border-bottom: 1px solid var(--border-subtle);
       position: sticky;
