@@ -1,4 +1,4 @@
-import React, { useId, useState, ReactNode, useRef } from 'react';
+import React, { useId, useState, ReactNode, useRef, useLayoutEffect } from 'react';
 
 import './legacy-expansion-panel.styles.scss';
 
@@ -25,8 +25,21 @@ const LegacyExpansionPanel: React.FC<LegacyExpansionPanelProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(defaultExpanded);
   const contentRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(0);
   const headerId = useId();
   const contentId = useId();
+
+  useLayoutEffect(() => {
+    const inner = innerRef.current;
+    if (!inner) { return undefined; }
+    const measure = () => setContentHeight(inner.scrollHeight);
+    measure();
+    if (typeof ResizeObserver === 'undefined') { return undefined; }
+    const observer = new ResizeObserver(measure);
+    observer.observe(inner);
+    return () => observer.disconnect();
+  }, [children]);
 
   const togglePanel = () => {
     if (disabled) {
@@ -69,13 +82,12 @@ const LegacyExpansionPanel: React.FC<LegacyExpansionPanelProps> = ({
         ref={contentRef}
         role="region"
         aria-labelledby={headerId}
+        aria-hidden={!isOpen}
         style={{
-          maxHeight: isOpen
-            ? `${contentRef.current?.scrollHeight ?? 0}px`
-            : '0px',
+          maxHeight: isOpen ? `${contentHeight}px` : '0px',
         }}
       >
-        <div className="expansion-panel__content-inner">{children}</div>
+        <div ref={innerRef} className="expansion-panel__content-inner">{children}</div>
       </div>
     </div>
   );

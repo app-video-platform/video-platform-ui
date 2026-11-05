@@ -8,6 +8,14 @@
   padding: 120px 0;
 }
 
+@media (max-width: 768px) {
+  .different-section {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .different-list { min-width: 0; }
+}
+
 .different-heading-container {
   h2 {
     font-size: $size-xl;

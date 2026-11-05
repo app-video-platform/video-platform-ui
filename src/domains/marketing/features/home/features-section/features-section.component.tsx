@@ -28,6 +28,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const revealRef = useRef<gsap.core.Timeline | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const FEATURES: FeatureObject[] = useMemo(
@@ -94,7 +95,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         gsap.set(header, { autoAlpha: 0, y: 18, filter: 'blur(10px)' });
       }
       gsap.set(items, {
-        autoAlpha: 0,
+        opacity: 0,
         y: 14,
         filter: 'blur(8px)',
         willChange: 'transform, opacity, filter',
@@ -111,6 +112,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
       }
 
       const tl = gsap.timeline({ paused: true });
+      revealRef.current = tl;
 
       // Header reveal
       if (header) {
@@ -127,7 +129,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
       tl.to(
         items,
         {
-          autoAlpha: 1,
+          opacity: 1,
           y: 0,
           filter: 'blur(0px)',
           duration: 0.65,
@@ -160,7 +162,10 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         content.classList.toggle('is-revealing', on);
       };
       tl.eventCallback('onStart', () => setRevealing(true));
-      tl.eventCallback('onComplete', () => setRevealing(false));
+      tl.eventCallback('onComplete', () => {
+        setRevealing(false);
+        gsap.set(items, { clearProps: 'opacity,visibility' });
+      });
       tl.eventCallback('onReverseComplete', () => setRevealing(false));
 
       // Play / reverse trigger
@@ -212,7 +217,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
       }
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => { revealRef.current = null; ctx.revert(); };
   }, []);
 
   return (
@@ -241,7 +246,9 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         />
       </div>
 
-      <div className="features-content" ref={contentRef}>
+      <div className="features-content" ref={contentRef}
+        onFocusCapture={() => revealRef.current?.progress(1)}
+        onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) { setActiveIndex(null); } }}>
         {FEATURES.map((feat, index) => (
           <button
             key={index}

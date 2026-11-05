@@ -27,6 +27,7 @@ const CTASection: React.FC<CTASectionProps> = ({
   onSecondaryClick,
 }) => {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const revealRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     if (!sectionRef.current) {
@@ -51,13 +52,14 @@ const CTASection: React.FC<CTASectionProps> = ({
         gsap.set(header, { autoAlpha: 0, y: 20, filter: 'blur(10px)' });
       }
       if (btnWrap) {
-        gsap.set(btnWrap, { autoAlpha: 0, y: 14, filter: 'blur(8px)' });
+        gsap.set(btnWrap, { opacity: 0, y: 14, filter: 'blur(8px)' });
       }
 
       // Also “calm” the buttons initially (so they don't pop)
       gsap.set(btns, { scale: 0.985 });
 
       const tl = gsap.timeline({ paused: true });
+      revealRef.current = tl;
 
       if (header) {
         tl.to(header, {
@@ -73,7 +75,7 @@ const CTASection: React.FC<CTASectionProps> = ({
         tl.to(
           btnWrap,
           {
-            autoAlpha: 1,
+            opacity: 1,
             y: 0,
             filter: 'blur(0px)',
             duration: 0.75,
@@ -105,7 +107,7 @@ const CTASection: React.FC<CTASectionProps> = ({
       });
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => { revealRef.current = null; ctx.revert(); };
   }, []);
 
   return (
@@ -117,7 +119,7 @@ const CTASection: React.FC<CTASectionProps> = ({
 
       <SectionHeader title={title} subtitle={subtitle} />
 
-      <div className="btns-container">
+      <div className="btns-container" onFocusCapture={() => revealRef.current?.progress(1)}>
         <ButtonMarketing
           type="button"
           variant="primary"

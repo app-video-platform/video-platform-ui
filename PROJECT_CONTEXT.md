@@ -979,6 +979,12 @@ Avoid hardcoding viewport-specific pixel values into this document; inspect the 
 - Membership Product picker keeps its shared native checkbox compact and names it from the complete Product title. Shared CheckboxInput forwards its native checked and disabled states and retains keyboard focus.
 - Uppy dashboards use their available container width. Shared Product landing hero grids allow their title column to shrink and wrap, including in previews.
 
+## Marketing interaction and animation ownership
+
+- LegacyExpansionPanel measures its inner content after mount and observes size changes so initially expanded and dynamically changing content remain visible.
+- Homepage Product and Feature reveals keep controls keyboard reachable and complete the reveal when focus enters. GSAP relinquishes inline opacity after card-group reveals so CSS owns the active/dimmed appearance. Keep reduced-motion behavior and GSAP context cleanup when changing these sequences.
+- The Contact FAQ fragment is `#faq`; route navigation scrolls its target into view. Contact agreement remains a controlled native checkbox and does not imply submission or consent enforcement.
+
 ## Recent / Unfinished Work
 
 Recent Git history includes admin role/product ownership work, Membership frontend work, and the authenticated Creator redesign:

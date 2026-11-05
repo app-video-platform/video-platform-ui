@@ -40,7 +40,7 @@
       align-items: flex-start;
       gap: $spacing-4;
       text-align: left;
-      width: 520px; // keeps it tight like screenshot; adjust if needed
+      width: min(520px, 100%);
       position: relative;
       isolation: isolate;
 

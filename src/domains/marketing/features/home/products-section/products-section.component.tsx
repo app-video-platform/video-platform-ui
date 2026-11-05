@@ -25,6 +25,7 @@ interface ProductObject {
 const ProductsSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const cardsWrapRef = useRef<HTMLDivElement | null>(null);
+  const revealRef = useRef<gsap.core.Timeline | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const PRODUCT_OBJECTS: ProductObject[] = useMemo(
@@ -89,7 +90,7 @@ const ProductsSection: React.FC = () => {
 
       // Initial cinematic state
       gsap.set(cards, {
-        autoAlpha: 0,
+        opacity: 0,
         y: 28,
         scale: 0.98,
         filter: 'blur(10px)',
@@ -97,9 +98,10 @@ const ProductsSection: React.FC = () => {
       });
 
       const tl = gsap.timeline({ paused: true });
+      revealRef.current = tl;
 
       tl.to(cards, {
-        autoAlpha: 1,
+        opacity: 1,
         y: 0,
         scale: 1,
         filter: 'blur(0px)',
@@ -118,6 +120,7 @@ const ProductsSection: React.FC = () => {
       });
       tl.eventCallback('onComplete', () => {
         setRevealing(false);
+        gsap.set(cards, { clearProps: 'opacity,visibility' });
       });
       tl.eventCallback('onReverseComplete', () => {
         setRevealing(false);
@@ -134,7 +137,7 @@ const ProductsSection: React.FC = () => {
       });
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => { revealRef.current = null; ctx.revert(); };
   }, []);
 
   return (
@@ -153,6 +156,8 @@ const ProductsSection: React.FC = () => {
         className="max-w products-section-content"
         ref={cardsWrapRef}
         onMouseLeave={() => setActiveIndex(null)}
+        onFocusCapture={() => revealRef.current?.progress(1)}
+        onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) { setActiveIndex(null); } }}
       >
         {PRODUCT_OBJECTS.map((prod, index) => (
           <div className="product-col" key={index}>
@@ -162,6 +167,7 @@ const ProductsSection: React.FC = () => {
                 'is-active': activeIndex === index,
               })}
               onMouseEnter={() => setActiveIndex(index)}
+              onFocus={() => setActiveIndex(index)}
             >
               {/* cinematic overlays (no background card) */}
               <span className="pc-energy" aria-hidden="true" />

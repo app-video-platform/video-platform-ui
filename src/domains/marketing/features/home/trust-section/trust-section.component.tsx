@@ -87,7 +87,10 @@ const TrustSection: React.FC = () => {
       };
 
       tl.eventCallback('onStart', () => setRevealing(true));
-      tl.eventCallback('onComplete', () => setRevealing(false));
+      tl.eventCallback('onComplete', () => {
+        setRevealing(false);
+        gsap.set(cards, { clearProps: 'opacity,visibility' });
+      });
       tl.eventCallback('onReverseComplete', () => setRevealing(false));
 
       ScrollTrigger.create({
