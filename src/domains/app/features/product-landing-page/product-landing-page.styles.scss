@@ -63,9 +63,12 @@
 
 .product-landing__hero-copy {
   display: grid;
+  min-width: 0;
   gap: $spacing-4;
 
   h1 {
+    min-width: 0;
+    overflow-wrap: anywhere;
     max-width: 860px;
     margin: 0;
     font-size: clamp(3rem, 4.8rem, 5.8rem);
@@ -359,7 +362,7 @@
   }
 
   .product-landing__hero {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     min-height: auto;
     padding-top: $spacing-7;
   }

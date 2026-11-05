@@ -5,6 +5,7 @@
   flex-direction: column;
   gap: $spacing-5;
   width: 100%;
+  min-width: 0;
   max-width: 980px;
 }
 
@@ -56,6 +57,7 @@
 
 .product-media-upload {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: $spacing-3;
 }
@@ -190,6 +192,6 @@
 
   .product-media-thumbnail,
   .product-media-video {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -63,6 +63,7 @@ describe('UppyFileUploader component', () => {
 
     // Parse the props that Dashboard was given.
     const dashboardProps = JSON.parse(dashboard.textContent || '{}');
+    expect(dashboardProps.width).toBe('100%');
     expect(dashboardProps.plugins).toEqual([
       'GoogleDrive',
       'Dropbox',

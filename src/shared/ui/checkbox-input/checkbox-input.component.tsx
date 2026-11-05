@@ -18,7 +18,7 @@ const CheckboxInput: React.FC<CheckboxProps> = ({
 
   return (
     <label className={inputClass}>
-      <input type="checkbox" {...inputProps} />
+      <input type="checkbox" {...inputProps} checked={checked} disabled={disabled} />
       <span className="checkbox-box" />
       {label && <span className="checkbox-label">{label}</span>}
     </label>

@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+  min-width: 0;
 }
 
 .product-picker__search {
@@ -68,6 +69,7 @@
 .product-picker-row__content p {
   margin-top: 0.35rem;
   color: var(--text-secondary);
+  overflow-wrap: anywhere;
 }
 
 .product-picker-row__meta {
@@ -86,14 +88,6 @@
 }
 
 @media (max-width: 768px) {
-  .product-picker-row {
-    grid-template-columns: 2.75rem minmax(0, 1fr);
-  }
-
-  .product-picker-row .checkbox-input {
-    grid-column: 1 / -1;
-  }
-
   .product-picker__actions {
     flex-direction: column-reverse;
   }
