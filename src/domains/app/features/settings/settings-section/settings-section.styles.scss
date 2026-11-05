@@ -3,6 +3,7 @@
 .settings-section {
   display: flex;
   width: 100%;
+  min-width: 0;
 
   .section-header {
     width: 40%;
@@ -10,5 +11,12 @@
 
   .section-content {
     flex: 1;
+    min-width: 0;
+  }
+
+  @media (max-width: $bp-tablet) {
+    flex-direction: column;
+    gap: $spacing-3;
+    .section-header { width: 100%; }
   }
 }

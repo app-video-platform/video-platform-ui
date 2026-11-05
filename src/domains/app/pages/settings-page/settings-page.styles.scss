@@ -1,6 +1,23 @@
 @use '../../../../styles/index.scss' as *;
 
 .settings-page {
+  min-width: 0;
+  max-width: 100%;
+
+  .tabs, .tab-content, .settings-tab-content { min-width: 0; }
+  .tabs-header { overflow-x: auto; }
+  .tabs-header .tab-button { flex: 0 0 auto; }
+
+  @media (max-width: $bp-tablet) {
+    .settings-tab-content {
+      .settings-input-row { display: flex; flex-wrap: wrap; }
+      .connect-calendar-row { flex-wrap: wrap; gap: $spacing-3; }
+      .connect-calendar-row .calendar-selector { width: 100%; min-width: 0; }
+    }
+    .page-header { flex-wrap: wrap; gap: $spacing-3; }
+    .page-header .header-actions { width: 100%; }
+    .page-header .header-actions .vp-btn { flex: 1; width: auto; min-width: 0; }
+  }
   // max-width: 900px;
 
   // .banner-wrapper {

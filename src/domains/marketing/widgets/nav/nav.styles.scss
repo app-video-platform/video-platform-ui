@@ -17,11 +17,9 @@
     align-items: center;
     justify-content: space-between;
 
-    .logo-container {
-      width: 150px;
-      background-color: aquamarine;
-      height: 50px;
-    }
+    .marketing-brand { font-weight: 800; color: var(--text-primary); }
+    .marketing-menu-toggle { display: none; }
+    .marketing-menu { display: flex; align-items: center; gap: 30px; }
 
     .nav-link-list {
       display: flex;
@@ -31,6 +29,35 @@
 
       .dashboard-link {
         font-size: 14px;
+      }
+    }
+  }
+
+  @media (max-width: 900px) {
+    .navbar-content {
+      position: relative;
+      .marketing-menu-toggle { display: block; min-height: 44px; padding: 0 16px; color: var(--text-primary); background: var(--surface-panel-elevated); }
+      .marketing-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        padding: 16px 20px;
+        background: var(--surface-panel-elevated);
+        box-shadow: var(--shadow-e2);
+        max-height: calc(100dvh - 80px);
+        overflow-y: auto;
+        &.is-open { display: flex; align-items: stretch; flex-direction: column; gap: 16px; }
+        .nav-link-list { flex-wrap: wrap; gap: 12px 20px; }
+        .user-buttons .nav-link-list { align-items: center; }
+        .user-buttons .inline { display: grid; gap: 8px; }
+        .user-dropdown .dropdown-root { display: block; }
+        .user-dropdown .account-dropdown-panel {
+          position: static;
+          width: 100%;
+          margin-top: 8px;
+        }
       }
     }
   }
