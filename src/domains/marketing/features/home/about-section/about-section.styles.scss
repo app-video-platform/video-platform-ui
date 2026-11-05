@@ -2,7 +2,7 @@
 
 .about-sec-content {
   text-align: center;
-  width: 550px;
+  width: min(550px, 100%);
   margin: $spacing-5 auto 0;
 
   // your spacing rules (kept)

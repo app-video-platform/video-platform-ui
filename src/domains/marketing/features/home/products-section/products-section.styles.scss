@@ -210,6 +210,17 @@
   }
 }
 
+@media (max-width: 1000px) {
+  .products-section-content {
+    flex-direction: column;
+    align-items: center;
+
+    .product-col { width: 100%; justify-content: center; }
+    .product-card { width: min(300px, 100%); }
+    .product-col > .vp-divider-marketing__vertical { display: none; }
+  }
+}
+
 @keyframes pcSheenSweep {
   0% {
     transform: translateX(-120%) skewX(-12deg);

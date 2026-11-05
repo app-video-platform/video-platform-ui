@@ -13,3 +13,19 @@ it('keeps the agreement checkbox in sync when toggled on and off', async () => {
   await user.click(checkbox);
   expect(checkbox).not.toBeChecked();
 });
+
+it('supports Tab and Space while keeping the visual state synchronized', async () => {
+  const user = userEvent.setup();
+  render(<ContactForm />);
+  const message = screen.getByRole('textbox', { name: 'Message' });
+  const checkbox = screen.getByRole('checkbox', { name: 'I agree to the terms and conditions' });
+  message.focus();
+  await user.tab();
+  expect(checkbox).toHaveFocus();
+  await user.keyboard(' ');
+  expect(checkbox).toBeChecked();
+  expect(checkbox.closest('label')).toHaveClass('checked');
+  await user.keyboard(' ');
+  expect(checkbox).not.toBeChecked();
+  expect(checkbox.closest('label')).not.toHaveClass('checked');
+});
