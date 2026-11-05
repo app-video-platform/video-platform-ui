@@ -1,6 +1,9 @@
 @use '../../../styles/index.scss' as *;
 
+.custom-uppy-dashboard { min-width: 0; width: 100%; }
+
 .custom-uppy-dashboard .uppy-Dashboard-inner {
+  max-width: 100%;
   background-color: var(--surface-0); // page background
   border-radius: $radius-lg;
   padding: $spacing-5;

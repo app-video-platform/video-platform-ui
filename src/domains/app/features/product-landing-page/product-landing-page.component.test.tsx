@@ -56,6 +56,12 @@ const product: ProductLandingPageViewModel = {
 };
 
 describe('<ProductLandingPage /> media', () => {
+  it('retains the full long product title and price', () => {
+    const title = 'UnbrokenProductTitle'.repeat(12);
+    render(<ProductLandingPage product={{ ...product, name: title }} />);
+    expect(screen.getByRole('heading', { name: title })).toBeInTheDocument();
+    expect(screen.getAllByText('Free').length).toBeGreaterThan(0);
+  });
   it('renders canonical Product thumbnail, gallery, and ready promo video', () => {
     render(<ProductLandingPage product={product} />);
 

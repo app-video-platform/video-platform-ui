@@ -973,6 +973,12 @@ Avoid hardcoding viewport-specific pixel values into this document; inspect the 
 - Marketing and marketplace headers each use their existing navigation content in a compact, non-modal menu at narrower widths. Menu state closes on route changes and Escape restores focus to its trigger. Marketplace keeps the existing SmartSearch visible in a separate row when compact; its form must shrink within its container so it cannot overlap Explore.
 - Settings keeps all tabs in a contained horizontal tab strip on narrow screens and stacks sections and action rows. Do not hide document overflow to compensate for oversized fields or controls.
 
+## Long content and media layout
+
+- Customer detail identity and Sales ledger text can wrap long unbroken values inside shrinkable grid/flex children; preserve complete identities, product titles and accessible names.
+- Membership Product picker keeps its shared native checkbox compact and names it from the complete Product title. Shared CheckboxInput forwards its native checked and disabled states and retains keyboard focus.
+- Uppy dashboards use their available container width. Shared Product landing hero grids allow their title column to shrink and wrap, including in previews.
+
 ## Recent / Unfinished Work
 
 Recent Git history includes admin role/product ownership work, Membership frontend work, and the authenticated Creator redesign:

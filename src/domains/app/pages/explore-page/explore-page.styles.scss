@@ -23,12 +23,17 @@
       width: 100%;
       display: inline-flex;
       gap: 30px;
+      flex-wrap: wrap;
 
       button {
         min-width: unset;
       }
     }
   }
+}
+
+@media (max-width: 480px) {
+  .explore-page .explore-page-content { padding: 16px 0; }
 }
 
 .explore-page .creator-route-btn {

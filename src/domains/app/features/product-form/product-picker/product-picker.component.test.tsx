@@ -1,6 +1,7 @@
 import React from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 import { ProductMinimised, ProductType } from 'core/api/models';
 import ProductPicker from './product-picker.component';
@@ -96,6 +97,18 @@ describe('<ProductPicker />', () => {
     fireEvent.click(screen.getByLabelText('Select Course One'));
     fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
 
+    expect(onConfirm).toHaveBeenCalledWith(['course-1']);
+  });
+
+  it('allows keyboard selection with the full long title as its accessible name', async () => {
+    const title = 'Long'.repeat(40);
+    const { onConfirm } = renderPicker({ products: [{ ...products[0], title }] });
+    const checkbox = screen.getByRole('checkbox', { name: `Select ${title}` });
+    checkbox.focus();
+    await userEvent.keyboard(' ');
+    expect(checkbox).toBeChecked();
+    expect(screen.getByText(title)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Add selected' }));
     expect(onConfirm).toHaveBeenCalledWith(['course-1']);
   });
 

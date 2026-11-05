@@ -142,7 +142,7 @@ const ProductPicker: React.FC<ProductPickerProps> = ({
               <CheckboxInput
                 id={`product-picker-${productId}`}
                 checked={isSelected}
-                label={`Select ${getProductTitle(product)}`}
+                aria-label={`Select ${getProductTitle(product)}`}
                 onChange={() => toggleSelection(productId)}
               />
             </div>

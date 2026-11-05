@@ -157,6 +157,7 @@ const UppyFileUploader: React.FC<UppyFileUploaderProps> = ({
       {uppy ? (
         <Dashboard
           uppy={uppy}
+          width="100%"
           plugins={
             disableImporters
               ? []

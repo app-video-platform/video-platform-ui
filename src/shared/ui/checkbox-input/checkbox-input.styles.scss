@@ -22,7 +22,15 @@
   }
 
   input[type='checkbox'] {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  input[type='checkbox']:focus-visible + .checkbox-box {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 3px;
   }
 
   // Custom radio circle
